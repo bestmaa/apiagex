@@ -22,6 +22,7 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - React Admin UI includes owner login/logout controls backed by bootstrap/login APIs.
 - `/doc` and `/readme` document owner bootstrap and login routes.
 - Owner bootstrap/login checkpoint v0.2.4 is ready.
+- Schema repository can create schemas, ordered fields, and relation fields that target existing schemas.
 
 ## Required MVP Paths
 
@@ -97,7 +98,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T014`: add schema and field repositories with relation-aware field model.
+The next pending task is `T015`: add schema admin APIs for create/list/read/update/delete.
 
 ## Coding Rules
 

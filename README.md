@@ -22,6 +22,7 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Admin UI screens are built in React and served by the same API server.
 - Owner docs are available on `/doc` and `/readme`.
 - Owner bootstrap checkpoint is ready at version `v0.2.4`.
+- Schema repository supports ordered fields and safe relation targets.
 
 ## MVP Direction
 

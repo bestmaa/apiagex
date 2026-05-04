@@ -63,6 +63,12 @@ English: v0.2.4 verifies owner bootstrap API, login API, React Admin UI login/lo
 
 Hinglish: v0.2.4 owner bootstrap API, login API, React Admin UI login/logout, aur docs verify karta hai.
 
+## Schema Repository
+
+English: Schemas have name, slug, description, and ordered fields. Relation fields must target an existing schema before save.
+
+Hinglish: Schema me name, slug, description, aur ordered fields hote hain. Relation field save hone se pehle existing schema ko target karega.
+
 ## MVP Contract
 
 ### English
