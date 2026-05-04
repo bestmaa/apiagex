@@ -25,6 +25,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Schema repository supports ordered fields and safe relation targets.
 - Schema admin APIs are available at `/api/admin/schemas` for create, list, read, update, and delete.
 - Schema admin APIs `/api/admin/schemas` par create, list, read, update, aur delete ke liye available hain.
+- React Admin UI now includes a schema builder form with all MVP field types.
+- React Admin UI me ab sab MVP field types ke saath schema builder form hai.
 
 ## MVP Direction
 

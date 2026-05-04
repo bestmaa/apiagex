@@ -92,6 +92,8 @@ function renderDocPage(): string {
       "v0.2.4 verifies owner bootstrap API, login API, React Admin UI login/logout, and docs.",
       "Schemas: /api/admin/schemas supports create, list, read, update, and delete with field validation.",
       "Schemas: /api/admin/schemas field validation ke saath create, list, read, update, aur delete support karta hai.",
+      "Admin UI: owner login reveals a React schema builder form for all MVP field types.",
+      "Admin UI: owner login ke baad React schema builder form sab MVP field types ke liye dikhata hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -107,6 +109,8 @@ function renderReadmePage(): string {
       "Owner login starts in /adminui and uses the bootstrap/login APIs.",
       "Schema APIs are now available at /api/admin/schemas for owner/admin workflows.",
       "Schema APIs ab owner/admin workflow ke liye /api/admin/schemas par available hain.",
+      "The React Admin UI can create schemas from a form after owner login.",
+      "React Admin UI owner login ke baad form se schema create kar sakta hai.",
     ].join(" "),
   );
 }

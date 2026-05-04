@@ -1,6 +1,6 @@
 {
   "name": "@apiagex/core",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Core contracts for Apiagex CMS.",
   "type": "module",
   "license": "MIT"

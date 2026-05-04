@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { authenticateOwner } from "./api";
+import { SchemaBuilder } from "./SchemaBuilder";
 import type { OwnerSession } from "./session.type";
 import "./styles.css";
 
@@ -63,6 +64,7 @@ export function App() {
           {!session ? <OwnerLoginForm onSubmit={submitLogin} /> : <button onClick={logout}>Logout</button>}
           <p id="owner-session-status">{status}</p>
         </section>
+        {session ? <SchemaBuilder /> : <p>Login as owner to create schemas.</p>}
       </main>
     </>
   );

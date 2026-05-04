@@ -44,6 +44,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `POST /api/admin/schemas` validated fields ke saath schema banata hai.
 - `GET /api/admin/schemas` lists schemas, and `/api/admin/schemas/:id` supports read, update, and delete.
 - `GET /api/admin/schemas` schemas list karta hai, aur `/api/admin/schemas/:id` read, update, delete support karta hai.
+- `/adminui` has a React schema builder form for text, long text, number, boolean, date, JSON, media, and relation fields.
+- `/adminui` me text, long text, number, boolean, date, JSON, media, aur relation fields ke liye React schema builder form hai.
 
 ## Owner Bootstrap And Login
 
@@ -86,6 +88,16 @@ Use `GET /api/admin/schemas` to list, `GET /api/admin/schemas/:id` to read, `PUT
 `POST /api/admin/schemas` me `name`, `slug`, optional `description`, aur `fields` bhejo.
 Field types `text`, `longText`, `number`, `boolean`, `date`, `json`, `media`, aur `relation` hain.
 List ke liye `GET /api/admin/schemas`, read ke liye `GET /api/admin/schemas/:id`, update ke liye `PUT /api/admin/schemas/:id`, aur delete ke liye `DELETE /api/admin/schemas/:id` use karo.
+
+## Admin UI Schema Builder
+
+### English
+
+After owner login, `/adminui` shows a schema builder. Add schema name, slug, description, and one or more fields. The form can choose every MVP field type. Relation target picking is handled by the next task.
+
+### Hinglish
+
+Owner login ke baad `/adminui` schema builder dikhata hai. Schema name, slug, description, aur ek ya jyada fields add karo. Form har MVP field type choose kar sakta hai. Relation target picker next task me handle hoga.
 
 ## MVP Contract
 

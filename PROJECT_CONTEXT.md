@@ -25,6 +25,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Schema repository can create schemas, ordered fields, and relation fields that target existing schemas.
 - Schema admin APIs can create, list, read, update, and delete schemas at `/api/admin/schemas`.
 - Schema admin APIs `/api/admin/schemas` par schema create, list, read, update, aur delete kar sakte hain.
+- React Admin UI includes a schema builder form after owner login.
+- React Admin UI owner login ke baad schema builder form dikhata hai.
 
 ## Required MVP Paths
 
@@ -100,7 +102,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T016`: add the React Admin UI schema builder form.
+The next pending task is `T017`: add relation picker/validation in the schema builder.
 
 ## Coding Rules
 

@@ -37,3 +37,36 @@ label {
   display: grid;
   gap: 4px;
 }
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  width: fit-content;
+}
+
+fieldset {
+  border: 1px solid #d7dce5;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 12px;
+}
+
+.field-list {
+  display: grid;
+  gap: 12px;
+}
+
+.schema-row {
+  align-items: center;
+  border-bottom: 1px solid #d7dce5;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr auto auto;
+  padding: 10px 0;
+}
