@@ -20,6 +20,7 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `POST /api/auth/login` logs in the owner after bootstrap.
 - `/adminui` is now a React Admin UI served by Fastify.
 - React Admin UI includes owner login/logout controls backed by bootstrap/login APIs.
+- `/doc` and `/readme` document owner bootstrap and login routes.
 
 ## Required MVP Paths
 
@@ -95,7 +96,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T012`: document owner bootstrap and login in `/doc` and `/readme`.
+The next pending task is `T013`: release owner bootstrap checkpoint.
 
 ## Coding Rules
 

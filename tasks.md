@@ -79,7 +79,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 - T009 | Version: v0.2.0 | Status: completed | Goal: Add SQLite foundation, migrations, and tables for users, roles, schemas, fields, entries, permissions. | Verify: migration tests. | Commit: `Add MVP database foundation`
 - T010 | Version: v0.2.1 | Status: completed | Goal: Add first-time owner bootstrap so first login creates or activates owner. | Verify: owner bootstrap API test and manual request. | Commit: `Add owner bootstrap`
 - T011 | Version: v0.2.2 | Status: completed | Goal: Add Admin UI login/logout for owner. | Verify: Browser Use owner login flow. | Commit: `Add owner login UI`
-- T012 | Version: v0.2.3 | Status: pending | Goal: Document owner bootstrap and login in `/doc` and `/readme`. | Verify: Browser Use docs check. | Commit: `Document owner login`
+- T012 | Version: v0.2.3 | Status: completed | Goal: Document owner bootstrap and login in `/doc` and `/readme`. | Verify: Browser Use docs check. | Commit: `Document owner login`
 - T013 | Version: v0.2.4 | Status: pending | Goal: Release owner login checkpoint. | Verify: standard verification plus Browser Use login. | Commit: `Release owner bootstrap`
 
 ### Phase 3: Schema Builder And Relations

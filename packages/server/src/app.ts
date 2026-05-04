@@ -85,6 +85,8 @@ function renderDocPage(): string {
     [
       "English: Completed MVP base paths are /api, /api/health, /doc, /readme, and /adminui.",
       "Hinglish: Completed MVP base paths /api, /api/health, /doc, /readme, aur /adminui hain.",
+      "Owner auth: POST /api/auth/bootstrap-owner creates the first owner, then POST /api/auth/login logs in.",
+      "Owner auth: POST /api/auth/bootstrap-owner pehla owner banata hai, phir POST /api/auth/login login karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -96,7 +98,8 @@ function renderReadmePage(): string {
     [
       "English: Apiagex is a fresh MVP headless CMS/API platform on one server.",
       "Hinglish: Apiagex ek fresh MVP headless CMS/API platform hai jo ek server par chalega.",
-      "Use /adminui for UI and /api for backend routes.",
+      "Use /adminui for React UI and /api for backend routes.",
+      "Owner login starts in /adminui and uses the bootstrap/login APIs.",
     ].join(" "),
   );
 }

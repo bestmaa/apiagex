@@ -20,6 +20,7 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - First owner bootstrap API is `POST /api/auth/bootstrap-owner`.
 - Admin UI owner login/logout is available at `/adminui`.
 - Admin UI screens are built in React and served by the same API server.
+- Owner docs are available on `/doc` and `/readme`.
 
 ## MVP Direction
 

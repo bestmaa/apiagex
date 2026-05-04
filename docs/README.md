@@ -41,6 +41,22 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Admin UI is built in React and served from the same Fastify server.
 - Admin UI React me bana hai aur same Fastify server se serve hota hai.
 
+## Owner Bootstrap And Login
+
+### English
+
+Use `POST /api/auth/bootstrap-owner` once to create the first owner.
+Send JSON: `{ "email": "owner@apiagex.local", "password": "OwnerPass123!" }`.
+After the owner exists, use `POST /api/auth/login` with the same shape.
+The React Admin UI at `/adminui` first tries bootstrap, then falls back to login when the owner already exists.
+
+### Hinglish
+
+Pehla owner banane ke liye `POST /api/auth/bootstrap-owner` ek baar use karo.
+JSON bhejo: `{ "email": "owner@apiagex.local", "password": "OwnerPass123!" }`.
+Owner banne ke baad same shape ke saath `POST /api/auth/login` use karo.
+`/adminui` ka React UI pehle bootstrap try karta hai, aur owner already hone par login karta hai.
+
 ## MVP Contract
 
 ### English
