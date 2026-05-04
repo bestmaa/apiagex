@@ -147,6 +147,10 @@ function renderDocPage(): string {
       "Admin UI: Users screen role assignment ke saath users create aur list karta hai.",
       "RBAC flow: /api/auth/login-user returns a role id for permission-checked dynamic APIs.",
       "RBAC flow: /api/auth/login-user permission-checked dynamic APIs ke liye role id return karta hai.",
+      "Docs: RBAC allow/block examples are available in English and Hinglish.",
+      "Docs: RBAC allow/block examples English aur Hinglish me available hain.",
+      "RBAC blocked dynamic API requests return API_PERMISSION_DENIED.",
+      "RBAC blocked dynamic API requests API_PERMISSION_DENIED return karte hain.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -198,6 +202,10 @@ function renderReadmePage(): string {
       "User management UI RBAC end-to-end flow ke liye ready hai.",
       "RBAC end-to-end verifies allowed and blocked user API access.",
       "RBAC end-to-end allowed aur blocked user API access verify karta hai.",
+      "Read /doc and /readme for RBAC allow/block examples.",
+      "RBAC allow/block examples ke liye /doc aur /readme padho.",
+      "Blocked RBAC requests return API_PERMISSION_DENIED.",
+      "Blocked RBAC requests API_PERMISSION_DENIED return karte hain.",
     ].join(" "),
   );
 }

@@ -84,6 +84,12 @@ English: After creating a schema, use `/api/content/:schemaSlug` for list/create
 
 Hinglish: Schema banane ke baad list/create ke liye `/api/content/:schemaSlug` use karo aur read/update/delete ke liye `/api/content/:schemaSlug/:entryId` use karo. Entry payload `{ "data": { ... } }` shape me bhejo.
 
+## RBAC Quick Use
+
+English: Create a role, assign schema action permissions, create a user with that role, login with `/api/auth/login-user`, then call dynamic APIs with `x-apiagex-role-id`. Allowed roles work; blocked roles receive `API_PERMISSION_DENIED`.
+
+Hinglish: Role banao, schema action permissions assign karo, us role ke saath user banao, `/api/auth/login-user` se login karo, phir dynamic APIs ko `x-apiagex-role-id` ke saath call karo. Allowed roles work karte hain; blocked roles ko `API_PERMISSION_DENIED` milta hai.
+
 ## Workspace
 
 ```txt

@@ -274,6 +274,40 @@ The verified RBAC flow creates a schema API, creates roles, assigns read permiss
 
 Verified RBAC flow schema API banata hai, roles create karta hai, read permission assign karta hai, users create karta hai, `POST /api/auth/login-user` se users login karta hai, phir check karta hai ki allowed role read kar sakta hai aur blocked role ko `API_PERMISSION_DENIED` milta hai.
 
+## RBAC Allow/Block Examples
+
+### English
+
+Create a role, then save permissions for a schema API:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/admin/roles \
+  -H "content-type: application/json" \
+  -d '{"name":"reader"}'
+curl -X PUT http://127.0.0.1:4000/api/admin/roles/ROLE_ID/permissions \
+  -H "content-type: application/json" \
+  -d '{"permissions":[{"schemaId":"SCHEMA_ID","action":"read","allowed":true}]}'
+```
+
+Create a user in that role, login, then pass the returned `roleId` as `x-apiagex-role-id` when calling dynamic APIs. If permission is missing, the API returns `403 API_PERMISSION_DENIED`.
+
+### Hinglish
+
+Pehle role banao, phir schema API ke liye permissions save karo:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/admin/users \
+  -H "content-type: application/json" \
+  -d '{"email":"reader@apiagex.local","password":"UserPass123!","roleId":"ROLE_ID"}'
+curl -X POST http://127.0.0.1:4000/api/auth/login-user \
+  -H "content-type: application/json" \
+  -d '{"email":"reader@apiagex.local","password":"UserPass123!"}'
+curl http://127.0.0.1:4000/api/content/article \
+  -H "x-apiagex-role-id: ROLE_ID"
+```
+
+Jis role ko permission mili hai uska request pass hota hai. Jis role ko permission nahi mili usko `403 API_PERMISSION_DENIED` milta hai.
+
 ## MVP Contract
 
 ### English

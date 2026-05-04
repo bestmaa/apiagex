@@ -61,6 +61,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Admin UI Users screen role assignment ke saath users create aur list karta hai.
 - RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.
 - RBAC end-to-end flow user login aur allowed/blocked dynamic API access verify karta hai.
+- `/doc` and `/readme` document RBAC allow/block examples.
+- `/doc` aur `/readme` RBAC allow/block examples document karte hain.
 
 ## Required MVP Paths
 
@@ -136,7 +138,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T034`: document roles, permissions, users, and allow/block examples.
+The next pending task is `T035`: release MVP RBAC checkpoint.
 
 ## Coding Rules
 
