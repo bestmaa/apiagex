@@ -103,7 +103,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 
 ### Phase 5: Roles, Permissions, And Users
 
-- T027 | Version: v0.5.0 | Status: pending | Goal: Add role repository and APIs to create unlimited roles. | Verify: role API tests and manual request. | Commit: `Add role APIs`
+- T027 | Version: v0.5.0 | Status: completed | Goal: Add role repository and APIs to create unlimited roles. | Verify: role API tests and manual request. | Commit: `Add role APIs`
 - T028 | Version: v0.5.1 | Status: pending | Goal: Add permission model for each dynamic API action: read, create, update, delete, manage. | Verify: permission evaluator tests. | Commit: `Add API permission model`
 - T029 | Version: v0.5.2 | Status: pending | Goal: Add Admin UI role screen with dynamic API checklist and action checkboxes. | Verify: Browser Use role permission UI. | Commit: `Add role permission UI`
 - T030 | Version: v0.5.3 | Status: pending | Goal: Enforce permissions on dynamic APIs with allow/block behavior. | Verify: allowed role succeeds, blocked role fails. | Commit: `Enforce dynamic API permissions`

@@ -16,6 +16,11 @@ export {
   updateEntry,
 } from "./entry-repository.js";
 export {
+  createRole,
+  getRoleById,
+  listRoles,
+} from "./role-repository.js";
+export {
   createSchema,
   deleteSchema,
   getSchemaById,
@@ -30,6 +35,7 @@ export type {
   EntryRecord,
   UpdateEntryInput,
 } from "./entry-repository.type.js";
+export type { CreateRoleInput, RoleRecord } from "./role-repository.type.js";
 export type {
   CreateFieldInput,
   CreateSchemaInput,

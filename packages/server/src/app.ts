@@ -12,6 +12,7 @@ import { readAdminIndex, resolveAdminUiAsset } from "./admin-ui.js";
 import { registerContentRoutes } from "./content-routes.js";
 import { registerSchemaRoutes } from "./schema-routes.js";
 import { registerEntryRoutes } from "./entry-routes.js";
+import { registerRoleRoutes } from "./role-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -24,6 +25,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   registerSchemaRoutes(server, database);
   registerEntryRoutes(server, database);
   registerContentRoutes(server, database);
+  registerRoleRoutes(server, database);
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,
@@ -116,6 +118,8 @@ function renderDocPage(): string {
       "Docs: dynamic API examples show list, create, update, and delete calls.",
       "Docs: dynamic API examples list, create, update, aur delete calls dikhate hain.",
       "v0.4.6 verifies schema, entry, dynamic APIs, Admin UI API list, docs, tests, and audit.",
+      "Roles: /api/admin/roles creates, lists, and reads unlimited non-owner roles.",
+      "Roles: /api/admin/roles unlimited non-owner roles create, list, aur read karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -153,6 +157,8 @@ function renderReadmePage(): string {
       "Dynamic API examples ke liye /doc aur /readme padho.",
       "Dynamic API checkpoint v0.4.6 is ready.",
       "Dynamic API checkpoint v0.4.6 ready hai.",
+      "Role admin APIs are ready for permission assignment.",
+      "Role admin APIs permission assignment ke liye ready hain.",
     ].join(" "),
   );
 }

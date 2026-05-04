@@ -47,6 +47,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `/doc` aur `/readme` dynamic API usage examples include karte hain.
 - Dynamic API checkpoint v0.4.6 is ready.
 - Dynamic API checkpoint v0.4.6 ready hai.
+- Role repository and `/api/admin/roles` APIs can create, list, and read non-owner roles.
+- Role repository aur `/api/admin/roles` APIs non-owner roles create, list, aur read kar sakte hain.
 
 ## Required MVP Paths
 
@@ -122,7 +124,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T027`: add role repository and APIs.
+The next pending task is `T028`: add API permission model.
 
 ## Coding Rules
 

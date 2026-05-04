@@ -204,6 +204,16 @@ English: v0.4.6 verifies schema creation, entry creation, generated dynamic API 
 
 Hinglish: v0.4.6 schema creation, entry creation, generated dynamic API CRUD, Admin UI entry forms, generated API list, docs, tests, audit, aur Browser Use checks verify karta hai.
 
+## Role Admin APIs
+
+### English
+
+Use `POST /api/admin/roles` with `{ "name": "editor", "description": "..." }` to create roles. Use `GET /api/admin/roles` to list roles and `GET /api/admin/roles/:roleId` to read one role. The `owner` role name is reserved.
+
+### Hinglish
+
+Roles create karne ke liye `POST /api/admin/roles` par `{ "name": "editor", "description": "..." }` bhejo. Roles list ke liye `GET /api/admin/roles` aur one role read ke liye `GET /api/admin/roles/:roleId` use karo. `owner` role name reserved hai.
+
 ## MVP Contract
 
 ### English

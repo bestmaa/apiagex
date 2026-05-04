@@ -43,6 +43,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Admin UI har schema ke generated dynamic APIs list karta hai.
 - Dynamic API checkpoint is ready at version `v0.4.6`.
 - Dynamic API checkpoint version `v0.4.6` par ready hai.
+- Role admin APIs are available at `/api/admin/roles`.
+- Role admin APIs `/api/admin/roles` par available hain.
 
 ## MVP Direction
 
