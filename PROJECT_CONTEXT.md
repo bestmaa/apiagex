@@ -138,6 +138,7 @@ packages/admin            Future admin UI package
 - `packages/server` now includes a pure permission evaluator with owner bypass and default-deny exact scope/action checks.
 - The permission evaluator now applies explicit deny precedence before any fallback allow.
 - Existing content role catalog checks now run through the evaluator while preserving current list/read compatibility.
+- Fastify routes can now attach and read RBAC scope/action metadata for later guard migration.
 - `packages/server` now serves the Admin UI at `/adminui/`, README at `/readme`, and admin UI API aliases under `/api/...` from the same server.
 - `packages/server` now exposes a duplicate content-type route at `/admin/content-types/:id/duplicate`, and the admin content-type cards expose a Duplicate action.
 - Static documentation page with top English/Hindi toggle.
