@@ -18,6 +18,11 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Role allow/block guide
 - Manual QA checklist
 
+## Implemented Now
+
+- `GET /api/health` returns the minimal server health payload.
+- `GET /api/health` minimal server health payload deta hai.
+
 ## MVP Contract
 
 ### English

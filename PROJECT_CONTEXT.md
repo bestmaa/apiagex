@@ -11,6 +11,7 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Package/workspace setup is preserved.
 - Old implementation code was removed.
 - New code must follow `tasks.md` only.
+- Minimal API server shell exists with `GET /api/health`.
 
 ## Required MVP Paths
 
@@ -41,7 +42,7 @@ One server must serve exactly these primary paths:
 ### Routes
 
 - `/api` is the only backend API prefix.
-- `/api/health` proves the server is alive.
+- `/api/health` proves the server is alive and returns `{ ok, service, path }`.
 - `/doc` explains every completed feature with API examples.
 - `/readme` gives a concise product/workspace summary.
 - `/adminui` is the browser UI for owner/admin/user workflows.
