@@ -35,10 +35,10 @@ describe("api health route", () => {
   });
 
   it.each([
-    ["/doc", "Apiagex Docs"],
-    ["/readme", "Apiagex Readme"],
+    ["/doc", "Apiagex Docs", "Completed MVP base paths"],
+    ["/readme", "Apiagex Readme", "fresh MVP headless CMS/API platform"],
     ["/adminui", "Apiagex Admin UI"],
-  ])("serves %s from the same server", async (url, heading) => {
+  ])("serves %s from the same server", async (url, heading, detail) => {
     const server = createServer();
 
     const response = await server.inject({ method: "GET", url });
@@ -46,5 +46,8 @@ describe("api health route", () => {
     expect(response.statusCode).toBe(200);
     expect(response.headers["content-type"]).toContain("text/html");
     expect(response.body).toContain(`<h1>${heading}</h1>`);
+    if (detail) {
+      expect(response.body).toContain(detail);
+    }
   });
 });

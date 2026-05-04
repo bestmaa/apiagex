@@ -24,6 +24,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `GET /api/health` minimal server health payload deta hai.
 - `/api`, `/doc`, `/readme`, and `/adminui` are served from the same server.
 - `/api`, `/doc`, `/readme`, aur `/adminui` ek hi server se serve hote hain.
+- `/doc` and `/readme` render current MVP status in English and Hinglish.
+- `/doc` aur `/readme` current MVP status English aur Hinglish me dikhate hain.
 
 ## MVP Contract
 

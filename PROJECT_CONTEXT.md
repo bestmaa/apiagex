@@ -12,6 +12,7 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Old implementation code was removed.
 - New code must follow `tasks.md` only.
 - Minimal API server shell exists with `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
+- `/doc` and `/readme` now show English+Hinglish completed-feature summaries.
 
 ## Required MVP Paths
 
@@ -46,7 +47,7 @@ One server must serve exactly these primary paths:
 - `/doc` explains every completed feature with API examples.
 - `/readme` gives a concise product/workspace summary.
 - `/adminui` is the browser UI for owner/admin/user workflows.
-- The current `/doc`, `/readme`, and `/adminui` pages are simple route-ready placeholders.
+- The current `/adminui` page is a simple route-ready placeholder.
 
 ### Owner And Auth
 

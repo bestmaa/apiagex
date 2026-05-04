@@ -13,6 +13,7 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Package implementation folders are intentionally empty until the new MVP flow is confirmed.
 - Read [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) and [tasks.md](./tasks.md) before coding.
 - Minimal routes now exist for `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
+- `/doc` and `/readme` now explain the current MVP status in English and Hinglish.
 
 ## MVP Direction
 
