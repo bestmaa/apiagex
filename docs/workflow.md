@@ -41,6 +41,14 @@ Local data rules:
 - Use development credentials only for local verification.
 - Never commit real secrets.
 
+Single-server routes:
+
+- Start only the API server with `npm run dev`.
+- Admin UI is served by the API server at `/adminui/`.
+- API docs are served at `/docs/`.
+- README is served at `/readme`.
+- Admin UI calls stay under `/api/...` from the browser and are handled by the API server.
+
 ## Hinglish
 
 Apiagex ka kaam `tasks.md` ke through chalega.
@@ -81,3 +89,11 @@ Local data rules:
 - Local owner credentials `owner@apiagex.local` aur `OwnerPass123!` hain.
 - Development credentials sirf local verification ke liye hain.
 - Real secrets kabhi commit nahi karne.
+
+Single-server routes:
+
+- Sirf API server `npm run dev` se start karo.
+- Admin UI API server se `/adminui/` par milega.
+- API docs `/docs/` par milenge.
+- README `/readme` par milega.
+- Browser se Admin UI ke calls `/api/...` par rahenge aur API server handle karega.

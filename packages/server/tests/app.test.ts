@@ -28,7 +28,9 @@ describe('buildServer', () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({
+      adminUi: '/adminui/',
       docs: '/docs',
+      readme: '/readme',
       requestId: 'request-health-1',
       service: 'apiagex',
       status: 'ok',
@@ -67,6 +69,26 @@ describe('buildServer', () => {
     expect(response.body).toContain('Apiagex Docs');
   });
 
+  it('serves admin UI and README from the API server', async () => {
+    const app = await buildServer({ logger: false });
+    const adminRedirect = await app.inject({ method: 'GET', url: '/adminui' });
+    const adminIndex = await app.inject({ method: 'GET', url: '/adminui/' });
+    const adminScript = await app.inject({ method: 'GET', url: '/adminui/app.js' });
+    const readme = await app.inject({ method: 'GET', url: '/readme' });
+
+    await app.close();
+
+    expect(adminRedirect.statusCode).toBe(302);
+    expect(adminRedirect.headers.location).toBe('/adminui/');
+    expect(adminIndex.statusCode).toBe(200);
+    expect(adminIndex.body).toContain('Apiagex Admin');
+    expect(adminIndex.body).toContain('./app.js');
+    expect(adminScript.statusCode).toBe(200);
+    expect(adminScript.headers['content-type']).toContain('javascript');
+    expect(readme.statusCode).toBe(200);
+    expect(readme.headers['content-type']).toContain('text/markdown');
+  });
+
   it('requires authentication for admin routes', async () => {
     const app = await buildServer({ logger: false });
     const unauthorized = await app.inject({ method: 'GET', url: '/admin/content-types' });
@@ -81,6 +103,23 @@ describe('buildServer', () => {
 
     expect(unauthorized.statusCode).toBe(401);
     expect(authorized.statusCode).toBe(200);
+  });
+
+  it('aliases admin UI API calls under /api', async () => {
+    const app = await buildServer({ logger: false });
+    const unauthorized = await app.inject({ method: 'GET', url: '/api/content-types' });
+    const token = await loginAdmin(app);
+    const authorized = await app.inject({
+      headers: bearerHeaders(token),
+      method: 'GET',
+      url: '/api/content-types',
+    });
+
+    await app.close();
+
+    expect(unauthorized.statusCode).toBe(401);
+    expect(authorized.statusCode).toBe(200);
+    expect(authorized.json()).toMatchObject({ status: 'ok' });
   });
 
   it('allows editors to read admin lists but blocks content type writes', async () => {

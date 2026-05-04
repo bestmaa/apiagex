@@ -5,6 +5,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createAdminAuthService } from './auth.js';
+import { registerAdminApiAliases } from './admin-api-aliases.routes.js';
+import { registerAdminUiRoutes } from './admin-ui.routes.js';
 import { createSqliteAuditLogsRepository } from './audit-logs.repository.js';
 import { createPublicResponseCache } from './content-public.cache.js';
 import { createSqliteContentEntriesRepository } from './content-entries.repository.js';
@@ -35,7 +37,9 @@ export async function buildServer(
   options: BuildServerOptions = {},
 ): Promise<ApiagexServer> {
   const app = fastify({ logger: options.logger ?? true, requestIdHeader: 'x-request-id' });
+  const adminUiRoot = options.adminUiRoot ?? resolve(workspaceRoot, 'packages', 'admin', 'src', 'public');
   const docsRoot = options.docsRoot ?? resolve(workspaceRoot, 'docs');
+  const readmeFile = options.readmeFile ?? resolve(workspaceRoot, 'README.md');
   const contentTypesDatabaseFile =
     options.contentTypesDatabaseFile ?? resolve(workspaceRoot, 'data', 'content-types.db');
   const mediaStorageDir = options.mediaStorageDir ?? resolve(workspaceRoot, 'data', 'uploads');
@@ -159,6 +163,7 @@ export async function buildServer(
     prefix: '/uploads/',
     root: mediaStorageDir,
   });
+  await registerAdminUiRoutes(app, adminUiRoot, readmeFile);
 
   app.addHook('onClose', async () => {
     auditLogsRepository.close();
@@ -204,6 +209,7 @@ export async function buildServer(
     schemaMigrationsRepository,
     webhooksRepository,
   });
+  await registerAdminApiAliases(app);
 
   await publishScheduler.start();
 
@@ -216,7 +222,9 @@ export async function buildServer(
   });
 
   app.get('/health', async (request) => ({
+    adminUi: '/adminui/',
     docs: '/docs',
+    readme: '/readme',
     requestId: request.id,
     service: 'apiagex',
     status: 'ok',
