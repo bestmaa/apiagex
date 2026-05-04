@@ -87,6 +87,7 @@ function renderDocPage(): string {
       "Hinglish: Completed MVP base paths /api, /api/health, /doc, /readme, aur /adminui hain.",
       "Owner auth: POST /api/auth/bootstrap-owner creates the first owner, then POST /api/auth/login logs in.",
       "Owner auth: POST /api/auth/bootstrap-owner pehla owner banata hai, phir POST /api/auth/login login karta hai.",
+      "v0.2.4 verifies owner bootstrap API, login API, React Admin UI login/logout, and docs.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );

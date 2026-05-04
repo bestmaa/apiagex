@@ -1,6 +1,6 @@
 {
   "name": "apiagex",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Installable headless CMS platform workspace.",
   "type": "module",
   "license": "MIT",

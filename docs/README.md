@@ -57,6 +57,12 @@ JSON bhejo: `{ "email": "owner@apiagex.local", "password": "OwnerPass123!" }`.
 Owner banne ke baad same shape ke saath `POST /api/auth/login` use karo.
 `/adminui` ka React UI pehle bootstrap try karta hai, aur owner already hone par login karta hai.
 
+## Owner Checkpoint
+
+English: v0.2.4 verifies owner bootstrap API, login API, React Admin UI login/logout, and docs.
+
+Hinglish: v0.2.4 owner bootstrap API, login API, React Admin UI login/logout, aur docs verify karta hai.
+
 ## MVP Contract
 
 ### English
