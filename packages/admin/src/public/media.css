@@ -1,0 +1,28 @@
+.media-actions {
+  margin-bottom: 12px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.media-actions input[type='file'] {
+  max-width: 320px;
+}
+
+.media-list {
+  display: grid;
+  gap: 10px;
+}
+
+.media-item {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  background: #fcfdff;
+}
+
+.media-item span,
+.media-item small {
+  color: var(--muted);
+}

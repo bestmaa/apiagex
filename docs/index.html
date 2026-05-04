@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Apiagex Docs</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#overview" aria-label="Apiagex docs home">
+        <span class="brand-mark">A</span>
+        <span>Apiagex Docs</span>
+      </a>
+      <div class="language-toggle" aria-label="Language switcher">
+        <button class="toggle-button is-active" data-language="en" type="button">
+          English
+        </button>
+        <button class="toggle-button" data-language="hi" type="button">
+          Hindi
+        </button>
+      </div>
+    </header>
+
+    <main class="docs-layout">
+      <aside class="docs-sidebar">
+        <p class="eyebrow" data-i18n="docsIndexLabel">Markdown source of truth</p>
+        <nav id="docs-nav" class="docs-nav" aria-label="Documentation pages"></nav>
+      </aside>
+
+      <section class="docs-panel" id="overview">
+        <p class="eyebrow" data-i18n="docsHeroLabel">Live markdown docs</p>
+        <h1 id="doc-title">Apiagex Docs</h1>
+        <p id="doc-summary" class="doc-summary"></p>
+        <article id="doc-content" class="markdown"></article>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

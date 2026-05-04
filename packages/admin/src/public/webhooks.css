@@ -1,0 +1,91 @@
+.webhooks-layout {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 340px minmax(0, 1fr);
+}
+
+.webhooks-events {
+  display: grid;
+  gap: 8px;
+}
+
+.webhooks-filters {
+  display: grid;
+  gap: 12px;
+}
+
+.webhooks-filter-group {
+  display: grid;
+  gap: 8px;
+}
+
+.webhooks-filter-list {
+  display: grid;
+  gap: 8px;
+}
+
+.checkbox-row {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.switch-row {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.webhooks-list,
+.webhook-deliveries {
+  display: grid;
+  gap: 12px;
+}
+
+.webhook-item,
+.webhook-delivery {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fbfcff;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.webhook-item.active {
+  border-color: var(--accent);
+}
+
+.webhook-head {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.webhook-events {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.webhook-delivery pre {
+  margin: 0;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.webhook-delivery-meta {
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+}
+
+@media (max-width: 960px) {
+  .webhooks-layout {
+    grid-template-columns: 1fr;
+  }
+}

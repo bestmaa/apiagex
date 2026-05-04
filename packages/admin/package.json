@@ -1,0 +1,17 @@
+{
+  "name": "@apiagex/admin",
+  "version": "0.2.0",
+  "description": "Admin UI package for Apiagex CMS.",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsx src/main.ts",
+    "start": "node dist/main.js",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}

@@ -1,0 +1,72 @@
+.roles-layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(420px, 1.1fr);
+  align-items: start;
+}
+
+.roles-list-panel,
+.roles-form {
+  min-width: 0;
+}
+
+.roles-matrix-section {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.roles-matrix-wrap {
+  overflow-x: auto;
+}
+
+.permissions-matrix {
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+.permissions-matrix th,
+.permissions-matrix td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.permissions-matrix th {
+  white-space: nowrap;
+}
+
+.permissions-matrix td {
+  text-align: center;
+}
+
+.permissions-matrix .muted {
+  font-size: 0.82rem;
+}
+
+.permissions-toggle {
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.permissions-summary {
+  margin: 0.35rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.sr-only {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+@media (max-width: 980px) {
+  .roles-layout {
+    grid-template-columns: 1fr;
+  }
+}
