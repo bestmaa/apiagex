@@ -94,6 +94,8 @@ function renderDocPage(): string {
       "Schemas: /api/admin/schemas field validation ke saath create, list, read, update, aur delete support karta hai.",
       "Admin UI: owner login reveals a React schema builder form for all MVP field types.",
       "Admin UI: owner login ke baad React schema builder form sab MVP field types ke liye dikhata hai.",
+      "Relations: relation fields must pick an existing schema and are validated by the API.",
+      "Relations: relation fields existing schema pick karte hain aur API validate karti hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -111,6 +113,8 @@ function renderReadmePage(): string {
       "Schema APIs ab owner/admin workflow ke liye /api/admin/schemas par available hain.",
       "The React Admin UI can create schemas from a form after owner login.",
       "React Admin UI owner login ke baad form se schema create kar sakta hai.",
+      "Relation fields use an existing-schema picker before save.",
+      "Relation fields save se pehle existing-schema picker use karte hain.",
     ].join(" "),
   );
 }

@@ -73,7 +73,13 @@ export function SchemaBuilder() {
         <label>Description <textarea name="description" rows={3} /></label>
         <div className="field-list">
           {fields.map((field, index) => (
-            <SchemaFieldRow field={field} index={index} key={index} onChange={updateField} />
+            <SchemaFieldRow
+              field={field}
+              index={index}
+              key={index}
+              onChange={updateField}
+              schemas={schemas}
+            />
           ))}
         </div>
         <button type="button" onClick={() => setFields([...fields, { ...emptyField }])}>Add field</button>
@@ -89,14 +95,23 @@ function SchemaFieldRow(props: {
   field: SchemaFieldDraft;
   index: number;
   onChange: (index: number, patch: Partial<SchemaFieldDraft>) => void;
+  schemas: SchemaRecord[];
 }) {
-  const { field, index, onChange } = props;
+  const { field, index, onChange, schemas } = props;
   return (
     <fieldset>
       <legend>Field {index + 1}</legend>
       <label>Field name <input required value={field.name} onChange={(event) => onChange(index, { name: event.target.value })} /></label>
       <label>Field slug <input required pattern="[a-z][a-z0-9-]*" value={field.slug} onChange={(event) => onChange(index, { slug: event.target.value })} /></label>
-      <label>Type <select value={field.type} onChange={(event) => onChange(index, { type: event.target.value as FieldType })}>{fieldTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
+      <label>Type <select value={field.type} onChange={(event) => onChange(index, { relationSchemaId: "", type: event.target.value as FieldType })}>{fieldTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
+      {field.type === "relation" ? (
+        <label>Relation target
+          <select required value={field.relationSchemaId ?? ""} onChange={(event) => onChange(index, { relationSchemaId: event.target.value })}>
+            <option value="">Select schema</option>
+            {schemas.map((schema) => <option key={schema.id} value={schema.id}>{schema.name}</option>)}
+          </select>
+        </label>
+      ) : null}
       <label><input checked={field.required} type="checkbox" onChange={(event) => onChange(index, { required: event.target.checked })} /> Required</label>
     </fieldset>
   );

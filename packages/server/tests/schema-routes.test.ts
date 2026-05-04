@@ -66,4 +66,44 @@ describe("schema admin APIs", () => {
     expect(response.statusCode).toBe(400);
     expect(response.json()).toEqual({ ok: false, error: "FIELD_SLUG_INVALID" });
   });
+
+  it("creates relation fields only when target schema exists", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const author = await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Author",
+        slug: "author",
+        fields: [{ name: "Name", slug: "name", type: "text" }],
+      },
+    });
+    const authorId = author.json().schema.id as string;
+
+    const book = await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Book",
+        slug: "book",
+        fields: [
+          { name: "Author", slug: "author", type: "relation", relationSchemaId: authorId },
+        ],
+      },
+    });
+    expect(book.statusCode).toBe(200);
+    expect(book.json().schema.fields[0].relationSchemaId).toBe(authorId);
+
+    const bad = await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Bad Book",
+        slug: "bad-book",
+        fields: [{ name: "Author", slug: "author", type: "relation" }],
+      },
+    });
+    expect(bad.statusCode).toBe(400);
+    expect(bad.json()).toEqual({ ok: false, error: "RELATION_TARGET_REQUIRED" });
+  });
 });

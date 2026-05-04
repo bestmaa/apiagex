@@ -46,6 +46,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `GET /api/admin/schemas` schemas list karta hai, aur `/api/admin/schemas/:id` read, update, delete support karta hai.
 - `/adminui` has a React schema builder form for text, long text, number, boolean, date, JSON, media, and relation fields.
 - `/adminui` me text, long text, number, boolean, date, JSON, media, aur relation fields ke liye React schema builder form hai.
+- Relation fields show a target schema picker and cannot save without a valid existing schema.
+- Relation fields target schema picker dikhate hain aur valid existing schema ke bina save nahi hote.
 
 ## Owner Bootstrap And Login
 
@@ -93,11 +95,11 @@ List ke liye `GET /api/admin/schemas`, read ke liye `GET /api/admin/schemas/:id`
 
 ### English
 
-After owner login, `/adminui` shows a schema builder. Add schema name, slug, description, and one or more fields. The form can choose every MVP field type. Relation target picking is handled by the next task.
+After owner login, `/adminui` shows a schema builder. Add schema name, slug, description, and one or more fields. The form can choose every MVP field type. Relation fields require selecting an existing schema.
 
 ### Hinglish
 
-Owner login ke baad `/adminui` schema builder dikhata hai. Schema name, slug, description, aur ek ya jyada fields add karo. Form har MVP field type choose kar sakta hai. Relation target picker next task me handle hoga.
+Owner login ke baad `/adminui` schema builder dikhata hai. Schema name, slug, description, aur ek ya jyada fields add karo. Form har MVP field type choose kar sakta hai. Relation fields ke liye existing schema select karna zaruri hai.
 
 ## MVP Contract
 
