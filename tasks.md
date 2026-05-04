@@ -98,7 +98,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 - T022 | Version: v0.4.2 | Status: completed | Goal: Add Admin UI entry forms generated from schema fields. | Verify: Browser Use entry create/edit flow. | Commit: `Add entry UI`
 - T023 | Version: v0.4.3 | Status: completed | Goal: Add dynamic `/api/content/:schemaSlug` routes for list/read/create/update/delete. | Verify: dynamic API CRUD tests and manual request. | Commit: `Add dynamic content APIs`
 - T024 | Version: v0.4.4 | Status: completed | Goal: Add Admin UI API list showing every generated dynamic API. | Verify: Browser Use API list check. | Commit: `Add dynamic API list UI`
-- T025 | Version: v0.4.5 | Status: pending | Goal: Document dynamic API usage with examples in `/doc` and `/readme`. | Verify: Browser Use docs check. | Commit: `Document dynamic APIs`
+- T025 | Version: v0.4.5 | Status: completed | Goal: Document dynamic API usage with examples in `/doc` and `/readme`. | Verify: Browser Use docs check. | Commit: `Document dynamic APIs`
 - T026 | Version: v0.4.6 | Status: pending | Goal: Release dynamic API checkpoint. | Verify: create schema, entry, call dynamic API. | Commit: `Release dynamic APIs`
 
 ### Phase 5: Roles, Permissions, And Users

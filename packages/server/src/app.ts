@@ -113,6 +113,8 @@ function renderDocPage(): string {
       "Dynamic APIs: /api/content/:schemaSlug schema-based CRUD expose karta hai.",
       "Admin UI: Generated APIs lists every schema's dynamic content route.",
       "Admin UI: Generated APIs har schema ka dynamic content route list karta hai.",
+      "Docs: dynamic API examples show list, create, update, and delete calls.",
+      "Docs: dynamic API examples list, create, update, aur delete calls dikhate hain.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -146,6 +148,8 @@ function renderReadmePage(): string {
       "Dynamic content APIs /api/content/:schemaSlug ke under ready hain.",
       "Admin UI now lists generated dynamic APIs.",
       "Admin UI ab generated dynamic APIs list karta hai.",
+      "Read /doc and /readme for dynamic API examples.",
+      "Dynamic API examples ke liye /doc aur /readme padho.",
     ].join(" "),
   );
 }

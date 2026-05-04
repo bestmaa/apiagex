@@ -43,6 +43,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Dynamic content APIs har schema slug ko `/api/content/:schemaSlug` ke under expose karte hain.
 - Admin UI lists generated dynamic APIs for all schemas.
 - Admin UI sab schemas ke generated dynamic APIs list karta hai.
+- `/doc` and `/readme` include dynamic API usage examples.
+- `/doc` aur `/readme` dynamic API usage examples include karte hain.
 
 ## Required MVP Paths
 
@@ -118,7 +120,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T025`: document dynamic API usage with examples.
+The next pending task is `T026`: release dynamic API checkpoint.
 
 ## Coding Rules
 

@@ -171,6 +171,23 @@ Every schema slug creates `/api/content/:schemaSlug`. Use `GET` to list entries 
 
 Har schema slug `/api/content/:schemaSlug` banata hai. Entries list ke liye `GET` aur create ke liye `{ "data": { ... } }` ke saath `POST` use karo. Read, update, delete ke liye `/api/content/:schemaSlug/:entryId` use karo.
 
+### Dynamic API Examples
+
+```bash
+curl http://127.0.0.1:4000/api/content/article
+curl -X POST http://127.0.0.1:4000/api/content/article \
+  -H "content-type: application/json" \
+  -d '{"data":{"title":"Hello"}}'
+curl -X PUT http://127.0.0.1:4000/api/content/article/ENTRY_ID \
+  -H "content-type: application/json" \
+  -d '{"data":{"title":"Updated"}}'
+curl -X DELETE http://127.0.0.1:4000/api/content/article/ENTRY_ID
+```
+
+English: Replace `article` with the schema slug and `ENTRY_ID` with the entry id returned from create/list.
+
+Hinglish: `article` ko schema slug se replace karo aur `ENTRY_ID` ko create/list se mile entry id se replace karo.
+
 ## Generated API List
 
 ### English
