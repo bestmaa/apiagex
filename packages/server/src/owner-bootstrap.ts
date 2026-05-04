@@ -3,6 +3,7 @@ import type { SqliteDatabase } from "@apiagex/database";
 import type {
   OwnerBootstrapInput,
   OwnerBootstrapResult,
+  OwnerLoginResult,
 } from "./owner-bootstrap.type.js";
 
 const OWNER_ROLE_ID = "role_owner";
@@ -39,6 +40,28 @@ export function bootstrapOwner(
     ok: true,
     created: true,
     user: { id: userId, email, role: "owner" },
+  };
+}
+
+export function loginOwner(
+  db: SqliteDatabase,
+  input: OwnerBootstrapInput,
+): OwnerLoginResult {
+  const email = input.email.trim().toLowerCase();
+  const row = db
+    .prepare(
+      "SELECT users.id, users.email, users.password_hash FROM users JOIN roles ON roles.id = users.role_id WHERE users.email = ? AND roles.is_owner = 1",
+    )
+    .get(email) as { id: string; email: string; password_hash: string } | undefined;
+
+  if (!row || row.password_hash !== hashPassword(input.password)) {
+    throw new Error("OWNER_LOGIN_INVALID");
+  }
+
+  return {
+    ok: true,
+    token: `owner:${row.id}`,
+    user: { id: row.id, email: row.email, role: "owner" },
   };
 }
 

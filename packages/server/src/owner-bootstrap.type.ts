@@ -12,3 +12,13 @@ export type OwnerBootstrapResult = {
     role: "owner";
   };
 };
+
+export type OwnerLoginResult = {
+  ok: true;
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    role: "owner";
+  };
+};

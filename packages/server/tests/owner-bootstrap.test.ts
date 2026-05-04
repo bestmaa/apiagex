@@ -57,4 +57,45 @@ describe("owner bootstrap API", () => {
       error: "OWNER_ALREADY_BOOTSTRAPPED",
     });
   });
+
+  it("logs in an existing owner", async () => {
+    const database = openSqliteDatabase();
+    const server = createServer({ database });
+
+    await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: {
+        email: "owner@apiagex.local",
+        password: "OwnerPass123!",
+      },
+    });
+    const response = await server.inject({
+      method: "POST",
+      url: "/api/auth/login",
+      payload: {
+        email: "owner@apiagex.local",
+        password: "OwnerPass123!",
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      ok: true,
+      user: {
+        email: "owner@apiagex.local",
+        role: "owner",
+      },
+    });
+  });
+
+  it("serves owner login controls in Admin UI", async () => {
+    const server = createServer();
+    const response = await server.inject({ method: "GET", url: "/adminui" });
+
+    expect(response.statusCode).toBe(200);
+    for (const text of ["Apiagex Admin UI", "id=\"root\"", "script"]) {
+      expect(response.body).toContain(text);
+    }
+  });
 });

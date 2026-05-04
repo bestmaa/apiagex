@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import fastifyStatic from "@fastify/static";
 import { migrateMvpDatabase, openSqliteDatabase } from "@apiagex/database";
 import type {
   ApiagexServer,
@@ -6,12 +7,17 @@ import type {
   CreateServerOptions,
   HealthResponse,
 } from "./app.type.js";
-import { bootstrapOwner } from "./owner-bootstrap.js";
+import { bootstrapOwner, loginOwner } from "./owner-bootstrap.js";
+import { readAdminIndex, resolveAdminUiAsset } from "./admin-ui.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
   const database = options.database ?? openSqliteDatabase();
   migrateMvpDatabase(database);
+  server.register(fastifyStatic, {
+    prefix: "/adminui/",
+    root: resolveAdminUiAsset().root,
+  });
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,
@@ -38,6 +44,18 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
     }
   });
 
+  server.post("/api/auth/login", async (request, reply) => {
+    try {
+      return loginOwner(
+        database,
+        request.body as { email: string; password: string },
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "OWNER_LOGIN_FAILED";
+      return reply.code(401).send({ ok: false, error: message });
+    }
+  });
+
   server.get("/doc", async (_request, reply) => {
     return reply.type("text/html").send(renderDocPage());
   });
@@ -47,7 +65,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   });
 
   server.get("/adminui", async (_request, reply) => {
-    return reply.type("text/html").send(renderAdminPage());
+    return reply.type("text/html").send(await readAdminIndex());
   });
 
   return server;
@@ -81,37 +99,4 @@ function renderReadmePage(): string {
       "Use /adminui for UI and /api for backend routes.",
     ].join(" "),
   );
-}
-
-function renderAdminPage(): string {
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Apiagex Admin UI</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; color: #172033; }
-    header { padding: 20px 28px; border-bottom: 1px solid #d7dce5; }
-    nav { display: flex; gap: 12px; flex-wrap: wrap; padding: 16px 28px; }
-    a { color: #1457d9; text-decoration: none; font-weight: 700; }
-    main { padding: 20px 28px; max-width: 900px; }
-  </style>
-</head>
-<body>
-  <header><h1>Apiagex Admin UI</h1><p>Fresh MVP admin shell</p></header>
-  <nav aria-label="Admin navigation">
-    <a href="#dashboard">Dashboard</a>
-    <a href="#schemas">Schemas</a>
-    <a href="#apis">APIs</a>
-    <a href="#roles">Roles</a>
-    <a href="#users">Users</a>
-    <a href="/doc">Docs</a>
-  </nav>
-  <main>
-    <h2>Dashboard</h2>
-    <p>English: Admin shell is ready for owner login, schema builder, APIs, roles, and users.</p>
-    <p>Hinglish: Admin shell owner login, schema builder, APIs, roles, aur users ke liye ready hai.</p>
-  </main>
-</body>
-</html>`;
 }

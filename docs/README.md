@@ -34,6 +34,12 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - SQLite foundation me MVP tables hain: migrations, roles, users, schemas, fields, entries, permissions.
 - `POST /api/auth/bootstrap-owner` creates the first owner user.
 - `POST /api/auth/bootstrap-owner` pehla owner user banata hai.
+- `POST /api/auth/login` logs in the owner after bootstrap.
+- `POST /api/auth/login` bootstrap ke baad owner ko login karta hai.
+- `/adminui` has owner login/logout controls.
+- `/adminui` me owner login/logout controls hain.
+- Admin UI is built in React and served from the same Fastify server.
+- Admin UI React me bana hai aur same Fastify server se serve hota hai.
 
 ## MVP Contract
 

@@ -1,5 +1,9 @@
+export { readAdminIndex, resolveAdminUiAsset } from "./admin-ui.js";
 export { createServer } from "./app.js";
-export { bootstrapOwner } from "./owner-bootstrap.js";
+export { bootstrapOwner, loginOwner } from "./owner-bootstrap.js";
+export type {
+  AdminUiAsset,
+} from "./admin-ui.type.js";
 export type {
   ApiagexServer,
   ApiRootResponse,
@@ -9,4 +13,5 @@ export type {
 export type {
   OwnerBootstrapInput,
   OwnerBootstrapResult,
+  OwnerLoginResult,
 } from "./owner-bootstrap.type.js";
