@@ -23,6 +23,12 @@ Apply the reset only when you want to delete local CMS data:
 npm run reset:local -- --apply
 ```
 
+Run the smoke check without touching your real local DB:
+
+```bash
+npm run reset:local:smoke
+```
+
 After reset, start the API with a local owner account:
 
 ```bash
@@ -68,6 +74,12 @@ Local CMS data delete karna ho tabhi reset apply karo:
 
 ```bash
 npm run reset:local -- --apply
+```
+
+Real local DB ko touch kiye bina smoke check chalao:
+
+```bash
+npm run reset:local:smoke
 ```
 
 Reset ke baad API ko local owner account ke saath start karo:
