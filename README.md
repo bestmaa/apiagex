@@ -44,6 +44,12 @@ The rebuilt product should let an owner:
 
 Primary MVP paths: `/doc`, `/readme`, `/adminui`, and `/api`.
 
+## Schema Builder Quick Use
+
+English: Log in at `/adminui`, create the target schema first, then create schemas with text, long text, number, boolean, date, JSON, media, or relation fields. Relation fields must select an existing schema target.
+
+Hinglish: `/adminui` par login karo, pehle target schema banao, phir text, long text, number, boolean, date, JSON, media, ya relation fields ke saath schema banao. Relation field me existing schema target select karna zaruri hai.
+
 ## Workspace
 
 ```txt

@@ -29,6 +29,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - React Admin UI owner login ke baad schema builder form dikhata hai.
 - Relation fields can pick an existing schema target and are validated by the backend.
 - Relation fields existing schema target pick kar sakte hain aur backend validation hota hai.
+- `/doc` and `/readme` now document schema builder usage and relation rules.
+- `/doc` aur `/readme` schema builder usage aur relation rules document karte hain.
 
 ## Required MVP Paths
 
@@ -104,7 +106,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T018`: document schema builder and relation rules.
+The next pending task is `T019`: release schema builder checkpoint.
 
 ## Coding Rules
 

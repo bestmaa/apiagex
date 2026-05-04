@@ -91,6 +91,20 @@ Use `GET /api/admin/schemas` to list, `GET /api/admin/schemas/:id` to read, `PUT
 Field types `text`, `longText`, `number`, `boolean`, `date`, `json`, `media`, aur `relation` hain.
 List ke liye `GET /api/admin/schemas`, read ke liye `GET /api/admin/schemas/:id`, update ke liye `PUT /api/admin/schemas/:id`, aur delete ke liye `DELETE /api/admin/schemas/:id` use karo.
 
+### Example
+
+```json
+{
+  "name": "Article",
+  "slug": "article",
+  "description": "Editorial content",
+  "fields": [
+    { "name": "Title", "slug": "title", "type": "text", "required": true },
+    { "name": "Body", "slug": "body", "type": "longText" }
+  ]
+}
+```
+
 ## Admin UI Schema Builder
 
 ### English
@@ -100,6 +114,16 @@ After owner login, `/adminui` shows a schema builder. Add schema name, slug, des
 ### Hinglish
 
 Owner login ke baad `/adminui` schema builder dikhata hai. Schema name, slug, description, aur ek ya jyada fields add karo. Form har MVP field type choose kar sakta hai. Relation fields ke liye existing schema select karna zaruri hai.
+
+## Relation Rules
+
+### English
+
+Create the target schema first, then create a relation field in another schema. Relation fields store `relationSchemaId`, so deleting or renaming labels later does not break the field target. The backend rejects missing targets with `RELATION_TARGET_REQUIRED` or `RELATION_TARGET_MISSING`.
+
+### Hinglish
+
+Pehle target schema banao, phir dusre schema me relation field banao. Relation fields `relationSchemaId` store karte hain, isliye label rename hone par target break nahi hota. Backend missing target ko `RELATION_TARGET_REQUIRED` ya `RELATION_TARGET_MISSING` se reject karta hai.
 
 ## MVP Contract
 
