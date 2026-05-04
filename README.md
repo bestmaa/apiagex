@@ -55,6 +55,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - User admin APIs `/api/admin/users` par available hain, har user ke liye ek role.
 - Admin UI Users screen can create and list users with role assignment.
 - Admin UI Users screen role assignment ke saath users create aur list kar sakta hai.
+- RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.
+- RBAC end-to-end flow user login aur allowed/blocked dynamic API access verify karta hai.
 
 ## MVP Direction
 

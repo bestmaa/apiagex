@@ -59,6 +59,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - User repository aur `/api/admin/users` APIs users ko exactly one role ke saath create karte hain.
 - Admin UI Users screen creates and lists users with role assignment.
 - Admin UI Users screen role assignment ke saath users create aur list karta hai.
+- RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.
+- RBAC end-to-end flow user login aur allowed/blocked dynamic API access verify karta hai.
 
 ## Required MVP Paths
 
@@ -134,7 +136,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T033`: verify MVP RBAC flow end-to-end.
+The next pending task is `T034`: document roles, permissions, users, and allow/block examples.
 
 ## Coding Rules
 

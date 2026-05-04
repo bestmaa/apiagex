@@ -14,6 +14,7 @@ import { registerSchemaRoutes } from "./schema-routes.js";
 import { registerEntryRoutes } from "./entry-routes.js";
 import { registerRoleRoutes } from "./role-routes.js";
 import { registerUserRoutes } from "./user-routes.js";
+import { loginUser } from "./user-auth.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -62,6 +63,18 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : "OWNER_LOGIN_FAILED";
+      return reply.code(401).send({ ok: false, error: message });
+    }
+  });
+
+  server.post("/api/auth/login-user", async (request, reply) => {
+    try {
+      return loginUser(
+        database,
+        request.body as { email: string; password: string },
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "USER_LOGIN_FAILED";
       return reply.code(401).send({ ok: false, error: message });
     }
   });
@@ -132,6 +145,8 @@ function renderDocPage(): string {
       "Users: /api/admin/users one-role users create, list, aur read karta hai.",
       "Admin UI: Users screen creates and lists users with role assignment.",
       "Admin UI: Users screen role assignment ke saath users create aur list karta hai.",
+      "RBAC flow: /api/auth/login-user returns a role id for permission-checked dynamic APIs.",
+      "RBAC flow: /api/auth/login-user permission-checked dynamic APIs ke liye role id return karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -181,6 +196,8 @@ function renderReadmePage(): string {
       "User admin APIs Admin UI user screen ke liye ready hain.",
       "User management UI is ready for the RBAC end-to-end flow.",
       "User management UI RBAC end-to-end flow ke liye ready hai.",
+      "RBAC end-to-end verifies allowed and blocked user API access.",
+      "RBAC end-to-end allowed aur blocked user API access verify karta hai.",
     ].join(" "),
   );
 }

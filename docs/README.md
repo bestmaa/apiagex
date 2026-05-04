@@ -264,6 +264,16 @@ The Users screen loads roles, creates users with email/password/role, and lists 
 
 Users screen roles load karta hai, email/password/role ke saath users create karta hai, aur created users ko assigned role ke saath list karta hai. MVP me har user exactly ek role me hota hai.
 
+## RBAC End-To-End Flow
+
+### English
+
+The verified RBAC flow creates a schema API, creates roles, assigns read permission, creates users, logs in users through `POST /api/auth/login-user`, then checks that the allowed role can read and the blocked role receives `API_PERMISSION_DENIED`.
+
+### Hinglish
+
+Verified RBAC flow schema API banata hai, roles create karta hai, read permission assign karta hai, users create karta hai, `POST /api/auth/login-user` se users login karta hai, phir check karta hai ki allowed role read kar sakta hai aur blocked role ko `API_PERMISSION_DENIED` milta hai.
+
 ## MVP Contract
 
 ### English

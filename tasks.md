@@ -109,7 +109,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 - T030 | Version: v0.5.3 | Status: completed | Goal: Enforce permissions on dynamic APIs with allow/block behavior. | Verify: allowed role succeeds, blocked role fails. | Commit: `Enforce dynamic API permissions`
 - T031 | Version: v0.5.4 | Status: completed | Goal: Add user repository and APIs to create users and assign one role. | Verify: user API tests and manual request. | Commit: `Add user APIs`
 - T032 | Version: v0.5.5 | Status: completed | Goal: Add Admin UI user create/list screen with role assignment. | Verify: Browser Use user create flow. | Commit: `Add user management UI`
-- T033 | Version: v0.5.6 | Status: pending | Goal: Verify role/user/API flow end-to-end: create API, create role, assign permissions, create user, login user, check visible/blocked APIs. | Verify: automated e2e plus Browser Use. | Commit: `Verify MVP RBAC flow`
+- T033 | Version: v0.5.6 | Status: completed | Goal: Verify role/user/API flow end-to-end: create API, create role, assign permissions, create user, login user, check visible/blocked APIs. | Verify: automated e2e plus Browser Use. | Commit: `Verify MVP RBAC flow`
 - T034 | Version: v0.5.7 | Status: pending | Goal: Document roles, permissions, users, allow/block examples in English+Hinglish. | Verify: Browser Use docs check. | Commit: `Document MVP RBAC`
 - T035 | Version: v0.5.8 | Status: pending | Goal: Release MVP RBAC checkpoint. | Verify: standard verification and full manual flow. | Commit: `Release MVP RBAC`
 
