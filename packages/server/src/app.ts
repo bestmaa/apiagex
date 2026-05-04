@@ -13,6 +13,7 @@ import { registerContentRoutes } from "./content-routes.js";
 import { registerSchemaRoutes } from "./schema-routes.js";
 import { registerEntryRoutes } from "./entry-routes.js";
 import { registerRoleRoutes } from "./role-routes.js";
+import { registerUserRoutes } from "./user-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -26,6 +27,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   registerEntryRoutes(server, database);
   registerContentRoutes(server, database);
   registerRoleRoutes(server, database);
+  registerUserRoutes(server, database);
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,
@@ -126,6 +128,8 @@ function renderDocPage(): string {
       "Admin UI: Role Permissions generated APIs ke action checkboxes save karta hai.",
       "Enforcement: dynamic APIs check x-apiagex-role-id and block missing permissions.",
       "Enforcement: dynamic APIs x-apiagex-role-id check karte hain aur missing permissions block karte hain.",
+      "Users: /api/admin/users creates, lists, and reads users assigned to one role.",
+      "Users: /api/admin/users one-role users create, list, aur read karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -171,6 +175,8 @@ function renderReadmePage(): string {
       "Role permission UI dynamic API enforcement ke liye ready hai.",
       "Allowed roles succeed and blocked roles return API_PERMISSION_DENIED.",
       "Allowed roles succeed karte hain aur blocked roles API_PERMISSION_DENIED return karte hain.",
+      "User admin APIs are ready for the Admin UI user screen.",
+      "User admin APIs Admin UI user screen ke liye ready hain.",
     ].join(" "),
   );
 }

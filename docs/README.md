@@ -244,6 +244,16 @@ Dynamic APIs check permissions when a request sends `x-apiagex-role-id`. Missing
 
 Dynamic APIs permission tab check karte hain jab request `x-apiagex-role-id` bhejti hai. Missing permissions par `403` aur `API_PERMISSION_DENIED` return hota hai. User login tokens add hone tak header ke bina current owner/admin tooling work karta rahega.
 
+## User Admin APIs
+
+### English
+
+Use `POST /api/admin/users` with `email`, `password`, and `roleId` to create a user assigned to exactly one role. Use `GET /api/admin/users` to list users and `GET /api/admin/users/:userId` to read one user.
+
+### Hinglish
+
+Ek role assigned user create karne ke liye `POST /api/admin/users` par `email`, `password`, aur `roleId` bhejo. Users list ke liye `GET /api/admin/users` aur one user read ke liye `GET /api/admin/users/:userId` use karo.
+
 ## MVP Contract
 
 ### English

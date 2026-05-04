@@ -26,6 +26,12 @@ export {
   setPermission,
 } from "./permission-repository.js";
 export {
+  createUser,
+  getUserById,
+  getUserPasswordHashByEmail,
+  listUsers,
+} from "./user-repository.js";
+export {
   createSchema,
   deleteSchema,
   getSchemaById,
@@ -46,6 +52,7 @@ export type {
   PermissionRecord,
   SetPermissionInput,
 } from "./permission-repository.type.js";
+export type { CreateUserInput, UserRecord } from "./user-repository.type.js";
 export type {
   CreateFieldInput,
   CreateSchemaInput,

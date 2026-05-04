@@ -55,6 +55,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Admin UI Role Permissions screen roles create kar sakta hai aur dynamic API action checkboxes save kar sakta hai.
 - Dynamic APIs enforce allow/block when `x-apiagex-role-id` is present.
 - Dynamic APIs `x-apiagex-role-id` present hone par allow/block enforce karte hain.
+- User repository and `/api/admin/users` APIs create users assigned to exactly one role.
+- User repository aur `/api/admin/users` APIs users ko exactly one role ke saath create karte hain.
 
 ## Required MVP Paths
 
@@ -130,7 +132,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T031`: add user repository and APIs.
+The next pending task is `T032`: add Admin UI user management.
 
 ## Coding Rules
 

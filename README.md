@@ -51,6 +51,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Admin UI role permissions screen dynamic API action checkboxes dikhata hai.
 - Dynamic APIs enforce role permissions when `x-apiagex-role-id` is provided.
 - Dynamic APIs `x-apiagex-role-id` provide hone par role permissions enforce karte hain.
+- User admin APIs are available at `/api/admin/users` with one role per user.
+- User admin APIs `/api/admin/users` par available hain, har user ke liye ek role.
 
 ## MVP Direction
 
