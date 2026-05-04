@@ -1,59 +1,41 @@
 # Apiagex
 
-Apiagex is planned as an installable, open-source, multi-tenant headless CMS platform.
+Apiagex is being rebuilt as a fresh MVP headless CMS/API platform.
 
-Apiagex ek installable, open-source, multi-tenant headless CMS platform ke roop me banaya jayega.
+Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha hai.
 
-## Project Context
+## Current Status
 
-Read [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) before continuing work, especially after switching models or sessions.
+- Old implementation code is backed up in Git:
+  - Branch: `backup/pre-mvp-rebuild`
+  - Tag: `backup-pre-mvp-rebuild`
+- Workspace/package setup is preserved.
+- Package implementation folders are intentionally empty until the new MVP flow is confirmed.
+- Read [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) and [tasks.md](./tasks.md) before coding.
 
-Kaam continue karne se pehle [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) padho, especially model ya session switch ke baad.
+## MVP Direction
 
-## First Goal
+The rebuilt product should let an owner:
 
-The first deliverable is the `create-apiagex` installer. A new user should be able to run one command, answer setup questions, and get a ready CMS project.
-
-Pehla deliverable `create-apiagex` installer hai. New user ek command run kare, setup questions answer kare, aur ready CMS project paaye.
-
-```bash
-npx create-apiagex my-cms
-```
+- log in,
+- create a schema/API from Admin UI,
+- add fields,
+- create entries,
+- get generated API endpoints,
+- read generated docs,
+- allow/block APIs per role.
 
 ## Workspace
 
 ```txt
-packages/create-apiagex  Installer CLI
-packages/core           CMS core contracts
-packages/server         Fastify server package
+packages/create-apiagex  Installer CLI package
+packages/core           Shared contracts package
+packages/server         API server package
 packages/database       Database adapter package
 packages/admin          Admin UI package
-docs                    English and Hindi documentation
+docs                    Product and developer docs
 ```
 
-## Docs Page
+## Verification Rule
 
-Open `docs/index.html` in a browser to read the documentation page with Hindi and English toggle buttons.
-
-Documentation page padhne ke liye browser me `docs/index.html` open karo. Top par Hindi aur English toggle buttons hain.
-
-After starting the API server, the same docs are available at `http://localhost:4000/docs`.
-
-API server start karne ke baad same docs `http://localhost:4000/docs` par milenge.
-
-```bash
-npm run dev
-```
-
-## Release Checks
-
-Before shipping, run:
-
-```bash
-npm run check
-npm run smoke
-npm audit --audit-level=high
-npm run release:check
-```
-
-Release smoke flow padhne ke liye `docs/release.md` open karo.
+When code returns, each completed task must be tested, checked in Browser Use when user-facing, documented in English/Hinglish, and committed.
