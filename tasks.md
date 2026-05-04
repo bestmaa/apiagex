@@ -87,7 +87,7 @@ Push only on phase release tasks or explicit user request.
 - T003 | Version: v0.2.2 | Status: completed | Goal: Add dev owner seed config using `owner@apiagex.local` and `OwnerPass123!` for local reset only. | Verify: login API test. | Commit: `Seed local owner account`
 - T004 | Version: v0.2.3 | Status: completed | Goal: Add docs for local DB reset, owner login, and recovery in English/Hinglish. | Verify: docs browser check. | Commit: `Document local owner reset`
 - T005 | Version: v0.2.4 | Status: completed | Goal: Add reset smoke that deletes/recreates local SQLite DB and verifies owner login. | Verify: focused reset smoke. | Commit: `Test local reset smoke`
-- T006 | Version: v0.2.5 | Status: pending | Goal: Phase 1 release check. | Verify: phase release verification. | Commit: `Release dev reset phase`
+- T006 | Version: v0.2.5 | Status: completed | Goal: Phase 1 release check. | Verify: phase release verification. | Commit: `Release dev reset phase`
 
 ### Phase 2: RBAC V2 Permission Core
 

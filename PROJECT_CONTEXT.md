@@ -159,8 +159,9 @@ npm run release:check
 Last verified:
 
 ```txt
-npm run check -> pass
-npm audit     -> 0 vulnerabilities
+npm run release:check -> pass
+Browser Use docs check -> pass at http://localhost:4000/docs/
+npm audit            -> 0 vulnerabilities
 ```
 
 ## Next Recommended Step
