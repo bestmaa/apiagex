@@ -21,9 +21,11 @@ The rebuilt product should let an owner:
 - create a schema/API from Admin UI,
 - add fields,
 - create entries,
-- get generated API endpoints,
+- get generated API endpoints under `/api`,
 - read generated docs,
 - allow/block APIs per role.
+
+Primary MVP paths: `/doc`, `/readme`, `/adminui`, and `/api`.
 
 ## Workspace
 

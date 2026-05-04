@@ -2,46 +2,54 @@
 
 Apiagex is being rebuilt from a fresh MVP baseline.
 
+Apiagex fresh MVP baseline se dobara ban raha hai.
+
 ## Current State
 
-- The previous implementation is backed up at Git branch `backup/pre-mvp-rebuild`.
-- The same commit is also tagged as `backup-pre-mvp-rebuild`.
-- Project/package setup is preserved.
-- Current package implementation folders were removed:
-  - `packages/*/src`
-  - `packages/*/tests`
-  - `packages/*/dist`
-- The next code must be written fresh from the user's MVP instructions.
+- Previous implementation backup branch: `backup/pre-mvp-rebuild`
+- Previous implementation backup tag: `backup-pre-mvp-rebuild`
+- Package/workspace setup is preserved.
+- Old implementation code was removed.
+- New code must follow `tasks.md` only.
 
-## Preserved Setup
+## Required MVP Paths
 
-- Root npm workspace remains in `package.json`.
-- Package folders remain under `packages/`.
-- Root docs, scripts, package metadata, and Git history remain unless a future task changes them.
-- Development target stays one server with `/api`, `/docs`, `/readme`, and `/adminui`.
+One server must serve exactly these primary paths:
 
-## Fresh MVP Direction
+- `/api` for backend APIs.
+- `/adminui` for owner/admin/user UI.
+- `/doc` for product/API docs in English+Hinglish.
+- `/readme` for readable project summary in English+Hinglish.
 
-The MVP should feel like a Stripe-style headless CMS/API platform:
+## User-Defined MVP Flow
 
-- Owner logs in.
-- Owner creates a schema/API from Admin UI.
-- Owner adds fields and saves the schema.
-- Owner creates entries for that schema.
-- System generates API endpoints automatically.
-- Admin UI shows generated API docs and examples.
-- Owner assigns allow/block permissions per API and role.
-- Browser Use, automated tests, manual API requests, docs, and commits are required after each completed task.
+1. First-time owner bootstrap/login.
+2. Owner opens Admin UI.
+3. Owner creates a schema/API from a form.
+4. Schema supports text, long text, number, boolean, date, JSON, media, and relation fields.
+5. Relation design must be safe because generated APIs and UI depend on it.
+6. Created schema becomes a dynamic API.
+7. Admin UI lists all dynamic APIs.
+8. Owner creates unlimited roles.
+9. Owner assigns per-API permissions to each role with checkboxes.
+10. Owner creates users and assigns roles.
+11. User can see/access only APIs allowed by their role.
+12. Allowed API request must succeed; blocked API request must fail.
+
+## Verification Contract
+
+- Browser Use is required for Admin UI, `/doc`, and `/readme` checks.
+- API changes require automated tests and one manual request flow.
+- RBAC changes require a real role+user+API allow/block verification.
+- Every completed task must update docs where relevant and be committed.
 
 ## Next Step
 
-Do not code product behavior until the user gives the fresh MVP flow details. The next pending task is `T002` in `tasks.md`: capture and confirm the fresh MVP flow.
+The next pending task is `T003`: write the detailed MVP product contract in docs and project context before coding implementation.
 
-## Do Not Forget
+## Coding Rules
 
-- Keep every file below 250 lines.
-- Keep strict TypeScript when code returns.
-- Use matching `*.type.ts` files for shared types.
-- Write docs in English and Hinglish.
-- Use Browser Use for Admin UI/docs checks.
-- Commit every completed task.
+- Keep files below 250 lines.
+- Use strict TypeScript.
+- Put shared types in matching `*.type.ts` files.
+- Keep one server for `/api`, `/adminui`, `/doc`, and `/readme`.
