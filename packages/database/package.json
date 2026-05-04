@@ -1,6 +1,6 @@
 {
   "name": "@apiagex/database",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Kysely database adapter package for Apiagex CMS.",
   "type": "module",
   "license": "MIT",
@@ -10,5 +10,11 @@
   "scripts": {
     "build": "tsc -b",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.9.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13"
   }
 }
