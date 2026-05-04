@@ -14,6 +14,7 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Read [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) and [tasks.md](./tasks.md) before coding.
 - Minimal routes now exist for `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 - `/doc` and `/readme` now explain the current MVP status in English and Hinglish.
+- `/adminui` now has the first MVP navigation shell.
 
 ## MVP Direction
 

@@ -26,6 +26,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `/api`, `/doc`, `/readme`, aur `/adminui` ek hi server se serve hote hain.
 - `/doc` and `/readme` render current MVP status in English and Hinglish.
 - `/doc` aur `/readme` current MVP status English aur Hinglish me dikhate hain.
+- `/adminui` renders the MVP navigation shell: Dashboard, Schemas, APIs, Roles, Users, Docs.
+- `/adminui` MVP navigation shell dikhata hai: Dashboard, Schemas, APIs, Roles, Users, Docs.
 
 ## MVP Contract
 

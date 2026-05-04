@@ -37,7 +37,7 @@ describe("api health route", () => {
   it.each([
     ["/doc", "Apiagex Docs", "Completed MVP base paths"],
     ["/readme", "Apiagex Readme", "fresh MVP headless CMS/API platform"],
-    ["/adminui", "Apiagex Admin UI"],
+    ["/adminui", "Apiagex Admin UI", "Admin navigation"],
   ])("serves %s from the same server", async (url, heading, detail) => {
     const server = createServer();
 
@@ -48,6 +48,16 @@ describe("api health route", () => {
     expect(response.body).toContain(`<h1>${heading}</h1>`);
     if (detail) {
       expect(response.body).toContain(detail);
+    }
+  });
+
+  it("serves the Admin UI shell navigation", async () => {
+    const server = createServer();
+    const response = await server.inject({ method: "GET", url: "/adminui" });
+
+    expect(response.statusCode).toBe(200);
+    for (const label of ["Dashboard", "Schemas", "APIs", "Roles", "Users", "Docs"]) {
+      expect(response.body).toContain(label);
     }
   });
 });

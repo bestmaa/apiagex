@@ -29,7 +29,7 @@ export function createServer(): ApiagexServer {
   });
 
   server.get("/adminui", async (_request, reply) => {
-    return reply.type("text/html").send(renderPage("Apiagex Admin UI", "Admin UI route ready"));
+    return reply.type("text/html").send(renderAdminPage());
   });
 
   return server;
@@ -63,4 +63,37 @@ function renderReadmePage(): string {
       "Use /adminui for UI and /api for backend routes.",
     ].join(" "),
   );
+}
+
+function renderAdminPage(): string {
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Apiagex Admin UI</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; color: #172033; }
+    header { padding: 20px 28px; border-bottom: 1px solid #d7dce5; }
+    nav { display: flex; gap: 12px; flex-wrap: wrap; padding: 16px 28px; }
+    a { color: #1457d9; text-decoration: none; font-weight: 700; }
+    main { padding: 20px 28px; max-width: 900px; }
+  </style>
+</head>
+<body>
+  <header><h1>Apiagex Admin UI</h1><p>Fresh MVP admin shell</p></header>
+  <nav aria-label="Admin navigation">
+    <a href="#dashboard">Dashboard</a>
+    <a href="#schemas">Schemas</a>
+    <a href="#apis">APIs</a>
+    <a href="#roles">Roles</a>
+    <a href="#users">Users</a>
+    <a href="/doc">Docs</a>
+  </nav>
+  <main>
+    <h2>Dashboard</h2>
+    <p>English: Admin shell is ready for owner login, schema builder, APIs, roles, and users.</p>
+    <p>Hinglish: Admin shell owner login, schema builder, APIs, roles, aur users ke liye ready hai.</p>
+  </main>
+</body>
+</html>`;
 }
