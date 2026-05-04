@@ -61,6 +61,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - MVP RBAC checkpoint version `v0.5.8` par ready hai.
 - Admin UI has cleaner layout, form controls, empty states, and responsive styling.
 - Admin UI me cleaner layout, form controls, empty states, aur responsive styling hai.
+- MVP manual QA checklist is available at [docs/qa-checklist.md](./docs/qa-checklist.md).
+- MVP manual QA checklist [docs/qa-checklist.md](./docs/qa-checklist.md) me available hai.
 
 ## MVP Direction
 

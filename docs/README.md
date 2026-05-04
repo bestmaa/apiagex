@@ -324,6 +324,12 @@ The Admin UI now uses a cleaner control-plane layout with a stronger header, com
 
 Admin UI ab cleaner control-plane layout use karta hai jisme stronger header, compact navigation, consistent form controls, clear empty states, aur responsive mobile spacing hai.
 
+## Manual QA Checklist
+
+English: Full manual QA steps for Browser Use and API requests are in [qa-checklist.md](./qa-checklist.md).
+
+Hinglish: Browser Use aur API requests ke full manual QA steps [qa-checklist.md](./qa-checklist.md) me hain.
+
 ## MVP Contract
 
 ### English

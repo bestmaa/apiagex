@@ -154,6 +154,8 @@ function renderDocPage(): string {
       "v0.5.8 verifies full MVP RBAC: roles, permissions, users, login, allow, and block.",
       "Admin UI polish improves layout, controls, empty states, and responsive spacing.",
       "Admin UI polish layout, controls, empty states, aur responsive spacing improve karta hai.",
+      "QA checklist: docs/qa-checklist.md covers Browser Use and API request checks.",
+      "QA checklist: docs/qa-checklist.md Browser Use aur API request checks cover karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -213,6 +215,8 @@ function renderReadmePage(): string {
       "MVP RBAC checkpoint v0.5.8 ready hai.",
       "Admin UI polish is ready for desktop and mobile checks.",
       "Admin UI polish desktop aur mobile checks ke liye ready hai.",
+      "Manual QA checklist is documented in docs/qa-checklist.md.",
+      "Manual QA checklist docs/qa-checklist.md me documented hai.",
     ].join(" "),
   );
 }

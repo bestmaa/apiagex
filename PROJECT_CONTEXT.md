@@ -67,6 +67,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - MVP RBAC checkpoint v0.5.8 ready hai.
 - Admin UI has polished layout, form controls, empty states, and responsive styling.
 - Admin UI me polished layout, form controls, empty states, aur responsive styling hai.
+- Manual QA checklist is documented in `docs/qa-checklist.md`.
+- Manual QA checklist `docs/qa-checklist.md` me documented hai.
 
 ## Required MVP Paths
 
@@ -142,7 +144,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T037`: add MVP QA checklist.
+The next pending task is `T038`: add MVP smoke test.
 
 ## Coding Rules
 
