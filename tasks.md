@@ -1,11 +1,7 @@
 # Apiagex Task Queue
-
 This queue is the working contract for moving Apiagex forward in small verified version steps. Pick the first task with `Status: pending`, mark it `in_progress`, finish it, verify it, update docs/context, commit it, then start the next task automatically.
-
 Ye queue Apiagex ko chhote verified version steps me aage badhane ka contract hai. Pehla `Status: pending` task lo, use `in_progress` mark karo, finish karo, verify karo, docs/context update karo, commit karo, phir next task auto start karo.
-
 ## Operating Rules
-
 - Work on exactly one task at a time.
 - Pick the first task with `Status: pending`.
 - Change its status to `in_progress` before editing code.
@@ -31,7 +27,6 @@ Ye queue Apiagex ko chhote verified version steps me aage badhane ka contract ha
 - Do not delete SQLite data unless the active task requires a reset. Before reset, stop servers, remove only known local dev DB/uploads paths, then recreate through migrations.
 
 ## Standard Verification
-
 Run these checks for every code task unless the task explicitly says docs-only:
 
 ```powershell
@@ -42,7 +37,6 @@ wsl.exe -e bash -lc "cd /home/aditya/projects/apiagex && git diff --check"
 ```
 
 Manual Browser Use verification is required before marking a user-facing task complete:
-
 ```text
 Open http://127.0.0.1:4000/docs/ and http://127.0.0.1:4000/adminui/.
 Log in with the active dev owner account.
@@ -51,7 +45,6 @@ For backend APIs, create a matching manual request flow and confirm status/body.
 ```
 
 ## Phase Release Verification
-
 For phase release tasks, do all standard checks, then:
 
 ```powershell
@@ -62,7 +55,6 @@ wsl.exe -e bash -lc "cd /home/aditya/projects/apiagex && git status --short && g
 Then verify: GitHub workflow if remote CI exists, starter install, `/docs/`, `/adminui/` login plus one dynamic API CRUD flow, and public API read after publish.
 
 ## GPT-5.5 Low-Token Prompt
-
 ```text
 Apiagex task runner.
 Read agent.md, PROJECT_CONTEXT.md, and tasks.md. Pick first `Status: pending`.
@@ -98,7 +90,7 @@ Push only on phase release tasks or explicit user request.
 ### Phase 2: RBAC V2 Permission Core
 
 - T007 | Version: v0.3.0 | Status: completed | Goal: Design canonical permission scope grammar for system, tenant, content, media, webhook, backup, and raw API routes. | Verify: design docs. | Commit: `Design permission scope grammar`
-- T008 | Version: v0.3.1 | Status: pending | Goal: Add permission action constants for `read`, `create`, `update`, `delete`, `execute`, and `manage`. | Verify: type tests. | Commit: `Add permission action constants`
+- T008 | Version: v0.3.1 | Status: completed | Goal: Add permission action constants for `read`, `create`, `update`, `delete`, `execute`, and `manage`. | Verify: type tests. | Commit: `Add permission action constants`
 - T009 | Version: v0.3.2 | Status: pending | Goal: Add permission evaluator service with owner bypass and default-deny behavior. | Verify: evaluator unit tests. | Commit: `Add permission evaluator`
 - T010 | Version: v0.3.3 | Status: pending | Goal: Add deny precedence so explicit `false` blocks fallback allows. | Verify: deny precedence tests. | Commit: `Add explicit deny precedence`
 - T011 | Version: v0.3.4 | Status: pending | Goal: Migrate existing role catalog permissions through the new evaluator without breaking current tests. | Verify: role and entry permission tests. | Commit: `Migrate roles to permission evaluator`

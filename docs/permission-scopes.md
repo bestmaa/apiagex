@@ -17,6 +17,8 @@ Actions are:
 - `execute`
 - `manage`
 
+These are the only canonical RBAC V2 actions. Legacy admin `write` checks remain a compatibility layer until the route guard migration is complete.
+
 Scope domains:
 
 - `system:roles` for role catalog management
@@ -72,6 +74,8 @@ Actions ye hain:
 - `delete`
 - `execute`
 - `manage`
+
+Ye hi canonical RBAC V2 actions hain. Legacy admin `write` checks route guard migration complete hone tak compatibility layer rahenge.
 
 Scope domains:
 
