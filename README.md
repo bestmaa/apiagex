@@ -49,6 +49,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Permission model role aur schema ke hisab se read, create, update, delete, aur manage support karta hai.
 - Admin UI role permissions screen shows dynamic API action checkboxes.
 - Admin UI role permissions screen dynamic API action checkboxes dikhata hai.
+- Dynamic APIs enforce role permissions when `x-apiagex-role-id` is provided.
+- Dynamic APIs `x-apiagex-role-id` provide hone par role permissions enforce karte hain.
 
 ## MVP Direction
 

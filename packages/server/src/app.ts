@@ -124,6 +124,8 @@ function renderDocPage(): string {
       "Permissions: read, create, update, delete, aur manage role aur schema ke hisab se evaluate hote hain.",
       "Admin UI: Role Permissions saves action checkboxes for generated APIs.",
       "Admin UI: Role Permissions generated APIs ke action checkboxes save karta hai.",
+      "Enforcement: dynamic APIs check x-apiagex-role-id and block missing permissions.",
+      "Enforcement: dynamic APIs x-apiagex-role-id check karte hain aur missing permissions block karte hain.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -167,6 +169,8 @@ function renderReadmePage(): string {
       "Permission evaluator default block karta hai, manage all allow karta hai, aur owner checks bypass karta hai.",
       "Role permission UI is ready for dynamic API enforcement.",
       "Role permission UI dynamic API enforcement ke liye ready hai.",
+      "Allowed roles succeed and blocked roles return API_PERMISSION_DENIED.",
+      "Allowed roles succeed karte hain aur blocked roles API_PERMISSION_DENIED return karte hain.",
     ].join(" "),
   );
 }

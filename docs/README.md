@@ -234,6 +234,16 @@ The Role Permissions screen creates roles, selects an active role, shows every g
 
 Role Permissions screen roles create karta hai, active role select karta hai, har generated schema API dikhata hai, aur `read`, `create`, `update`, `delete`, `manage` action checkboxes save karta hai.
 
+## Dynamic API Permission Enforcement
+
+### English
+
+Dynamic APIs check permissions when a request sends `x-apiagex-role-id`. Missing permissions return `403` with `API_PERMISSION_DENIED`. Requests without that header still work for current owner/admin tooling until user login tokens are added.
+
+### Hinglish
+
+Dynamic APIs permission tab check karte hain jab request `x-apiagex-role-id` bhejti hai. Missing permissions par `403` aur `API_PERMISSION_DENIED` return hota hai. User login tokens add hone tak header ke bina current owner/admin tooling work karta rahega.
+
 ## MVP Contract
 
 ### English

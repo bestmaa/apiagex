@@ -53,6 +53,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Permission model role aur schema ke hisab se read, create, update, delete, aur manage support karta hai.
 - Admin UI Role Permissions screen can create roles and save dynamic API action checkboxes.
 - Admin UI Role Permissions screen roles create kar sakta hai aur dynamic API action checkboxes save kar sakta hai.
+- Dynamic APIs enforce allow/block when `x-apiagex-role-id` is present.
+- Dynamic APIs `x-apiagex-role-id` present hone par allow/block enforce karte hain.
 
 ## Required MVP Paths
 
@@ -128,7 +130,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T030`: enforce permissions on dynamic APIs.
+The next pending task is `T031`: add user repository and APIs.
 
 ## Coding Rules
 

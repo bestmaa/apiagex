@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyReply } from "fastify";
 import {
+  canRoleAccess,
   createEntry,
   deleteEntry,
   getEntryById,
@@ -9,6 +10,7 @@ import {
   type SchemaRecord,
   type SqliteDatabase,
 } from "@apiagex/database";
+import type { FastifyRequest } from "fastify";
 import type {
   ContentBody,
   ContentEntryParams,
@@ -22,6 +24,7 @@ export function registerContentRoutes(
   server.get<{ Params: ContentListParams }>("/api/content/:schemaSlug", async (request, reply) => {
     const schema = findSchema(database, request.params.schemaSlug, reply);
     if (!schema) return reply;
+    if (!canAccess(database, request, schema, "read")) return forbidden(reply);
     return { ok: true, schema: schema.slug, entries: listEntries(database, schema.id) };
   });
 
@@ -30,6 +33,7 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
+      if (!canAccess(database, request, schema, "create")) return forbidden(reply);
       try {
         return { ok: true, entry: createEntry(database, { schemaId: schema.id, data: request.body.data }) };
       } catch (error) {
@@ -43,6 +47,7 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
+      if (!canAccess(database, request, schema, "read")) return forbidden(reply);
       const entry = getEntryById(database, request.params.entryId);
       if (!entry || entry.schemaId !== schema.id) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
@@ -56,6 +61,7 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
+      if (!canAccess(database, request, schema, "update")) return forbidden(reply);
       if (!entryBelongsToSchema(database, request.params.entryId, schema.id)) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
       }
@@ -72,6 +78,7 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
+      if (!canAccess(database, request, schema, "delete")) return forbidden(reply);
       if (!entryBelongsToSchema(database, request.params.entryId, schema.id)) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
       }
@@ -96,6 +103,21 @@ function findSchema(
 function entryBelongsToSchema(database: SqliteDatabase, entryId: string, schemaId: string): boolean {
   const entry = getEntryById(database, entryId);
   return Boolean(entry && entry.schemaId === schemaId);
+}
+
+function canAccess(
+  database: SqliteDatabase,
+  request: FastifyRequest,
+  schema: SchemaRecord,
+  action: "read" | "create" | "update" | "delete",
+): boolean {
+  const roleId = request.headers["x-apiagex-role-id"];
+  if (!roleId || Array.isArray(roleId)) return true;
+  return canRoleAccess(database, roleId, schema.id, action);
+}
+
+function forbidden(reply: FastifyReply): FastifyReply {
+  return reply.code(403).send({ ok: false, error: "API_PERMISSION_DENIED" });
 }
 
 function sendContentError(reply: FastifyReply, error: unknown, statusCode: number): FastifyReply {

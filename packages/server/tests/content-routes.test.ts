@@ -51,10 +51,37 @@ describe("dynamic content APIs", () => {
     expect(invalid.statusCode).toBe(400);
     expect(invalid.json()).toEqual({ ok: false, error: "ENTRY_FIELD_REQUIRED:title" });
   });
+
+  it("allows and blocks dynamic APIs by role permission header", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+    const allowedRole = await createRole(server, "reader");
+    const blockedRole = await createRole(server, "blocked");
+    await server.inject({
+      method: "PUT",
+      url: `/api/admin/roles/${allowedRole}/permissions`,
+      payload: { permissions: [{ schemaId, action: "read", allowed: true }] },
+    });
+
+    const allowed = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { "x-apiagex-role-id": allowedRole },
+    });
+    expect(allowed.statusCode).toBe(200);
+
+    const blocked = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { "x-apiagex-role-id": blockedRole },
+    });
+    expect(blocked.statusCode).toBe(403);
+    expect(blocked.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
+  });
 });
 
-async function createArticleSchema(server: ReturnType<typeof createServer>): Promise<void> {
-  await server.inject({
+async function createArticleSchema(server: ReturnType<typeof createServer>): Promise<string> {
+  const response = await server.inject({
     method: "POST",
     url: "/api/admin/schemas",
     payload: {
@@ -63,4 +90,14 @@ async function createArticleSchema(server: ReturnType<typeof createServer>): Pro
       fields: [{ name: "Title", slug: "title", type: "text", required: true }],
     },
   });
+  return response.json().schema.id as string;
+}
+
+async function createRole(server: ReturnType<typeof createServer>, name: string): Promise<string> {
+  const response = await server.inject({
+    method: "POST",
+    url: "/api/admin/roles",
+    payload: { name },
+  });
+  return response.json().role.id as string;
 }
