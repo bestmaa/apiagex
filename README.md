@@ -17,6 +17,7 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - `/adminui` now has the first MVP navigation shell.
 - Base path checkpoint is ready at version `v0.1.4`.
 - SQLite MVP foundation defines the first database tables for auth, schema, entries, and permissions.
+- First owner bootstrap API is `POST /api/auth/bootstrap-owner`.
 
 ## MVP Direction
 

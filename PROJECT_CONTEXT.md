@@ -16,6 +16,7 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `/adminui` now shows the minimal Admin shell navigation.
 - Base path checkpoint v0.1.4 covers `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 - SQLite MVP foundation creates migrations, roles, users, schemas, fields, entries, and permissions tables.
+- `POST /api/auth/bootstrap-owner` creates the first owner and blocks repeat bootstrap.
 
 ## Required MVP Paths
 
@@ -91,7 +92,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T010`: add first-time owner bootstrap.
+The next pending task is `T011`: add Admin UI login/logout for owner.
 
 ## Coding Rules
 

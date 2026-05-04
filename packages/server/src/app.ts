@@ -1,12 +1,17 @@
 import Fastify from "fastify";
+import { migrateMvpDatabase, openSqliteDatabase } from "@apiagex/database";
 import type {
   ApiagexServer,
   ApiRootResponse,
+  CreateServerOptions,
   HealthResponse,
 } from "./app.type.js";
+import { bootstrapOwner } from "./owner-bootstrap.js";
 
-export function createServer(): ApiagexServer {
+export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
+  const database = options.database ?? openSqliteDatabase();
+  migrateMvpDatabase(database);
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,
@@ -19,6 +24,19 @@ export function createServer(): ApiagexServer {
     service: "apiagex",
     path: "/api/health",
   }));
+
+  server.post("/api/auth/bootstrap-owner", async (request, reply) => {
+    try {
+      return bootstrapOwner(
+        database,
+        request.body as { email: string; password: string },
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "OWNER_BOOTSTRAP_FAILED";
+      const statusCode = message === "OWNER_ALREADY_BOOTSTRAPPED" ? 409 : 400;
+      return reply.code(statusCode).send({ ok: false, error: message });
+    }
+  });
 
   server.get("/doc", async (_request, reply) => {
     return reply.type("text/html").send(renderDocPage());

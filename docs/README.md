@@ -32,6 +32,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Base path checkpoint `/api`, `/api/health`, `/doc`, `/readme`, aur `/adminui` verify karta hai.
 - SQLite foundation has MVP tables: migrations, roles, users, schemas, fields, entries, permissions.
 - SQLite foundation me MVP tables hain: migrations, roles, users, schemas, fields, entries, permissions.
+- `POST /api/auth/bootstrap-owner` creates the first owner user.
+- `POST /api/auth/bootstrap-owner` pehla owner user banata hai.
 
 ## MVP Contract
 
