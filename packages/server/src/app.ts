@@ -122,6 +122,8 @@ function renderDocPage(): string {
       "Roles: /api/admin/roles unlimited non-owner roles create, list, aur read karta hai.",
       "Permissions: read, create, update, delete, and manage can be evaluated per role and schema.",
       "Permissions: read, create, update, delete, aur manage role aur schema ke hisab se evaluate hote hain.",
+      "Admin UI: Role Permissions saves action checkboxes for generated APIs.",
+      "Admin UI: Role Permissions generated APIs ke action checkboxes save karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -163,6 +165,8 @@ function renderReadmePage(): string {
       "Role admin APIs permission assignment ke liye ready hain.",
       "Permission evaluator defaults to block, manage allows all, and owner bypasses checks.",
       "Permission evaluator default block karta hai, manage all allow karta hai, aur owner checks bypass karta hai.",
+      "Role permission UI is ready for dynamic API enforcement.",
+      "Role permission UI dynamic API enforcement ke liye ready hai.",
     ].join(" "),
   );
 }

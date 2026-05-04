@@ -224,6 +224,16 @@ Permissions are stored per role, schema, and action. Actions are `read`, `create
 
 Permissions role, schema, aur action ke hisab se store hote hain. Actions `read`, `create`, `update`, `delete`, aur `manage` hain. Missing permission ka matlab block hai. `manage` us schema ke liye har action allow karta hai. Owner roles checks bypass karte hain.
 
+## Admin UI Role Permissions
+
+### English
+
+The Role Permissions screen creates roles, selects an active role, shows every generated schema API, and saves action checkboxes for `read`, `create`, `update`, `delete`, and `manage`.
+
+### Hinglish
+
+Role Permissions screen roles create karta hai, active role select karta hai, har generated schema API dikhata hai, aur `read`, `create`, `update`, `delete`, `manage` action checkboxes save karta hai.
+
 ## MVP Contract
 
 ### English

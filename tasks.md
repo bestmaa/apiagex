@@ -105,7 +105,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 
 - T027 | Version: v0.5.0 | Status: completed | Goal: Add role repository and APIs to create unlimited roles. | Verify: role API tests and manual request. | Commit: `Add role APIs`
 - T028 | Version: v0.5.1 | Status: completed | Goal: Add permission model for each dynamic API action: read, create, update, delete, manage. | Verify: permission evaluator tests. | Commit: `Add API permission model`
-- T029 | Version: v0.5.2 | Status: pending | Goal: Add Admin UI role screen with dynamic API checklist and action checkboxes. | Verify: Browser Use role permission UI. | Commit: `Add role permission UI`
+- T029 | Version: v0.5.2 | Status: completed | Goal: Add Admin UI role screen with dynamic API checklist and action checkboxes. | Verify: Browser Use role permission UI. | Commit: `Add role permission UI`
 - T030 | Version: v0.5.3 | Status: pending | Goal: Enforce permissions on dynamic APIs with allow/block behavior. | Verify: allowed role succeeds, blocked role fails. | Commit: `Enforce dynamic API permissions`
 - T031 | Version: v0.5.4 | Status: pending | Goal: Add user repository and APIs to create users and assign one role. | Verify: user API tests and manual request. | Commit: `Add user APIs`
 - T032 | Version: v0.5.5 | Status: pending | Goal: Add Admin UI user create/list screen with role assignment. | Verify: Browser Use user create flow. | Commit: `Add user management UI`

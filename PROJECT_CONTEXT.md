@@ -51,6 +51,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Role repository aur `/api/admin/roles` APIs non-owner roles create, list, aur read kar sakte hain.
 - Permission model supports read, create, update, delete, and manage per role and schema.
 - Permission model role aur schema ke hisab se read, create, update, delete, aur manage support karta hai.
+- Admin UI Role Permissions screen can create roles and save dynamic API action checkboxes.
+- Admin UI Role Permissions screen roles create kar sakta hai aur dynamic API action checkboxes save kar sakta hai.
 
 ## Required MVP Paths
 
@@ -126,7 +128,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T029`: add Admin UI role permission screen.
+The next pending task is `T030`: enforce permissions on dynamic APIs.
 
 ## Coding Rules
 

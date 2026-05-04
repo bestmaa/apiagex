@@ -2,10 +2,12 @@ import type { FastifyInstance, FastifyReply } from "fastify";
 import {
   createRole,
   getRoleById,
+  listRolePermissions,
   listRoles,
+  setPermission,
   type SqliteDatabase,
 } from "@apiagex/database";
-import type { RoleBody, RoleParams } from "./role-routes.type.js";
+import type { RoleBody, RoleParams, RolePermissionsBody } from "./role-routes.type.js";
 
 export function registerRoleRoutes(server: FastifyInstance, database: SqliteDatabase): void {
   server.get("/api/admin/roles", async () => ({
@@ -28,6 +30,30 @@ export function registerRoleRoutes(server: FastifyInstance, database: SqliteData
     }
     return { ok: true, role };
   });
+
+  server.get<{ Params: RoleParams }>(
+    "/api/admin/roles/:roleId/permissions",
+    async (request, reply) => {
+      if (!getRoleById(database, request.params.roleId)) {
+        return reply.code(404).send({ ok: false, error: "ROLE_NOT_FOUND" });
+      }
+      return { ok: true, permissions: listRolePermissions(database, request.params.roleId) };
+    },
+  );
+
+  server.put<{ Body: RolePermissionsBody; Params: RoleParams }>(
+    "/api/admin/roles/:roleId/permissions",
+    async (request, reply) => {
+      try {
+        for (const permission of request.body.permissions) {
+          setPermission(database, { ...permission, roleId: request.params.roleId });
+        }
+        return { ok: true, permissions: listRolePermissions(database, request.params.roleId) };
+      } catch (error) {
+        return sendRoleError(reply, error, 400);
+      }
+    },
+  );
 }
 
 function sendRoleError(reply: FastifyReply, error: unknown, statusCode: number): FastifyReply {

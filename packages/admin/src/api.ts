@@ -5,6 +5,12 @@ import type {
   EntryMutationResponse,
 } from "./entry.type";
 import type {
+  PermissionDraft,
+  PermissionListResponse,
+  RoleListResponse,
+  RoleMutationResponse,
+} from "./role.type";
+import type {
   SchemaDraft,
   SchemaListResponse,
   SchemaMutationResponse,
@@ -63,4 +69,38 @@ export async function createEntry(
     body: JSON.stringify({ data }),
   });
   return (await response.json()) as EntryMutationResponse;
+}
+
+export async function listRoles(): Promise<RoleListResponse> {
+  const response = await fetch("/api/admin/roles");
+  return (await response.json()) as RoleListResponse;
+}
+
+export async function createRole(
+  name: string,
+  description: string,
+): Promise<RoleMutationResponse> {
+  const response = await fetch("/api/admin/roles", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name, description }),
+  });
+  return (await response.json()) as RoleMutationResponse;
+}
+
+export async function listRolePermissions(roleId: string): Promise<PermissionListResponse> {
+  const response = await fetch(`/api/admin/roles/${roleId}/permissions`);
+  return (await response.json()) as PermissionListResponse;
+}
+
+export async function saveRolePermissions(
+  roleId: string,
+  permissions: PermissionDraft[],
+): Promise<PermissionListResponse> {
+  const response = await fetch(`/api/admin/roles/${roleId}/permissions`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ permissions }),
+  });
+  return (await response.json()) as PermissionListResponse;
 }

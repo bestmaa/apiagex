@@ -33,4 +33,35 @@ describe("role admin APIs", () => {
     expect(response.statusCode).toBe(400);
     expect(response.json()).toEqual({ ok: false, error: "ROLE_NAME_INVALID" });
   });
+
+  it("saves role permissions for schema actions", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const role = await server.inject({
+      method: "POST",
+      url: "/api/admin/roles",
+      payload: { name: "editor" },
+    });
+    const schema = await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Article",
+        slug: "article",
+        fields: [{ name: "Title", slug: "title", type: "text" }],
+      },
+    });
+
+    const save = await server.inject({
+      method: "PUT",
+      url: `/api/admin/roles/${role.json().role.id}/permissions`,
+      payload: {
+        permissions: [
+          { schemaId: schema.json().schema.id, action: "read", allowed: true },
+        ],
+      },
+    });
+
+    expect(save.statusCode).toBe(200);
+    expect(save.json().permissions).toHaveLength(1);
+  });
 });

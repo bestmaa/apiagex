@@ -47,6 +47,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Role admin APIs `/api/admin/roles` par available hain.
 - Permission model supports read, create, update, delete, and manage per role and schema.
 - Permission model role aur schema ke hisab se read, create, update, delete, aur manage support karta hai.
+- Admin UI role permissions screen shows dynamic API action checkboxes.
+- Admin UI role permissions screen dynamic API action checkboxes dikhata hai.
 
 ## MVP Direction
 
