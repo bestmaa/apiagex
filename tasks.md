@@ -22,6 +22,8 @@ Ye queue Apiagex ko chhote verified version steps me aage badhane ka contract ha
 - Add or update tests for every behavior change.
 - Use Browser Use for every user-facing version check. Open the admin/docs route and verify visible UI, console errors, forms, navigation, and language toggle when relevant.
 - Test APIs after every backend change with automated tests and at least one manual request flow.
+- Use one runtime server for local development: API, docs, README, uploads, and Admin UI must be served from the same API host/port.
+- Do not start a separate Admin UI server unless a task explicitly targets package-level admin dev-server compatibility.
 - After every completed code task, bump package versions to the task version listed below.
 - After every completed task, commit with the listed commit message.
 - Do not push after every task. Push only at phase release tasks or when the user explicitly asks.
@@ -42,7 +44,7 @@ wsl.exe -e bash -lc "cd /home/aditya/projects/apiagex && git diff --check"
 Manual Browser Use verification is required before marking a user-facing task complete:
 
 ```text
-Open http://127.0.0.1:4000/docs and the admin UI route.
+Open http://127.0.0.1:4000/docs/ and http://127.0.0.1:4000/adminui/.
 Log in with the active dev owner account.
 Verify the changed screen, forms, role visibility, API calls, console errors, docs language toggle, and any new route.
 For backend APIs, create a matching manual request flow and confirm status/body.
@@ -57,7 +59,7 @@ wsl.exe -e bash -lc "cd /home/aditya/projects/apiagex && npm run release:check"
 wsl.exe -e bash -lc "cd /home/aditya/projects/apiagex && git status --short && git log -1 --oneline"
 ```
 
-Then verify: GitHub workflow if remote CI exists, starter install, `/docs`, admin login plus one dynamic API CRUD flow, and public API read after publish.
+Then verify: GitHub workflow if remote CI exists, starter install, `/docs/`, `/adminui/` login plus one dynamic API CRUD flow, and public API read after publish.
 
 ## GPT-5.5 Low-Token Prompt
 
@@ -66,7 +68,7 @@ Apiagex task runner.
 Read agent.md, PROJECT_CONTEXT.md, and tasks.md. Pick first `Status: pending`.
 Set it `in_progress`. Implement only that task.
 Rules: clean strict TS, no any unless documented, files <250 lines, matching *.type.ts, docs in English+Hinglish, tests for behavior changes.
-If user-facing: verify with Browser Use on docs/admin UI and test API manually.
+If user-facing: verify with Browser Use on /docs/ and /adminui/ and test API manually.
 Verify: npm run check + npm run smoke + npm audit --audit-level=high + git diff --check.
 Bump package versions to task Version when code changes.
 Set task `completed`. Update PROJECT_CONTEXT.md. Commit with task Commit message.
@@ -88,6 +90,10 @@ Push only on phase release tasks or explicit user request.
 - T004 | Version: v0.2.3 | Status: completed | Goal: Add docs for local DB reset, owner login, and recovery in English/Hinglish. | Verify: docs browser check. | Commit: `Document local owner reset`
 - T005 | Version: v0.2.4 | Status: completed | Goal: Add reset smoke that deletes/recreates local SQLite DB and verifies owner login. | Verify: focused reset smoke. | Commit: `Test local reset smoke`
 - T006 | Version: v0.2.5 | Status: completed | Goal: Phase 1 release check. | Verify: phase release verification. | Commit: `Release dev reset phase`
+
+### Infrastructure Adjustment: Single-Server Admin UI
+
+- T007A | Version: v0.3.0 | Status: completed | Goal: Serve Admin UI, docs, README, uploads, and Admin UI API aliases from the API server so local users only start one server. | Verify: server tests, standard verification, Browser Use admin login at `/adminui/`. | Commit: `Serve admin UI from API server`
 
 ### Phase 2: RBAC V2 Permission Core
 
