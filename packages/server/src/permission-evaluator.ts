@@ -6,10 +6,11 @@ export function canEvaluatePermission(input: PermissionEvaluationInput): boolean
   }
 
   const scopedActions = input.permissions?.[input.scope];
+  const explicitValue = scopedActions?.[input.action];
 
-  if (!scopedActions) {
-    return false;
+  if (typeof explicitValue === 'boolean') {
+    return explicitValue;
   }
 
-  return scopedActions[input.action] === true;
+  return input.fallbackPermissions?.[input.scope]?.[input.action] === true;
 }

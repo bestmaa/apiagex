@@ -58,7 +58,7 @@ Evaluation order:
 5. Explicit `false` must block fallback allows.
 6. Missing permission is denied for sensitive admin APIs.
 
-The first evaluator implementation enforces owner bypass and default-deny for exact scope/action checks. Fallback migration and deny precedence are separate follow-up tasks.
+The evaluator keeps default-deny behavior and checks explicit catalog values before fallback values. If a catalog value is `false`, that deny wins over any fallback allow.
 
 ## Hindi
 
@@ -118,4 +118,4 @@ Evaluation order:
 5. Explicit `false` fallback allow ko block karega.
 6. Sensitive admin APIs par missing permission deny hogi.
 
-Pehla evaluator owner bypass aur exact scope/action ke liye default-deny enforce karta hai. Fallback migration aur deny precedence alag follow-up tasks hain.
+Evaluator fallback values se pehle explicit catalog values check karta hai. Agar catalog value `false` hai to vo deny kisi bhi fallback allow se jeetega.

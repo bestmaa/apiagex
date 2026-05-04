@@ -4,6 +4,7 @@ export type PermissionCatalog = Record<string, PermissionActionMap>;
 
 export interface PermissionEvaluationInput {
   action: PermissionAction;
+  fallbackPermissions?: PermissionCatalog | null;
   permissions?: PermissionCatalog | null;
   role: string | null | undefined;
   scope: string;

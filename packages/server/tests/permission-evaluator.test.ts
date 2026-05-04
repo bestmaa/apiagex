@@ -54,4 +54,40 @@ describe('permission evaluator', () => {
       scope: 'content-types:posts',
     })).toBe(false);
   });
+
+  it('uses fallback allows only when no explicit catalog value exists', () => {
+    const fallbackPermissions: PermissionCatalog = {
+      'content-types:posts': {
+        update: true,
+      },
+    };
+
+    expect(canEvaluatePermission({
+      action: 'update',
+      fallbackPermissions,
+      permissions: {},
+      role: 'editor',
+      scope: 'content-types:posts',
+    })).toBe(true);
+  });
+
+  it('lets explicit false block fallback allows', () => {
+    const fallbackPermissions: PermissionCatalog = {
+      'content-types:posts': {
+        update: true,
+      },
+    };
+
+    expect(canEvaluatePermission({
+      action: 'update',
+      fallbackPermissions,
+      permissions: {
+        'content-types:posts': {
+          update: false,
+        },
+      },
+      role: 'editor',
+      scope: 'content-types:posts',
+    })).toBe(false);
+  });
 });
