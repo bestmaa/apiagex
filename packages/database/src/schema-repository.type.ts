@@ -23,6 +23,8 @@ export type CreateSchemaInput = {
   fields: CreateFieldInput[];
 };
 
+export type UpdateSchemaInput = CreateSchemaInput;
+
 export type FieldRecord = {
   id: string;
   schemaId: string;

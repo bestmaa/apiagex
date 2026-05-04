@@ -40,6 +40,10 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `/adminui` me owner login/logout controls hain.
 - Admin UI is built in React and served from the same Fastify server.
 - Admin UI React me bana hai aur same Fastify server se serve hota hai.
+- `POST /api/admin/schemas` creates a schema with validated fields.
+- `POST /api/admin/schemas` validated fields ke saath schema banata hai.
+- `GET /api/admin/schemas` lists schemas, and `/api/admin/schemas/:id` supports read, update, and delete.
+- `GET /api/admin/schemas` schemas list karta hai, aur `/api/admin/schemas/:id` read, update, delete support karta hai.
 
 ## Owner Bootstrap And Login
 
@@ -68,6 +72,20 @@ Hinglish: v0.2.4 owner bootstrap API, login API, React Admin UI login/logout, au
 English: Schemas have name, slug, description, and ordered fields. Relation fields must target an existing schema before save.
 
 Hinglish: Schema me name, slug, description, aur ordered fields hote hain. Relation field save hone se pehle existing schema ko target karega.
+
+## Schema Admin APIs
+
+### English
+
+Use `POST /api/admin/schemas` with `name`, `slug`, optional `description`, and `fields`.
+Field types are `text`, `longText`, `number`, `boolean`, `date`, `json`, `media`, and `relation`.
+Use `GET /api/admin/schemas` to list, `GET /api/admin/schemas/:id` to read, `PUT /api/admin/schemas/:id` to update, and `DELETE /api/admin/schemas/:id` to remove.
+
+### Hinglish
+
+`POST /api/admin/schemas` me `name`, `slug`, optional `description`, aur `fields` bhejo.
+Field types `text`, `longText`, `number`, `boolean`, `date`, `json`, `media`, aur `relation` hain.
+List ke liye `GET /api/admin/schemas`, read ke liye `GET /api/admin/schemas/:id`, update ke liye `PUT /api/admin/schemas/:id`, aur delete ke liye `DELETE /api/admin/schemas/:id` use karo.
 
 ## MVP Contract
 

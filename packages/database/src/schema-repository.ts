@@ -4,10 +4,22 @@ import type {
   CreateFieldInput,
   CreateSchemaInput,
   FieldRecord,
+  FieldType,
   SchemaRecord,
+  UpdateSchemaInput,
 } from "./schema-repository.type.js";
 
 const slugPattern = /^[a-z][a-z0-9-]*$/;
+const fieldTypes: FieldType[] = [
+  "text",
+  "longText",
+  "number",
+  "boolean",
+  "date",
+  "json",
+  "media",
+  "relation",
+];
 
 export function createSchema(
   db: SqliteDatabase,
@@ -53,6 +65,50 @@ export function getSchemaById(
   return { ...schema, fields: listFields(db, schema.id) };
 }
 
+export function getSchemaBySlug(
+  db: SqliteDatabase,
+  slug: string,
+): SchemaRecord | undefined {
+  const row = db.prepare("SELECT id FROM schemas WHERE slug = ?").get(slug) as
+    | { id: string }
+    | undefined;
+  return row ? getSchemaById(db, row.id) : undefined;
+}
+
+export function updateSchema(
+  db: SqliteDatabase,
+  id: string,
+  input: UpdateSchemaInput,
+): SchemaRecord {
+  if (!getSchemaById(db, id)) {
+    throw new Error("SCHEMA_NOT_FOUND");
+  }
+  validateSchemaInput(db, input);
+  const now = new Date().toISOString();
+  const description = input.description ?? "";
+  const update = db.transaction(() => {
+    db.prepare(
+      "UPDATE schemas SET name = ?, slug = ?, description = ?, updated_at = ? WHERE id = ?",
+    ).run(input.name, input.slug, description, now, id);
+    db.prepare("DELETE FROM fields WHERE schema_id = ?").run(id);
+    input.fields.forEach((field, index) => insertField(db, id, field, index));
+  });
+  update();
+
+  const updated = getSchemaById(db, id);
+  if (!updated) {
+    throw new Error("SCHEMA_UPDATE_FAILED");
+  }
+  return updated;
+}
+
+export function deleteSchema(db: SqliteDatabase, id: string): void {
+  const result = db.prepare("DELETE FROM schemas WHERE id = ?").run(id);
+  if (result.changes === 0) {
+    throw new Error("SCHEMA_NOT_FOUND");
+  }
+}
+
 function insertField(
   db: SqliteDatabase,
   schemaId: string,
@@ -90,6 +146,9 @@ function validateSchemaInput(db: SqliteDatabase, input: CreateSchemaInput): void
   }
   for (const field of input.fields) {
     validateSlug(field.slug, "FIELD_SLUG_INVALID");
+    if (!fieldTypes.includes(field.type)) {
+      throw new Error("FIELD_TYPE_INVALID");
+    }
     if (field.type === "relation" && !field.relationSchemaId) {
       throw new Error("RELATION_TARGET_REQUIRED");
     }

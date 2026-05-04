@@ -9,6 +9,7 @@ import type {
 } from "./app.type.js";
 import { bootstrapOwner, loginOwner } from "./owner-bootstrap.js";
 import { readAdminIndex, resolveAdminUiAsset } from "./admin-ui.js";
+import { registerSchemaRoutes } from "./schema-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -18,6 +19,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
     prefix: "/adminui/",
     root: resolveAdminUiAsset().root,
   });
+  registerSchemaRoutes(server, database);
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,
@@ -88,6 +90,8 @@ function renderDocPage(): string {
       "Owner auth: POST /api/auth/bootstrap-owner creates the first owner, then POST /api/auth/login logs in.",
       "Owner auth: POST /api/auth/bootstrap-owner pehla owner banata hai, phir POST /api/auth/login login karta hai.",
       "v0.2.4 verifies owner bootstrap API, login API, React Admin UI login/logout, and docs.",
+      "Schemas: /api/admin/schemas supports create, list, read, update, and delete with field validation.",
+      "Schemas: /api/admin/schemas field validation ke saath create, list, read, update, aur delete support karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -101,6 +105,8 @@ function renderReadmePage(): string {
       "Hinglish: Apiagex ek fresh MVP headless CMS/API platform hai jo ek server par chalega.",
       "Use /adminui for React UI and /api for backend routes.",
       "Owner login starts in /adminui and uses the bootstrap/login APIs.",
+      "Schema APIs are now available at /api/admin/schemas for owner/admin workflows.",
+      "Schema APIs ab owner/admin workflow ke liye /api/admin/schemas par available hain.",
     ].join(" "),
   );
 }

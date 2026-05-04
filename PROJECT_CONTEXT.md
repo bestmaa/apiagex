@@ -23,6 +23,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `/doc` and `/readme` document owner bootstrap and login routes.
 - Owner bootstrap/login checkpoint v0.2.4 is ready.
 - Schema repository can create schemas, ordered fields, and relation fields that target existing schemas.
+- Schema admin APIs can create, list, read, update, and delete schemas at `/api/admin/schemas`.
+- Schema admin APIs `/api/admin/schemas` par schema create, list, read, update, aur delete kar sakte hain.
 
 ## Required MVP Paths
 
@@ -98,7 +100,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T015`: add schema admin APIs for create/list/read/update/delete.
+The next pending task is `T016`: add the React Admin UI schema builder form.
 
 ## Coding Rules
 

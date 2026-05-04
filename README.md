@@ -23,6 +23,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Owner docs are available on `/doc` and `/readme`.
 - Owner bootstrap checkpoint is ready at version `v0.2.4`.
 - Schema repository supports ordered fields and safe relation targets.
+- Schema admin APIs are available at `/api/admin/schemas` for create, list, read, update, and delete.
+- Schema admin APIs `/api/admin/schemas` par create, list, read, update, aur delete ke liye available hain.
 
 ## MVP Direction
 

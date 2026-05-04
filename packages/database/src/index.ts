@@ -10,8 +10,11 @@ export {
 } from "./sqlite.js";
 export {
   createSchema,
+  deleteSchema,
   getSchemaById,
+  getSchemaBySlug,
   listSchemas,
+  updateSchema,
 } from "./schema-repository.js";
 export type { MvpTableName, MigrationRecord, TableInfoRow } from "./schema.type.js";
 export type {
@@ -20,5 +23,6 @@ export type {
   FieldRecord,
   FieldType,
   SchemaRecord,
+  UpdateSchemaInput,
 } from "./schema-repository.type.js";
 export type { SqliteDatabase } from "./sqlite.js";

@@ -85,7 +85,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 ### Phase 3: Schema Builder And Relations
 
 - T014 | Version: v0.3.0 | Status: completed | Goal: Add schema and field repositories with relation-aware field model. | Verify: repository tests. | Commit: `Add schema repositories`
-- T015 | Version: v0.3.1 | Status: pending | Goal: Add schema admin APIs for create/list/read/update/delete with field validation. | Verify: API tests and manual request. | Commit: `Add schema APIs`
+- T015 | Version: v0.3.1 | Status: completed | Goal: Add schema admin APIs for create/list/read/update/delete with field validation. | Verify: API tests and manual request. | Commit: `Add schema APIs`
 - T016 | Version: v0.3.2 | Status: pending | Goal: Add Admin UI schema form with text, long text, number, boolean, date, JSON, media, and relation fields. | Verify: Browser Use schema create flow. | Commit: `Add schema builder UI`
 - T017 | Version: v0.3.3 | Status: pending | Goal: Add relation picker/validation so fields can reference another schema safely. | Verify: relation tests and Browser Use relation field flow. | Commit: `Add relation field support`
 - T018 | Version: v0.3.4 | Status: pending | Goal: Document schema builder and relation rules in English+Hinglish. | Verify: Browser Use docs check. | Commit: `Document schema builder`
