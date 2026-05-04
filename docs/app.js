@@ -9,6 +9,7 @@ const pages = [
   { label: { en: 'Overview', hi: 'Overview' }, path: 'README.md', summary: { en: 'Markdown index and current scope.', hi: 'Markdown index aur current scope.' } },
   { label: { en: 'Install', hi: 'Install' }, path: 'install.md', summary: { en: 'How the installer works.', hi: 'Installer ka flow.' } },
   { label: { en: 'Local DB', hi: 'Local DB' }, path: 'local-database.md', summary: { en: 'SQLite local development mode.', hi: 'SQLite local development mode.' } },
+  { label: { en: 'Local Reset', hi: 'Local Reset' }, path: 'local-reset.md', summary: { en: 'Safe reset and owner login recovery.', hi: 'Safe reset aur owner login recovery.' } },
   { label: { en: 'Admin UI', hi: 'Admin UI' }, path: 'admin-ui.md', summary: { en: 'Login, roles, and content editing.', hi: 'Login, roles, aur content editing.' } },
   { label: { en: 'Roles', hi: 'Roles' }, path: 'roles.md', summary: { en: 'Role catalog management.', hi: 'Role catalog management.' } },
   { label: { en: 'Security', hi: 'Security' }, path: 'security.md', summary: { en: 'Authentication and permissions.', hi: 'Authentication aur permissions.' } },

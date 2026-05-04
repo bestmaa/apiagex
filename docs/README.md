@@ -9,6 +9,7 @@ Current topics:
 
 - Install flow
 - Local SQLite database mode
+- Local reset and owner login recovery
 - Admin UI
 - Workflow and task queue rules
 - Login, roles, and permissions
@@ -35,6 +36,7 @@ Current topics:
 
 - Install flow
 - Local SQLite database mode
+- Local reset aur owner login recovery
 - Admin UI
 - Workflow and task queue rules
 - Login, roles, and permissions
