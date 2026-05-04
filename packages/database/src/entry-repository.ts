@@ -75,6 +75,9 @@ function validateEntryData(
   schema: SchemaRecord,
   data: EntryData,
 ): void {
+  if (!isRecord(data)) {
+    throw new Error("ENTRY_DATA_INVALID");
+  }
   const fieldSlugs = new Set(schema.fields.map((field) => field.slug));
   for (const key of Object.keys(data)) {
     if (!fieldSlugs.has(key)) {
@@ -122,6 +125,10 @@ function assertType(field: FieldRecord, valid: boolean): void {
 
 function isMissing(value: unknown): boolean {
   return value === undefined || value === null || value === "";
+}
+
+function isRecord(value: unknown): value is EntryData {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function requireSchema(db: SqliteDatabase, schemaId: string): SchemaRecord {

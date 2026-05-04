@@ -94,7 +94,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 ### Phase 4: Entries And Dynamic APIs
 
 - T020 | Version: v0.4.0 | Status: completed | Goal: Add entries repository with schema-based validation. | Verify: entry repository tests. | Commit: `Add entry repository`
-- T021 | Version: v0.4.1 | Status: pending | Goal: Add entry admin APIs for create/list/read/update/delete per schema. | Verify: API tests and manual request. | Commit: `Add entry admin APIs`
+- T021 | Version: v0.4.1 | Status: completed | Goal: Add entry admin APIs for create/list/read/update/delete per schema. | Verify: API tests and manual request. | Commit: `Add entry admin APIs`
 - T022 | Version: v0.4.2 | Status: pending | Goal: Add Admin UI entry forms generated from schema fields. | Verify: Browser Use entry create/edit flow. | Commit: `Add entry UI`
 - T023 | Version: v0.4.3 | Status: pending | Goal: Add dynamic `/api/content/:schemaSlug` routes for list/read/create/update/delete. | Verify: dynamic API CRUD tests and manual request. | Commit: `Add dynamic content APIs`
 - T024 | Version: v0.4.4 | Status: pending | Goal: Add Admin UI API list showing every generated dynamic API. | Verify: Browser Use API list check. | Commit: `Add dynamic API list UI`

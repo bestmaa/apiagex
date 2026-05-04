@@ -141,6 +141,16 @@ Entries store JSON data for one schema. The repository rejects unknown fields, m
 
 Entries ek schema ke liye JSON data store karte hain. Repository unknown fields, missing required fields, galat value types, aur relation values ko reject karti hai jo target schema ke entry ko point nahi karte.
 
+## Entry Admin APIs
+
+### English
+
+Use `POST /api/admin/schemas/:schemaId/entries` with `{ "data": { ... } }` to create an entry. Use the same base path for list, and add `/:entryId` for read, update, and delete.
+
+### Hinglish
+
+Entry create karne ke liye `POST /api/admin/schemas/:schemaId/entries` par `{ "data": { ... } }` bhejo. List ke liye same base path use karo, aur read, update, delete ke liye `/:entryId` add karo.
+
 ## MVP Contract
 
 ### English

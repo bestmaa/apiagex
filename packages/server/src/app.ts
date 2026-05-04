@@ -10,6 +10,7 @@ import type {
 import { bootstrapOwner, loginOwner } from "./owner-bootstrap.js";
 import { readAdminIndex, resolveAdminUiAsset } from "./admin-ui.js";
 import { registerSchemaRoutes } from "./schema-routes.js";
+import { registerEntryRoutes } from "./entry-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -20,6 +21,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
     root: resolveAdminUiAsset().root,
   });
   registerSchemaRoutes(server, database);
+  registerEntryRoutes(server, database);
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,
@@ -101,6 +103,8 @@ function renderDocPage(): string {
       "v0.3.5 verifies schema APIs, React schema builder, relation picker, docs, tests, and audit.",
       "Entries: repository validation checks required fields, value types, unknown fields, and relation targets.",
       "Entries: repository validation required fields, value types, unknown fields, aur relation targets check karta hai.",
+      "Entry APIs: /api/admin/schemas/:schemaId/entries supports admin CRUD per schema.",
+      "Entry APIs: /api/admin/schemas/:schemaId/entries per schema admin CRUD support karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -126,6 +130,8 @@ function renderReadmePage(): string {
       "Schema builder checkpoint v0.3.5 ready hai.",
       "Entry repository validation is ready for admin and dynamic APIs.",
       "Entry repository validation admin aur dynamic APIs ke liye ready hai.",
+      "Entry admin APIs are available below each schema.",
+      "Entry admin APIs har schema ke below available hain.",
     ].join(" "),
   );
 }

@@ -35,6 +35,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Schema builder checkpoint v0.3.5 ready hai.
 - Entry repository validates JSON entry data against schema fields and relation entry targets.
 - Entry repository JSON entry data ko schema fields aur relation entry targets ke against validate karta hai.
+- Entry admin APIs provide create, list, read, update, and delete under `/api/admin/schemas/:schemaId/entries`.
+- Entry admin APIs `/api/admin/schemas/:schemaId/entries` ke under create, list, read, update, aur delete provide karte hain.
 
 ## Required MVP Paths
 
@@ -110,7 +112,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T021`: add entry admin APIs.
+The next pending task is `T022`: add Admin UI entry forms generated from schema fields.
 
 ## Coding Rules
 
