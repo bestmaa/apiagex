@@ -17,3 +17,23 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Generated API usage
 - Role allow/block guide
 - Manual QA checklist
+
+## MVP Contract
+
+### English
+
+Apiagex MVP runs on one server with four paths: `/api`, `/adminui`, `/doc`, and `/readme`.
+The owner logs in first, creates schemas from Admin UI, adds fields, creates entries, and receives generated APIs under `/api/content/:schemaSlug`.
+Schema fields must support text, long text, number, boolean, date, JSON, media, and relation.
+Relations must point to an existing schema before the schema can be saved.
+The Admin UI must list every generated API, show docs/examples, create roles, assign API permissions with checkboxes, create users, and assign one role per user.
+Allowed users must access the API; blocked users must fail.
+
+### Hinglish
+
+Apiagex MVP ek hi server par chalega jisme chaar path honge: `/api`, `/adminui`, `/doc`, aur `/readme`.
+Owner sabse pehle login karega, Admin UI se schema banayega, fields add karega, entries create karega, aur system `/api/content/:schemaSlug` par generated API dega.
+Schema fields me text, long text, number, boolean, date, JSON, media, aur relation support hona chahiye.
+Relation field save hone se pehle existing schema ko point karna chahiye.
+Admin UI me har generated API ki list, docs/examples, role creation, checkbox based API permissions, user creation, aur user ko role assign karne ka flow hona chahiye.
+Allowed user API access kare; blocked user fail ho.

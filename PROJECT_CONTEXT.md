@@ -36,6 +36,46 @@ One server must serve exactly these primary paths:
 11. User can see/access only APIs allowed by their role.
 12. Allowed API request must succeed; blocked API request must fail.
 
+## MVP Product Contract
+
+### Routes
+
+- `/api` is the only backend API prefix.
+- `/api/health` proves the server is alive.
+- `/doc` explains every completed feature with API examples.
+- `/readme` gives a concise product/workspace summary.
+- `/adminui` is the browser UI for owner/admin/user workflows.
+
+### Owner And Auth
+
+- The first successful bootstrap login creates or activates the owner.
+- Owner has full access and cannot be blocked by role permissions.
+- Later users must be created by an allowed owner/admin flow.
+- A user belongs to exactly one role for MVP simplicity.
+
+### Schema Builder
+
+- A schema is an API definition with name, slug, description, and fields.
+- Field types: text, long text, number, boolean, date, JSON, media, relation.
+- Slugs must be unique and URL safe.
+- Relation fields reference another schema by stable schema id/slug.
+- Relations must validate target schema existence before save.
+
+### Dynamic APIs
+
+- Every schema creates API routes under `/api/content/:schemaSlug`.
+- MVP actions: list, read, create, update, delete.
+- Admin UI must show every generated API with docs and examples.
+- API behavior must match schema validation and relation rules.
+
+### RBAC
+
+- Owner can create unlimited roles.
+- Permissions are assigned per role, per dynamic API, per action.
+- Actions: read, create, update, delete, manage.
+- Checked means allowed; unchecked means blocked by default.
+- Permission verification must test an allowed user and blocked user.
+
 ## Verification Contract
 
 - Browser Use is required for Admin UI, `/doc`, and `/readme` checks.

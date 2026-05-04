@@ -63,7 +63,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 
 - T001 | Version: reset | Status: completed | Goal: Back up old code and remove previous implementation while preserving setup. | Verify: backup branch/tag and clean reset commit. | Commit: `Reset implementation for fresh MVP`
 - T002 | Version: spec | Status: completed | Goal: Capture fresh MVP flow: `/doc`, `/readme`, `/adminui`, `/api`, owner, schema, dynamic API, role permissions, users. | Verify: user-provided flow documented. | Commit: `Document fresh MVP flow`
-- T003 | Version: spec | Status: pending | Goal: Write detailed MVP product contract in docs/README and PROJECT_CONTEXT with English+Hinglish. | Verify: docs review and line count. | Commit: `Define fresh MVP contract`
+- T003 | Version: spec | Status: completed | Goal: Write detailed MVP product contract in docs/README and PROJECT_CONTEXT with English+Hinglish. | Verify: docs review and line count. | Commit: `Define fresh MVP contract`
 
 ### Phase 1: One Server And Four Paths
 
