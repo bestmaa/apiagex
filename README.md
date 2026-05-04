@@ -37,6 +37,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Entry admin APIs `/api/admin/schemas/:schemaId/entries` ke under available hain.
 - React Admin UI now generates entry forms from schema fields.
 - React Admin UI ab schema fields se entry forms generate karta hai.
+- Dynamic content APIs are available at `/api/content/:schemaSlug`.
+- Dynamic content APIs `/api/content/:schemaSlug` par available hain.
 
 ## MVP Direction
 

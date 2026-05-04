@@ -39,6 +39,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Entry admin APIs `/api/admin/schemas/:schemaId/entries` ke under create, list, read, update, aur delete provide karte hain.
 - React Admin UI generates entry forms from selected schema fields.
 - React Admin UI selected schema fields se entry forms generate karta hai.
+- Dynamic content APIs expose each schema slug under `/api/content/:schemaSlug`.
+- Dynamic content APIs har schema slug ko `/api/content/:schemaSlug` ke under expose karte hain.
 
 ## Required MVP Paths
 
@@ -114,7 +116,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T023`: add dynamic `/api/content/:schemaSlug` routes.
+The next pending task is `T024`: add Admin UI API list showing generated dynamic APIs.
 
 ## Coding Rules
 

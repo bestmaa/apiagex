@@ -9,6 +9,7 @@ import type {
 } from "./app.type.js";
 import { bootstrapOwner, loginOwner } from "./owner-bootstrap.js";
 import { readAdminIndex, resolveAdminUiAsset } from "./admin-ui.js";
+import { registerContentRoutes } from "./content-routes.js";
 import { registerSchemaRoutes } from "./schema-routes.js";
 import { registerEntryRoutes } from "./entry-routes.js";
 
@@ -22,6 +23,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   });
   registerSchemaRoutes(server, database);
   registerEntryRoutes(server, database);
+  registerContentRoutes(server, database);
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,
@@ -107,6 +109,8 @@ function renderDocPage(): string {
       "Entry APIs: /api/admin/schemas/:schemaId/entries per schema admin CRUD support karta hai.",
       "Admin UI: Entry Manager renders entry forms from selected schema fields.",
       "Admin UI: Entry Manager selected schema fields se entry forms render karta hai.",
+      "Dynamic APIs: /api/content/:schemaSlug exposes schema-based CRUD.",
+      "Dynamic APIs: /api/content/:schemaSlug schema-based CRUD expose karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -136,6 +140,8 @@ function renderReadmePage(): string {
       "Entry admin APIs har schema ke below available hain.",
       "The React Admin UI can create entries from generated forms.",
       "React Admin UI generated forms se entries create kar sakta hai.",
+      "Dynamic content APIs are ready under /api/content/:schemaSlug.",
+      "Dynamic content APIs /api/content/:schemaSlug ke under ready hain.",
     ].join(" "),
   );
 }

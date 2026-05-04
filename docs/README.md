@@ -161,6 +161,16 @@ After owner login, the Entry Manager reads schemas and renders a form from the s
 
 Owner login ke baad Entry Manager schemas read karta hai aur selected schema fields se form render karta hai. Text, long text, number, boolean, date, JSON, media, aur relation fields matching inputs ke saath dikhte hain.
 
+## Dynamic Content APIs
+
+### English
+
+Every schema slug creates `/api/content/:schemaSlug`. Use `GET` to list entries and `POST` with `{ "data": { ... } }` to create. Use `/api/content/:schemaSlug/:entryId` for read, update, and delete.
+
+### Hinglish
+
+Har schema slug `/api/content/:schemaSlug` banata hai. Entries list ke liye `GET` aur create ke liye `{ "data": { ... } }` ke saath `POST` use karo. Read, update, delete ke liye `/api/content/:schemaSlug/:entryId` use karo.
+
 ## MVP Contract
 
 ### English
