@@ -1,41 +1,119 @@
+:root {
+  color: #162033;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f7fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  color: #172033;
-  font-family: Arial, sans-serif;
   margin: 0;
 }
 
-header {
-  border-bottom: 1px solid #d7dce5;
-  padding: 20px 28px;
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-header {
+  align-items: center;
+  background: #ffffff;
+  border-bottom: 1px solid #d9e1ec;
+  display: flex;
+  justify-content: space-between;
+  padding: 24px 32px;
+}
+
+.eyebrow {
+  color: #657187;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 28px;
+  line-height: 1.2;
+  margin-bottom: 0;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3 {
+  font-size: 16px;
 }
 
 nav {
+  background: #ffffff;
+  border-bottom: 1px solid #d9e1ec;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 16px 28px;
+  gap: 8px;
+  padding: 12px 32px;
 }
 
 a {
-  color: #1457d9;
+  border-radius: 6px;
+  color: #1d4f91;
   font-weight: 700;
+  padding: 8px 10px;
   text-decoration: none;
 }
 
+a:hover {
+  background: #edf4ff;
+}
+
 main {
-  max-width: 900px;
-  padding: 20px 28px;
+  display: grid;
+  gap: 18px;
+  max-width: 1120px;
+  padding: 24px 32px 48px;
+}
+
+section {
+  background: #ffffff;
+  border: 1px solid #d9e1ec;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(22, 32, 51, 0.04);
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+}
+
+.summary-panel {
+  background: #102238;
+  color: #ffffff;
+}
+
+.summary-panel p {
+  color: #d8e2ef;
 }
 
 form {
   display: grid;
   gap: 12px;
-  max-width: 360px;
+  max-width: 520px;
 }
 
 label {
+  color: #344157;
   display: grid;
-  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 6px;
 }
 
 button,
@@ -45,46 +123,121 @@ textarea {
   font: inherit;
 }
 
+input,
+select,
+textarea {
+  background: #ffffff;
+  border: 1px solid #b9c4d3;
+  border-radius: 6px;
+  color: #162033;
+  min-height: 38px;
+  padding: 8px 10px;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
 button {
+  background: #175cd3;
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  min-height: 38px;
+  padding: 8px 14px;
   width: fit-content;
 }
 
+button:hover {
+  background: #124cad;
+}
+
+button:disabled {
+  background: #9aa7b8;
+  cursor: not-allowed;
+}
+
 fieldset {
-  border: 1px solid #d7dce5;
+  border: 1px solid #d9e1ec;
+  border-radius: 8px;
   display: grid;
   gap: 10px;
   margin: 0;
-  padding: 12px;
+  padding: 14px;
 }
 
-.field-list {
+legend {
+  color: #657187;
+  font-weight: 700;
+  padding: 0 6px;
+}
+
+code {
+  background: #eef3f8;
+  border-radius: 4px;
+  color: #102238;
+  padding: 4px 6px;
+}
+
+.field-list,
+.permission-grid {
   display: grid;
   gap: 12px;
 }
 
-.schema-row {
-  align-items: center;
-  border-bottom: 1px solid #d7dce5;
-  display: grid;
-  gap: 8px;
-  grid-template-columns: 1fr auto auto;
-  padding: 10px 0;
-}
-
+.schema-row,
 .api-row {
-  border-bottom: 1px solid #d7dce5;
+  align-items: center;
+  border-top: 1px solid #e5ebf2;
   display: grid;
   gap: 8px;
   padding: 12px 0;
 }
 
-code {
-  background: #eef3f8;
-  padding: 4px 6px;
+.schema-row {
+  grid-template-columns: minmax(0, 1fr) auto auto;
 }
 
-.permission-grid {
-  display: grid;
-  gap: 12px;
-  margin: 12px 0;
+.api-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.api-row ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.api-row li,
+.status-line,
+.empty-state {
+  background: #eef3f8;
+  border-radius: 6px;
+  color: #4b5870;
+  padding: 8px 10px;
+}
+
+@media (max-width: 700px) {
+  .app-header,
+  nav,
+  main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .app-header {
+    align-items: flex-start;
+    display: grid;
+    gap: 14px;
+  }
+
+  .schema-row {
+    grid-template-columns: 1fr;
+  }
 }

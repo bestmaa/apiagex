@@ -65,6 +65,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `/doc` aur `/readme` RBAC allow/block examples document karte hain.
 - MVP RBAC checkpoint v0.5.8 is ready.
 - MVP RBAC checkpoint v0.5.8 ready hai.
+- Admin UI has polished layout, form controls, empty states, and responsive styling.
+- Admin UI me polished layout, form controls, empty states, aur responsive styling hai.
 
 ## Required MVP Paths
 
@@ -140,7 +142,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T036`: polish Admin UI.
+The next pending task is `T037`: add MVP QA checklist.
 
 ## Coding Rules
 

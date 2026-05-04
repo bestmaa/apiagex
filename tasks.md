@@ -115,7 +115,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 
 ### Phase 6: MVP Polish And Final Gate
 
-- T036 | Version: v0.6.0 | Status: pending | Goal: Polish Admin UI empty states, success/errors, loading states, and responsive layout. | Verify: Browser Use desktop/mobile visual check. | Commit: `Polish MVP admin UI`
+- T036 | Version: v0.6.0 | Status: completed | Goal: Polish Admin UI empty states, success/errors, loading states, and responsive layout. | Verify: Browser Use desktop/mobile visual check. | Commit: `Polish MVP admin UI`
 - T037 | Version: v0.6.1 | Status: pending | Goal: Add full MVP manual QA checklist for Browser Use and API requests. | Verify: checklist review. | Commit: `Add MVP QA checklist`
 - T038 | Version: v0.6.2 | Status: pending | Goal: Add smoke test covering owner login, schema, entry, dynamic API, role, user permission. | Verify: `npm run smoke`. | Commit: `Add MVP smoke test`
 - T039 | Version: v0.6.3 | Status: pending | Goal: Final docs/readme sync for every completed MVP feature. | Verify: Browser Use `/doc` and `/readme`. | Commit: `Sync MVP docs`

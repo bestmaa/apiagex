@@ -314,6 +314,16 @@ English: v0.5.8 verifies role APIs, permission model, role permission UI, dynami
 
 Hinglish: v0.5.8 role APIs, permission model, role permission UI, dynamic API enforcement, user APIs, user UI, user login, allowed role success, blocked role failure, docs, tests, audit, aur Browser Use checks verify karta hai.
 
+## Admin UI Polish
+
+### English
+
+The Admin UI now uses a cleaner control-plane layout with a stronger header, compact navigation, consistent form controls, clear empty states, and responsive mobile spacing.
+
+### Hinglish
+
+Admin UI ab cleaner control-plane layout use karta hai jisme stronger header, compact navigation, consistent form controls, clear empty states, aur responsive mobile spacing hai.
+
 ## MVP Contract
 
 ### English

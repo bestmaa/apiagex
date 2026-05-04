@@ -152,6 +152,8 @@ function renderDocPage(): string {
       "RBAC blocked dynamic API requests return API_PERMISSION_DENIED.",
       "RBAC blocked dynamic API requests API_PERMISSION_DENIED return karte hain.",
       "v0.5.8 verifies full MVP RBAC: roles, permissions, users, login, allow, and block.",
+      "Admin UI polish improves layout, controls, empty states, and responsive spacing.",
+      "Admin UI polish layout, controls, empty states, aur responsive spacing improve karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -209,6 +211,8 @@ function renderReadmePage(): string {
       "Blocked RBAC requests API_PERMISSION_DENIED return karte hain.",
       "MVP RBAC checkpoint v0.5.8 is ready.",
       "MVP RBAC checkpoint v0.5.8 ready hai.",
+      "Admin UI polish is ready for desktop and mobile checks.",
+      "Admin UI polish desktop aur mobile checks ke liye ready hai.",
     ].join(" "),
   );
 }

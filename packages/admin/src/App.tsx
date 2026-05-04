@@ -47,10 +47,13 @@ export function App() {
   }
 
   return (
-    <>
-      <header>
-        <h1>Apiagex Admin UI</h1>
-        <p>Fresh MVP admin shell</p>
+    <div className="app-shell">
+      <header className="app-header">
+        <div>
+          <p className="eyebrow">Headless CMS control plane</p>
+          <h1>Apiagex Admin UI</h1>
+        </div>
+        {session ? <button onClick={logout}>Logout</button> : null}
       </header>
       <nav aria-label="Admin navigation">
         {navItems.map((item) => (
@@ -60,13 +63,15 @@ export function App() {
         ))}
       </nav>
       <main>
-        <h2>Dashboard</h2>
-        <p>English: Admin shell is ready for owner login, schema builder, APIs, roles, and users.</p>
-        <p>Hinglish: Admin shell owner login, schema builder, APIs, roles, aur users ke liye ready hai.</p>
+        <section className="summary-panel">
+          <h2>Dashboard</h2>
+          <p>English: Owner can create schemas, entries, APIs, roles, permissions, and users.</p>
+          <p>Hinglish: Owner schemas, entries, APIs, roles, permissions, aur users bana sakta hai.</p>
+        </section>
         <section aria-labelledby="owner-login-title">
           <h2 id="owner-login-title">Owner Login</h2>
-          {!session ? <OwnerLoginForm onSubmit={submitLogin} /> : <button onClick={logout}>Logout</button>}
-          <p id="owner-session-status">{status}</p>
+          {!session ? <OwnerLoginForm onSubmit={submitLogin} /> : null}
+          <p className="status-line" id="owner-session-status">{status}</p>
         </section>
         {session ? (
           <>
@@ -76,9 +81,9 @@ export function App() {
             <RoleManager />
             <UserManager />
           </>
-        ) : <p>Login as owner to create schemas and entries.</p>}
+        ) : <p className="empty-state">Login as owner to create schemas, entries, roles, and users.</p>}
       </main>
-    </>
+    </div>
   );
 }
 

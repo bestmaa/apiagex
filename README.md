@@ -59,6 +59,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - RBAC end-to-end flow user login aur allowed/blocked dynamic API access verify karta hai.
 - MVP RBAC checkpoint is ready at version `v0.5.8`.
 - MVP RBAC checkpoint version `v0.5.8` par ready hai.
+- Admin UI has cleaner layout, form controls, empty states, and responsive styling.
+- Admin UI me cleaner layout, form controls, empty states, aur responsive styling hai.
 
 ## MVP Direction
 
