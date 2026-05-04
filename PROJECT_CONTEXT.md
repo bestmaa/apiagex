@@ -132,6 +132,7 @@ packages/admin            Future admin UI package
 - `packages/server` now supports `APIAGEX_LOCAL_OWNER=true` in non-production mode to seed the local owner login `owner@apiagex.local` / `OwnerPass123!`.
 - Docs now include a local reset page covering dry-run reset, guarded apply, local owner login, and recovery steps in English/Hinglish.
 - Root workspace now includes `npm run reset:local:smoke`, which resets a temporary local DB/uploads fixture, recreates SQLite state, and verifies owner login.
+- Docs now include the RBAC V2 permission scope grammar covering system, tenant, content, media, webhook, backup, realtime, audit, migration, and raw API scopes.
 - `packages/server` now exposes a duplicate content-type route at `/admin/content-types/:id/duplicate`, and the admin content-type cards expose a Duplicate action.
 - Static documentation page with top English/Hindi toggle.
 - Static docs shell now renders `docs/*.md` directly with English/Hindi toggle.

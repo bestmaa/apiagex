@@ -20,6 +20,8 @@ Current access pattern:
 - custom roles can define `content-types:<slug>` permission scopes, and those catalog permissions are evaluated first for authenticated requests
 - if a role catalog entry does not define a scope for a content type, the current content-type permission matrix remains the fallback
 
+RBAC V2 will standardize these scopes across system, tenant, content, media, webhook, backup, realtime, and raw API routes. See `permission-scopes.md`.
+
 ## Hindi
 
 `/admin/roles` API dynamic role catalog manage karti hai.
@@ -39,3 +41,5 @@ Current access pattern:
 - `editor` aur `viewer` existing authenticated APIs ko content-type permission defaults ke through use karte hain
 - custom roles `content-types:<slug>` permission scopes define kar sakte hain, aur authenticated requests me pehle wahi catalog permissions evaluate hoti hain
 - agar role catalog entry kisi content type ke liye scope define nahi karti, to current content-type permission matrix fallback rahegi
+
+RBAC V2 in scopes ko system, tenant, content, media, webhook, backup, realtime, aur raw API routes par standard karega. `permission-scopes.md` dekho.

@@ -12,6 +12,7 @@ const pages = [
   { label: { en: 'Local Reset', hi: 'Local Reset' }, path: 'local-reset.md', summary: { en: 'Safe reset and owner login recovery.', hi: 'Safe reset aur owner login recovery.' } },
   { label: { en: 'Admin UI', hi: 'Admin UI' }, path: 'admin-ui.md', summary: { en: 'Login, roles, and content editing.', hi: 'Login, roles, aur content editing.' } },
   { label: { en: 'Roles', hi: 'Roles' }, path: 'roles.md', summary: { en: 'Role catalog management.', hi: 'Role catalog management.' } },
+  { label: { en: 'Permission Scopes', hi: 'Permission Scopes' }, path: 'permission-scopes.md', summary: { en: 'RBAC V2 permission grammar.', hi: 'RBAC V2 permission grammar.' } },
   { label: { en: 'Security', hi: 'Security' }, path: 'security.md', summary: { en: 'Authentication and permissions.', hi: 'Authentication aur permissions.' } },
   { label: { en: 'Audit', hi: 'Audit' }, path: 'audit.md', summary: { en: 'Mutation tracking.', hi: 'Mutation tracking.' } },
   { label: { en: 'Webhooks', hi: 'Webhooks' }, path: 'webhooks.md', summary: { en: 'Outbound event delivery.', hi: 'Outbound event delivery.' } },
