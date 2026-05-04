@@ -4,6 +4,7 @@ import { ApiList } from "./ApiList";
 import { EntryManager } from "./EntryManager";
 import { RoleManager } from "./RoleManager";
 import { SchemaBuilder } from "./SchemaBuilder";
+import { UserManager } from "./UserManager";
 import type { OwnerSession } from "./session.type";
 import "./styles.css";
 
@@ -73,6 +74,7 @@ export function App() {
             <EntryManager />
             <ApiList />
             <RoleManager />
+            <UserManager />
           </>
         ) : <p>Login as owner to create schemas and entries.</p>}
       </main>

@@ -53,6 +53,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Dynamic APIs `x-apiagex-role-id` provide hone par role permissions enforce karte hain.
 - User admin APIs are available at `/api/admin/users` with one role per user.
 - User admin APIs `/api/admin/users` par available hain, har user ke liye ek role.
+- Admin UI Users screen can create and list users with role assignment.
+- Admin UI Users screen role assignment ke saath users create aur list kar sakta hai.
 
 ## MVP Direction
 

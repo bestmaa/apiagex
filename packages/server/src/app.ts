@@ -130,6 +130,8 @@ function renderDocPage(): string {
       "Enforcement: dynamic APIs x-apiagex-role-id check karte hain aur missing permissions block karte hain.",
       "Users: /api/admin/users creates, lists, and reads users assigned to one role.",
       "Users: /api/admin/users one-role users create, list, aur read karta hai.",
+      "Admin UI: Users screen creates and lists users with role assignment.",
+      "Admin UI: Users screen role assignment ke saath users create aur list karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -177,6 +179,8 @@ function renderReadmePage(): string {
       "Allowed roles succeed karte hain aur blocked roles API_PERMISSION_DENIED return karte hain.",
       "User admin APIs are ready for the Admin UI user screen.",
       "User admin APIs Admin UI user screen ke liye ready hain.",
+      "User management UI is ready for the RBAC end-to-end flow.",
+      "User management UI RBAC end-to-end flow ke liye ready hai.",
     ].join(" "),
   );
 }

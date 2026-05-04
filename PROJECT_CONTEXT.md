@@ -57,6 +57,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Dynamic APIs `x-apiagex-role-id` present hone par allow/block enforce karte hain.
 - User repository and `/api/admin/users` APIs create users assigned to exactly one role.
 - User repository aur `/api/admin/users` APIs users ko exactly one role ke saath create karte hain.
+- Admin UI Users screen creates and lists users with role assignment.
+- Admin UI Users screen role assignment ke saath users create aur list karta hai.
 
 ## Required MVP Paths
 
@@ -132,7 +134,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T032`: add Admin UI user management.
+The next pending task is `T033`: verify MVP RBAC flow end-to-end.
 
 ## Coding Rules
 

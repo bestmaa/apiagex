@@ -254,6 +254,16 @@ Use `POST /api/admin/users` with `email`, `password`, and `roleId` to create a u
 
 Ek role assigned user create karne ke liye `POST /api/admin/users` par `email`, `password`, aur `roleId` bhejo. Users list ke liye `GET /api/admin/users` aur one user read ke liye `GET /api/admin/users/:userId` use karo.
 
+## Admin UI Users
+
+### English
+
+The Users screen loads roles, creates users with email/password/role, and lists created users with their assigned role. MVP users belong to exactly one role.
+
+### Hinglish
+
+Users screen roles load karta hai, email/password/role ke saath users create karta hai, aur created users ko assigned role ke saath list karta hai. MVP me har user exactly ek role me hota hai.
+
 ## MVP Contract
 
 ### English

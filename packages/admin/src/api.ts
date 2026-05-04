@@ -10,6 +10,7 @@ import type {
   RoleListResponse,
   RoleMutationResponse,
 } from "./role.type";
+import type { UserListResponse, UserMutationResponse } from "./user.type";
 import type {
   SchemaDraft,
   SchemaListResponse,
@@ -103,4 +104,22 @@ export async function saveRolePermissions(
     body: JSON.stringify({ permissions }),
   });
   return (await response.json()) as PermissionListResponse;
+}
+
+export async function listUsers(): Promise<UserListResponse> {
+  const response = await fetch("/api/admin/users");
+  return (await response.json()) as UserListResponse;
+}
+
+export async function createUser(input: {
+  email: string;
+  password: string;
+  roleId: string;
+}): Promise<UserMutationResponse> {
+  const response = await fetch("/api/admin/users", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return (await response.json()) as UserMutationResponse;
 }
