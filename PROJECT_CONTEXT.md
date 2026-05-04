@@ -45,6 +45,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Admin UI sab schemas ke generated dynamic APIs list karta hai.
 - `/doc` and `/readme` include dynamic API usage examples.
 - `/doc` aur `/readme` dynamic API usage examples include karte hain.
+- Dynamic API checkpoint v0.4.6 is ready.
+- Dynamic API checkpoint v0.4.6 ready hai.
 
 ## Required MVP Paths
 
@@ -120,7 +122,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T026`: release dynamic API checkpoint.
+The next pending task is `T027`: add role repository and APIs.
 
 ## Coding Rules
 

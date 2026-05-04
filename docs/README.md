@@ -198,6 +198,12 @@ The Admin UI shows every generated dynamic API in the Generated APIs section. Ea
 
 Admin UI Generated APIs section me har generated dynamic API dikhata hai. Har schema apna `/api/content/:schemaSlug` route aur supported actions show karta hai.
 
+## Dynamic API Checkpoint
+
+English: v0.4.6 verifies schema creation, entry creation, generated dynamic API CRUD, Admin UI entry forms, generated API list, docs, tests, audit, and Browser Use checks.
+
+Hinglish: v0.4.6 schema creation, entry creation, generated dynamic API CRUD, Admin UI entry forms, generated API list, docs, tests, audit, aur Browser Use checks verify karta hai.
+
 ## MVP Contract
 
 ### English

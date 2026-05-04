@@ -115,6 +115,7 @@ function renderDocPage(): string {
       "Admin UI: Generated APIs har schema ka dynamic content route list karta hai.",
       "Docs: dynamic API examples show list, create, update, and delete calls.",
       "Docs: dynamic API examples list, create, update, aur delete calls dikhate hain.",
+      "v0.4.6 verifies schema, entry, dynamic APIs, Admin UI API list, docs, tests, and audit.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -150,6 +151,8 @@ function renderReadmePage(): string {
       "Admin UI ab generated dynamic APIs list karta hai.",
       "Read /doc and /readme for dynamic API examples.",
       "Dynamic API examples ke liye /doc aur /readme padho.",
+      "Dynamic API checkpoint v0.4.6 is ready.",
+      "Dynamic API checkpoint v0.4.6 ready hai.",
     ].join(" "),
   );
 }
