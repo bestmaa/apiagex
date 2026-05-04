@@ -31,6 +31,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Relation fields existing schema target pick kar sakte hain aur backend validation hota hai.
 - `/doc` and `/readme` now document schema builder usage and relation rules.
 - `/doc` aur `/readme` schema builder usage aur relation rules document karte hain.
+- Schema builder checkpoint v0.3.5 is ready.
+- Schema builder checkpoint v0.3.5 ready hai.
 
 ## Required MVP Paths
 
@@ -106,7 +108,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T019`: release schema builder checkpoint.
+The next pending task is `T020`: add entries repository with schema-based validation.
 
 ## Coding Rules
 

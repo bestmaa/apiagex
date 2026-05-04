@@ -89,7 +89,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 - T016 | Version: v0.3.2 | Status: completed | Goal: Add Admin UI schema form with text, long text, number, boolean, date, JSON, media, and relation fields. | Verify: Browser Use schema create flow. | Commit: `Add schema builder UI`
 - T017 | Version: v0.3.3 | Status: completed | Goal: Add relation picker/validation so fields can reference another schema safely. | Verify: relation tests and Browser Use relation field flow. | Commit: `Add relation field support`
 - T018 | Version: v0.3.4 | Status: completed | Goal: Document schema builder and relation rules in English+Hinglish. | Verify: Browser Use docs check. | Commit: `Document schema builder`
-- T019 | Version: v0.3.5 | Status: pending | Goal: Release schema builder checkpoint. | Verify: standard verification and Browser Use schema flow. | Commit: `Release schema builder`
+- T019 | Version: v0.3.5 | Status: completed | Goal: Release schema builder checkpoint. | Verify: standard verification and Browser Use schema flow. | Commit: `Release schema builder`
 
 ### Phase 4: Entries And Dynamic APIs
 

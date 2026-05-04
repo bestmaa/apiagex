@@ -29,6 +29,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - React Admin UI me ab sab MVP field types ke saath schema builder form hai.
 - Relation fields now use an existing-schema picker and backend validation.
 - Relation fields ab existing-schema picker aur backend validation use karte hain.
+- Schema builder checkpoint is ready at version `v0.3.5`.
+- Schema builder checkpoint version `v0.3.5` par ready hai.
 
 ## MVP Direction
 

@@ -98,6 +98,7 @@ function renderDocPage(): string {
       "Relations: relation fields existing schema pick karte hain aur API validate karti hai.",
       "Docs: schema builder usage and relation rules are documented in English and Hinglish.",
       "Docs: schema builder usage aur relation rules English aur Hinglish me documented hain.",
+      "v0.3.5 verifies schema APIs, React schema builder, relation picker, docs, tests, and audit.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -119,6 +120,8 @@ function renderReadmePage(): string {
       "Relation fields save se pehle existing-schema picker use karte hain.",
       "Read /doc for schema examples and relation validation rules.",
       "/doc me schema examples aur relation validation rules padho.",
+      "Schema builder checkpoint v0.3.5 is ready.",
+      "Schema builder checkpoint v0.3.5 ready hai.",
     ].join(" "),
   );
 }

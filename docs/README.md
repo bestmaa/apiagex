@@ -125,6 +125,12 @@ Create the target schema first, then create a relation field in another schema. 
 
 Pehle target schema banao, phir dusre schema me relation field banao. Relation fields `relationSchemaId` store karte hain, isliye label rename hone par target break nahi hota. Backend missing target ko `RELATION_TARGET_REQUIRED` ya `RELATION_TARGET_MISSING` se reject karta hai.
 
+## Schema Builder Checkpoint
+
+English: v0.3.5 verifies schema repositories, schema admin APIs, React schema builder UI, relation picker, docs, tests, audit, and Browser Use schema flow.
+
+Hinglish: v0.3.5 schema repositories, schema admin APIs, React schema builder UI, relation picker, docs, tests, audit, aur Browser Use schema flow verify karta hai.
+
 ## MVP Contract
 
 ### English
