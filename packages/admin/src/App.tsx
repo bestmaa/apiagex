@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { authenticateOwner } from "./api";
+import { ApiList } from "./ApiList";
 import { EntryManager } from "./EntryManager";
 import { SchemaBuilder } from "./SchemaBuilder";
 import type { OwnerSession } from "./session.type";
@@ -69,6 +70,7 @@ export function App() {
           <>
             <SchemaBuilder />
             <EntryManager />
+            <ApiList />
           </>
         ) : <p>Login as owner to create schemas and entries.</p>}
       </main>

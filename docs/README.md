@@ -171,6 +171,16 @@ Every schema slug creates `/api/content/:schemaSlug`. Use `GET` to list entries 
 
 Har schema slug `/api/content/:schemaSlug` banata hai. Entries list ke liye `GET` aur create ke liye `{ "data": { ... } }` ke saath `POST` use karo. Read, update, delete ke liye `/api/content/:schemaSlug/:entryId` use karo.
 
+## Generated API List
+
+### English
+
+The Admin UI shows every generated dynamic API in the Generated APIs section. Each schema displays its `/api/content/:schemaSlug` route and supported actions.
+
+### Hinglish
+
+Admin UI Generated APIs section me har generated dynamic API dikhata hai. Har schema apna `/api/content/:schemaSlug` route aur supported actions show karta hai.
+
 ## MVP Contract
 
 ### English

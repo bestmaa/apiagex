@@ -111,6 +111,8 @@ function renderDocPage(): string {
       "Admin UI: Entry Manager selected schema fields se entry forms render karta hai.",
       "Dynamic APIs: /api/content/:schemaSlug exposes schema-based CRUD.",
       "Dynamic APIs: /api/content/:schemaSlug schema-based CRUD expose karta hai.",
+      "Admin UI: Generated APIs lists every schema's dynamic content route.",
+      "Admin UI: Generated APIs har schema ka dynamic content route list karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -142,6 +144,8 @@ function renderReadmePage(): string {
       "React Admin UI generated forms se entries create kar sakta hai.",
       "Dynamic content APIs are ready under /api/content/:schemaSlug.",
       "Dynamic content APIs /api/content/:schemaSlug ke under ready hain.",
+      "Admin UI now lists generated dynamic APIs.",
+      "Admin UI ab generated dynamic APIs list karta hai.",
     ].join(" "),
   );
 }
