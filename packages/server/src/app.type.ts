@@ -7,3 +7,9 @@ export type HealthResponse = {
   service: "apiagex";
   path: "/api/health";
 };
+
+export type ApiRootResponse = {
+  ok: true;
+  service: "apiagex";
+  paths: ["/api", "/doc", "/readme", "/adminui"];
+};
