@@ -128,6 +128,7 @@ packages/admin            Future admin UI package
 - Root docs now include a performance page with the index list and smoke commands.
 - Root docs now include a workflow page for task sequencing, Git commits, Browser Use checks, and safe local data rules.
 - The repository has been initialized as a local Git worktree on branch `main`.
+- Root workspace now includes `npm run reset:local` for dry-run local SQLite/upload reset and `npm run reset:local -- --apply` for the guarded delete.
 - `packages/server` now exposes a duplicate content-type route at `/admin/content-types/:id/duplicate`, and the admin content-type cards expose a Duplicate action.
 - Static documentation page with top English/Hindi toggle.
 - Static docs shell now renders `docs/*.md` directly with English/Hindi toggle.

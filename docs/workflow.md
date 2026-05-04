@@ -34,6 +34,8 @@ Local data rules:
 
 - Do not delete SQLite data outside a reset task.
 - Reset only known local development DB/uploads paths.
+- Preview reset targets with `npm run reset:local`.
+- Delete them only with `npm run reset:local -- --apply`.
 - Use development credentials only for local verification.
 - Never commit real secrets.
 
@@ -71,5 +73,7 @@ Local data rules:
 
 - SQLite data reset task ke bahar delete nahi karna.
 - Sirf known local development DB/uploads paths reset karne hain.
+- Reset targets preview karne ke liye `npm run reset:local` chalao.
+- Delete sirf `npm run reset:local -- --apply` se karna.
 - Development credentials sirf local verification ke liye hain.
 - Real secrets kabhi commit nahi karne.

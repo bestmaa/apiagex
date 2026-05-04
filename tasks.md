@@ -83,7 +83,7 @@ Push only on phase release tasks or explicit user request.
 ### Phase 1: Worktree, Dev Reset, And Owner Bootstrap
 
 - T001 | Version: v0.2.0 | Status: completed | Goal: Initialize/repair Git workflow for the repo without losing user files; document branch and commit rules. | Verify: `git status`, docs-only review. | Commit: `Document Apiagex task workflow`
-- T002 | Version: v0.2.1 | Status: pending | Goal: Add safe local reset script for SQLite dev DB/uploads with explicit known paths only. | Verify: reset script test dry-run. | Commit: `Add safe dev reset workflow`
+- T002 | Version: v0.2.1 | Status: completed | Goal: Add safe local reset script for SQLite dev DB/uploads with explicit known paths only. | Verify: reset script test dry-run. | Commit: `Add safe dev reset workflow`
 - T003 | Version: v0.2.2 | Status: pending | Goal: Add dev owner seed config using `owner@apiagex.local` and `OwnerPass123!` for local reset only. | Verify: login API test. | Commit: `Seed local owner account`
 - T004 | Version: v0.2.3 | Status: pending | Goal: Add docs for local DB reset, owner login, and recovery in English/Hinglish. | Verify: docs browser check. | Commit: `Document local owner reset`
 - T005 | Version: v0.2.4 | Status: pending | Goal: Add reset smoke that deletes/recreates local SQLite DB and verifies owner login. | Verify: focused reset smoke. | Commit: `Test local reset smoke`
