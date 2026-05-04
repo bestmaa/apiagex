@@ -177,41 +177,13 @@ npm audit            -> 0 vulnerabilities
 
 ## Next Recommended Step
 
-Tighten production hardening around storage abstraction, observability, and upgrade safety.
+Do not restart the project from scratch. The server, admin shell, dynamic content APIs, docs route, and RBAC foundation already exist. The next work should make the MVP obvious in Admin UI:
 
-Suggested scope:
-
-- Add a post-generation success screen with next commands.
-- Extend the generated app with database adapter placeholders and follow-on content tables.
-- Add admin UI scaffolds that save content types into the new metadata tables.
-- Connect the admin UI scaffold to the real database-backed content-type tables.
-- Add admin UI field forms that use the new content field routes.
-- Add admin UI entry forms that use the new content entry routes.
-- Keep server-side entry validation aligned with the cached field schema.
-- Keep public read output aligned with published entries and content type kind.
-- Keep admin auth and route protection aligned with the login token contract.
-- Keep the role matrix aligned across backend guards and admin UI visibility.
-- Keep audit log writes aligned with every content-type, field, and entry mutation.
-- Keep webhook events, webhook persistence, and delivery logs aligned with audit-backed mutations.
-- Keep webhook retries, attempt counts, and delivery status aligned with backend delivery records and admin UI.
-- Keep the admin webhooks panel aligned with webhook route contracts and delivery history.
-- Keep the realtime stream contract aligned with the content-type realtime flag and admin UI toggle.
-- Keep the admin realtime listener aligned with the shared SSE stream and the panel refresh behavior.
-- Keep the backup export/restore contract aligned with repository snapshots, media bytes, schema migrations, and admin UI panels.
-- Keep the public populate contract aligned with relation and media field resolution.
-- Keep the public response cache aligned with published content, media, and restore invalidation.
-- Keep the media storage adapter aligned with local writes today and future remote drivers later.
-- Keep the request id header and structured request logs aligned with the health/detail contract.
-- Keep the draft preview contract aligned with signed preview tokens, admin preview actions, and public read routes.
-- Keep the version history contract aligned with snapshot writes, restore routes, and the admin versions panel.
-- Keep the version compare contract aligned with the current form state, saved snapshots, and restore flows.
-- Keep the approval workflow contract aligned with pendingApproval status, admin-only approve/reject routes, and the admin approval panel.
-- Keep the approval queue contract aligned with the pendingApproval filter and the admin queue view.
-- Keep the admin entry form generated from backend content fields.
-- Keep the admin entries panel and server entry routes aligned.
-- Keep field-specific entry widgets visually distinct and accessible.
-- Keep media uploads, media fields, and uploaded file ids aligned across admin and server routes.
-- Keep docs and tests in sync with each generated file change.
+- Dashboard-first "Create API" flow: schema -> first entry -> generated API docs -> role assignment.
+- Schema builder labels, validation, save feedback, and next-step CTA.
+- Per-content-type docs with endpoint examples, auth notes, README/docs links, and copyable URLs.
+- Per-API role allow/block UI for owner/admin/editor/viewer/custom roles.
+- Browser Use verification on `/adminui/`, API manual request verification, automated tests, docs update, version bump, and commit after each task.
 
 ## Do Not Forget
 

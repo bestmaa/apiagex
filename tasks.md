@@ -87,7 +87,7 @@ Push only on phase release tasks or explicit user request.
 
 - T007A | Version: v0.3.0 | Status: completed | Goal: Serve Admin UI, docs, README, uploads, and Admin UI API aliases from the API server so local users only start one server. | Verify: server tests, standard verification, Browser Use admin login at `/adminui/`. | Commit: `Serve admin UI from API server`
 
-### Phase 2: RBAC V2 Permission Core
+### Phase 2: MVP Admin API Builder Flow
 
 - T007 | Version: v0.3.0 | Status: completed | Goal: Design canonical permission scope grammar for system, tenant, content, media, webhook, backup, and raw API routes. | Verify: design docs. | Commit: `Design permission scope grammar`
 - T008 | Version: v0.3.1 | Status: completed | Goal: Add permission action constants for `read`, `create`, `update`, `delete`, `execute`, and `manage`. | Verify: type tests. | Commit: `Add permission action constants`
@@ -96,16 +96,17 @@ Push only on phase release tasks or explicit user request.
 - T011 | Version: v0.3.4 | Status: completed | Goal: Migrate existing role catalog permissions through the new evaluator without breaking current tests. | Verify: role and entry permission tests. | Commit: `Migrate roles to permission evaluator`
 - T012 | Version: v0.3.5 | Status: completed | Goal: Add route permission metadata helper for Fastify routes. | Verify: route guard tests. | Commit: `Add route permission metadata`
 - T013 | Version: v0.3.6 | Status: completed | Goal: Guard roles routes with `system:roles` permissions. | Verify: roles API tests. | Commit: `Guard role APIs with permissions`
-- T014 | Version: v0.3.7 | Status: pending | Goal: Guard audit, backup, migrations, webhooks, media, search, and realtime admin routes through the evaluator. | Verify: route matrix tests. | Commit: `Guard admin APIs with permissions`
-- T015 | Version: v0.3.8 | Status: pending | Goal: Add public API authenticated allow/block tests for content-type list/read. | Verify: public permission tests. | Commit: `Test public API permissions`
-- T016 | Version: v0.3.9 | Status: pending | Goal: Document RBAC V2 scopes and examples in English/Hinglish. | Verify: docs browser check. | Commit: `Document RBAC V2`
-- T017 | Version: v0.3.10 | Status: pending | Goal: Phase 2 release check. | Verify: phase release verification. | Commit: `Release RBAC core phase`
+- T014 | Version: v0.3.7 | Status: pending | Goal: Add dashboard-first "Create API" guided flow: schema -> first entry -> generated API docs -> role assignment. | Verify: Browser Use owner flow and console check. | Commit: `Add MVP create API flow`
+- T015 | Version: v0.3.8 | Status: pending | Goal: Polish schema builder with clear labels, field help, validation, save feedback, and next-step CTA to Entries. | Verify: Browser Use schema create flow. | Commit: `Polish schema builder flow`
+- T016 | Version: v0.3.9 | Status: pending | Goal: Add per-content-type Admin UI docs with endpoint examples, auth notes, README/docs links, and copyable URLs. | Verify: docs panel browser check and API manual request. | Commit: `Add generated API docs panel`
+- T017 | Version: v0.3.10 | Status: pending | Goal: Add per-API role assignment UI for owner/admin/editor/viewer/custom roles with allow/block preview. | Verify: Browser Use role allow/block flow and permission tests. | Commit: `Add API role assignment flow`
+- T017A | Version: v0.3.11 | Status: pending | Goal: MVP release check for create API, create entry, generated docs, role assignment, and public API read. | Verify: phase release verification. | Commit: `Release MVP admin flow`
 
-### Phase 3: Admin Permission Matrix
+### Phase 3: RBAC V2 Hardening And Permission Matrix
 
 - T018 | Version: v0.4.0 | Status: pending | Goal: Split admin UI modules so all source files stay under 250 lines before adding role UI. | Verify: line-count check and admin tests. | Commit: `Split admin UI modules`
-- T019 | Version: v0.4.1 | Status: pending | Goal: Add roles page route and navigation visibility for owner/admin. | Verify: Browser Use role nav check. | Commit: `Add roles admin page`
-- T020 | Version: v0.4.2 | Status: pending | Goal: Add role list/create/edit/delete forms. | Verify: Browser Use CRUD and route tests. | Commit: `Add role management UI`
+- T019 | Version: v0.4.1 | Status: pending | Goal: Guard audit, backup, migrations, webhooks, media, search, and realtime admin routes through the evaluator. | Verify: route matrix tests. | Commit: `Guard admin APIs with permissions`
+- T020 | Version: v0.4.2 | Status: pending | Goal: Add public API authenticated allow/block tests for content-type list/read. | Verify: public permission tests. | Commit: `Test public API permissions`
 - T021 | Version: v0.4.3 | Status: pending | Goal: Add permission matrix component for system scopes. | Verify: UI test and browser check. | Commit: `Add system permission matrix`
 - T022 | Version: v0.4.4 | Status: pending | Goal: Add permission matrix component for every content type. | Verify: content API allow/block browser flow. | Commit: `Add content permission matrix`
 - T023 | Version: v0.4.5 | Status: pending | Goal: Add route/API permission rows for webhooks, backups, media, search, realtime, audit, and migrations. | Verify: matrix save tests. | Commit: `Add API permission rows`
