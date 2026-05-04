@@ -1,6 +1,6 @@
 {
   "name": "@apiagex/admin",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Admin UI package for Apiagex CMS.",
   "type": "module",
   "license": "MIT",

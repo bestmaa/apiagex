@@ -71,7 +71,7 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 - T005 | Version: v0.1.1 | Status: completed | Goal: Serve `/doc`, `/readme`, `/adminui`, and `/api` from the same server. | Verify: Browser Use path check and API request. | Commit: `Add four MVP paths`
 - T006 | Version: v0.1.2 | Status: completed | Goal: Add `/doc` and `/readme` pages that explain current completed features in English+Hinglish. | Verify: Browser Use doc/readme check. | Commit: `Add MVP docs pages`
 - T007 | Version: v0.1.3 | Status: completed | Goal: Add minimal Admin UI shell with navigation for Dashboard, Schemas, APIs, Roles, Users, Docs. | Verify: Browser Use admin nav check. | Commit: `Add MVP admin shell`
-- T008 | Version: v0.1.4 | Status: pending | Goal: Release base path checkpoint. | Verify: standard verification and Browser Use all four paths. | Commit: `Release base paths`
+- T008 | Version: v0.1.4 | Status: completed | Goal: Release base path checkpoint. | Verify: standard verification and Browser Use all four paths. | Commit: `Release base paths`
 
 ### Phase 2: Owner Bootstrap And Login
 

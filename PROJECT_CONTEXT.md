@@ -14,6 +14,7 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Minimal API server shell exists with `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 - `/doc` and `/readme` now show English+Hinglish completed-feature summaries.
 - `/adminui` now shows the minimal Admin shell navigation.
+- Base path checkpoint v0.1.4 covers `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 
 ## Required MVP Paths
 
@@ -89,7 +90,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T003`: write the detailed MVP product contract in docs and project context before coding implementation.
+The next pending task is `T009`: add SQLite foundation, migrations, and MVP tables.
 
 ## Coding Rules
 

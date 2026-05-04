@@ -15,6 +15,7 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Minimal routes now exist for `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 - `/doc` and `/readme` now explain the current MVP status in English and Hinglish.
 - `/adminui` now has the first MVP navigation shell.
+- Base path checkpoint is ready at version `v0.1.4`.
 
 ## MVP Direction
 
