@@ -1,20 +1,26 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { createAdminOnlyGuard } from './permissions.js';
+import { requireAdminToken } from './auth.js';
+import { canEvaluatePermission } from './permission-evaluator.js';
+import type { PermissionAction } from './permission-actions.type.js';
+import { withRoutePermission } from './route-permissions.js';
 import type { RegisterRolesRoutesOptions, RoleInput } from './roles.routes.type.js';
+
+const ROLES_SCOPE = 'system:roles';
 
 export async function registerRolesRoutes(
   app: FastifyInstance,
   options: RegisterRolesRoutesOptions,
 ): Promise<void> {
-  const adminGuard = createAdminOnlyGuard(options.auth);
+  const readGuard = createRolesGuard(options, 'read');
+  const manageGuard = createRolesGuard(options, 'manage');
 
-  app.get('/admin/roles', { preHandler: adminGuard }, async () => ({
+  app.get('/admin/roles', withRoutePermission({ action: 'read', scope: ROLES_SCOPE }, { preHandler: readGuard }), async () => ({
     items: options.repository.list(),
     status: 'ok',
   }));
 
-  app.post('/admin/roles', { preHandler: adminGuard }, async (request, reply) => {
+  app.post('/admin/roles', withRoutePermission({ action: 'manage', scope: ROLES_SCOPE }, { preHandler: manageGuard }), async (request, reply) => {
     const input = parseRoleInput(request.body);
 
     if (!input) {
@@ -28,7 +34,7 @@ export async function registerRolesRoutes(
     return reply.code(201).send(options.repository.create(input));
   });
 
-  app.put('/admin/roles/:id', { preHandler: adminGuard }, async (request, reply) => {
+  app.put('/admin/roles/:id', withRoutePermission({ action: 'manage', scope: ROLES_SCOPE }, { preHandler: manageGuard }), async (request, reply) => {
     const { id } = request.params as { id: string };
     const input = parseRoleInput(request.body, id);
 
@@ -56,7 +62,7 @@ export async function registerRolesRoutes(
     return reply.send(record);
   });
 
-  app.delete('/admin/roles/:id', { preHandler: adminGuard }, async (request, reply) => {
+  app.delete('/admin/roles/:id', withRoutePermission({ action: 'manage', scope: ROLES_SCOPE }, { preHandler: manageGuard }), async (request, reply) => {
     const { id } = request.params as { id: string };
 
     if (options.repository.isBuiltIn(id)) {
@@ -69,6 +75,38 @@ export async function registerRolesRoutes(
 
     return reply.code(204).send();
   });
+}
+
+function createRolesGuard(options: RegisterRolesRoutesOptions, action: PermissionAction) {
+  return async (request: FastifyRequest, reply: FastifyReply) => {
+    const session = requireAdminToken(options.auth, request.headers.authorization);
+
+    if (!session) {
+      return reply.code(401).send({ message: 'Authentication required' });
+    }
+
+    const roleRecord = options.repository.get(session.role) ?? options.repository.getByName(session.role);
+    const allowed = canEvaluatePermission({
+      action,
+      fallbackPermissions: defaultRolesFallback(session.role),
+      permissions: roleRecord?.permissions ?? {},
+      role: session.role,
+      scope: ROLES_SCOPE,
+    });
+
+    if (!allowed) {
+      return reply.code(403).send({ message: 'Forbidden' });
+    }
+  };
+}
+
+function defaultRolesFallback(role: string) {
+  return {
+    [ROLES_SCOPE]: {
+      manage: role === 'admin',
+      read: role === 'admin',
+    },
+  };
 }
 
 function parseRoleInput(body: unknown, fallbackId?: string): RoleInput | null {

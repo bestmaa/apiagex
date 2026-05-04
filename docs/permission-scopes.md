@@ -61,6 +61,7 @@ Evaluation order:
 The evaluator keeps default-deny behavior and checks explicit catalog values before fallback values. If a catalog value is `false`, that deny wins over any fallback allow.
 Existing content role catalog checks now pass through this evaluator while preserving `list` compatibility for current dynamic API routes.
 Fastify routes can attach permission metadata with a scope/action pair before route guards consume it.
+Role management APIs are guarded by `system:roles` with `read` for listing and `manage` for mutations.
 
 ## Hindi
 
@@ -123,3 +124,4 @@ Evaluation order:
 Evaluator fallback values se pehle explicit catalog values check karta hai. Agar catalog value `false` hai to vo deny kisi bhi fallback allow se jeetega.
 Existing content role catalog checks ab isi evaluator se pass hote hain aur current dynamic API routes ke liye `list` compatibility preserve karte hain.
 Fastify routes scope/action pair ke saath permission metadata attach kar sakte hain, jise route guards baad me consume karenge.
+Role management APIs `system:roles` se guard hote hain: listing ke liye `read`, mutations ke liye `manage`.

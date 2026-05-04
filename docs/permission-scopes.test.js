@@ -18,6 +18,7 @@ describe('permission scope docs', () => {
     expect(markdown).toContain('fallback allow');
     expect(markdown).toContain('content role catalog checks');
     expect(markdown).toContain('Fastify routes');
+    expect(markdown).toContain('Role management APIs');
     expect(markdown).toContain('Explicit `false`');
   });
 });
