@@ -58,6 +58,8 @@ Evaluation order:
 5. Explicit `false` must block fallback allows.
 6. Missing permission is denied for sensitive admin APIs.
 
+The first evaluator implementation enforces owner bypass and default-deny for exact scope/action checks. Fallback migration and deny precedence are separate follow-up tasks.
+
 ## Hindi
 
 RBAC V2 har protected action ke liye ek canonical permission grammar use karega:
@@ -115,3 +117,5 @@ Evaluation order:
 4. Built-in role defaults sirf fallback honge jab catalog rule missing ho.
 5. Explicit `false` fallback allow ko block karega.
 6. Sensitive admin APIs par missing permission deny hogi.
+
+Pehla evaluator owner bypass aur exact scope/action ke liye default-deny enforce karta hai. Fallback migration aur deny precedence alag follow-up tasks hain.

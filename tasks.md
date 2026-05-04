@@ -91,7 +91,7 @@ Push only on phase release tasks or explicit user request.
 
 - T007 | Version: v0.3.0 | Status: completed | Goal: Design canonical permission scope grammar for system, tenant, content, media, webhook, backup, and raw API routes. | Verify: design docs. | Commit: `Design permission scope grammar`
 - T008 | Version: v0.3.1 | Status: completed | Goal: Add permission action constants for `read`, `create`, `update`, `delete`, `execute`, and `manage`. | Verify: type tests. | Commit: `Add permission action constants`
-- T009 | Version: v0.3.2 | Status: pending | Goal: Add permission evaluator service with owner bypass and default-deny behavior. | Verify: evaluator unit tests. | Commit: `Add permission evaluator`
+- T009 | Version: v0.3.2 | Status: completed | Goal: Add permission evaluator service with owner bypass and default-deny behavior. | Verify: evaluator unit tests. | Commit: `Add permission evaluator`
 - T010 | Version: v0.3.3 | Status: pending | Goal: Add deny precedence so explicit `false` blocks fallback allows. | Verify: deny precedence tests. | Commit: `Add explicit deny precedence`
 - T011 | Version: v0.3.4 | Status: pending | Goal: Migrate existing role catalog permissions through the new evaluator without breaking current tests. | Verify: role and entry permission tests. | Commit: `Migrate roles to permission evaluator`
 - T012 | Version: v0.3.5 | Status: pending | Goal: Add route permission metadata helper for Fastify routes. | Verify: route guard tests. | Commit: `Add route permission metadata`

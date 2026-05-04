@@ -14,6 +14,7 @@ describe('permission scope docs', () => {
     expect(markdown).toContain('content-types:<contentTypeId>');
     expect(markdown).toContain('api:<method>:<path>');
     expect(markdown).toContain('Legacy admin `write` checks');
+    expect(markdown).toContain('default-deny');
     expect(markdown).toContain('Explicit `false`');
   });
 });

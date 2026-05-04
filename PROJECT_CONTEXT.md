@@ -135,6 +135,7 @@ packages/admin            Future admin UI package
 - Root workspace now includes `npm run reset:local:smoke`, which resets a temporary local DB/uploads fixture, recreates SQLite state, and verifies owner login.
 - Docs now include the RBAC V2 permission scope grammar covering system, tenant, content, media, webhook, backup, realtime, audit, migration, and raw API scopes.
 - `packages/server` now exports canonical RBAC V2 permission action constants for `read`, `create`, `update`, `delete`, `execute`, and `manage`.
+- `packages/server` now includes a pure permission evaluator with owner bypass and default-deny exact scope/action checks.
 - `packages/server` now serves the Admin UI at `/adminui/`, README at `/readme`, and admin UI API aliases under `/api/...` from the same server.
 - `packages/server` now exposes a duplicate content-type route at `/admin/content-types/:id/duplicate`, and the admin content-type cards expose a Duplicate action.
 - Static documentation page with top English/Hindi toggle.
