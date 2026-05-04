@@ -37,6 +37,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Entry repository JSON entry data ko schema fields aur relation entry targets ke against validate karta hai.
 - Entry admin APIs provide create, list, read, update, and delete under `/api/admin/schemas/:schemaId/entries`.
 - Entry admin APIs `/api/admin/schemas/:schemaId/entries` ke under create, list, read, update, aur delete provide karte hain.
+- React Admin UI generates entry forms from selected schema fields.
+- React Admin UI selected schema fields se entry forms generate karta hai.
 
 ## Required MVP Paths
 
@@ -112,7 +114,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T022`: add Admin UI entry forms generated from schema fields.
+The next pending task is `T023`: add dynamic `/api/content/:schemaSlug` routes.
 
 ## Coding Rules
 

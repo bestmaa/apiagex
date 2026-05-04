@@ -1,5 +1,10 @@
 import type { AuthResponse } from "./session.type";
 import type {
+  EntryData,
+  EntryListResponse,
+  EntryMutationResponse,
+} from "./entry.type";
+import type {
   SchemaDraft,
   SchemaListResponse,
   SchemaMutationResponse,
@@ -41,4 +46,21 @@ export async function createSchema(input: SchemaDraft): Promise<SchemaMutationRe
     body: JSON.stringify(input),
   });
   return (await response.json()) as SchemaMutationResponse;
+}
+
+export async function listEntries(schemaId: string): Promise<EntryListResponse> {
+  const response = await fetch(`/api/admin/schemas/${schemaId}/entries`);
+  return (await response.json()) as EntryListResponse;
+}
+
+export async function createEntry(
+  schemaId: string,
+  data: EntryData,
+): Promise<EntryMutationResponse> {
+  const response = await fetch(`/api/admin/schemas/${schemaId}/entries`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ data }),
+  });
+  return (await response.json()) as EntryMutationResponse;
 }

@@ -151,6 +151,16 @@ Use `POST /api/admin/schemas/:schemaId/entries` with `{ "data": { ... } }` to cr
 
 Entry create karne ke liye `POST /api/admin/schemas/:schemaId/entries` par `{ "data": { ... } }` bhejo. List ke liye same base path use karo, aur read, update, delete ke liye `/:entryId` add karo.
 
+## Admin UI Entry Forms
+
+### English
+
+After owner login, the Entry Manager reads schemas and renders a form from the selected schema fields. Text, long text, number, boolean, date, JSON, media, and relation fields are shown with matching inputs.
+
+### Hinglish
+
+Owner login ke baad Entry Manager schemas read karta hai aur selected schema fields se form render karta hai. Text, long text, number, boolean, date, JSON, media, aur relation fields matching inputs ke saath dikhte hain.
+
 ## MVP Contract
 
 ### English

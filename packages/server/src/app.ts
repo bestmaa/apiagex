@@ -105,6 +105,8 @@ function renderDocPage(): string {
       "Entries: repository validation required fields, value types, unknown fields, aur relation targets check karta hai.",
       "Entry APIs: /api/admin/schemas/:schemaId/entries supports admin CRUD per schema.",
       "Entry APIs: /api/admin/schemas/:schemaId/entries per schema admin CRUD support karta hai.",
+      "Admin UI: Entry Manager renders entry forms from selected schema fields.",
+      "Admin UI: Entry Manager selected schema fields se entry forms render karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -132,6 +134,8 @@ function renderReadmePage(): string {
       "Entry repository validation admin aur dynamic APIs ke liye ready hai.",
       "Entry admin APIs are available below each schema.",
       "Entry admin APIs har schema ke below available hain.",
+      "The React Admin UI can create entries from generated forms.",
+      "React Admin UI generated forms se entries create kar sakta hai.",
     ].join(" "),
   );
 }

@@ -35,6 +35,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Entry repository data ko schema fields, required fields, types, aur relation entry targets ke against validate karta hai.
 - Entry admin APIs are available under `/api/admin/schemas/:schemaId/entries`.
 - Entry admin APIs `/api/admin/schemas/:schemaId/entries` ke under available hain.
+- React Admin UI now generates entry forms from schema fields.
+- React Admin UI ab schema fields se entry forms generate karta hai.
 
 ## MVP Direction
 
