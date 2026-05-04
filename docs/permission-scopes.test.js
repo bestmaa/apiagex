@@ -16,6 +16,7 @@ describe('permission scope docs', () => {
     expect(markdown).toContain('Legacy admin `write` checks');
     expect(markdown).toContain('default-deny');
     expect(markdown).toContain('fallback allow');
+    expect(markdown).toContain('content role catalog checks');
     expect(markdown).toContain('Explicit `false`');
   });
 });

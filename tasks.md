@@ -93,7 +93,7 @@ Push only on phase release tasks or explicit user request.
 - T008 | Version: v0.3.1 | Status: completed | Goal: Add permission action constants for `read`, `create`, `update`, `delete`, `execute`, and `manage`. | Verify: type tests. | Commit: `Add permission action constants`
 - T009 | Version: v0.3.2 | Status: completed | Goal: Add permission evaluator service with owner bypass and default-deny behavior. | Verify: evaluator unit tests. | Commit: `Add permission evaluator`
 - T010 | Version: v0.3.3 | Status: completed | Goal: Add deny precedence so explicit `false` blocks fallback allows. | Verify: deny precedence tests. | Commit: `Add explicit deny precedence`
-- T011 | Version: v0.3.4 | Status: pending | Goal: Migrate existing role catalog permissions through the new evaluator without breaking current tests. | Verify: role and entry permission tests. | Commit: `Migrate roles to permission evaluator`
+- T011 | Version: v0.3.4 | Status: completed | Goal: Migrate existing role catalog permissions through the new evaluator without breaking current tests. | Verify: role and entry permission tests. | Commit: `Migrate roles to permission evaluator`
 - T012 | Version: v0.3.5 | Status: pending | Goal: Add route permission metadata helper for Fastify routes. | Verify: route guard tests. | Commit: `Add route permission metadata`
 - T013 | Version: v0.3.6 | Status: pending | Goal: Guard roles routes with `system:roles` permissions. | Verify: roles API tests. | Commit: `Guard role APIs with permissions`
 - T014 | Version: v0.3.7 | Status: pending | Goal: Guard audit, backup, migrations, webhooks, media, search, and realtime admin routes through the evaluator. | Verify: route matrix tests. | Commit: `Guard admin APIs with permissions`

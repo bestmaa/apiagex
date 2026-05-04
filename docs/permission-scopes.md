@@ -59,6 +59,7 @@ Evaluation order:
 6. Missing permission is denied for sensitive admin APIs.
 
 The evaluator keeps default-deny behavior and checks explicit catalog values before fallback values. If a catalog value is `false`, that deny wins over any fallback allow.
+Existing content role catalog checks now pass through this evaluator while preserving `list` compatibility for current dynamic API routes.
 
 ## Hindi
 
@@ -119,3 +120,4 @@ Evaluation order:
 6. Sensitive admin APIs par missing permission deny hogi.
 
 Evaluator fallback values se pehle explicit catalog values check karta hai. Agar catalog value `false` hai to vo deny kisi bhi fallback allow se jeetega.
+Existing content role catalog checks ab isi evaluator se pass hote hain aur current dynamic API routes ke liye `list` compatibility preserve karte hain.
