@@ -43,4 +43,16 @@ describe('readServerConfig', () => {
       }),
     ).toThrowError(/ADMIN_PASSWORD must be set in production/);
   });
+
+  it('blocks local owner mode in production', () => {
+    expect(() =>
+      readServerConfig({
+        ADMIN_EMAIL: 'admin@example.com',
+        ADMIN_PASSWORD: 'valid-password',
+        APIAGEX_LOCAL_OWNER: 'true',
+        AUTH_SECRET: 'valid-secret',
+        NODE_ENV: 'production',
+      }),
+    ).toThrowError(/APIAGEX_LOCAL_OWNER cannot be enabled in production/);
+  });
 });

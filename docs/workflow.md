@@ -36,6 +36,8 @@ Local data rules:
 - Reset only known local development DB/uploads paths.
 - Preview reset targets with `npm run reset:local`.
 - Delete them only with `npm run reset:local -- --apply`.
+- For local owner login, set `APIAGEX_LOCAL_OWNER=true`.
+- Local owner credentials are `owner@apiagex.local` and `OwnerPass123!`.
 - Use development credentials only for local verification.
 - Never commit real secrets.
 
@@ -75,5 +77,7 @@ Local data rules:
 - Sirf known local development DB/uploads paths reset karne hain.
 - Reset targets preview karne ke liye `npm run reset:local` chalao.
 - Delete sirf `npm run reset:local -- --apply` se karna.
+- Local owner login ke liye `APIAGEX_LOCAL_OWNER=true` set karo.
+- Local owner credentials `owner@apiagex.local` aur `OwnerPass123!` hain.
 - Development credentials sirf local verification ke liye hain.
 - Real secrets kabhi commit nahi karne.

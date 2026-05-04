@@ -4,6 +4,8 @@ export const DEFAULT_ADMIN_EMAIL = 'admin@example.com';
 export const DEFAULT_ADMIN_PASSWORD = 'change-me-in-production';
 export const DEFAULT_AUTH_SECRET = 'change-me-in-production-auth-secret';
 export const DEFAULT_HOST = '0.0.0.0';
+export const LOCAL_DEV_OWNER_EMAIL = 'owner@apiagex.local';
+export const LOCAL_DEV_OWNER_PASSWORD = 'OwnerPass123!';
 export const DEFAULT_PORT = 4000;
 
 export function readServerConfig(source: NodeJS.ProcessEnv = process.env): ServerConfig {
@@ -13,7 +15,7 @@ export function readServerConfig(source: NodeJS.ProcessEnv = process.env): Serve
   const authSecret = readText(source.AUTH_SECRET, DEFAULT_AUTH_SECRET, 'AUTH_SECRET', errors);
   const host = readText(source.HOST, DEFAULT_HOST, 'HOST', errors);
   const port = readPort(source.PORT, DEFAULT_PORT, errors);
-  const owner = readOptionalAccount(source.OWNER_EMAIL, source.OWNER_PASSWORD, 'OWNER', errors);
+  const owner = readOwnerAccount(source, errors);
   const editor = readOptionalAccount(source.EDITOR_EMAIL, source.EDITOR_PASSWORD, 'EDITOR', errors);
   const viewer = readOptionalAccount(source.VIEWER_EMAIL, source.VIEWER_PASSWORD, 'VIEWER', errors);
 
@@ -43,6 +45,22 @@ export function readServerConfig(source: NodeJS.ProcessEnv = process.env): Serve
 
 function isProduction(source: NodeJS.ProcessEnv): boolean {
   return source.NODE_ENV === 'production';
+}
+
+function readOwnerAccount(source: NodeJS.ProcessEnv, errors: string[]): Partial<ServerConfig> {
+  if (source.APIAGEX_LOCAL_OWNER === 'true') {
+    if (isProduction(source)) {
+      errors.push('APIAGEX_LOCAL_OWNER cannot be enabled in production.');
+      return {};
+    }
+
+    return {
+      ownerEmail: source.OWNER_EMAIL?.trim() || LOCAL_DEV_OWNER_EMAIL,
+      ownerPassword: source.OWNER_PASSWORD?.trim() || LOCAL_DEV_OWNER_PASSWORD,
+    };
+  }
+
+  return readOptionalAccount(source.OWNER_EMAIL, source.OWNER_PASSWORD, 'OWNER', errors);
 }
 
 function readOptionalAccount(

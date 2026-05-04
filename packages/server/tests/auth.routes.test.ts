@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildServer } from '../src/app.js';
-import { DEFAULT_ADMIN_PASSWORD } from '../src/config.js';
+import {
+  DEFAULT_ADMIN_PASSWORD,
+  LOCAL_DEV_OWNER_EMAIL,
+  LOCAL_DEV_OWNER_PASSWORD,
+  readServerConfig,
+} from '../src/config.js';
 
 describe('auth routes', () => {
   it('issues a bearer token for valid credentials', async () => {
@@ -87,6 +92,32 @@ describe('auth routes', () => {
       user: {
         email: 'viewer@example.com',
         role: 'viewer',
+      },
+    });
+  });
+
+  it('issues a local owner token when local owner mode is enabled', async () => {
+    const config = readServerConfig({
+      APIAGEX_LOCAL_OWNER: 'true',
+      NODE_ENV: 'development',
+    });
+    const app = await buildServer({ ...config, logger: false });
+    const response = await app.inject({
+      method: 'POST',
+      url: '/auth/login',
+      payload: {
+        email: LOCAL_DEV_OWNER_EMAIL,
+        password: LOCAL_DEV_OWNER_PASSWORD,
+      },
+    });
+
+    await app.close();
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      user: {
+        email: LOCAL_DEV_OWNER_EMAIL,
+        role: 'owner',
       },
     });
   });
