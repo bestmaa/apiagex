@@ -214,6 +214,16 @@ Use `POST /api/admin/roles` with `{ "name": "editor", "description": "..." }` to
 
 Roles create karne ke liye `POST /api/admin/roles` par `{ "name": "editor", "description": "..." }` bhejo. Roles list ke liye `GET /api/admin/roles` aur one role read ke liye `GET /api/admin/roles/:roleId` use karo. `owner` role name reserved hai.
 
+## Permission Model
+
+### English
+
+Permissions are stored per role, schema, and action. Actions are `read`, `create`, `update`, `delete`, and `manage`. Missing permission means blocked. `manage` allows every action for that schema. Owner roles bypass checks.
+
+### Hinglish
+
+Permissions role, schema, aur action ke hisab se store hote hain. Actions `read`, `create`, `update`, `delete`, aur `manage` hain. Missing permission ka matlab block hai. `manage` us schema ke liye har action allow karta hai. Owner roles checks bypass karte hain.
+
 ## MVP Contract
 
 ### English

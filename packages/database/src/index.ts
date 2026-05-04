@@ -21,6 +21,11 @@ export {
   listRoles,
 } from "./role-repository.js";
 export {
+  canRoleAccess,
+  listRolePermissions,
+  setPermission,
+} from "./permission-repository.js";
+export {
   createSchema,
   deleteSchema,
   getSchemaById,
@@ -36,6 +41,11 @@ export type {
   UpdateEntryInput,
 } from "./entry-repository.type.js";
 export type { CreateRoleInput, RoleRecord } from "./role-repository.type.js";
+export type {
+  PermissionAction,
+  PermissionRecord,
+  SetPermissionInput,
+} from "./permission-repository.type.js";
 export type {
   CreateFieldInput,
   CreateSchemaInput,

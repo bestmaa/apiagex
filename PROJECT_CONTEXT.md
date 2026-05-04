@@ -49,6 +49,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Dynamic API checkpoint v0.4.6 ready hai.
 - Role repository and `/api/admin/roles` APIs can create, list, and read non-owner roles.
 - Role repository aur `/api/admin/roles` APIs non-owner roles create, list, aur read kar sakte hain.
+- Permission model supports read, create, update, delete, and manage per role and schema.
+- Permission model role aur schema ke hisab se read, create, update, delete, aur manage support karta hai.
 
 ## Required MVP Paths
 
@@ -124,7 +126,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T028`: add API permission model.
+The next pending task is `T029`: add Admin UI role permission screen.
 
 ## Coding Rules
 

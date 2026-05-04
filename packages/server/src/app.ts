@@ -120,6 +120,8 @@ function renderDocPage(): string {
       "v0.4.6 verifies schema, entry, dynamic APIs, Admin UI API list, docs, tests, and audit.",
       "Roles: /api/admin/roles creates, lists, and reads unlimited non-owner roles.",
       "Roles: /api/admin/roles unlimited non-owner roles create, list, aur read karta hai.",
+      "Permissions: read, create, update, delete, and manage can be evaluated per role and schema.",
+      "Permissions: read, create, update, delete, aur manage role aur schema ke hisab se evaluate hote hain.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -159,6 +161,8 @@ function renderReadmePage(): string {
       "Dynamic API checkpoint v0.4.6 ready hai.",
       "Role admin APIs are ready for permission assignment.",
       "Role admin APIs permission assignment ke liye ready hain.",
+      "Permission evaluator defaults to block, manage allows all, and owner bypasses checks.",
+      "Permission evaluator default block karta hai, manage all allow karta hai, aur owner checks bypass karta hai.",
     ].join(" "),
   );
 }
