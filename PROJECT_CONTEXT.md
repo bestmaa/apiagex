@@ -63,6 +63,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - RBAC end-to-end flow user login aur allowed/blocked dynamic API access verify karta hai.
 - `/doc` and `/readme` document RBAC allow/block examples.
 - `/doc` aur `/readme` RBAC allow/block examples document karte hain.
+- MVP RBAC checkpoint v0.5.8 is ready.
+- MVP RBAC checkpoint v0.5.8 ready hai.
 
 ## Required MVP Paths
 
@@ -138,7 +140,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T035`: release MVP RBAC checkpoint.
+The next pending task is `T036`: polish Admin UI.
 
 ## Coding Rules
 

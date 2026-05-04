@@ -308,6 +308,12 @@ curl http://127.0.0.1:4000/api/content/article \
 
 Jis role ko permission mili hai uska request pass hota hai. Jis role ko permission nahi mili usko `403 API_PERMISSION_DENIED` milta hai.
 
+## MVP RBAC Checkpoint
+
+English: v0.5.8 verifies role APIs, permission model, role permission UI, dynamic API enforcement, user APIs, user UI, user login, allowed role success, blocked role failure, docs, tests, audit, and Browser Use checks.
+
+Hinglish: v0.5.8 role APIs, permission model, role permission UI, dynamic API enforcement, user APIs, user UI, user login, allowed role success, blocked role failure, docs, tests, audit, aur Browser Use checks verify karta hai.
+
 ## MVP Contract
 
 ### English
