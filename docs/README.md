@@ -131,6 +131,16 @@ English: v0.3.5 verifies schema repositories, schema admin APIs, React schema bu
 
 Hinglish: v0.3.5 schema repositories, schema admin APIs, React schema builder UI, relation picker, docs, tests, audit, aur Browser Use schema flow verify karta hai.
 
+## Entry Repository
+
+### English
+
+Entries store JSON data for one schema. The repository rejects unknown fields, missing required fields, wrong value types, and relation values that do not point to an entry in the target schema.
+
+### Hinglish
+
+Entries ek schema ke liye JSON data store karte hain. Repository unknown fields, missing required fields, galat value types, aur relation values ko reject karti hai jo target schema ke entry ko point nahi karte.
+
 ## MVP Contract
 
 ### English

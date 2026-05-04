@@ -33,6 +33,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `/doc` aur `/readme` schema builder usage aur relation rules document karte hain.
 - Schema builder checkpoint v0.3.5 is ready.
 - Schema builder checkpoint v0.3.5 ready hai.
+- Entry repository validates JSON entry data against schema fields and relation entry targets.
+- Entry repository JSON entry data ko schema fields aur relation entry targets ke against validate karta hai.
 
 ## Required MVP Paths
 
@@ -108,7 +110,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T020`: add entries repository with schema-based validation.
+The next pending task is `T021`: add entry admin APIs.
 
 ## Coding Rules
 

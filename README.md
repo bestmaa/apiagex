@@ -31,6 +31,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Relation fields ab existing-schema picker aur backend validation use karte hain.
 - Schema builder checkpoint is ready at version `v0.3.5`.
 - Schema builder checkpoint version `v0.3.5` par ready hai.
+- Entry repository validates data against schema fields, required fields, types, and relation entry targets.
+- Entry repository data ko schema fields, required fields, types, aur relation entry targets ke against validate karta hai.
 
 ## MVP Direction
 

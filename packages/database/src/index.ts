@@ -9,6 +9,13 @@ export {
   openSqliteDatabase,
 } from "./sqlite.js";
 export {
+  createEntry,
+  deleteEntry,
+  getEntryById,
+  listEntries,
+  updateEntry,
+} from "./entry-repository.js";
+export {
   createSchema,
   deleteSchema,
   getSchemaById,
@@ -17,6 +24,12 @@ export {
   updateSchema,
 } from "./schema-repository.js";
 export type { MvpTableName, MigrationRecord, TableInfoRow } from "./schema.type.js";
+export type {
+  CreateEntryInput,
+  EntryData,
+  EntryRecord,
+  UpdateEntryInput,
+} from "./entry-repository.type.js";
 export type {
   CreateFieldInput,
   CreateSchemaInput,

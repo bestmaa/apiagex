@@ -99,6 +99,8 @@ function renderDocPage(): string {
       "Docs: schema builder usage and relation rules are documented in English and Hinglish.",
       "Docs: schema builder usage aur relation rules English aur Hinglish me documented hain.",
       "v0.3.5 verifies schema APIs, React schema builder, relation picker, docs, tests, and audit.",
+      "Entries: repository validation checks required fields, value types, unknown fields, and relation targets.",
+      "Entries: repository validation required fields, value types, unknown fields, aur relation targets check karta hai.",
       "Next: owner bootstrap, schema builder, dynamic APIs, roles, permissions, and users.",
     ].join(" "),
   );
@@ -122,6 +124,8 @@ function renderReadmePage(): string {
       "/doc me schema examples aur relation validation rules padho.",
       "Schema builder checkpoint v0.3.5 is ready.",
       "Schema builder checkpoint v0.3.5 ready hai.",
+      "Entry repository validation is ready for admin and dynamic APIs.",
+      "Entry repository validation admin aur dynamic APIs ke liye ready hai.",
     ].join(" "),
   );
 }
