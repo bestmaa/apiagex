@@ -23,6 +23,8 @@ Generated starter files:
 - `src/main.ts`
 - `docs/README.md`
 
+The generated `.env.example` documents `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite` and `APIAGEX_UPLOADS_PATH=.apiagex/uploads` for local persistence.
+
 Example:
 
 ```bash
@@ -61,6 +63,8 @@ Generated starter files:
 - `README.md`
 - `src/main.ts`
 - `docs/README.md`
+
+Generated `.env.example` local persistence ke liye `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite` aur `APIAGEX_UPLOADS_PATH=.apiagex/uploads` document karta hai.
 
 Example:
 

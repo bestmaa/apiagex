@@ -19,7 +19,7 @@ import { loginUser } from "./user-auth.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
-  const database = options.database ?? openSqliteDatabase();
+  const database = options.database ?? openSqliteDatabase(options.databasePath);
   migrateMvpDatabase(database);
   server.register(fastifyStatic, {
     prefix: "/adminui/",

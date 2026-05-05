@@ -252,7 +252,7 @@ Each task uses this structure:
 #### T215 - Add Local Persistence Configuration
 
 - Version: `v1.3.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add clear local database path and upload path configuration for development.
 - Persona: Local developer; make data persistence understandable.
 - Success Criteria: Server can run with documented local SQLite path, uploads directory is documented, and tests still use in-memory database.

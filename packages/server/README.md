@@ -77,10 +77,12 @@ Authentication uses `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `AUTH_SECRET`. Optional
 
 In local development the defaults are `admin@example.com`, `secret123`, and `apiagex-dev-secret`.
 
+Local development persistence defaults to `.apiagex/apiagex.sqlite`, and local uploads are reserved under `.apiagex/uploads`. Override them with `APIAGEX_DATABASE_PATH` and `APIAGEX_UPLOADS_PATH`.
+
 Run it with:
 
 ```bash
-npm run dev -w server
+npm run dev -w @apiagex/server
 ```
 
 ## Hindi
@@ -157,6 +159,8 @@ Admin search route `/admin/search` par available hai aur logged-in role ke hisaa
 Content types ko `POST /admin/content-types/:id/duplicate` se duplicate kiya ja sakta hai. Self-relation fields cloned slug par rewrite ho jati hain.
 
 Authentication `ADMIN_EMAIL`, `ADMIN_PASSWORD`, aur `AUTH_SECRET` use karti hai. Optional `OWNER_EMAIL` / `OWNER_PASSWORD`, `EDITOR_EMAIL` / `EDITOR_PASSWORD`, aur `VIEWER_EMAIL` / `VIEWER_PASSWORD` accounts bhi configure kiye ja sakte hain.
+
+Local development persistence default me `.apiagex/apiagex.sqlite` use karta hai, aur local uploads `.apiagex/uploads` ke under reserved hain. Inko `APIAGEX_DATABASE_PATH` aur `APIAGEX_UPLOADS_PATH` se override kar sakte ho.
 
 Local development me defaults `admin@example.com`, `secret123`, aur `apiagex-dev-secret` hain.
 

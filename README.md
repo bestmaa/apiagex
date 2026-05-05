@@ -100,6 +100,14 @@ English: Create a role, assign schema action permissions, create a user with tha
 
 Hinglish: Role banao, schema action permissions assign karo, us role ke saath user banao, `/api/auth/login-user` se login karo, phir dynamic APIs ko `x-apiagex-role-id` ke saath call karo. Allowed roles work karte hain; blocked roles ko `API_PERMISSION_DENIED` milta hai.
 
+## Local Persistence
+
+English: `npm run dev` stores local server data in `.apiagex/apiagex.sqlite` and reserves `.apiagex/uploads` for local uploads. Override with `APIAGEX_DATABASE_PATH` and `APIAGEX_UPLOADS_PATH` when you need a different local path.
+
+Hinglish: `npm run dev` local server data `.apiagex/apiagex.sqlite` me store karta hai aur local uploads ke liye `.apiagex/uploads` use karta hai. Alag local path chahiye ho to `APIAGEX_DATABASE_PATH` aur `APIAGEX_UPLOADS_PATH` set karo.
+
+Tests stay isolated by passing in-memory databases directly; they do not write to `.apiagex` by default.
+
 ## Workspace
 
 ```txt

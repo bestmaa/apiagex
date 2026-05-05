@@ -1,7 +1,9 @@
 coverage/
 data/
 dist/
+.apiagex/
 node_modules/
 *.db
+*.sqlite
 *.tsbuildinfo
 *.log

@@ -133,7 +133,7 @@ function createScaffoldFiles(projectName: string): ScaffoldFile[] {
     },
     {
       path: ".env.example",
-      content: "ADMIN_EMAIL=owner@example.com\nADMIN_PASSWORD=change-me\nAUTH_SECRET=change-me\nAPIAGEX_DATABASE_URL=file:./apiagex.sqlite\n",
+      content: "ADMIN_EMAIL=owner@example.com\nADMIN_PASSWORD=change-me\nAUTH_SECRET=change-me\nAPIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite\nAPIAGEX_UPLOADS_PATH=.apiagex/uploads\n",
     },
     {
       path: "apiagex.config.json",

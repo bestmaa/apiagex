@@ -17,4 +17,6 @@ export type ApiRootResponse = {
 
 export type CreateServerOptions = {
   database?: SqliteDatabase;
+  databasePath?: string;
+  uploadsPath?: string;
 };
