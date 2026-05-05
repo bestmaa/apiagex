@@ -226,7 +226,7 @@ Each task uses this structure:
 #### T213 - Implement Static Docs Package
 
 - Version: `v1.2.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a docs package that builds `/doc` and `/readme` content as static assets served by the API server.
 - Persona: Documentation platform engineer; separate content from server code.
 - Success Criteria: Docs build command exists, server serves built docs, `/doc` and `/readme` still work, and missing-build fallback is clear.
