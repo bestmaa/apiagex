@@ -2,80 +2,78 @@
 
 ## English
 
-This package owns the first-run installer. It will generate new Apiagex projects and ask setup questions like database type, database credentials, admin account, and realtime preference.
+`create-apiagex` is the installer CLI for starting a new Apiagex project.
 
-Current output:
+Current CLI behavior:
+
+- Prints help with `create-apiagex --help`.
+- Prints version with `create-apiagex --version`.
+- Validates that the target folder is a safe slug like `my-cms`.
+- Refuses to overwrite an existing non-empty folder.
+- Supports `--dry-run` to show the scaffold plan without writing files.
+- Creates a small starter scaffold when the target folder is missing or empty.
+
+Generated starter files:
 
 - `package.json`
-- `tsconfig.base.json`
-- `tsconfig.json`
 - `.gitignore`
 - `.env.example`
 - `apiagex.config.json`
 - `README.md`
-- `src/`
-- `docs/`
+- `src/main.ts`
+- `docs/README.md`
 
-The installer also asks for a target folder name and blocks accidental overwrite when that folder already has files.
-
-Project name and target folder must be safe slugs like `my-cms`.
-
-After install, it shows a short success screen with next commands and the docs URL.
-
-Admin email, admin password, and database settings are validated before files are written.
-
-The generated `.env.example` also includes `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `AUTH_SECRET` for the bootstrap login flow.
-
-The generated starter also runs a smoke check before the success message prints.
-
-SQLite starter boot files are included so local dev can start without a separate database server.
-
-The starter also includes a small migration scaffold that creates system tables on boot.
-
-It also includes content-type storage helpers for `content_types` and `content_fields`.
-
-Run it with:
+Example:
 
 ```bash
-npm run dev -w create-apiagex
+npm run build -w create-apiagex
+node packages/create-apiagex/dist/index.js my-cms --dry-run
+node packages/create-apiagex/dist/index.js my-cms
 ```
 
-## Hindi
+After scaffolding:
 
-Ye package first-run installer ka owner hai. Ye new Apiagex projects generate karega aur database type, database credentials, admin account, aur realtime preference jaise setup questions puchega.
+```bash
+cd my-cms
+npm install
+npm run dev
+```
 
-Current output:
+## Hinglish
+
+`create-apiagex` new Apiagex project start karne ke liye installer CLI hai.
+
+Current CLI behavior:
+
+- `create-apiagex --help` se help print hoti hai.
+- `create-apiagex --version` se version print hota hai.
+- Target folder safe slug hona chahiye, jaise `my-cms`.
+- Existing non-empty folder overwrite nahi hota.
+- `--dry-run` scaffold plan dikhata hai bina files likhe.
+- Target folder missing ya empty ho to small starter scaffold create hota hai.
+
+Generated starter files:
 
 - `package.json`
-- `tsconfig.base.json`
-- `tsconfig.json`
 - `.gitignore`
 - `.env.example`
 - `apiagex.config.json`
 - `README.md`
-- `src/`
-- `docs/`
+- `src/main.ts`
+- `docs/README.md`
 
-Installer target folder ka naam bhi poochta hai aur agar folder me pehle se files hain to accidental overwrite block karta hai.
-
-Project name aur target folder safe slug hone chahiye, jaise `my-cms`.
-
-Install ke baad success screen next commands aur docs URL dikhati hai.
-
-Admin email, admin password, aur database settings files likhne se pehle validate hote hain.
-
-Generated `.env.example` me `ADMIN_EMAIL`, `ADMIN_PASSWORD`, aur `AUTH_SECRET` bhi aate hain, taaki bootstrap login flow ready ho.
-
-Generated starter me success message se pehle smoke check bhi hota hai.
-
-SQLite starter boot files bhi include hote hain taaki local dev bina separate database server ke start ho sake.
-
-Starter me ek chhota migration scaffold bhi hota hai jo boot par system tables create karta hai.
-
-Starter me `content_types` aur `content_fields` ke liye content-type storage helpers bhi hote hain.
-
-Run karne ke liye:
+Example:
 
 ```bash
-npm run dev -w create-apiagex
+npm run build -w create-apiagex
+node packages/create-apiagex/dist/index.js my-cms --dry-run
+node packages/create-apiagex/dist/index.js my-cms
+```
+
+Scaffold ke baad:
+
+```bash
+cd my-cms
+npm install
+npm run dev
 ```

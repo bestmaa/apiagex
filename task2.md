@@ -239,7 +239,7 @@ Each task uses this structure:
 #### T214 - Make create-apiagex CLI Useful
 
 - Version: `v1.3.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Replace the placeholder `create-apiagex` package with a real installer/scaffold CLI plan or minimal implementation.
 - Persona: Package author; make new project creation predictable.
 - Success Criteria: CLI can at least print help, validate target folder, and explain/install scaffold steps; tests cover basic CLI behavior.
