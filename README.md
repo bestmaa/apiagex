@@ -67,6 +67,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - `npm run smoke` full MVP owner/schema/entry/dynamic API/RBAC flow cover karta hai.
 - Apiagex MVP release gate is ready at version `v1.0.0`.
 - Apiagex MVP release gate version `v1.0.0` par ready hai.
+- Apiagex task2 release gate is ready at version `v2.0.0`.
+- Apiagex task2 release gate version `v2.0.0` par ready hai.
 
 ## MVP Direction
 
@@ -107,6 +109,8 @@ English: `npm run dev` stores local server data in `.apiagex/apiagex.sqlite` and
 Hinglish: `npm run dev` local server data `.apiagex/apiagex.sqlite` me store karta hai aur local uploads ke liye `.apiagex/uploads` use karta hai. Alag local path chahiye ho to `APIAGEX_DATABASE_PATH` aur `APIAGEX_UPLOADS_PATH` set karo.
 
 Tests stay isolated by passing in-memory databases directly; they do not write to `.apiagex` by default.
+
+Task2 release verification covered routed Admin UI desktop/mobile browser checks, static `/doc` and `/readme`, local persistence, create-apiagex CLI, smoke tests, audit, and live API/RBAC allow/block flow.
 
 ## Workspace
 

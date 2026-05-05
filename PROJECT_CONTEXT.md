@@ -139,18 +139,22 @@ One server must serve exactly these primary paths:
 - Checked means allowed; unchecked means blocked by default.
 - Permission verification must test an allowed user and blocked user.
 
-## Static Docs Architecture Plan
+## Static Docs Architecture
 
 - `/doc` and `/readme` must remain public URLs.
-- Move authored documentation into a future `packages/docs` workspace package.
-- Use VitePress or a similarly small static docs builder unless implementation constraints change.
-- Source pages should be Markdown, with English + Hinglish content preserved.
-- Build output should land in a generated folder such as `packages/docs/dist`.
-- The API server should serve built docs assets the same way it serves Admin UI assets.
-- `/doc` should load the main docs page, and `/readme` should load the readable project summary page.
+- Authored documentation now lives in the `packages/docs` workspace package.
+- The docs package uses a small static builder and preserves English + Hinglish content.
+- Build output lands in `packages/docs/dist`.
+- The API server serves built docs assets through stable `/doc` and `/readme` routes.
+- `/doc` loads the main docs page, and `/readme` loads the readable project summary page.
 - Missing docs build should return a clear fallback telling the developer to run the docs build.
-- The migration should first copy current inline `/doc` and `/readme` content into docs source files.
-- After static docs are verified, remove only the duplicated inline docs content from server code.
+
+## Local Persistence
+
+- `npm run dev` resolves local SQLite data to `.apiagex/apiagex.sqlite` by default.
+- `npm run dev` reserves `.apiagex/uploads` for local uploads by default.
+- `APIAGEX_DATABASE_PATH` and `APIAGEX_UPLOADS_PATH` can override those paths.
+- Tests pass in-memory databases directly and must not write to `.apiagex` by default.
 
 ## Verification Contract
 
@@ -161,7 +165,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-Continue from `task2.md`. The next pending phase starts with Admin UI routing.
+Task2 is complete through the `v2.0.0` release gate. Start the next task file when new scope is defined.
 
 ## Coding Rules
 

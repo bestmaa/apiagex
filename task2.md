@@ -267,7 +267,7 @@ Each task uses this structure:
 #### T216 - Task 2 Release Gate
 
 - Version: `v2.0.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Final verification for routed Admin UI, synced docs, smoke flow, and package health.
 - Persona: Release engineer; only release what is verified.
 - Success Criteria: All task2 features are documented, Admin UI browser checks pass on desktop/mobile, docs paths work, API smoke passes, and standard verification is clean.
