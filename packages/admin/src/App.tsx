@@ -49,6 +49,7 @@ export function App() {
     const data = new FormData(event.currentTarget);
     const email = String(data.get("email") ?? "");
     const password = String(data.get("password") ?? "");
+    setStatus("Checking owner setup/login");
     const result = await authenticateOwner(email, password);
     if (!result.ok || !result.user) {
       setStatus(result.error ?? "Login failed");
@@ -88,7 +89,7 @@ export function App() {
         ))}
       </nav>
       <main>
-        {renderRoute(route, session, status, submitLogin)}
+        {renderRoute(route, session, status, submitLogin, logout)}
       </main>
     </div>
   );
@@ -104,16 +105,24 @@ function renderRoute(
   session: OwnerSession | null,
   status: string,
   submitLogin: (event: FormEvent<HTMLFormElement>) => void,
+  logout: () => void,
 ) {
   if (route === "dashboard") {
     return (
       <DashboardPage
-        sessionPanel={<SessionPanel session={session} status={status} onSubmit={submitLogin} />}
+        sessionPanel={
+          <SessionPanel
+            onReset={logout}
+            onSubmit={submitLogin}
+            session={session}
+            status={status}
+          />
+        }
       />
     );
   }
   if (route === "docs") return <DocsPage />;
-  if (!session) return <LoginRequiredPage status={status} onSubmit={submitLogin} />;
+  if (!session) return <LoginRequiredPage onReset={logout} status={status} onSubmit={submitLogin} />;
   if (route === "schemas") return <SchemaBuilder />;
   if (route === "entries") return <EntryManager />;
   if (route === "apis") return <ApiList />;
@@ -122,16 +131,18 @@ function renderRoute(
 }
 
 function LoginRequiredPage({
+  onReset,
   status,
   onSubmit,
 }: {
+  onReset: () => void;
   status: string;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   return (
     <>
       <p className="empty-state">Login as owner to use this Admin UI page.</p>
-      <SessionPanel session={null} status={status} onSubmit={onSubmit} />
+      <SessionPanel onReset={onReset} session={null} status={status} onSubmit={onSubmit} />
     </>
   );
 }
@@ -151,18 +162,28 @@ function DocsPage() {
 }
 
 function SessionPanel({
+  onReset,
   session,
   status,
   onSubmit,
 }: {
+  onReset: () => void;
   session: OwnerSession | null;
   status: string;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   return (
     <section aria-labelledby="owner-login-title">
-      <h2 id="owner-login-title">Owner Login</h2>
-      {!session ? <OwnerLoginForm onSubmit={onSubmit} /> : null}
+      <h2 id="owner-login-title">Owner Setup / Login</h2>
+      <p>English: First submit creates the owner when none exists; later submits log in.</p>
+      <p>Hinglish: Pehla submit owner banata hai jab owner nahi hai; baad me login karta hai.</p>
+      {!session ? <OwnerLoginForm onSubmit={onSubmit} /> : (
+        <div className="api-row">
+          <strong>{session.email}</strong>
+          <span>Local owner session is active.</span>
+          <button type="button" onClick={onReset}>Reset session</button>
+        </div>
+      )}
       <p className="status-line" id="owner-session-status">{status}</p>
     </section>
   );
@@ -173,7 +194,7 @@ function OwnerLoginForm({ onSubmit }: { onSubmit: (event: FormEvent<HTMLFormElem
     <form onSubmit={onSubmit}>
       <label>Email <input name="email" type="email" required /></label>
       <label>Password <input name="password" type="password" required minLength={8} /></label>
-      <button type="submit">Login as owner</button>
+      <button type="submit">Setup or login owner</button>
     </form>
   );
 }

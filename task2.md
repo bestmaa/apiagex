@@ -185,7 +185,7 @@ Each task uses this structure:
 #### T210 - Improve Auth And Session UX
 
 - Version: `v1.1.7`
-- Status: `pending`
+- Status: `completed`
 - Goal: Improve owner login/bootstrap/session handling in Admin UI.
 - Persona: First-time owner; make setup/login states clear.
 - Success Criteria: UI supports first owner bootstrap when needed, owner login, logout, persisted session display, failed login errors, and session reset.
