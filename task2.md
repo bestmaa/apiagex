@@ -79,7 +79,7 @@ Each task uses this structure:
 #### T202 - Release MVP V0 Gate
 
 - Version: `v1.0.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Run final MVP v0 release gate and document the release state.
 - Persona: Release engineer; verify before claiming release readiness.
 - Success Criteria: Standard verification passes, smoke passes, browser checks cover `/adminui`, `/doc`, `/readme`, and manual API flow covers owner/schema/entry/content/RBAC.

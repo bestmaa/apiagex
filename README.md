@@ -65,6 +65,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - MVP manual QA checklist [docs/qa-checklist.md](./docs/qa-checklist.md) me available hai.
 - `npm run smoke` covers the full MVP owner/schema/entry/dynamic API/RBAC flow.
 - `npm run smoke` full MVP owner/schema/entry/dynamic API/RBAC flow cover karta hai.
+- Apiagex MVP release gate is ready at version `v1.0.0`.
+- Apiagex MVP release gate version `v1.0.0` par ready hai.
 
 ## MVP Direction
 

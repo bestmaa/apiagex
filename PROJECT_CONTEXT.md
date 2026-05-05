@@ -71,6 +71,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Manual QA checklist `docs/qa-checklist.md` me documented hai.
 - `npm run smoke` covers the full MVP owner/schema/entry/dynamic API/RBAC flow.
 - `npm run smoke` full MVP owner/schema/entry/dynamic API/RBAC flow cover karta hai.
+- Apiagex MVP release gate is ready at version `v1.0.0`.
+- Apiagex MVP release gate version `v1.0.0` par ready hai.
 
 ## Required MVP Paths
 
@@ -146,7 +148,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-Continue from `task2.md`. The first pending task is `T201`: sync current MVP docs.
+Continue from `task2.md`. The next pending phase starts with Admin UI routing.
 
 ## Coding Rules
 
