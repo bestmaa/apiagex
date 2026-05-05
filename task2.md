@@ -172,7 +172,7 @@ Each task uses this structure:
 #### T209 - Rework Users Page
 
 - Version: `v1.1.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make Users a dedicated page for creating users, assigning one role, listing users, and checking assigned access.
 - Persona: Admin managing team access; keep user-role mapping obvious.
 - Success Criteria: User form validates email/password/role, user list shows role, empty/loading/error states work, and role dropdown uses live roles.
