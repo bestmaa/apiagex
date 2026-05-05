@@ -63,6 +63,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Admin UI me cleaner layout, form controls, empty states, aur responsive styling hai.
 - MVP manual QA checklist is available at [docs/qa-checklist.md](./docs/qa-checklist.md).
 - MVP manual QA checklist [docs/qa-checklist.md](./docs/qa-checklist.md) me available hai.
+- `npm run smoke` covers the full MVP owner/schema/entry/dynamic API/RBAC flow.
+- `npm run smoke` full MVP owner/schema/entry/dynamic API/RBAC flow cover karta hai.
 
 ## MVP Direction
 
