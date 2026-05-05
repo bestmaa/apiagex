@@ -66,7 +66,7 @@ Each task uses this structure:
 #### T201 - Sync Current MVP Docs
 
 - Version: `v0.6.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Sync `/doc`, `/readme`, root `README.md`, and `PROJECT_CONTEXT.md` with every completed MVP v0 feature.
 - Persona: Clear product explainer; write so a beginner can understand owner, schema, entry, API, role, user, and permission flow.
 - Success Criteria: `/doc` and `/readme` mention owner bootstrap/login, schema fields, relation rules, entries, dynamic APIs, roles, users, allow/block behavior, smoke test, and QA checklist.

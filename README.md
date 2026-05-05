@@ -11,7 +11,7 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
   - Tag: `backup-pre-mvp-rebuild`
 - Workspace/package setup is preserved.
 - Package implementation folders are intentionally empty until the new MVP flow is confirmed.
-- Read [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) and [tasks.md](./tasks.md) before coding.
+- Read [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md), [tasks.md](./tasks.md), and [task2.md](./task2.md) before coding.
 - Minimal routes now exist for `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 - `/doc` and `/readme` now explain the current MVP status in English and Hinglish.
 - `/adminui` now has the first MVP navigation shell.

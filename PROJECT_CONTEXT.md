@@ -10,7 +10,7 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Previous implementation backup tag: `backup-pre-mvp-rebuild`
 - Package/workspace setup is preserved.
 - Old implementation code was removed.
-- New code must follow `tasks.md` only.
+- New code must follow `tasks.md` for completed MVP v0 history and `task2.md` for current work.
 - Minimal API server shell exists with `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 - `/doc` and `/readme` now show English+Hinglish completed-feature summaries.
 - `/adminui` now shows the minimal Admin shell navigation.
@@ -69,6 +69,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Admin UI me polished layout, form controls, empty states, aur responsive styling hai.
 - Manual QA checklist is documented in `docs/qa-checklist.md`.
 - Manual QA checklist `docs/qa-checklist.md` me documented hai.
+- `npm run smoke` covers the full MVP owner/schema/entry/dynamic API/RBAC flow.
+- `npm run smoke` full MVP owner/schema/entry/dynamic API/RBAC flow cover karta hai.
 
 ## Required MVP Paths
 
@@ -144,7 +146,7 @@ One server must serve exactly these primary paths:
 
 ## Next Step
 
-The next pending task is `T038`: add MVP smoke test.
+Continue from `task2.md`. The first pending task is `T201`: sync current MVP docs.
 
 ## Coding Rules
 
