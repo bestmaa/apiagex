@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { authenticateOwner } from "./api";
 import { ApiList } from "./ApiList";
+import { DashboardPage } from "./DashboardPage";
 import { EntryManager } from "./EntryManager";
 import { RoleManager } from "./RoleManager";
 import { SchemaBuilder } from "./SchemaBuilder";
@@ -105,7 +106,11 @@ function renderRoute(
   submitLogin: (event: FormEvent<HTMLFormElement>) => void,
 ) {
   if (route === "dashboard") {
-    return <DashboardPage session={session} status={status} onSubmit={submitLogin} />;
+    return (
+      <DashboardPage
+        sessionPanel={<SessionPanel session={session} status={status} onSubmit={submitLogin} />}
+      />
+    );
   }
   if (route === "docs") return <DocsPage />;
   if (!session) return <LoginRequiredPage status={status} onSubmit={submitLogin} />;
@@ -114,27 +119,6 @@ function renderRoute(
   if (route === "apis") return <ApiList />;
   if (route === "roles") return <RoleManager />;
   return <UserManager />;
-}
-
-function DashboardPage({
-  session,
-  status,
-  onSubmit,
-}: {
-  session: OwnerSession | null;
-  status: string;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-}) {
-  return (
-    <>
-      <section className="summary-panel">
-        <h2>Dashboard</h2>
-        <p>English: Owner can create schemas, entries, APIs, roles, permissions, and users.</p>
-        <p>Hinglish: Owner schemas, entries, APIs, roles, permissions, aur users bana sakta hai.</p>
-      </section>
-      <SessionPanel session={session} status={status} onSubmit={onSubmit} />
-    </>
-  );
 }
 
 function LoginRequiredPage({

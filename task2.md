@@ -107,7 +107,7 @@ Each task uses this structure:
 #### T204 - Build Dashboard Page
 
 - Version: `v1.1.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Create a useful Dashboard page with counts, recent schemas, generated API summary, and quick actions.
 - Persona: Owner/admin operator; show what needs attention at a glance.
 - Success Criteria: Dashboard shows schema count, role count, user count, API count, empty states, and quick links to create schema/role/user.
