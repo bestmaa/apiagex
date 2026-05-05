@@ -146,7 +146,7 @@ Each task uses this structure:
 #### T207 - Build Generated API Explorer Page
 
 - Version: `v1.1.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Replace simple API list with an API Explorer page showing generated endpoints, actions, sample payloads, and copyable examples.
 - Persona: Developer using generated APIs; make the API contract easy to inspect.
 - Success Criteria: For each schema, show list/read/create/update/delete endpoints, payload shape, headers for role permission testing, and response examples.
