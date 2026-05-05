@@ -120,7 +120,7 @@ Each task uses this structure:
 #### T205 - Rework Schemas Page
 
 - Version: `v1.1.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make Schemas a full page with schema list, create/edit form, field builder, relation picker, and selected schema details.
 - Persona: CMS builder; make schema creation understandable and repeatable.
 - Success Criteria: Owner can create schema, add fields, see field list, select existing schema, edit schema basics, and understand validation errors.

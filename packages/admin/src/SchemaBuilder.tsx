@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { createSchema, listSchemas } from "./api";
+import { createSchema, listSchemas, updateSchema } from "./api";
 import type { FieldType, SchemaDraft, SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
 const fieldTypes: FieldType[] = [
@@ -20,73 +20,99 @@ const emptyField: SchemaFieldDraft = {
   required: false,
 };
 
+const emptyDraft: SchemaDraft = {
+  name: "",
+  slug: "",
+  description: "",
+  fields: [{ ...emptyField }],
+};
+
 export function SchemaBuilder() {
   const [schemas, setSchemas] = useState<SchemaRecord[]>([]);
+  const [draft, setDraft] = useState<SchemaDraft>({ ...emptyDraft });
+  const [selectedId, setSelectedId] = useState("");
   const [status, setStatus] = useState("Schema list loading");
-  const [fields, setFields] = useState<SchemaFieldDraft[]>([{ ...emptyField }]);
 
   useEffect(() => {
     void refreshSchemas();
   }, []);
 
-  async function refreshSchemas() {
+  async function refreshSchemas(successStatus = "Schema list ready") {
     const result = await listSchemas();
     setSchemas(result.schemas ?? []);
-    setStatus(result.ok ? "Schema list ready" : result.error ?? "Schema list failed");
+    setStatus(result.ok ? successStatus : result.error ?? "Schema list failed");
   }
 
   async function submitSchema(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    const input: SchemaDraft = {
-      name: String(data.get("name") ?? ""),
-      slug: String(data.get("slug") ?? ""),
-      description: String(data.get("description") ?? ""),
-      fields: fields.map(cleanField),
-    };
-    const result = await createSchema(input);
+    const input = { ...draft, fields: draft.fields.map(cleanField) };
+    const result = selectedId ? await updateSchema(selectedId, input) : await createSchema(input);
     if (!result.ok) {
       setStatus(result.error ?? "Schema create failed");
       return;
     }
-    form.reset();
-    setFields([{ ...emptyField }]);
-    setStatus(`Created schema: ${result.schema?.slug ?? input.slug}`);
-    await refreshSchemas();
+    const successStatus = `${selectedId ? "Updated" : "Created"} schema: ${result.schema?.slug ?? input.slug}`;
+    await refreshSchemas(successStatus);
+    if (result.schema) selectSchema(result.schema);
+  }
+
+  function resetDraft() {
+    setSelectedId("");
+    setDraft({ ...emptyDraft, fields: [{ ...emptyField }] });
+    setStatus("Ready to create schema");
+  }
+
+  function selectSchema(schema: SchemaRecord) {
+    setSelectedId(schema.id);
+    setDraft({
+      name: schema.name,
+      slug: schema.slug,
+      description: schema.description,
+      fields: schema.fields.map((field) => ({
+        name: field.name,
+        slug: field.slug,
+        type: field.type,
+        required: field.required,
+        relationSchemaId: field.relationSchemaId ?? undefined,
+      })),
+    });
   }
 
   function updateField(index: number, patch: Partial<SchemaFieldDraft>) {
-    setFields((current) =>
-      current.map((field, fieldIndex) =>
-        fieldIndex === index ? { ...field, ...patch } : field,
-      ),
-    );
+    setDraft((current) => ({
+      ...current,
+      fields: current.fields.map((field, fieldIndex) =>
+        fieldIndex === index ? { ...field, ...patch } : field),
+    }));
   }
 
   return (
     <section aria-labelledby="schema-builder-title">
-      <h2 id="schema-builder-title">Schema Builder</h2>
+      <h2 id="schema-builder-title">Schemas</h2>
+      <p>English: Create schemas, edit schema basics, add fields, and connect relation fields safely.</p>
+      <p>Hinglish: Schemas banao, basics edit karo, fields add karo, aur relation fields safely connect karo.</p>
       <form onSubmit={submitSchema}>
-        <label>Name <input name="name" required placeholder="Article" /></label>
-        <label>Slug <input name="slug" required pattern="[a-z][a-z0-9-]*" placeholder="article" /></label>
-        <label>Description <textarea name="description" rows={3} /></label>
+        <label>Name <input required placeholder="Article" value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
+        <label>Slug <input required pattern="[a-z](?:[a-z0-9]|-)*" placeholder="article" value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value })} /></label>
+        <label>Description <textarea rows={3} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
         <div className="field-list">
-          {fields.map((field, index) => (
+          {draft.fields.map((field, index) => (
             <SchemaFieldRow
               field={field}
               index={index}
-              key={index}
+              key={`${field.slug}-${index}`}
               onChange={updateField}
               schemas={schemas}
             />
           ))}
         </div>
-        <button type="button" onClick={() => setFields([...fields, { ...emptyField }])}>Add field</button>
-        <button type="submit">Create schema</button>
+        <button type="button" onClick={() => setDraft({ ...draft, fields: [...draft.fields, { ...emptyField }] })}>Add field</button>
+        <button type="submit">{selectedId ? "Update schema" : "Create schema"}</button>
+        {selectedId ? <button type="button" onClick={resetDraft}>New schema</button> : null}
       </form>
-      <p>{status}</p>
-      <SchemaList schemas={schemas} />
+      <p className="status-line">{status}</p>
+      <SchemaDetails schema={schemas.find((schema) => schema.id === selectedId)} />
+      <SchemaList onSelect={selectSchema} schemas={schemas} selectedId={selectedId} />
     </section>
   );
 }
@@ -102,7 +128,7 @@ function SchemaFieldRow(props: {
     <fieldset>
       <legend>Field {index + 1}</legend>
       <label>Field name <input required value={field.name} onChange={(event) => onChange(index, { name: event.target.value })} /></label>
-      <label>Field slug <input required pattern="[a-z][a-z0-9-]*" value={field.slug} onChange={(event) => onChange(index, { slug: event.target.value })} /></label>
+      <label>Field slug <input required pattern="[a-z](?:[a-z0-9]|-)*" value={field.slug} onChange={(event) => onChange(index, { slug: event.target.value })} /></label>
       <label>Type <select value={field.type} onChange={(event) => onChange(index, { relationSchemaId: "", type: event.target.value as FieldType })}>{fieldTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
       {field.type === "relation" ? (
         <label>Relation target
@@ -117,15 +143,33 @@ function SchemaFieldRow(props: {
   );
 }
 
-function SchemaList({ schemas }: { schemas: SchemaRecord[] }) {
+function SchemaDetails({ schema }: { schema?: SchemaRecord }) {
+  if (!schema) return <p className="empty-state">Select a schema to inspect fields.</p>;
+  return (
+    <div className="api-row">
+      <strong>{schema.name}</strong>
+      <code>/api/content/{schema.slug}</code>
+      <span>{schema.fields.length} fields</span>
+    </div>
+  );
+}
+
+function SchemaList(props: {
+  onSelect: (schema: SchemaRecord) => void;
+  schemas: SchemaRecord[];
+  selectedId: string;
+}) {
+  const { onSelect, schemas, selectedId } = props;
   return (
     <div>
       <h3>Created Schemas</h3>
-      {schemas.length === 0 ? <p>No schemas yet</p> : schemas.map((schema) => (
+      {schemas.length === 0 ? <p className="empty-state">No schemas yet</p> : schemas.map((schema) => (
         <article className="schema-row" key={schema.id}>
           <strong>{schema.name}</strong>
           <span>/{schema.slug}</span>
-          <span>{schema.fields.length} fields</span>
+          <button type="button" onClick={() => onSelect(schema)}>
+            {selectedId === schema.id ? "Selected" : "Edit"}
+          </button>
         </article>
       ))}
     </div>

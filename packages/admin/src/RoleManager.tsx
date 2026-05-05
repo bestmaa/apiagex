@@ -88,7 +88,7 @@ export function RoleManager() {
     <section aria-labelledby="role-manager-title">
       <h2 id="role-manager-title">Role Permissions</h2>
       <form onSubmit={submitRole}>
-        <label>Role name <input name="name" pattern="[a-z][a-z0-9-]*" required /></label>
+        <label>Role name <input name="name" pattern="[a-z](?:[a-z0-9]|-)*" required /></label>
         <label>Role description <input name="description" /></label>
         <button type="submit">Create role</button>
       </form>

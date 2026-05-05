@@ -55,6 +55,18 @@ export async function createSchema(input: SchemaDraft): Promise<SchemaMutationRe
   return (await response.json()) as SchemaMutationResponse;
 }
 
+export async function updateSchema(
+  schemaId: string,
+  input: SchemaDraft,
+): Promise<SchemaMutationResponse> {
+  const response = await fetch(`/api/admin/schemas/${schemaId}`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return (await response.json()) as SchemaMutationResponse;
+}
+
 export async function listEntries(schemaId: string): Promise<EntryListResponse> {
   const response = await fetch(`/api/admin/schemas/${schemaId}/entries`);
   return (await response.json()) as EntryListResponse;
