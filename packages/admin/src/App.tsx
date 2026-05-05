@@ -8,6 +8,7 @@ import { SchemaBuilder } from "./SchemaBuilder";
 import { UserManager } from "./UserManager";
 import type { OwnerSession } from "./session.type";
 import "./styles.css";
+import "./polish.css";
 
 type AdminRoute = "dashboard" | "schemas" | "entries" | "apis" | "roles" | "users" | "docs";
 

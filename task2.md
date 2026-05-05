@@ -198,7 +198,7 @@ Each task uses this structure:
 #### T211 - Add Admin UI Interaction Polish
 
 - Version: `v1.1.8`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add consistent loading states, success/error banners, disabled submit states, empty states, and responsive layout across Admin UI pages.
 - Persona: Practical SaaS UI designer; make repeated admin work calm and predictable.
 - Success Criteria: Every form has pending/success/error states, long labels fit on mobile, navigation stays usable, and page sections do not overlap.

@@ -1,0 +1,48 @@
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #8ab4ff;
+  outline-offset: 2px;
+}
+
+pre {
+  background: #eef3f8;
+  border-radius: 6px;
+  margin: 0;
+  max-width: 100%;
+  overflow: auto;
+  padding: 10px;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  white-space: pre-wrap;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-line {
+  border-left: 4px solid #175cd3;
+}
+
+.empty-state {
+  border-left: 4px solid #9aa7b8;
+}
+
+@media (max-width: 700px) {
+  button {
+    width: 100%;
+  }
+
+  .api-row,
+  .schema-row {
+    align-items: stretch;
+  }
+}
