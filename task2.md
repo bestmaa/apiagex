@@ -94,7 +94,7 @@ Each task uses this structure:
 #### T203 - Add Real Admin UI Routing
 
 - Version: `v1.1.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Convert Admin UI from one long page into a routed app with stable pages for Dashboard, Schemas, Entries, APIs, Roles, Users, and Docs.
 - Persona: Product UI engineer; build a control panel that feels organized, not like a demo page.
 - Success Criteria: Navigation changes visible page content without full reload; active route is highlighted; direct URLs or hash routes work after refresh under `/adminui`.

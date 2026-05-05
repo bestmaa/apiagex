@@ -76,6 +76,11 @@ a:hover {
   background: #edf4ff;
 }
 
+a.active,
+a[aria-current="page"] {
+  background: #dbeafe;
+}
+
 main {
   display: grid;
   gap: 18px;

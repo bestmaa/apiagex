@@ -8,11 +8,22 @@ import { UserManager } from "./UserManager";
 import type { OwnerSession } from "./session.type";
 import "./styles.css";
 
-const navItems = ["Dashboard", "Schemas", "APIs", "Roles", "Users", "Docs"];
+type AdminRoute = "dashboard" | "schemas" | "entries" | "apis" | "roles" | "users" | "docs";
+
+const navItems: { label: string; route: AdminRoute }[] = [
+  { label: "Dashboard", route: "dashboard" },
+  { label: "Schemas", route: "schemas" },
+  { label: "Entries", route: "entries" },
+  { label: "APIs", route: "apis" },
+  { label: "Roles", route: "roles" },
+  { label: "Users", route: "users" },
+  { label: "Docs", route: "docs" },
+];
 const sessionKey = "apiagexOwner";
 
 export function App() {
   const [session, setSession] = useState<OwnerSession | null>(null);
+  const [route, setRoute] = useState<AdminRoute>(readRoute());
   const [status, setStatus] = useState("No owner session");
 
   useEffect(() => {
@@ -22,6 +33,14 @@ export function App() {
       setSession(nextSession);
       setStatus(`Logged in owner: ${nextSession.email}`);
     }
+  }, []);
+
+  useEffect(() => {
+    function syncRoute() {
+      setRoute(readRoute());
+    }
+    window.addEventListener("hashchange", syncRoute);
+    return () => window.removeEventListener("hashchange", syncRoute);
   }, []);
 
   async function submitLogin(event: FormEvent<HTMLFormElement>) {
@@ -57,33 +76,111 @@ export function App() {
       </header>
       <nav aria-label="Admin navigation">
         {navItems.map((item) => (
-          <a href={item === "Docs" ? "/doc" : `#${item.toLowerCase()}`} key={item}>
-            {item}
+          <a
+            aria-current={route === item.route ? "page" : undefined}
+            className={route === item.route ? "active" : undefined}
+            href={`#${item.route}`}
+            key={item.route}
+          >
+            {item.label}
           </a>
         ))}
       </nav>
       <main>
-        <section className="summary-panel">
-          <h2>Dashboard</h2>
-          <p>English: Owner can create schemas, entries, APIs, roles, permissions, and users.</p>
-          <p>Hinglish: Owner schemas, entries, APIs, roles, permissions, aur users bana sakta hai.</p>
-        </section>
-        <section aria-labelledby="owner-login-title">
-          <h2 id="owner-login-title">Owner Login</h2>
-          {!session ? <OwnerLoginForm onSubmit={submitLogin} /> : null}
-          <p className="status-line" id="owner-session-status">{status}</p>
-        </section>
-        {session ? (
-          <>
-            <SchemaBuilder />
-            <EntryManager />
-            <ApiList />
-            <RoleManager />
-            <UserManager />
-          </>
-        ) : <p className="empty-state">Login as owner to create schemas, entries, roles, and users.</p>}
+        {renderRoute(route, session, status, submitLogin)}
       </main>
     </div>
+  );
+}
+
+function readRoute(): AdminRoute {
+  const nextRoute = window.location.hash.replace("#", "");
+  return navItems.some((item) => item.route === nextRoute) ? nextRoute as AdminRoute : "dashboard";
+}
+
+function renderRoute(
+  route: AdminRoute,
+  session: OwnerSession | null,
+  status: string,
+  submitLogin: (event: FormEvent<HTMLFormElement>) => void,
+) {
+  if (route === "dashboard") {
+    return <DashboardPage session={session} status={status} onSubmit={submitLogin} />;
+  }
+  if (route === "docs") return <DocsPage />;
+  if (!session) return <LoginRequiredPage status={status} onSubmit={submitLogin} />;
+  if (route === "schemas") return <SchemaBuilder />;
+  if (route === "entries") return <EntryManager />;
+  if (route === "apis") return <ApiList />;
+  if (route === "roles") return <RoleManager />;
+  return <UserManager />;
+}
+
+function DashboardPage({
+  session,
+  status,
+  onSubmit,
+}: {
+  session: OwnerSession | null;
+  status: string;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  return (
+    <>
+      <section className="summary-panel">
+        <h2>Dashboard</h2>
+        <p>English: Owner can create schemas, entries, APIs, roles, permissions, and users.</p>
+        <p>Hinglish: Owner schemas, entries, APIs, roles, permissions, aur users bana sakta hai.</p>
+      </section>
+      <SessionPanel session={session} status={status} onSubmit={onSubmit} />
+    </>
+  );
+}
+
+function LoginRequiredPage({
+  status,
+  onSubmit,
+}: {
+  status: string;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  return (
+    <>
+      <p className="empty-state">Login as owner to use this Admin UI page.</p>
+      <SessionPanel session={null} status={status} onSubmit={onSubmit} />
+    </>
+  );
+}
+
+function DocsPage() {
+  return (
+    <section>
+      <h2>Docs</h2>
+      <p>English: Product docs and readable project summary are served by the same API server.</p>
+      <p>Hinglish: Product docs aur readable project summary same API server se serve hote hain.</p>
+      <div className="action-row">
+        <a href="/doc">Open Docs</a>
+        <a href="/readme">Open Readme</a>
+      </div>
+    </section>
+  );
+}
+
+function SessionPanel({
+  session,
+  status,
+  onSubmit,
+}: {
+  session: OwnerSession | null;
+  status: string;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  return (
+    <section aria-labelledby="owner-login-title">
+      <h2 id="owner-login-title">Owner Login</h2>
+      {!session ? <OwnerLoginForm onSubmit={onSubmit} /> : null}
+      <p className="status-line" id="owner-session-status">{status}</p>
+    </section>
   );
 }
 
