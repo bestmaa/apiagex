@@ -213,7 +213,7 @@ Each task uses this structure:
 #### T212 - Plan Static Docs Architecture
 
 - Version: `v1.2.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Decide and document how `/doc` and `/readme` should move from inline server HTML to static built docs.
 - Persona: System architect; keep URLs stable while improving maintainability.
 - Success Criteria: Architecture note explains VitePress/static-docs option, package location, build output, server static serving, and migration steps.

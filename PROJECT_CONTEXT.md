@@ -139,6 +139,19 @@ One server must serve exactly these primary paths:
 - Checked means allowed; unchecked means blocked by default.
 - Permission verification must test an allowed user and blocked user.
 
+## Static Docs Architecture Plan
+
+- `/doc` and `/readme` must remain public URLs.
+- Move authored documentation into a future `packages/docs` workspace package.
+- Use VitePress or a similarly small static docs builder unless implementation constraints change.
+- Source pages should be Markdown, with English + Hinglish content preserved.
+- Build output should land in a generated folder such as `packages/docs/dist`.
+- The API server should serve built docs assets the same way it serves Admin UI assets.
+- `/doc` should load the main docs page, and `/readme` should load the readable project summary page.
+- Missing docs build should return a clear fallback telling the developer to run the docs build.
+- The migration should first copy current inline `/doc` and `/readme` content into docs source files.
+- After static docs are verified, remove only the duplicated inline docs content from server code.
+
 ## Verification Contract
 
 - Browser Use is required for Admin UI, `/doc`, and `/readme` checks.
