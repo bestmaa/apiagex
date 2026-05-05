@@ -159,7 +159,7 @@ Each task uses this structure:
 #### T208 - Rework Roles And Permissions Page
 
 - Version: `v1.1.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make Roles a dedicated page for creating roles and managing per-schema read/create/update/delete/manage permissions.
 - Persona: Access-control admin; make allow/block behavior visible and hard to misunderstand.
 - Success Criteria: Role list, role creation, schema permission matrix, save status, and clear unchecked-means-blocked behavior.

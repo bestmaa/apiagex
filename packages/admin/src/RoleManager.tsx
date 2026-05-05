@@ -30,6 +30,10 @@ export function RoleManager() {
   async function loadInitial() {
     const roleResult = await listRoles();
     const schemaResult = await listSchemas();
+    if (!roleResult.ok || !schemaResult.ok) {
+      setStatus(roleResult.error ?? schemaResult.error ?? "Role permissions failed");
+      return;
+    }
     const nextRoles = roleResult.roles ?? [];
     setRoles(nextRoles);
     setSchemas(schemaResult.schemas ?? []);
@@ -56,7 +60,12 @@ export function RoleManager() {
       return;
     }
     form.reset();
-    await loadInitial();
+    const roleResult = await listRoles();
+    setRoles(roleResult.roles ?? []);
+    if (result.role) {
+      setRoleId(result.role.id);
+      await loadPermissions(result.role.id);
+    }
     setStatus(`Created role: ${result.role?.name ?? "role"}`);
   }
 
@@ -66,6 +75,10 @@ export function RoleManager() {
   }
 
   async function savePermissions() {
+    if (!roleId) {
+      setStatus("Create or select a role first");
+      return;
+    }
     const drafts = buildPermissionDrafts(schemas, permissions);
     const result = await saveRolePermissions(roleId, drafts);
     setPermissions(result.permissions ?? []);
@@ -86,14 +99,19 @@ export function RoleManager() {
 
   return (
     <section aria-labelledby="role-manager-title">
-      <h2 id="role-manager-title">Role Permissions</h2>
+      <h2 id="role-manager-title">Roles</h2>
+      <p>English: Checked actions are allowed for requests sent with that role id.</p>
+      <p>Hinglish: Checked actions us role id ke saath bheje gaye requests ke liye allowed hain.</p>
+      <p>Unchecked actions are blocked when <code>x-apiagex-role-id</code> is provided.</p>
       <form onSubmit={submitRole}>
         <label>Role name <input name="name" pattern="[a-z](?:[a-z0-9]|-)*" required /></label>
         <label>Role description <input name="description" /></label>
         <button type="submit">Create role</button>
       </form>
+      <RoleList activeRoleId={roleId} roles={roles} />
       <label>Active role
         <select value={roleId} onChange={(event) => void changeRole(event.target.value)}>
+          <option value="">Select role</option>
           {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
         </select>
       </label>
@@ -101,8 +119,23 @@ export function RoleManager() {
       <button disabled={!roleId || schemas.length === 0} onClick={() => void savePermissions()}>
         Save permissions
       </button>
-      <p>{status}</p>
+      <p className="status-line">{status}</p>
     </section>
+  );
+}
+
+function RoleList({ activeRoleId, roles }: { activeRoleId: string; roles: RoleRecord[] }) {
+  if (roles.length === 0) return <p className="empty-state">No roles yet</p>;
+  return (
+    <div className="field-list">
+      <h3>Role list</h3>
+      {roles.map((role) => (
+        <article className="api-row" key={role.id}>
+          <strong>{role.name}{role.id === activeRoleId ? " (active)" : ""}</strong>
+          <span>{role.description || "No description"}</span>
+        </article>
+      ))}
+    </div>
   );
 }
 
@@ -113,9 +146,9 @@ function PermissionGrid(props: {
 }) {
   return (
     <div className="permission-grid">
-      {props.schemas.map((schema) => (
+      {props.schemas.length === 0 ? <p className="empty-state">Create a schema before assigning permissions.</p> : props.schemas.map((schema) => (
         <fieldset key={schema.id}>
-          <legend>{schema.name} API</legend>
+          <legend>{schema.name} API - /api/content/{schema.slug}</legend>
           {actions.map((action) => (
             <label key={action}>
               <input
