@@ -118,5 +118,9 @@ Run npm run check, npm audit --audit-level=high, git diff --check. Commit comple
 - T036 | Version: v0.6.0 | Status: completed | Goal: Polish Admin UI empty states, success/errors, loading states, and responsive layout. | Verify: Browser Use desktop/mobile visual check. | Commit: `Polish MVP admin UI`
 - T037 | Version: v0.6.1 | Status: completed | Goal: Add full MVP manual QA checklist for Browser Use and API requests. | Verify: checklist review. | Commit: `Add MVP QA checklist`
 - T038 | Version: v0.6.2 | Status: completed | Goal: Add smoke test covering owner login, schema, entry, dynamic API, role, user permission. | Verify: `npm run smoke`. | Commit: `Add MVP smoke test`
-- T039 | Version: v0.6.3 | Status: pending | Goal: Final docs/readme sync for every completed MVP feature. | Verify: Browser Use `/doc` and `/readme`. | Commit: `Sync MVP docs`
-- T040 | Version: v1.0.0 | Status: pending | Goal: Final MVP release gate. | Verify: standard verification, smoke, Browser Use full flow, manual API flow. | Commit: `Release Apiagex MVP`
+- T039 | Version: v0.6.3 | Status: moved_to_task2 | Goal: Final docs/readme sync for every completed MVP feature. | Verify: Browser Use `/doc` and `/readme`. | Commit: `Sync MVP docs`
+- T040 | Version: v1.0.0 | Status: moved_to_task2 | Goal: Final MVP release gate. | Verify: standard verification, smoke, Browser Use full flow, manual API flow. | Commit: `Release Apiagex MVP`
+
+## Next Queue
+
+Continue future work from [task2.md](./task2.md). Do not pick more work from this file unless the user explicitly reopens the MVP v0 queue.
