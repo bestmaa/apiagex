@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { createEntry, listEntries, listSchemas } from "./api";
+import { createEntry, deleteEntry, listEntries, listSchemas, updateEntry } from "./api";
 import type { EntryData, EntryRecord, EntryFormProps } from "./entry.type";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
@@ -7,6 +7,7 @@ export function EntryManager() {
   const [schemas, setSchemas] = useState<SchemaRecord[]>([]);
   const [schemaId, setSchemaId] = useState("");
   const [entries, setEntries] = useState<EntryRecord[]>([]);
+  const [editingEntry, setEditingEntry] = useState<EntryRecord | null>(null);
   const [status, setStatus] = useState("Entry manager loading");
   const schema = schemas.find((item) => item.id === schemaId);
 
@@ -34,86 +35,131 @@ export function EntryManager() {
 
   async function changeSchema(nextSchemaId: string) {
     setSchemaId(nextSchemaId);
+    setEditingEntry(null);
     await loadEntries(nextSchemaId);
+  }
+
+  async function removeEntry(entry: EntryRecord) {
+    const result = await deleteEntry(entry.schemaId, entry.id);
+    if (!result.ok) {
+      setStatus(result.error ?? "Entry delete failed");
+      return;
+    }
+    setEditingEntry(null);
+    setStatus(`Deleted entry: ${entry.id.slice(0, 8)}`);
+    await loadEntries(entry.schemaId);
   }
 
   return (
     <section aria-labelledby="entry-manager-title">
-      <h2 id="entry-manager-title">Entry Manager</h2>
+      <h2 id="entry-manager-title">Entries</h2>
+      <p>English: Select a schema, create content, then edit or delete entries.</p>
+      <p>Hinglish: Schema select karo, content banao, phir entries edit ya delete karo.</p>
       <label>Entry schema
         <select value={schemaId} onChange={(event) => void changeSchema(event.target.value)}>
           {schemas.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
         </select>
       </label>
-      {schema ? <GeneratedEntryForm schema={schema} onCreated={() => loadEntries(schema.id)} /> : null}
-      <p>{status}</p>
-      <EntryList entries={entries} />
+      {schema ? (
+        <GeneratedEntryForm
+          editingEntry={editingEntry}
+          key={`${schema.id}-${editingEntry?.id ?? "new"}`}
+          onCancelEdit={() => setEditingEntry(null)}
+          onCreated={() => loadEntries(schema.id)}
+          schema={schema}
+        />
+      ) : <p className="empty-state">Create a schema first.</p>}
+      <p className="status-line">{status}</p>
+      <EntryList entries={entries} onDelete={removeEntry} onEdit={setEditingEntry} />
     </section>
   );
 }
 
-function GeneratedEntryForm({ schema, onCreated }: EntryFormProps) {
+function GeneratedEntryForm({ schema, editingEntry, onCancelEdit, onCreated }: EntryFormProps) {
   const [status, setStatus] = useState("");
 
   async function submitEntry(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const data = readEntryData(new FormData(form), schema.fields);
-    const result = await createEntry(schema.id, data);
+    const data = readEntryData(new FormData(form), schema.fields, setStatus);
+    if (!data) return;
+    const result = editingEntry
+      ? await updateEntry(schema.id, editingEntry.id, data)
+      : await createEntry(schema.id, data);
     if (!result.ok) {
-      setStatus(result.error ?? "Entry create failed");
+      setStatus(result.error ?? "Entry save failed");
       return;
     }
-    form.reset();
-    setStatus(`Created entry: ${result.entry?.id.slice(0, 8) ?? schema.slug}`);
+    if (!editingEntry) form.reset();
+    setStatus(`${editingEntry ? "Updated" : "Created"} entry: ${result.entry?.id.slice(0, 8) ?? schema.slug}`);
     await onCreated();
   }
 
   return (
     <form onSubmit={submitEntry}>
-      {schema.fields.map((field) => <EntryInput field={field} key={field.slug} />)}
-      <button type="submit">Create entry</button>
-      <p>{status}</p>
+      <h3>{editingEntry ? "Edit entry" : "Create entry"}</h3>
+      {schema.fields.map((field) => (
+        <EntryInput data={editingEntry?.data} field={field} key={field.slug} />
+      ))}
+      <button type="submit">{editingEntry ? "Update entry" : "Create entry"}</button>
+      {editingEntry ? <button type="button" onClick={onCancelEdit}>Cancel edit</button> : null}
+      <p className="status-line">{status || "Entry form ready"}</p>
     </form>
   );
 }
 
-function EntryInput({ field }: { field: SchemaFieldDraft }) {
+function EntryInput({ data, field }: { data?: EntryData; field: SchemaFieldDraft }) {
   const name = field.slug;
+  const value = data?.[field.slug];
   if (field.type === "longText" || field.type === "json") {
-    return <label>{field.name} <textarea name={name} required={field.required} rows={3} /></label>;
+    return <label>{field.name} <textarea defaultValue={formatValue(value)} name={name} required={field.required} rows={3} /></label>;
   }
   if (field.type === "boolean") {
-    return <label><input name={name} type="checkbox" /> {field.name}</label>;
+    return <label><input defaultChecked={value === true} name={name} type="checkbox" /> {field.name}</label>;
   }
   const type = field.type === "number" ? "number" : field.type === "date" ? "date" : "text";
-  return <label>{field.name} <input name={name} required={field.required} type={type} /></label>;
+  return <label>{field.name} <input defaultValue={formatValue(value)} name={name} required={field.required} type={type} /></label>;
 }
 
-function EntryList({ entries }: { entries: EntryRecord[] }) {
+function EntryList(props: {
+  entries: EntryRecord[];
+  onDelete: (entry: EntryRecord) => void;
+  onEdit: (entry: EntryRecord) => void;
+}) {
+  const { entries, onDelete, onEdit } = props;
   return (
     <div>
       <h3>Entries</h3>
-      {entries.length === 0 ? <p>No entries yet</p> : entries.map((entry) => (
-        <article className="schema-row" key={entry.id}>
+      {entries.length === 0 ? <p className="empty-state">No entries yet</p> : entries.map((entry) => (
+        <article className="api-row" key={entry.id}>
           <strong>{entry.id.slice(0, 8)}</strong>
           <span>{Object.keys(entry.data).join(", ")}</span>
-          <span>{new Date(entry.createdAt).toLocaleDateString()}</span>
+          <button type="button" onClick={() => onEdit(entry)}>Edit</button>
+          <button type="button" onClick={() => onDelete(entry)}>Delete</button>
         </article>
       ))}
     </div>
   );
 }
 
-function readEntryData(form: FormData, fields: SchemaFieldDraft[]): EntryData {
+function readEntryData(
+  form: FormData,
+  fields: SchemaFieldDraft[],
+  setStatus: (status: string) => void,
+): EntryData | null {
   const data: EntryData = {};
-  for (const field of fields) {
-    const raw = form.get(field.slug);
-    if (field.type === "boolean") {
-      data[field.slug] = raw === "on";
-    } else if (raw !== null && raw !== "") {
-      data[field.slug] = parseFieldValue(field, String(raw));
+  try {
+    for (const field of fields) {
+      const raw = form.get(field.slug);
+      if (field.type === "boolean") {
+        data[field.slug] = raw === "on";
+      } else if (raw !== null && raw !== "") {
+        data[field.slug] = parseFieldValue(field, String(raw));
+      }
     }
+  } catch {
+    setStatus("JSON_INVALID");
+    return null;
   }
   return data;
 }
@@ -122,4 +168,9 @@ function parseFieldValue(field: SchemaFieldDraft, raw: string): unknown {
   if (field.type === "number") return Number(raw);
   if (field.type === "json") return JSON.parse(raw);
   return raw;
+}
+
+function formatValue(value: unknown): string {
+  if (value === undefined || value === null) return "";
+  return typeof value === "object" ? JSON.stringify(value) : String(value);
 }

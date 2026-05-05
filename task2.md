@@ -133,7 +133,7 @@ Each task uses this structure:
 #### T206 - Rework Entries Page
 
 - Version: `v1.1.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make Entries a dedicated page where owner selects schema, creates entries, lists entries, and edits/deletes entries.
 - Persona: Content editor; make day-to-day content work simple.
 - Success Criteria: Entry form is generated from schema fields, validates required/type errors, lists existing entries, and supports edit/delete.

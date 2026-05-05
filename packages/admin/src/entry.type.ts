@@ -22,7 +22,15 @@ export type EntryMutationResponse = {
   error?: string;
 };
 
+export type EntryDeleteResponse = {
+  ok: boolean;
+  deleted?: boolean;
+  error?: string;
+};
+
 export type EntryFormProps = {
   schema: SchemaRecord;
+  editingEntry: EntryRecord | null;
   onCreated: () => Promise<void>;
+  onCancelEdit: () => void;
 };

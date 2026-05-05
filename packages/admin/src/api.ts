@@ -1,5 +1,6 @@
 import type { AuthResponse } from "./session.type";
 import type {
+  EntryDeleteResponse,
   EntryData,
   EntryListResponse,
   EntryMutationResponse,
@@ -82,6 +83,29 @@ export async function createEntry(
     body: JSON.stringify({ data }),
   });
   return (await response.json()) as EntryMutationResponse;
+}
+
+export async function updateEntry(
+  schemaId: string,
+  entryId: string,
+  data: EntryData,
+): Promise<EntryMutationResponse> {
+  const response = await fetch(`/api/admin/schemas/${schemaId}/entries/${entryId}`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ data }),
+  });
+  return (await response.json()) as EntryMutationResponse;
+}
+
+export async function deleteEntry(
+  schemaId: string,
+  entryId: string,
+): Promise<EntryDeleteResponse> {
+  const response = await fetch(`/api/admin/schemas/${schemaId}/entries/${entryId}`, {
+    method: "DELETE",
+  });
+  return (await response.json()) as EntryDeleteResponse;
 }
 
 export async function listRoles(): Promise<RoleListResponse> {
