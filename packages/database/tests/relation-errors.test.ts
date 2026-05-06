@@ -3,6 +3,7 @@ import {
   relationErrors,
   relationEntryReferenced,
   relationOneToOneConflict,
+  relationSchemaReferenced,
   relationTargetEntryInvalid,
   relationValueShapeInvalid,
 } from "../src/index.js";
@@ -13,6 +14,7 @@ describe("relation error codes", () => {
       metadataForNonRelationField: "RELATION_METADATA_FOR_NON_RELATION_FIELD",
       entryReferenced: "RELATION_ENTRY_REFERENCED",
       oneToOneConflict: "RELATION_ONE_TO_ONE_CONFLICT",
+      schemaReferenced: "RELATION_SCHEMA_REFERENCED",
       targetEntryInvalid: "RELATION_TARGET_ENTRY_INVALID",
       targetMissing: "RELATION_TARGET_MISSING",
       targetRequired: "RELATION_TARGET_REQUIRED",
@@ -24,6 +26,7 @@ describe("relation error codes", () => {
   it("formats field-specific relation errors", () => {
     expect(relationEntryReferenced("entry-1")).toBe("RELATION_ENTRY_REFERENCED:entry-1");
     expect(relationOneToOneConflict("author")).toBe("RELATION_ONE_TO_ONE_CONFLICT:author");
+    expect(relationSchemaReferenced("schema-1")).toBe("RELATION_SCHEMA_REFERENCED:schema-1");
     expect(relationTargetEntryInvalid("author")).toBe("RELATION_TARGET_ENTRY_INVALID:author");
     expect(relationValueShapeInvalid("tags")).toBe("RELATION_VALUE_SHAPE_INVALID:tags");
   });

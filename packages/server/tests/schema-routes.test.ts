@@ -132,4 +132,52 @@ describe("schema admin APIs", () => {
     expect(invalidType.statusCode).toBe(400);
     expect(invalidType.json()).toEqual({ ok: false, error: "RELATION_TYPE_INVALID" });
   });
+
+  it("blocks deleting relation target schemas", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const author = await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Author",
+        slug: "author",
+        fields: [{ name: "Name", slug: "name", type: "text" }],
+      },
+    });
+    const authorId = author.json().schema.id as string;
+    const book = await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Book",
+        slug: "book",
+        fields: [
+          {
+            name: "Author",
+            slug: "author",
+            type: "relation",
+            relationSchemaId: authorId,
+            relationType: "manyToOne",
+          },
+        ],
+      },
+    });
+    const bookId = book.json().schema.id as string;
+
+    const blocked = await server.inject({
+      method: "DELETE",
+      url: `/api/admin/schemas/${authorId}`,
+    });
+    expect(blocked.statusCode).toBe(400);
+    expect(blocked.json()).toEqual({
+      ok: false,
+      error: `RELATION_SCHEMA_REFERENCED:${authorId}`,
+    });
+
+    const deletedSource = await server.inject({
+      method: "DELETE",
+      url: `/api/admin/schemas/${bookId}`,
+    });
+    expect(deletedSource.statusCode).toBe(200);
+  });
 });

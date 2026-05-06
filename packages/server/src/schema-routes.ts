@@ -58,7 +58,8 @@ export function registerSchemaRoutes(
       deleteSchema(database, request.params.id);
       return { ok: true, deleted: true };
     } catch (error) {
-      return sendSchemaError(reply, error, 404);
+      const statusCode = errorCode(error) === "SCHEMA_NOT_FOUND" ? 404 : 400;
+      return sendSchemaError(reply, error, statusCode);
     }
   });
 }

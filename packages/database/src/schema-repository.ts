@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { relationErrors } from "./relation-errors.js";
+import { relationErrors, relationSchemaReferenced } from "./relation-errors.js";
 import type { SqliteDatabase } from "./sqlite.js";
 import type {
   CreateFieldInput,
@@ -111,9 +111,19 @@ export function updateSchema(
 }
 
 export function deleteSchema(db: SqliteDatabase, id: string): void {
+  assertSchemaNotReferenced(db, id);
   const result = db.prepare("DELETE FROM schemas WHERE id = ?").run(id);
   if (result.changes === 0) {
     throw new Error("SCHEMA_NOT_FOUND");
+  }
+}
+
+function assertSchemaNotReferenced(db: SqliteDatabase, id: string): void {
+  const dependent = db
+    .prepare("SELECT schema_id as schemaId FROM fields WHERE relation_schema_id = ? AND schema_id != ? LIMIT 1")
+    .get(id, id) as { schemaId: string } | undefined;
+  if (dependent) {
+    throw new Error(relationSchemaReferenced(id));
   }
 }
 

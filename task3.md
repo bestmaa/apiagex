@@ -267,7 +267,7 @@ Each task uses this structure:
 #### T316 - Add Relation Schema Delete Guard
 
 - Version: `v2.2.7`
-- Status: `pending`
+- Status: `completed`
 - Goal: Prevent deleting schemas that are used as relation targets unless safe.
 - Persona: Data safety engineer; protect content models.
 - Success Criteria: Schema delete fails with a clear error when another schema references it.

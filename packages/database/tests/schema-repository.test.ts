@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   createSchema,
+  deleteSchema,
   listSchemas,
   migrateMvpDatabase,
   openSqliteDatabase,
@@ -116,6 +117,31 @@ describe("schema repository", () => {
         ],
       }),
     ).toThrow("RELATION_METADATA_FOR_NON_RELATION_FIELD");
+  });
+
+  it("blocks deleting relation target schemas", () => {
+    const db = openMigratedDb();
+    const author = createSchema(db, {
+      name: "Author",
+      slug: "author",
+      fields: [{ name: "Name", slug: "name", type: "text" }],
+    });
+    const book = createSchema(db, {
+      name: "Book",
+      slug: "book",
+      fields: [
+        {
+          name: "Author",
+          slug: "author",
+          type: "relation",
+          relationSchemaId: author.id,
+          relationType: "manyToOne",
+        },
+      ],
+    });
+
+    expect(() => deleteSchema(db, author.id)).toThrow(`RELATION_SCHEMA_REFERENCED:${author.id}`);
+    expect(() => deleteSchema(db, book.id)).not.toThrow();
   });
 });
 
