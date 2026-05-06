@@ -224,38 +224,46 @@ function EntryInput({
   const fieldClass = isWideEntryField(field) ? "entry-field entry-field-wide" : "entry-field";
   if (isSingleRelationField(field)) {
     return (
-      <label className={fieldClass}>{field.name}
-        <select
-          defaultValue={formatValue(value)}
-          key={`${name}-${formatValue(value)}-${relationEntries.length}`}
-          name={name}
-          required={field.required}
-        >
-          <option value="">Select {field.relationTarget?.name ?? "target entry"}</option>
-          {relationEntries.map((entry) => (
-            <option key={entry.id} value={entry.id}>{entryLabel(entry)}</option>
-          ))}
-        </select>
-      </label>
+      <div className="entry-field entry-field-wide relation-picker">
+        <RelationPickerHeader field={field} selectedCount={formatValue(value) ? 1 : 0} total={relationEntries.length} />
+        <label>{field.name}
+          <select
+            defaultValue={formatValue(value)}
+            key={`${name}-${formatValue(value)}-${relationEntries.length}`}
+            name={name}
+            required={field.required}
+          >
+            <option value="">Select {field.relationTarget?.name ?? "target entry"}</option>
+            {relationEntries.map((entry) => (
+              <option key={entry.id} value={entry.id}>{entryLabel(entry)}</option>
+            ))}
+          </select>
+        </label>
+        {relationEntries.length === 0 ? <StateMessage title="No target entries" variant="empty">Create entries in the target schema first.</StateMessage> : null}
+      </div>
     );
   }
   if (isMultiRelationField(field)) {
     const selectedValues = Array.isArray(value) ? value.map(String) : [];
     return (
-      <label className="entry-field entry-field-wide">{field.name}
-        <select
-          defaultValue={selectedValues}
-          key={`${name}-${selectedValues.join(",")}-${relationEntries.length}`}
-          multiple
-          name={name}
-          required={field.required}
-        >
-          {relationEntries.map((entry) => (
-            <option key={entry.id} value={entry.id}>{entryLabel(entry)}</option>
-          ))}
-        </select>
-        <span className="helper-text">Use Ctrl/Cmd to select more than one entry.</span>
-      </label>
+      <div className="entry-field entry-field-wide relation-picker">
+        <RelationPickerHeader field={field} selectedCount={selectedValues.length} total={relationEntries.length} />
+        <label>{field.name}
+          <select
+            defaultValue={selectedValues}
+            key={`${name}-${selectedValues.join(",")}-${relationEntries.length}`}
+            multiple
+            name={name}
+            required={field.required}
+          >
+            {relationEntries.map((entry) => (
+              <option key={entry.id} value={entry.id}>{entryLabel(entry)}</option>
+            ))}
+          </select>
+        </label>
+        <span className="helper-text">Use Ctrl/Cmd to select more than one entry. Saved value stays an array of entry ids.</span>
+        {relationEntries.length === 0 ? <StateMessage title="No target entries" variant="empty">Create entries in the target schema first.</StateMessage> : null}
+      </div>
     );
   }
   if (field.type === "longText" || field.type === "json") {
@@ -266,6 +274,29 @@ function EntryInput({
   }
   const type = field.type === "number" ? "number" : field.type === "date" ? "date" : "text";
   return <label className={fieldClass}>{field.name} <input defaultValue={formatValue(value)} name={name} required={field.required} type={type} /></label>;
+}
+
+function RelationPickerHeader({
+  field,
+  selectedCount,
+  total,
+}: {
+  field: SchemaFieldDraft;
+  selectedCount: number;
+  total: number;
+}) {
+  return (
+    <div className="relation-picker-header">
+      <div>
+        <strong>{field.relationTarget?.name ?? "Target schema"}</strong>
+        <span>{relationKindLabel(field)} relation</span>
+      </div>
+      <div className="relation-picker-counts">
+        <span>{total} available</span>
+        <span>{selectedCount} selected</span>
+      </div>
+    </div>
+  );
 }
 
 function EntryList(props: {
@@ -361,6 +392,13 @@ function isMultiRelationField(field: SchemaFieldDraft): boolean {
 
 function isWideEntryField(field: SchemaFieldDraft): boolean {
   return field.type === "longText" || field.type === "json" || field.type === "relation" || field.type === "media";
+}
+
+function relationKindLabel(field: SchemaFieldDraft): string {
+  if (field.relationType === "oneToOne") return "One to one";
+  if (field.relationType === "oneToMany") return "One to many";
+  if (field.relationType === "manyToMany") return "Many to many";
+  return "Many to one";
 }
 
 function isEntryPickerRelationField(field: SchemaFieldDraft): boolean {

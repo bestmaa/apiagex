@@ -320,7 +320,7 @@ Each task uses this structure:
 #### T418 - Improve Relation Entry Pickers
 
 - Version: `v4.4.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make single and multi relation pickers easier to use.
 - Persona: Content editor; make relation choices understandable.
 - Success Criteria: Pickers show target schema, labels, selected state, empty target state, and helper copy.
