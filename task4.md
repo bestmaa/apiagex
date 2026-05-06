@@ -374,7 +374,7 @@ Each task uses this structure:
 #### T422 - Add API Method Badges
 
 - Version: `v4.5.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add clear method/path styling for API routes.
 - Persona: API docs designer; make endpoints readable.
 - Success Criteria: GET/POST/PUT/DELETE methods have consistent badges and paths are copyable.

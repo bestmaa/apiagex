@@ -684,14 +684,37 @@ code {
   padding: var(--admin-space-3);
 }
 
-.api-endpoint-list span {
-  color: var(--admin-color-text-strong);
-  font-weight: 900;
-}
-
 .api-endpoint-list p {
   color: var(--admin-color-text-soft);
   margin: 0;
+}
+
+.api-method {
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text-strong);
+  font-size: var(--admin-font-xs);
+  font-weight: 900;
+  padding: var(--admin-space-2) var(--admin-space-3);
+  text-align: center;
+}
+
+.api-method-get {
+  background: var(--admin-color-primary-soft);
+}
+
+.api-method-post {
+  background: var(--admin-color-primary-muted);
+  border: 1px solid var(--admin-color-primary);
+}
+
+.api-method-put {
+  background: var(--admin-color-warning-bg);
+}
+
+.api-method-delete {
+  background: var(--admin-color-warning-bg);
+  border: 1px solid var(--admin-color-warning-border);
+  color: var(--admin-color-warning-text);
 }
 
 .api-row ul {

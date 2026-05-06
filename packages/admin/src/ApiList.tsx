@@ -56,7 +56,7 @@ function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
       <ul className="api-endpoint-list">
         {actions.map((action) => (
           <li key={action.label}>
-            <span>{action.method}</span>
+            <span className={`api-method api-method-${action.method.toLowerCase()}`}>{action.method}</span>
             <code>{action.path.replace(":schemaSlug", schema.slug)}</code>
             <strong>{action.label}</strong>
             <p>{action.purpose}</p>
