@@ -685,7 +685,7 @@ Each task uses this structure:
 #### T445 - Verify Admin Theme Coverage
 
 - Version: `v4.10.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Verify light/dark mode across all Admin UI routes.
 - Persona: Visual QA engineer; ensure theme is complete.
 - Success Criteria: Dashboard, Schemas, Entries, APIs, Roles, Users, Docs render correctly in both themes.
@@ -693,6 +693,7 @@ Each task uses this structure:
 - Output: Theme coverage fixes/notes.
 - Strict Rule: No unreadable text in either theme.
 - Verify: Browser all routes light/dark plus standard verification.
+- Verification Notes: Browser coverage passed for Dashboard, Schemas, Entries, APIs, Roles, Users, and Docs in light/dark mode at 1366x900 and 390x844 with no horizontal overflow or missing theme tokens.
 - Commit: `Verify admin theme coverage`
 
 #### T446 - Verify Relation UI After Redesign
