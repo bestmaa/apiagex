@@ -29,6 +29,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - React Admin UI owner login ke baad schema builder form dikhata hai.
 - Relation fields can pick an existing schema target and are validated by the backend.
 - Relation fields existing schema target pick kar sakte hain aur backend validation hota hai.
+- Task3 relation support covers `oneToOne`, `oneToMany`, `manyToOne`, `manyToMany`, JSON value storage, delete guards, schema metadata, and one-level populate.
+- Task3 relation support `oneToOne`, `oneToMany`, `manyToOne`, `manyToMany`, JSON value storage, delete guards, schema metadata, aur one-level populate cover karta hai.
 - `/doc` and `/readme` now document schema builder usage and relation rules.
 - `/doc` aur `/readme` schema builder usage aur relation rules document karte hain.
 - Schema builder checkpoint v0.3.5 is ready.
@@ -37,10 +39,12 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Entry repository JSON entry data ko schema fields aur relation entry targets ke against validate karta hai.
 - Entry admin APIs provide create, list, read, update, and delete under `/api/admin/schemas/:schemaId/entries`.
 - Entry admin APIs `/api/admin/schemas/:schemaId/entries` ke under create, list, read, update, aur delete provide karte hain.
-- React Admin UI generates entry forms from selected schema fields.
-- React Admin UI selected schema fields se entry forms generate karta hai.
+- React Admin UI generates entry forms from selected schema fields, including single relation selects and multi relation pickers.
+- React Admin UI selected schema fields se entry forms generate karta hai, including single relation selects aur multi relation pickers.
 - Dynamic content APIs expose each schema slug under `/api/content/:schemaSlug`.
 - Dynamic content APIs har schema slug ko `/api/content/:schemaSlug` ke under expose karte hain.
+- Dynamic content APIs can expand one relation level with `?populate=relations`, `?populate=all`, or `?populate=*`.
+- Dynamic content APIs `?populate=relations`, `?populate=all`, ya `?populate=*` se one relation level expand kar sakte hain.
 - Admin UI lists generated dynamic APIs for all schemas.
 - Admin UI sab schemas ke generated dynamic APIs list karta hai.
 - `/doc` and `/readme` include dynamic API usage examples.
@@ -132,7 +136,8 @@ One server must serve exactly these primary paths:
 - `manyToOne`: many source entries can point to one parent entry, such as Articles to Category.
 - `oneToMany`: one source entry can store many child entry ids, such as Author to Articles.
 - `manyToMany`: both sides can connect to many entries, such as Articles and Tags.
-- Current Task3 status documents semantics only; validation, storage, populate, and Admin UI editing are later Task3 tasks.
+- Current Task3 status: relation metadata, validation, JSON storage, populate, Admin UI schema builder, entry pickers, relation summaries, desktop/mobile roundtrips, and all four relation types are implemented and verified.
+- Current Task3 status Hinglish: relation metadata, validation, JSON storage, populate, Admin UI schema builder, entry pickers, relation summaries, desktop/mobile roundtrips, aur all four relation types implemented aur verified hain.
 
 ### Relation Storage Model
 
@@ -162,7 +167,9 @@ One server must serve exactly these primary paths:
 
 - Task3 relation storage gate verifies relation metadata validation, single and multi value shapes, many-to-one, one-to-one, one-to-many, many-to-many, normalization, readback, delete guards, schema delete guards, and update safety.
 - Relation repository helpers centralize relation type defaults, entry JSON parsing, field-use checks, and reference checks for later API/populate work.
-- Existing smoke flow must remain green before Phase 3 API relation work starts.
+- Relation API gate verifies raw relation ids, `?populate=relations`, populate aliases, and RBAC allow/block behavior for related entries.
+- Relation Admin UI gate verifies relation type/target builder controls, required relation validation, single/multi entry pickers, relation list summaries, desktop/mobile roundtrips, and all four relation types.
+- Existing smoke flow must remain green before docs and release work continues.
 
 ### Dynamic APIs
 
@@ -170,6 +177,8 @@ One server must serve exactly these primary paths:
 - MVP actions: list, read, create, update, delete.
 - Admin UI must show every generated API with docs and examples.
 - API behavior must match schema validation and relation rules.
+- Relation reads/lists support one-level populate with `?populate=relations`, `?populate=all`, and `?populate=*`.
+- Populate must respect RBAC: related entries only expand when the request role can read the target schema.
 
 ### RBAC
 
@@ -201,6 +210,7 @@ One server must serve exactly these primary paths:
 - Browser Use is required for Admin UI, `/doc`, and `/readme` checks.
 - API changes require automated tests and one manual request flow.
 - RBAC changes require a real role+user+API allow/block verification.
+- Relation changes require standard verification plus focused checks for payload shape, populate behavior, Admin UI relation pickers, and desktop/mobile entry editing.
 - Every completed task must update docs where relevant and be committed.
 
 ## Next Step

@@ -29,14 +29,18 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - React Admin UI me ab sab MVP field types ke saath schema builder form hai.
 - Relation fields now use an existing-schema picker and backend validation.
 - Relation fields ab existing-schema picker aur backend validation use karte hain.
+- Task3 relation support now covers `oneToOne`, `oneToMany`, `manyToOne`, `manyToMany`, JSON storage, populate, delete guards, and Admin UI entry pickers.
+- Task3 relation support ab `oneToOne`, `oneToMany`, `manyToOne`, `manyToMany`, JSON storage, populate, delete guards, aur Admin UI entry pickers cover karta hai.
+- Dynamic APIs support one-level relation populate with `?populate=relations`, `?populate=all`, and `?populate=*`.
+- Dynamic APIs `?populate=relations`, `?populate=all`, aur `?populate=*` ke saath one-level relation populate support karte hain.
 - Schema builder checkpoint is ready at version `v0.3.5`.
 - Schema builder checkpoint version `v0.3.5` par ready hai.
 - Entry repository validates data against schema fields, required fields, types, and relation entry targets.
 - Entry repository data ko schema fields, required fields, types, aur relation entry targets ke against validate karta hai.
 - Entry admin APIs are available under `/api/admin/schemas/:schemaId/entries`.
 - Entry admin APIs `/api/admin/schemas/:schemaId/entries` ke under available hain.
-- React Admin UI now generates entry forms from schema fields.
-- React Admin UI ab schema fields se entry forms generate karta hai.
+- React Admin UI now generates entry forms from schema fields, including single relation selects and multi relation pickers.
+- React Admin UI ab schema fields se entry forms generate karta hai, including single relation selects aur multi relation pickers.
 - Dynamic content APIs are available at `/api/content/:schemaSlug`.
 - Dynamic content APIs `/api/content/:schemaSlug` par available hain.
 - Admin UI lists generated dynamic APIs for each schema.
@@ -98,9 +102,13 @@ Hinglish: Schema banane ke baad list/create ke liye `/api/content/:schemaSlug` u
 
 ## Relation Semantics
 
-English: Task3 defines the relation contract before full runtime behavior lands. `oneToOne` connects one entry to one target entry, like User Profile to User. `manyToOne` lets many entries point to one parent, like Articles to Category. `oneToMany` lets one parent hold many child entry ids, like Author to Articles. `manyToMany` lets both sides connect to many entries, like Articles and Tags.
+English: Task3 relation behavior is implemented for schema metadata, entry validation, JSON storage, dynamic APIs, one-level populate, delete safety, and Admin UI entry editing. `oneToOne` connects one entry to one target entry, like User Profile to User. `manyToOne` lets many entries point to one parent, like Articles to Category. `oneToMany` lets one parent hold many child entry ids, like Author to Articles. `manyToMany` lets both sides connect to many entries, like Articles and Tags.
 
-Hinglish: Task3 full runtime behavior se pehle relation contract define karta hai. `oneToOne` one entry ko one target entry se connect karta hai, jaise User Profile to User. `manyToOne` many entries ko one parent par point karne deta hai, jaise Articles to Category. `oneToMany` one parent me many child entry ids rakhta hai, jaise Author to Articles. `manyToMany` dono sides ko many entries se connect karne deta hai, jaise Articles aur Tags.
+Hinglish: Task3 relation behavior schema metadata, entry validation, JSON storage, dynamic APIs, one-level populate, delete safety, aur Admin UI entry editing ke liye implemented hai. `oneToOne` one entry ko one target entry se connect karta hai, jaise User Profile to User. `manyToOne` many entries ko one parent par point karne deta hai, jaise Articles to Category. `oneToMany` one parent me many child entry ids rakhta hai, jaise Author to Articles. `manyToMany` dono sides ko many entries se connect karne deta hai, jaise Articles aur Tags.
+
+English: Single relations store one entry id string or `null`; multi relations store arrays of entry ids. Dynamic reads/lists can expand one relation level with `?populate=relations`, `?populate=all`, or `?populate=*`. Admin UI verifies relation builder, entry pickers, required relation validation, relation summaries, desktop/mobile roundtrips, and all four relation types before release work.
+
+Hinglish: Single relations ek entry id string ya `null` store karte hain; multi relations entry ids ka array store karte hain. Dynamic reads/lists `?populate=relations`, `?populate=all`, ya `?populate=*` se one relation level expand kar sakte hain. Admin UI release work se pehle relation builder, entry pickers, required relation validation, relation summaries, desktop/mobile roundtrips, aur all four relation types verify karta hai.
 
 ## RBAC Quick Use
 

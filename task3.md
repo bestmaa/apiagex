@@ -667,7 +667,7 @@ Each task uses this structure:
 #### T346 - Update Root Project Context For Relations
 
 - Version: `v2.6.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Update README and PROJECT_CONTEXT with Task 3 relation capabilities.
 - Persona: Project maintainer; keep high-level context accurate.
 - Success Criteria: Root docs mention relation types, populate, UI support, and verification expectations.
