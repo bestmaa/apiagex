@@ -518,7 +518,7 @@ Each task uses this structure:
 #### T335 - Add Relation Schema Copy Examples
 
 - Version: `v2.4.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add copyable relation schema examples in Admin UI docs area.
 - Persona: Builder enablement writer; speed up setup for common models.
 - Success Criteria: Examples include Author-Article, Article-Category, Article-Tags, and User-Profile.
