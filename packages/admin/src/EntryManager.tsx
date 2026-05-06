@@ -119,7 +119,7 @@ function GeneratedEntryForm({ schema, editingEntry, onCancelEdit, onCreated }: E
   }
 
   return (
-    <form onSubmit={submitEntry}>
+    <form noValidate onSubmit={submitEntry}>
       <h3>{editingEntry ? "Edit entry" : "Create entry"}</h3>
       {schema.fields.map((field) => (
         <EntryInput
@@ -224,12 +224,22 @@ function readEntryData(
     for (const field of fields) {
       if (isMultiRelationField(field)) {
         const values = form.getAll(field.slug).map(String).filter(Boolean);
+        if (field.required && values.length === 0) {
+          setStatus(`ENTRY_FIELD_REQUIRED:${field.slug}`);
+          return null;
+        }
         if (values.length > 0 || field.required) data[field.slug] = values;
         continue;
       }
       const raw = form.get(field.slug);
       if (field.type === "boolean") {
         data[field.slug] = raw === "on";
+      } else if (isSingleRelationField(field) && field.required && (raw === null || raw === "")) {
+        setStatus(`ENTRY_FIELD_REQUIRED:${field.slug}`);
+        return null;
+      } else if (field.required && (raw === null || raw === "")) {
+        setStatus(`ENTRY_FIELD_REQUIRED:${field.slug}`);
+        return null;
       } else if (raw !== null && raw !== "") {
         data[field.slug] = parseFieldValue(field, String(raw));
       }

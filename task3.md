@@ -598,7 +598,7 @@ Each task uses this structure:
 #### T341 - Add Required Relation UI Validation
 
 - Version: `v2.5.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Validate required relation fields in the Admin UI before submit.
 - Persona: Form UX engineer; catch obvious errors early.
 - Success Criteria: Required single and multi relation fields show clear errors before save.
