@@ -713,7 +713,7 @@ Each task uses this structure:
 #### T447 - Verify RBAC UI After Redesign
 
 - Version: `v4.10.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Ensure redesign did not break roles, permissions, users, and allowed/blocked API flow.
 - Persona: Security QA engineer; protect access-control workflows.
 - Success Criteria: Browser/API verifies role creation, permission save, user creation, allowed request, blocked request.
@@ -721,6 +721,7 @@ Each task uses this structure:
 - Output: RBAC UI regression verification.
 - Strict Rule: Blocked role must return `API_PERMISSION_DENIED`.
 - Verify: Browser/API RBAC flow plus standard verification.
+- Verification Notes: Browser/API RBAC regression passed for role permission card visibility, read-allowed dynamic request, create-blocked `API_PERMISSION_DENIED` request, and user creation with the verified role.
 - Commit: `Verify redesigned RBAC UI`
 
 #### T448 - Final Admin UI Polish Pass
