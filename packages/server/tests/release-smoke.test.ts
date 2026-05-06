@@ -38,6 +38,62 @@ describe("MVP release smoke", () => {
     expect(allowed.statusCode).toBe(200);
     expect(blocked.statusCode).toBe(403);
   });
+
+  it("covers relation schema, entries, populate, and RBAC allow/block", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const authorSchema = await createRelationAuthorSchema(server);
+    const bookSchema = await createRelationBookSchema(server, authorSchema.id);
+    const author = await server.inject({
+      method: "POST",
+      url: "/api/content/smoke-author",
+      payload: { data: { name: "Octavia Butler" } },
+    });
+    expect(author.statusCode).toBe(200);
+    const authorId = author.json().entry.id as string;
+    const book = await server.inject({
+      method: "POST",
+      url: "/api/content/smoke-book",
+      payload: { data: { title: "Kindred", author: authorId } },
+    });
+    expect(book.statusCode).toBe(200);
+    const bookId = book.json().entry.id as string;
+
+    const raw = await server.inject({ method: "GET", url: `/api/content/smoke-book/${bookId}` });
+    expect(raw.statusCode).toBe(200);
+    expect(raw.json().entry.data.author).toBe(authorId);
+
+    const populated = await server.inject({
+      method: "GET",
+      url: `/api/content/smoke-book/${bookId}?populate=relations`,
+    });
+    expect(populated.statusCode).toBe(200);
+    expect(populated.json().entry.data.author.data.name).toBe("Octavia Butler");
+
+    const allowedRole = await createRole(server, "relation-reader");
+    const blockedRole = await createRole(server, "relation-blocked");
+    await saveReadPermission(server, allowedRole.id, bookSchema.id);
+    await saveReadPermission(server, allowedRole.id, authorSchema.id);
+    await createUser(server, "relation-reader@apiagex.local", allowedRole.id);
+    await createUser(server, "relation-blocked@apiagex.local", blockedRole.id);
+    const allowedLogin = await loginUser(server, "relation-reader@apiagex.local");
+    const blockedLogin = await loginUser(server, "relation-blocked@apiagex.local");
+
+    const allowed = await server.inject({
+      method: "GET",
+      url: `/api/content/smoke-book/${bookId}?populate=relations`,
+      headers: { "x-apiagex-role-id": allowedLogin.roleId },
+    });
+    expect(allowed.statusCode).toBe(200);
+    expect(allowed.json().entry.data.author.data.name).toBe("Octavia Butler");
+
+    const blocked = await server.inject({
+      method: "GET",
+      url: `/api/content/smoke-book/${bookId}?populate=relations`,
+      headers: { "x-apiagex-role-id": blockedLogin.roleId },
+    });
+    expect(blocked.statusCode).toBe(403);
+    expect(blocked.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
+  });
 });
 
 async function createArticleSchema(server: ReturnType<typeof createServer>) {
@@ -48,6 +104,42 @@ async function createArticleSchema(server: ReturnType<typeof createServer>) {
       name: "Article",
       slug: "article",
       fields: [{ name: "Title", slug: "title", type: "text", required: true }],
+    },
+  });
+  return response.json().schema as { id: string };
+}
+
+async function createRelationAuthorSchema(server: ReturnType<typeof createServer>) {
+  const response = await server.inject({
+    method: "POST",
+    url: "/api/admin/schemas",
+    payload: {
+      name: "Smoke Author",
+      slug: "smoke-author",
+      fields: [{ name: "Name", slug: "name", type: "text", required: true }],
+    },
+  });
+  return response.json().schema as { id: string };
+}
+
+async function createRelationBookSchema(server: ReturnType<typeof createServer>, authorSchemaId: string) {
+  const response = await server.inject({
+    method: "POST",
+    url: "/api/admin/schemas",
+    payload: {
+      name: "Smoke Book",
+      slug: "smoke-book",
+      fields: [
+        { name: "Title", slug: "title", type: "text", required: true },
+        {
+          name: "Author",
+          slug: "author",
+          type: "relation",
+          relationSchemaId: authorSchemaId,
+          relationType: "manyToOne",
+          required: true,
+        },
+      ],
     },
   });
   return response.json().schema as { id: string };

@@ -693,7 +693,7 @@ Each task uses this structure:
 #### T348 - Add Relation Smoke Test
 
 - Version: `v2.6.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a focused smoke test covering relation schema, entries, populate, and RBAC allow/block.
 - Persona: Release test engineer; protect the full relation path.
 - Success Criteria: Smoke covers relation create/read/populate and blocked role behavior.
