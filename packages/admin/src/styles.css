@@ -246,6 +246,65 @@ code {
   gap: var(--admin-space-5);
 }
 
+.role-list {
+  display: grid;
+  gap: var(--admin-space-4);
+}
+
+.role-list h3 {
+  margin: 0;
+}
+
+.role-row {
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-left: var(--admin-space-1) solid var(--admin-color-disabled);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  display: grid;
+  gap: var(--admin-space-4);
+  grid-template-columns: minmax(0, 1fr) minmax(200px, auto);
+  padding: var(--admin-space-5);
+}
+
+.role-row.is-active {
+  border-left-color: var(--admin-color-primary);
+}
+
+.role-row div:first-child {
+  display: grid;
+  gap: var(--admin-space-1);
+  min-width: 0;
+}
+
+.role-row strong,
+.role-row span,
+.role-row p {
+  overflow-wrap: anywhere;
+}
+
+.role-row p {
+  color: var(--admin-color-text-soft);
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.role-row-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-2);
+  justify-content: flex-end;
+}
+
+.role-row-badges span {
+  background: var(--admin-color-surface-muted);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text-soft);
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
+  padding: var(--admin-space-2) var(--admin-space-3);
+}
+
 .dashboard-metrics {
   display: grid;
   gap: var(--admin-space-5);
@@ -1062,6 +1121,7 @@ code {
   .entry-summary-list,
   .quick-action-list,
   .relation-guide dl,
+  .role-row,
   .schema-basics-grid,
   .schema-field-badge-row,
   .schema-inventory-row,

@@ -428,7 +428,7 @@ Each task uses this structure:
 #### T426 - Redesign Roles List
 
 - Version: `v4.6.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make roles easier to scan and manage.
 - Persona: Security admin designer; clarify who can access what.
 - Success Criteria: Roles page shows role name, description, owner/non-owner, permission summary, actions.

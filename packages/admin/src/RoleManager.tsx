@@ -113,7 +113,7 @@ export function RoleManager() {
           Create role
         </button>
       </form>
-      <RoleList activeRoleId={roleId} roles={roles} />
+      <RoleList activeRoleId={roleId} permissions={permissions} roles={roles} schemas={schemas} />
       <label>Active role
         <select value={roleId} onChange={(event) => void changeRole(event.target.value)}>
           <option value="">Select role</option>
@@ -130,20 +130,40 @@ export function RoleManager() {
   );
 }
 
-function RoleList({ activeRoleId, roles }: { activeRoleId: string; roles: RoleRecord[] }) {
+function RoleList({
+  activeRoleId,
+  permissions,
+  roles,
+  schemas,
+}: {
+  activeRoleId: string;
+  permissions: PermissionRecord[];
+  roles: RoleRecord[];
+  schemas: SchemaRecord[];
+}) {
   if (roles.length === 0) {
     return <StateMessage title="No roles yet" variant="empty">Create a role to start access setup.</StateMessage>;
   }
+  const allowedCount = permissions.filter((permission) => permission.allowed).length;
+  const possibleCount = schemas.length * actions.length;
   return (
-    <div className="field-list">
+    <section className="role-list" aria-labelledby="role-list-title">
       <h3>Role list</h3>
       {roles.map((role) => (
-        <article className="api-row" key={role.id}>
-          <strong>{role.name}{role.id === activeRoleId ? " (active)" : ""}</strong>
-          <span>{role.description || "No description"}</span>
+        <article className={role.id === activeRoleId ? "role-row is-active" : "role-row"} key={role.id}>
+          <div>
+            <strong>{role.name}</strong>
+            <span>{role.description || "No description"}</span>
+          </div>
+          <div className="role-row-badges">
+            <span>{role.isOwner ? "Owner" : "Custom role"}</span>
+            {role.id === activeRoleId ? <span>Active</span> : null}
+            <span>{role.id === activeRoleId ? `${allowedCount}/${possibleCount} allowed` : "Select to inspect"}</span>
+          </div>
+          <p>{role.isOwner ? "Owner can manage Admin UI. Content API requests still use role permission checks." : "Use this role id in API requests after permissions are saved."}</p>
         </article>
       ))}
-    </div>
+    </section>
   );
 }
 
