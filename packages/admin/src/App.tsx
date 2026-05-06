@@ -6,18 +6,17 @@ import { EntryManager } from "./EntryManager";
 import { RoleManager } from "./RoleManager";
 import { SchemaBuilder } from "./SchemaBuilder";
 import { UserManager } from "./UserManager";
+import type { AdminNavItem, AdminRoute } from "./app-route.type";
 import { SessionPanel } from "./components/SessionPanel";
-import { ThemeToggle } from "./components/ThemeToggle";
 import { useAdminTheme } from "./hooks/useAdminTheme";
+import { AdminShell } from "./layout/AdminShell";
 import { DocsPage } from "./pages/DocsPage";
 import type { OwnerSession } from "./session.type";
 import "./tokens.css";
 import "./styles.css";
 import "./polish.css";
 
-type AdminRoute = "dashboard" | "schemas" | "entries" | "apis" | "roles" | "users" | "docs";
-
-const navItems: { label: string; route: AdminRoute }[] = [
+const navItems: AdminNavItem[] = [
   { label: "Dashboard", route: "dashboard" },
   { label: "Schemas", route: "schemas" },
   { label: "Entries", route: "entries" },
@@ -75,33 +74,16 @@ export function App() {
   }
 
   return (
-    <div className="app-shell">
-      <header className="app-header">
-        <div>
-          <p className="eyebrow">Headless CMS control plane</p>
-          <h1>Apiagex Admin UI</h1>
-        </div>
-        <div className="header-actions">
-          <ThemeToggle onToggle={toggleTheme} theme={theme} />
-          {session ? <button onClick={logout}>Logout</button> : null}
-        </div>
-      </header>
-      <nav aria-label="Admin navigation">
-        {navItems.map((item) => (
-          <a
-            aria-current={route === item.route ? "page" : undefined}
-            className={route === item.route ? "active" : undefined}
-            href={`#${item.route}`}
-            key={item.route}
-          >
-            {item.label}
-          </a>
-        ))}
-      </nav>
-      <main>
-        {renderRoute(route, session, status, submitLogin, logout)}
-      </main>
-    </div>
+    <AdminShell
+      navItems={navItems}
+      onLogout={logout}
+      onToggleTheme={toggleTheme}
+      route={route}
+      session={session}
+      theme={theme}
+    >
+      {renderRoute(route, session, status, submitLogin, logout)}
+    </AdminShell>
   );
 }
 

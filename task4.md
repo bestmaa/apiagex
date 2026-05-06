@@ -119,7 +119,7 @@ Each task uses this structure:
 #### T403 - Rework Admin App Shell
 
 - Version: `v4.1.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Replace the current basic shell with a proper control-panel layout.
 - Persona: Product UI architect; make navigation feel like a real admin product.
 - Success Criteria: Desktop has sidebar and topbar; mobile has compact navigation without overlap.
