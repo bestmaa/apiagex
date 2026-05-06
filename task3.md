@@ -161,7 +161,7 @@ Each task uses this structure:
 #### T308 - Add Relation Test Fixtures
 
 - Version: `v2.1.7`
-- Status: `pending`
+- Status: `completed`
 - Goal: Create reusable test helpers for schemas like Author, Article, Category, Tag, and Profile.
 - Persona: Test engineer; make relation tests readable.
 - Success Criteria: Tests can create common relation schemas without repeating large payloads.
