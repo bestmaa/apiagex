@@ -562,7 +562,7 @@ Each task uses this structure:
 #### T436 - Add Accessible Confirm Dialogs
 
 - Version: `v4.8.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Standardize confirmations for destructive actions.
 - Persona: Accessibility-focused UI engineer; make confirmations safe.
 - Success Criteria: Confirm dialogs have labels, focus management, escape/cancel behavior.

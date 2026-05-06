@@ -1,6 +1,7 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { createEntry, deleteEntry, listEntries, listSchemas, updateEntry } from "./api";
+import { ConfirmDialog } from "./components/ConfirmDialog";
 import { StateMessage } from "./components/StateMessage";
 import type { EntryData, EntryRecord, EntryFormProps } from "./entry.type";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
@@ -308,6 +309,13 @@ function EntryList(props: {
 }) {
   const { entries, onDelete, onEdit, relationEntries, schema } = props;
   const [confirmDeleteId, setConfirmDeleteId] = useState("");
+  const deleteButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  function cancelDelete(entryId: string) {
+    setConfirmDeleteId("");
+    requestAnimationFrame(() => deleteButtonRefs.current[entryId]?.focus());
+  }
+
   return (
     <section className="entry-list" aria-labelledby="entry-list-title">
       <h3>Entries</h3>
@@ -337,23 +345,25 @@ function EntryList(props: {
               <Pencil aria-hidden="true" size={16} />
               Edit
             </button>
-            <button type="button" onClick={() => setConfirmDeleteId(entry.id)}>
+            <button
+              ref={(element) => { deleteButtonRefs.current[entry.id] = element; }}
+              type="button"
+              onClick={() => setConfirmDeleteId(entry.id)}
+            >
               <Trash2 aria-hidden="true" size={16} />
               Delete
             </button>
           </div>
           {confirmDeleteId === entry.id ? (
-            <div className="entry-delete-confirm" role="alert">
-              <strong>Delete this entry?</strong>
-              <span>This cannot be undone.</span>
-              <div>
-                <button type="button" onClick={() => setConfirmDeleteId("")}>Cancel</button>
-                <button type="button" onClick={() => { setConfirmDeleteId(""); void onDelete(entry); }}>
-                  <Trash2 aria-hidden="true" size={16} />
-                  Confirm delete
-                </button>
-              </div>
-            </div>
+            <ConfirmDialog
+              confirmIcon={<Trash2 aria-hidden="true" size={16} />}
+              confirmLabel="Confirm delete"
+              onCancel={() => cancelDelete(entry.id)}
+              onConfirm={() => { setConfirmDeleteId(""); void onDelete(entry); }}
+              title="Delete this entry?"
+            >
+              This cannot be undone. Confirm only when this entry should be permanently removed.
+            </ConfirmDialog>
           ) : null}
         </article>
       ))}

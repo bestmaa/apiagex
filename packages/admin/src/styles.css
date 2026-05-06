@@ -1277,7 +1277,7 @@ code {
   gap: var(--admin-space-3);
 }
 
-.entry-delete-confirm {
+.confirm-dialog {
   background: var(--admin-color-warning-bg);
   border: 1px solid var(--admin-color-warning-border);
   border-radius: var(--admin-radius-md);
@@ -1287,7 +1287,11 @@ code {
   padding: var(--admin-space-4);
 }
 
-.entry-delete-confirm div {
+.confirm-dialog p {
+  margin: 0;
+}
+
+.confirm-dialog div {
   display: flex;
   flex-wrap: wrap;
   gap: var(--admin-space-3);
