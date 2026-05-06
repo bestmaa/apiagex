@@ -754,7 +754,7 @@ Each task uses this structure:
 #### T450 - Release Apiagex Task 4
 
 - Version: `v4.11.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Final Task 4 release gate for Admin UI redesign.
 - Persona: Release engineer; release only verified UI.
 - Success Criteria: Standard verification passes, browser checks cover `/adminui` desktop/mobile light/dark, `/doc`, `/readme`, relation UI, RBAC UI, and no pending Task 4 tasks remain.
@@ -762,4 +762,5 @@ Each task uses this structure:
 - Output: Task 4 release checkpoint update.
 - Strict Rule: Do not mark complete with skipped browser checks unless user explicitly accepts the risk.
 - Verify: Standard verification, browser desktop/mobile light/dark, `/doc`, `/readme`, relation flow, RBAC flow.
+- Verification Notes: Final release gate passed standard verification, `/adminui` desktop/mobile light/dark route sweep, relation entry creation, RBAC blocked request check, `/doc`, `/readme`, and no remaining pending Task 4 tasks.
 - Commit: `Release Apiagex task 4`
