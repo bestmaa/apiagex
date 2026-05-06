@@ -727,7 +727,7 @@ Each task uses this structure:
 #### T448 - Final Admin UI Polish Pass
 
 - Version: `v4.10.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make a final small polish pass after verification tasks.
 - Persona: Senior product engineer; clean up visible rough edges.
 - Success Criteria: No obvious spacing, overlap, wording, contrast, or responsive issues remain.
@@ -735,6 +735,7 @@ Each task uses this structure:
 - Output: Final polish fixes.
 - Strict Rule: Do not start a new redesign in this task.
 - Verify: Browser smoke of key routes plus standard verification.
+- Verification Notes: Final polish browser smoke passed across key routes at desktop/mobile with no horizontal overflow, oversized controls, or nested-card pattern regressions.
 - Commit: `Polish final admin UI`
 
 #### T449 - Add Admin Redesign Release Notes
