@@ -219,6 +219,11 @@ code {
   padding: 0;
 }
 
+.api-row .relation-detail-list {
+  display: grid;
+  gap: 8px;
+}
+
 .api-row li,
 .status-line,
 .empty-state {

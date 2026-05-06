@@ -196,13 +196,35 @@ function fieldTypePatch(type: FieldType): Partial<SchemaFieldDraft> {
 
 function SchemaDetails({ schema }: { schema?: SchemaRecord }) {
   if (!schema) return <p className="empty-state">Select a schema to inspect fields.</p>;
+  const relationFields = schema.fields.filter((field) => field.type === "relation");
   return (
     <div className="api-row">
       <strong>{schema.name}</strong>
       <code>/api/content/{schema.slug}</code>
       <span>{schema.fields.length} fields</span>
+      {relationFields.length > 0 ? (
+        <ul className="relation-detail-list">
+          {relationFields.map((field) => (
+            <li key={field.slug}>
+              <strong>{field.name}</strong>
+              <span>{relationLabel(field.relationType)} target: {targetLabel(field)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : <span>No relation fields</span>}
     </div>
   );
+}
+
+function relationLabel(relationType?: RelationType): string {
+  return relationTypes.find((option) => option.value === relationType)?.label ?? "Many to one";
+}
+
+function targetLabel(field: SchemaFieldDraft): string {
+  if (field.relationTarget) {
+    return `${field.relationTarget.name} /${field.relationTarget.slug}`;
+  }
+  return field.relationSchemaId ?? "Target missing";
 }
 
 function SchemaList(props: {

@@ -479,7 +479,7 @@ Each task uses this structure:
 #### T332 - Display Relation Fields In Schema Details
 
 - Version: `v2.4.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Show relation type and target schema in selected schema details.
 - Persona: Admin operator; make existing content model easy to inspect.
 - Success Criteria: Schema details clearly show relation kind and target for every relation field.
