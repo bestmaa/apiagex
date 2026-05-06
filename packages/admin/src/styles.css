@@ -621,6 +621,79 @@ code {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.api-explorer-row {
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  display: grid;
+  gap: var(--admin-space-5);
+  padding: var(--admin-space-5);
+}
+
+.api-schema-heading {
+  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-4);
+  justify-content: space-between;
+}
+
+.api-schema-heading div {
+  display: grid;
+  gap: var(--admin-space-2);
+  min-width: 0;
+}
+
+.api-schema-heading h3 {
+  margin: 0;
+}
+
+.api-schema-heading code,
+.api-endpoint-list code {
+  overflow-wrap: anywhere;
+}
+
+.api-schema-heading > span,
+.api-rbac-note {
+  color: var(--admin-color-text-soft);
+}
+
+.api-rbac-note {
+  background: var(--admin-color-primary-muted);
+  border-radius: var(--admin-radius-sm);
+  margin: 0;
+  padding: var(--admin-space-3) var(--admin-space-4);
+}
+
+.api-endpoint-list {
+  display: grid;
+  gap: var(--admin-space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.api-endpoint-list li {
+  align-items: center;
+  background: var(--admin-color-surface-muted);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: 70px minmax(0, 1.2fr) minmax(120px, 0.6fr) minmax(160px, 0.8fr);
+  padding: var(--admin-space-3);
+}
+
+.api-endpoint-list span {
+  color: var(--admin-color-text-strong);
+  font-weight: 900;
+}
+
+.api-endpoint-list p {
+  color: var(--admin-color-text-soft);
+  margin: 0;
+}
+
 .api-row ul {
   display: flex;
   flex-wrap: wrap;
@@ -921,6 +994,7 @@ code {
 
   .dashboard-metrics,
   .dashboard-grid,
+  .api-endpoint-list li,
   .field-builder-grid,
   .field-relation-grid,
   .entry-selector,

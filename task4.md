@@ -361,7 +361,7 @@ Each task uses this structure:
 #### T421 - Redesign API List
 
 - Version: `v4.5.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make generated APIs easy to scan.
 - Persona: Developer experience designer; help users understand generated endpoints.
 - Success Criteria: API page groups endpoints by schema with method, path, purpose, and auth/RBAC notes.

@@ -4,11 +4,11 @@ import { StateMessage } from "./components/StateMessage";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
 const actions = [
-  { label: "List entries", method: "GET", path: "/api/content/:schemaSlug" },
-  { label: "Create entry", method: "POST", path: "/api/content/:schemaSlug" },
-  { label: "Read entry", method: "GET", path: "/api/content/:schemaSlug/:entryId" },
-  { label: "Update entry", method: "PUT", path: "/api/content/:schemaSlug/:entryId" },
-  { label: "Delete entry", method: "DELETE", path: "/api/content/:schemaSlug/:entryId" },
+  { label: "List entries", method: "GET", path: "/api/content/:schemaSlug", purpose: "Read collection items" },
+  { label: "Create entry", method: "POST", path: "/api/content/:schemaSlug", purpose: "Create one item" },
+  { label: "Read entry", method: "GET", path: "/api/content/:schemaSlug/:entryId", purpose: "Read one item" },
+  { label: "Update entry", method: "PUT", path: "/api/content/:schemaSlug/:entryId", purpose: "Replace one item" },
+  { label: "Delete entry", method: "DELETE", path: "/api/content/:schemaSlug/:entryId", purpose: "Delete one item" },
 ];
 
 export function ApiList() {
@@ -44,18 +44,25 @@ export function ApiList() {
 function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
   const basePath = `/api/content/${schema.slug}`;
   return (
-    <article className="api-row">
-      <h3>{schema.name}</h3>
-      <code>{basePath}</code>
-      <ul>
+    <article className="api-explorer-row">
+      <div className="api-schema-heading">
+        <div>
+          <h3>{schema.name}</h3>
+          <code>{basePath}</code>
+        </div>
+        <span>{schema.fields.length} fields</span>
+      </div>
+      <p className="api-rbac-note">Use <code>x-apiagex-role-id: ROLE_ID</code> for RBAC checks. Missing or blocked permissions return permission errors.</p>
+      <ul className="api-endpoint-list">
         {actions.map((action) => (
           <li key={action.label}>
-            {action.method} {action.path.replace(":schemaSlug", schema.slug)}
+            <span>{action.method}</span>
+            <code>{action.path.replace(":schemaSlug", schema.slug)}</code>
+            <strong>{action.label}</strong>
+            <p>{action.purpose}</p>
           </li>
         ))}
       </ul>
-      <strong>Role header</strong>
-      <code>x-apiagex-role-id: ROLE_ID</code>
       <strong>Payload</strong>
       <pre><code>{JSON.stringify({ data: sampleData(schema.fields) }, null, 2)}</code></pre>
       <strong>Populate routes</strong>
