@@ -158,6 +158,12 @@ One server must serve exactly these primary paths:
 - Conservative schema delete rule: schemas referenced as relation targets by another schema are blocked from deletion.
 - Relation field target/type updates are blocked when existing entries already use that relation field.
 
+### Relation Storage Checkpoint
+
+- Task3 relation storage gate verifies relation metadata validation, single and multi value shapes, many-to-one, one-to-one, one-to-many, many-to-many, normalization, readback, delete guards, schema delete guards, and update safety.
+- Relation repository helpers centralize relation type defaults, entry JSON parsing, field-use checks, and reference checks for later API/populate work.
+- Existing smoke flow must remain green before Phase 3 API relation work starts.
+
 ### Dynamic APIs
 
 - Every schema creates API routes under `/api/content/:schemaSlug`.

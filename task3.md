@@ -306,7 +306,7 @@ Each task uses this structure:
 #### T319 - Relation Storage Gate
 
 - Version: `v2.2.10`
-- Status: `pending`
+- Status: `completed`
 - Goal: Verify all relation validation/storage tasks together.
 - Persona: Release engineer; stop before API/UI work if data layer is weak.
 - Success Criteria: All relation repository tests pass and existing smoke flow still passes.
