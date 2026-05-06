@@ -308,34 +308,42 @@ function EntryList(props: {
 }) {
   const { entries, onDelete, onEdit, relationEntries, schema } = props;
   return (
-    <div>
+    <section className="entry-list" aria-labelledby="entry-list-title">
       <h3>Entries</h3>
       {entries.length === 0 ? (
         <StateMessage title="No entries yet" variant="empty">
           Create the first entry for this schema.
         </StateMessage>
       ) : entries.map((entry) => (
-        <article className="api-row" key={entry.id}>
-          <strong>{entry.id.slice(0, 8)}</strong>
-          <ul className="entry-summary-list">
+        <article className="entry-row" key={entry.id}>
+          <div className="entry-row-heading">
+            <div>
+              <strong>{entryPrimaryLabel(entry, schema.fields)}</strong>
+              <code>{entry.id.slice(0, 8)}</code>
+            </div>
+            <span>Updated {formatEntryDate(entry.updatedAt)}</span>
+          </div>
+          <dl className="entry-summary-list">
             {entrySummaryItems(entry, schema.fields, relationEntries).map((item) => (
-              <li className="entry-summary-item" key={item.slug}>
-                <span>{item.name}</span>
-                <strong>{item.value}</strong>
-              </li>
+              <div className={item.relation ? "entry-summary-item is-relation" : "entry-summary-item"} key={item.slug}>
+                <dt>{item.name}</dt>
+                <dd>{item.value}</dd>
+              </div>
             ))}
-          </ul>
-          <button type="button" onClick={() => onEdit(entry)}>
-            <Pencil aria-hidden="true" size={16} />
-            Edit
-          </button>
-          <button type="button" onClick={() => onDelete(entry)}>
-            <Trash2 aria-hidden="true" size={16} />
-            Delete
-          </button>
+          </dl>
+          <div className="entry-row-actions">
+            <button type="button" onClick={() => onEdit(entry)}>
+              <Pencil aria-hidden="true" size={16} />
+              Edit
+            </button>
+            <button type="button" onClick={() => onDelete(entry)}>
+              <Trash2 aria-hidden="true" size={16} />
+              Delete
+            </button>
+          </div>
         </article>
       ))}
-    </div>
+    </section>
   );
 }
 
@@ -405,18 +413,32 @@ function isEntryPickerRelationField(field: SchemaFieldDraft): boolean {
   return isSingleRelationField(field) || isMultiRelationField(field);
 }
 
+function entryPrimaryLabel(entry: EntryRecord, fields: SchemaFieldDraft[]): string {
+  const textField = fields.find((field) => typeof entry.data[field.slug] === "string" && field.type !== "relation");
+  const value = textField ? entry.data[textField.slug] : undefined;
+  return typeof value === "string" && value ? value : `Entry ${entry.id.slice(0, 8)}`;
+}
+
 function entrySummaryItems(
   entry: EntryRecord,
   fields: SchemaFieldDraft[],
   relationEntries: Record<string, EntryRecord[]>,
-): { slug: string; name: string; value: string }[] {
+): { relation: boolean; slug: string; name: string; value: string }[] {
   return fields
     .filter((field) => entry.data[field.slug] !== undefined)
     .map((field) => ({
+      relation: field.type === "relation",
       slug: field.slug,
       name: field.name,
       value: entrySummaryValue(field, entry.data[field.slug], relationEntries[field.slug] ?? []),
     }));
+}
+
+function formatEntryDate(value: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
 }
 
 function entrySummaryValue(field: SchemaFieldDraft, value: unknown, relationEntries: EntryRecord[]): string {

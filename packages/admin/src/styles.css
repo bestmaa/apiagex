@@ -753,32 +753,85 @@ code {
   gap: var(--admin-space-3);
 }
 
-.entry-summary-list {
+.entry-list {
+  display: grid;
+  gap: var(--admin-space-5);
+}
+
+.entry-row {
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  display: grid;
+  gap: var(--admin-space-5);
+  padding: var(--admin-space-5);
+}
+
+.entry-row-heading {
+  align-items: start;
   display: flex;
   flex-wrap: wrap;
+  gap: var(--admin-space-4);
+  justify-content: space-between;
+}
+
+.entry-row-heading div {
+  display: grid;
+  gap: var(--admin-space-2);
+  min-width: 0;
+}
+
+.entry-row-heading strong,
+.entry-row-heading code {
+  overflow-wrap: anywhere;
+}
+
+.entry-row-heading > span {
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
+}
+
+.entry-summary-list {
+  display: grid;
   gap: var(--admin-space-3);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
   min-width: 0;
 }
 
 .entry-summary-item {
-  max-width: 100%;
+  background: var(--admin-color-surface-muted);
+  border-left: var(--admin-space-1) solid var(--admin-color-disabled);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-1);
+  margin: 0;
   min-width: 0;
+  padding: var(--admin-space-3);
 }
 
-.entry-summary-item span,
-.entry-summary-item strong {
-  display: inline;
+.entry-summary-item.is-relation {
+  border-left-color: var(--admin-color-primary);
 }
 
-.entry-summary-item span {
+.entry-summary-item dt {
   color: var(--admin-color-text-muted);
-  font-weight: 700;
-  margin-right: var(--admin-space-2);
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
 }
 
-.entry-summary-item strong {
+.entry-summary-item dd {
   color: var(--admin-color-text-strong);
+  margin: 0;
   overflow-wrap: anywhere;
+}
+
+.entry-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
 }
 
 .api-row li,
@@ -856,6 +909,7 @@ code {
   .field-relation-grid,
   .entry-selector,
   .entry-form-grid,
+  .entry-summary-list,
   .quick-action-list,
   .relation-guide dl,
   .schema-basics-grid,

@@ -333,7 +333,7 @@ Each task uses this structure:
 #### T419 - Redesign Entry List
 
 - Version: `v4.4.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make entry list useful for scanning content.
 - Persona: Content operations designer; show key fields and relation summaries.
 - Success Criteria: Entry rows show id, primary label, field summaries, relation summaries, updated time, actions.
