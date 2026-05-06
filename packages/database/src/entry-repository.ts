@@ -5,6 +5,12 @@ import {
   relationTargetEntryInvalid,
   relationValueShapeInvalid,
 } from "./relation-errors.js";
+import {
+  entryDataReferences,
+  listEntryDataRows,
+  parseEntryData,
+  relationTypeOf,
+} from "./relation-helpers.js";
 import type { SqliteDatabase } from "./sqlite.js";
 import { getSchemaById } from "./schema-repository.js";
 import type {
@@ -13,7 +19,7 @@ import type {
   EntryRecord,
   UpdateEntryInput,
 } from "./entry-repository.type.js";
-import type { FieldRecord, RelationType, SchemaRecord } from "./schema-repository.type.js";
+import type { FieldRecord, SchemaRecord } from "./schema-repository.type.js";
 
 type EntryRow = {
   id: string;
@@ -80,17 +86,11 @@ export function deleteEntry(db: SqliteDatabase, id: string): void {
 }
 
 function assertEntryNotReferenced(db: SqliteDatabase, entryId: string): void {
-  const rows = db.prepare("SELECT id, data_json as dataJson FROM entries").all() as Array<{
-    dataJson: string;
-    id: string;
-  }>;
+  const rows = listEntryDataRows(db);
   for (const row of rows) {
     if (row.id === entryId) continue;
-    const data = JSON.parse(row.dataJson) as EntryData;
-    for (const value of Object.values(data)) {
-      if (value === entryId || (Array.isArray(value) && value.includes(entryId))) {
-        throw new Error(relationEntryReferenced(entryId));
-      }
+    if (entryDataReferences(parseEntryData(row.dataJson), entryId)) {
+      throw new Error(relationEntryReferenced(entryId));
     }
   }
 }
@@ -204,10 +204,6 @@ function normalizeEntryData(schema: SchemaRecord, data: EntryData): EntryData {
   return normalized;
 }
 
-function relationTypeOf(field: FieldRecord): RelationType {
-  return field.relationType ?? "manyToOne";
-}
-
 function assertOneToOneAvailable(
   db: SqliteDatabase,
   schema: SchemaRecord,
@@ -215,12 +211,10 @@ function assertOneToOneAvailable(
   targetEntryId: string,
   currentEntryId?: string,
 ): void {
-  const rows = db
-    .prepare("SELECT id, data_json as dataJson FROM entries WHERE schema_id = ?")
-    .all(schema.id) as Array<{ dataJson: string; id: string }>;
+  const rows = listEntryDataRows(db, "WHERE schema_id = ?", [schema.id]);
   for (const row of rows) {
     if (row.id === currentEntryId) continue;
-    const data = JSON.parse(row.dataJson) as EntryData;
+    const data = parseEntryData(row.dataJson);
     if (data[field.slug] === targetEntryId) {
       throw new Error(relationOneToOneConflict(field.slug));
     }

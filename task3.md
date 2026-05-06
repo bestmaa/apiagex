@@ -293,7 +293,7 @@ Each task uses this structure:
 #### T318 - Add Relation Repository Helpers
 
 - Version: `v2.2.9`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add focused helpers for finding relation references and target entries.
 - Persona: Repository maintainer; reduce duplicated relation lookup logic.
 - Success Criteria: Helpers are small, typed, and used by validation/delete/populate code.

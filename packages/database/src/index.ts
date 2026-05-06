@@ -48,6 +48,13 @@ export {
   relationTargetEntryInvalid,
   relationValueShapeInvalid,
 } from "./relation-errors.js";
+export {
+  entryDataReferences,
+  listEntryDataRows,
+  parseEntryData,
+  relationTypeOf,
+  schemaEntriesUseField,
+} from "./relation-helpers.js";
 export type { MvpTableName, MigrationRecord, TableInfoRow } from "./schema.type.js";
 export type {
   CreateEntryInput,

@@ -4,6 +4,7 @@ import {
   relationFieldUpdateUnsafe,
   relationSchemaReferenced,
 } from "./relation-errors.js";
+import { schemaEntriesUseField } from "./relation-helpers.js";
 import type { SqliteDatabase } from "./sqlite.js";
 import type {
   CreateFieldInput,
@@ -141,16 +142,6 @@ function assertSafeRelationUpdate(
   }
 }
 
-function schemaEntriesUseField(db: SqliteDatabase, schemaId: string, fieldSlug: string): boolean {
-  const rows = db
-    .prepare("SELECT data_json as dataJson FROM entries WHERE schema_id = ?")
-    .all(schemaId) as Array<{ dataJson: string }>;
-  return rows.some((row) => {
-    const data = JSON.parse(row.dataJson) as Record<string, unknown>;
-    const value = data[fieldSlug];
-    return value !== undefined && value !== null && value !== "";
-  });
-}
 
 export function deleteSchema(db: SqliteDatabase, id: string): void {
   assertSchemaNotReferenced(db, id);
