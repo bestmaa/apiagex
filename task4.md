@@ -173,7 +173,7 @@ Each task uses this structure:
 #### T407 - Add Quick Actions Panel
 
 - Version: `v4.2.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add practical quick actions for common workflows.
 - Persona: Workflow designer; reduce clicks for owner tasks.
 - Success Criteria: Dashboard offers quick links to create schema, create entry, view APIs, create role, create user.

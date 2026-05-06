@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
+import { BookOpen, Database, FileText, KeyRound, Network, Users } from "lucide-react";
 import { listEntries, listRoles, listSchemas, listUsers } from "./api";
 import type { RoleRecord } from "./role.type";
 import type { SchemaRecord } from "./schema.type";
@@ -96,6 +97,7 @@ function DashboardSummary({ state }: { state: DashboardState }) {
         />
         <RecentSchemas summaries={state.schemaSummaries} />
       </div>
+      <QuickActions hasRoles={state.roles.length > 0} hasSchemas={schemaCount > 0} />
     </>
   );
 }
@@ -136,6 +138,33 @@ function ReadinessSummary({
           <span>{item.detail}</span>
         </p>
       ))}
+    </section>
+  );
+}
+
+function QuickActions({ hasRoles, hasSchemas }: { hasRoles: boolean; hasSchemas: boolean }) {
+  const actions = [
+    { href: "#schemas", icon: Database, label: "Create schema", meta: "Define fields and relations" },
+    { href: "#entries", icon: FileText, label: "Create entry", meta: hasSchemas ? "Add content to a schema" : "Needs a schema first" },
+    { href: "#apis", icon: Network, label: "View APIs", meta: "Inspect generated endpoints" },
+    { href: "#roles", icon: KeyRound, label: "Create role", meta: "Prepare allow/block rules" },
+    { href: "#users", icon: Users, label: "Create user", meta: hasRoles ? "Assign role-based access" : "Needs a role first" },
+    { href: "#docs", icon: BookOpen, label: "Read docs", meta: "Review owner workflow" },
+  ];
+  return (
+    <section className="dashboard-panel quick-actions" aria-labelledby="quick-actions-title">
+      <h3 id="quick-actions-title">Quick actions</h3>
+      <div className="quick-action-list">
+        {actions.map(({ href, icon: Icon, label, meta }) => (
+          <a href={href} key={href}>
+            <Icon aria-hidden="true" size={18} />
+            <span>
+              <strong>{label}</strong>
+              <small>{meta}</small>
+            </span>
+          </a>
+        ))}
+      </div>
     </section>
   );
 }

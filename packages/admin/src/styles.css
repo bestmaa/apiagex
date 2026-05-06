@@ -306,6 +306,51 @@ code {
   grid-template-columns: minmax(0, 1fr) auto auto auto;
 }
 
+.quick-actions {
+  margin-top: var(--admin-space-6);
+}
+
+.quick-action-list {
+  display: grid;
+  gap: var(--admin-space-4);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.quick-action-list a {
+  align-items: center;
+  background: var(--admin-color-surface-muted);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text);
+  display: flex;
+  gap: var(--admin-space-4);
+  min-width: 0;
+  padding: var(--admin-space-4);
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.quick-action-list a:hover {
+  background: var(--admin-color-primary-muted);
+  border-color: var(--admin-color-primary);
+}
+
+.quick-action-list span {
+  display: grid;
+  gap: var(--admin-space-1);
+  min-width: 0;
+}
+
+.quick-action-list strong,
+.quick-action-list small {
+  overflow-wrap: anywhere;
+}
+
+.quick-action-list small {
+  color: var(--admin-color-text-soft);
+  font-size: var(--admin-font-xs);
+}
+
 .readiness-row {
   align-items: center;
   border-left: var(--admin-space-1) solid var(--admin-color-warning-border);
@@ -429,6 +474,7 @@ code {
 
   .dashboard-metrics,
   .dashboard-grid,
+  .quick-action-list,
   .dashboard-panel .schema-row {
     grid-template-columns: 1fr;
   }
