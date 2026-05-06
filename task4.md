@@ -400,7 +400,7 @@ Each task uses this structure:
 #### T424 - Add Copy Buttons For API Snippets
 
 - Version: `v4.5.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add copy-to-clipboard buttons for API paths and snippets.
 - Persona: Developer productivity engineer; reduce manual copying.
 - Success Criteria: Users can copy paths and payload examples with visible success state.

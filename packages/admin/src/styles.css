@@ -654,6 +654,23 @@ code {
   overflow-wrap: anywhere;
 }
 
+.copyable-code {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--admin-space-2);
+  min-width: 0;
+}
+
+.copyable-code code {
+  min-width: 0;
+}
+
+.copyable-code button,
+.api-example-heading button {
+  min-height: 30px;
+  padding: var(--admin-space-2);
+}
+
 .api-schema-heading > span,
 .api-rbac-note {
   color: var(--admin-color-text-soft);
@@ -727,6 +744,13 @@ code {
   display: grid;
   gap: var(--admin-space-3);
   min-width: 0;
+}
+
+.api-example-heading {
+  align-items: center;
+  display: flex;
+  gap: var(--admin-space-3);
+  justify-content: space-between;
 }
 
 .api-row ul {

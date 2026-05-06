@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Copy } from "lucide-react";
 import { listSchemas } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
@@ -43,12 +44,19 @@ export function ApiList() {
 
 function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
   const basePath = `/api/content/${schema.slug}`;
+  const [copied, setCopied] = useState("");
+
+  async function copy(label: string, value: string) {
+    const ok = await copyText(value);
+    setCopied(ok ? `Copied ${label}` : `Copy unavailable for ${label}`);
+  }
+
   return (
     <article className="api-explorer-row">
       <div className="api-schema-heading">
         <div>
           <h3>{schema.name}</h3>
-          <code>{basePath}</code>
+          <CopyableCode label={`${schema.name} base path`} onCopy={() => void copy("base path", basePath)} value={basePath} />
         </div>
         <span>{schema.fields.length} fields</span>
       </div>
@@ -57,29 +65,80 @@ function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
         {actions.map((action) => (
           <li key={action.label}>
             <span className={`api-method api-method-${action.method.toLowerCase()}`}>{action.method}</span>
-            <code>{action.path.replace(":schemaSlug", schema.slug)}</code>
+            <CopyableCode
+              label={`${action.label} path`}
+              onCopy={() => void copy(`${action.label} path`, action.path.replace(":schemaSlug", schema.slug))}
+              value={action.path.replace(":schemaSlug", schema.slug)}
+            />
             <strong>{action.label}</strong>
             <p>{action.purpose}</p>
           </li>
         ))}
       </ul>
       <div className="api-example-grid">
-        <ApiExample title="Create or update payload" value={{ data: sampleData(schema.fields) }} />
-        <ApiExample title="Populate routes" value={populateExamples(schema.slug, schema.fields)} />
-        <ApiExample title="Response examples" value={responseExamples(schema)} />
-        <ApiExample title="RBAC request hint" value={{ headers: { "x-apiagex-role-id": "ROLE_ID" }, blocked: { ok: false, error: "API_PERMISSION_DENIED" } }} />
+        <ApiExample onCopy={copy} title="Create or update payload" value={{ data: sampleData(schema.fields) }} />
+        <ApiExample onCopy={copy} title="Populate routes" value={populateExamples(schema.slug, schema.fields)} />
+        <ApiExample onCopy={copy} title="Response examples" value={responseExamples(schema)} />
+        <ApiExample onCopy={copy} title="RBAC request hint" value={{ headers: { "x-apiagex-role-id": "ROLE_ID" }, blocked: { ok: false, error: "API_PERMISSION_DENIED" } }} />
       </div>
+      {copied ? <p className="status-line">{copied}</p> : null}
     </article>
   );
 }
 
-function ApiExample({ title, value }: { title: string; value: unknown }) {
+function CopyableCode({ label, onCopy, value }: { label: string; onCopy: () => void; value: string }) {
+  return (
+    <span className="copyable-code">
+      <code>{value}</code>
+      <button aria-label={`Copy ${label}`} type="button" onClick={onCopy}>
+        <Copy aria-hidden="true" size={15} />
+      </button>
+    </span>
+  );
+}
+
+function ApiExample({
+  onCopy,
+  title,
+  value,
+}: {
+  onCopy: (label: string, value: string) => Promise<void>;
+  title: string;
+  value: unknown;
+}) {
+  const serialized = JSON.stringify(value, null, 2);
   return (
     <section className="api-example">
-      <strong>{title}</strong>
-      <pre><code>{JSON.stringify(value, null, 2)}</code></pre>
+      <div className="api-example-heading">
+        <strong>{title}</strong>
+        <button aria-label={`Copy ${title}`} type="button" onClick={() => void onCopy(title, serialized)}>
+          <Copy aria-hidden="true" size={15} />
+        </button>
+      </div>
+      <pre><code>{serialized}</code></pre>
     </section>
   );
+}
+
+async function copyText(value: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = value;
+    textarea.setAttribute("readonly", "true");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.append(textarea);
+    textarea.select();
+    const copied = document.execCommand("copy");
+    textarea.remove();
+    return copied;
+  } catch {
+    return false;
+  }
 }
 
 function sampleData(fields: SchemaFieldDraft[]): Record<string, unknown> {
