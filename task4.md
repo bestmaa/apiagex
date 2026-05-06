@@ -508,7 +508,7 @@ Each task uses this structure:
 #### T432 - Add Workflow Checklists In Admin Docs
 
 - Version: `v4.7.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add concise in-app workflow checklists.
 - Persona: Onboarding UX writer; help owners complete setup.
 - Success Criteria: Docs view includes checklists for first owner setup, schema creation, relation modeling, RBAC setup.

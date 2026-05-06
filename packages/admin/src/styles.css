@@ -505,6 +505,41 @@ code {
   gap: var(--admin-space-4);
 }
 
+.admin-doc-checklists {
+  display: grid;
+  gap: var(--admin-space-4);
+}
+
+.admin-doc-checklist-grid {
+  display: grid;
+  gap: var(--admin-space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-doc-checklist {
+  background: var(--admin-color-surface);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  padding: var(--admin-space-5);
+}
+
+.admin-doc-checklist h4 {
+  margin: 0 0 var(--admin-space-3);
+}
+
+.admin-doc-checklist ul {
+  display: grid;
+  gap: var(--admin-space-2);
+  margin: 0;
+  padding-left: var(--admin-space-5);
+}
+
+.admin-doc-checklist li {
+  color: var(--admin-color-text-soft);
+  line-height: var(--admin-line-normal);
+}
+
 .dashboard-metrics {
   display: grid;
   gap: var(--admin-space-5);
@@ -1319,6 +1354,7 @@ code {
   .entry-selector,
   .entry-form-grid,
   .entry-summary-list,
+  .admin-doc-checklist-grid,
   .admin-doc-grid,
   .admin-docs-hero,
   .quick-action-list,

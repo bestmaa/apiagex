@@ -118,6 +118,41 @@ const relationSchemaExamples = [
   },
 ];
 
+const workflowChecklists = [
+  {
+    title: "First owner setup",
+    items: [
+      "Open dashboard and submit owner email plus password.",
+      "Keep the owner session active before using protected admin pages.",
+      "Use Reset session when you need to test owner login again.",
+    ],
+  },
+  {
+    title: "Schema creation",
+    items: [
+      "Create the target schema first when another schema will relate to it.",
+      "Add fields with clear slugs and mark only truly required fields as required.",
+      "Save the schema before creating entries or reviewing generated APIs.",
+    ],
+  },
+  {
+    title: "Relation modeling",
+    items: [
+      "Use one-to-one for a single paired record.",
+      "Use one-to-many or many-to-one when one side owns a list.",
+      "Use many-to-many when both sides can connect to multiple entries.",
+    ],
+  },
+  {
+    title: "RBAC setup",
+    items: [
+      "Create roles before creating non-owner users.",
+      "Set allowed schema/API actions in the permission matrix.",
+      "Assign each user exactly one role and test allow/block behavior with headers.",
+    ],
+  },
+];
+
 export function DocsPage() {
   return (
     <section className="admin-docs" aria-labelledby="admin-docs-title">
@@ -155,6 +190,23 @@ export function DocsPage() {
           );
         })}
       </div>
+
+      <section className="admin-doc-checklists" aria-labelledby="workflow-checklists-title">
+        <div>
+          <span className="section-kicker">Setup checklists</span>
+          <h3 id="workflow-checklists-title">What to finish before testing APIs</h3>
+        </div>
+        <div className="admin-doc-checklist-grid">
+          {workflowChecklists.map((checklist) => (
+            <article className="admin-doc-checklist" key={checklist.title}>
+              <h4>{checklist.title}</h4>
+              <ul>
+                {checklist.items.map((item) => <li key={item}>{item}</li>)}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <section className="admin-doc-relations" aria-labelledby="relation-examples-title">
         <div>
