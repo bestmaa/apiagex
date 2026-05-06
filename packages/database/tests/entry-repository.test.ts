@@ -165,6 +165,53 @@ describe("entry repository", () => {
       updateEntry(db, profile.id, { data: { author: author.id } }),
     ).not.toThrow();
   });
+
+  it("validates one-to-many entry values", () => {
+    const db = openMigratedDb();
+    const articleSchema = createSchema(db, {
+      name: "Article",
+      slug: "article",
+      fields: [{ name: "Title", slug: "title", type: "text", required: true }],
+    });
+    const firstArticle = createEntry(db, {
+      schemaId: articleSchema.id,
+      data: { title: "One" },
+    });
+    const secondArticle = createEntry(db, {
+      schemaId: articleSchema.id,
+      data: { title: "Two" },
+    });
+    const authorSchema = createSchema(db, {
+      name: "Author",
+      slug: "author",
+      fields: [
+        {
+          name: "Articles",
+          slug: "articles",
+          type: "relation",
+          relationSchemaId: articleSchema.id,
+          relationType: "oneToMany",
+          required: true,
+        },
+      ],
+    });
+
+    const author = createEntry(db, {
+      schemaId: authorSchema.id,
+      data: { articles: [firstArticle.id, secondArticle.id] },
+    });
+
+    expect(author.data.articles).toEqual([firstArticle.id, secondArticle.id]);
+    expect(() =>
+      createEntry(db, { schemaId: authorSchema.id, data: { articles: firstArticle.id } }),
+    ).toThrow("RELATION_VALUE_SHAPE_INVALID:articles");
+    expect(() =>
+      createEntry(db, { schemaId: authorSchema.id, data: { articles: [] } }),
+    ).toThrow("ENTRY_FIELD_REQUIRED:articles");
+    expect(() =>
+      createEntry(db, { schemaId: authorSchema.id, data: { articles: ["missing"] } }),
+    ).toThrow("RELATION_TARGET_ENTRY_INVALID:articles");
+  });
 });
 
 function openMigratedDb() {

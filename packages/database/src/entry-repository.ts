@@ -129,8 +129,9 @@ function assertRelation(
   currentEntryId?: string,
 ): void {
   const relationType = relationTypeOf(field);
-  if (relationType !== "manyToOne" && relationType !== "oneToOne") {
-    throw new Error(relationValueShapeInvalid(field.slug));
+  if (relationType === "oneToMany") {
+    assertMultiRelation(db, field, value);
+    return;
   }
   if (typeof value !== "string") {
     throw new Error(relationValueShapeInvalid(field.slug));
@@ -141,6 +142,24 @@ function assertRelation(
   }
   if (relationType === "oneToOne") {
     assertOneToOneAvailable(db, schema, field, value, currentEntryId);
+  }
+}
+
+function assertMultiRelation(db: SqliteDatabase, field: FieldRecord, value: unknown): void {
+  if (!Array.isArray(value)) {
+    throw new Error(relationValueShapeInvalid(field.slug));
+  }
+  if (field.required && value.length === 0) {
+    throw new Error(`ENTRY_FIELD_REQUIRED:${field.slug}`);
+  }
+  for (const targetEntryId of value) {
+    if (typeof targetEntryId !== "string") {
+      throw new Error(relationValueShapeInvalid(field.slug));
+    }
+    const target = getEntryById(db, targetEntryId);
+    if (!target || target.schemaId !== field.relationSchemaId) {
+      throw new Error(relationTargetEntryInvalid(field.slug));
+    }
   }
 }
 

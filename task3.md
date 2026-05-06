@@ -202,7 +202,7 @@ Each task uses this structure:
 #### T311 - Validate One-To-Many Entry Values
 
 - Version: `v2.2.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Validate `oneToMany` values as arrays of target entry ids.
 - Persona: Data integrity engineer; make parent-to-children relations explicit.
 - Success Criteria: Array of valid target entries saves; non-array or wrong-schema ids fail.
