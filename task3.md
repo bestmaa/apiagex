@@ -412,7 +412,7 @@ Each task uses this structure:
 #### T327 - Add RBAC Populate Tests
 
 - Version: `v2.3.7`
-- Status: `pending`
+- Status: `completed`
 - Goal: Verify populated relation APIs respect role permissions.
 - Persona: Security-minded API tester; avoid leaking blocked content through populate.
 - Success Criteria: Allowed role can populate allowed schema; blocked role cannot read blocked content.
