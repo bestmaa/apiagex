@@ -559,7 +559,7 @@ Each task uses this structure:
 #### T338 - Add Single Relation Entry Picker
 
 - Version: `v2.5.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Render single relation fields as target-entry pickers in entry forms.
 - Persona: Content editor UI engineer; avoid raw id typing.
 - Success Criteria: one-to-one and many-to-one fields show selectable target entries.

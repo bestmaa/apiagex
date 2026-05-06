@@ -76,7 +76,30 @@ export function EntryManager() {
 }
 
 function GeneratedEntryForm({ schema, editingEntry, onCancelEdit, onCreated }: EntryFormProps) {
+  const [relationEntries, setRelationEntries] = useState<Record<string, EntryRecord[]>>({});
   const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    const singleRelationFields = schema.fields.filter(isSingleRelationField);
+    if (singleRelationFields.length === 0) {
+      setRelationEntries({});
+      return;
+    }
+    let active = true;
+    async function loadRelationEntries() {
+      const nextEntries: Record<string, EntryRecord[]> = {};
+      for (const field of singleRelationFields) {
+        if (!field.relationSchemaId) continue;
+        const result = await listEntries(field.relationSchemaId);
+        nextEntries[field.slug] = result.entries ?? [];
+      }
+      if (active) setRelationEntries(nextEntries);
+    }
+    void loadRelationEntries();
+    return () => {
+      active = false;
+    };
+  }, [schema]);
 
   async function submitEntry(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -99,7 +122,12 @@ function GeneratedEntryForm({ schema, editingEntry, onCancelEdit, onCreated }: E
     <form onSubmit={submitEntry}>
       <h3>{editingEntry ? "Edit entry" : "Create entry"}</h3>
       {schema.fields.map((field) => (
-        <EntryInput data={editingEntry?.data} field={field} key={field.slug} />
+        <EntryInput
+          data={editingEntry?.data}
+          field={field}
+          key={field.slug}
+          relationEntries={relationEntries[field.slug] ?? []}
+        />
       ))}
       <button type="submit">{editingEntry ? "Update entry" : "Create entry"}</button>
       {editingEntry ? <button type="button" onClick={onCancelEdit}>Cancel edit</button> : null}
@@ -108,9 +136,34 @@ function GeneratedEntryForm({ schema, editingEntry, onCancelEdit, onCreated }: E
   );
 }
 
-function EntryInput({ data, field }: { data?: EntryData; field: SchemaFieldDraft }) {
+function EntryInput({
+  data,
+  field,
+  relationEntries,
+}: {
+  data?: EntryData;
+  field: SchemaFieldDraft;
+  relationEntries: EntryRecord[];
+}) {
   const name = field.slug;
   const value = data?.[field.slug];
+  if (isSingleRelationField(field)) {
+    return (
+      <label>{field.name}
+        <select
+          defaultValue={formatValue(value)}
+          key={`${name}-${formatValue(value)}-${relationEntries.length}`}
+          name={name}
+          required={field.required}
+        >
+          <option value="">Select {field.relationTarget?.name ?? "target entry"}</option>
+          {relationEntries.map((entry) => (
+            <option key={entry.id} value={entry.id}>{entryLabel(entry)}</option>
+          ))}
+        </select>
+      </label>
+    );
+  }
   if (field.type === "longText" || field.type === "json") {
     return <label>{field.name} <textarea defaultValue={formatValue(value)} name={name} required={field.required} rows={3} /></label>;
   }
@@ -168,6 +221,15 @@ function parseFieldValue(field: SchemaFieldDraft, raw: string): unknown {
   if (field.type === "number") return Number(raw);
   if (field.type === "json") return JSON.parse(raw);
   return raw;
+}
+
+function isSingleRelationField(field: SchemaFieldDraft): boolean {
+  return field.type === "relation" && (field.relationType === "oneToOne" || field.relationType === "manyToOne");
+}
+
+function entryLabel(entry: EntryRecord): string {
+  const firstValue = Object.values(entry.data).find((value) => typeof value === "string" || typeof value === "number");
+  return firstValue ? `${String(firstValue)} (${entry.id.slice(0, 8)})` : entry.id.slice(0, 8);
 }
 
 function formatValue(value: unknown): string {
