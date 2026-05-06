@@ -492,7 +492,7 @@ Each task uses this structure:
 #### T333 - Add Relation Edit Safety UI
 
 - Version: `v2.4.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Warn before editing relation type or target on fields with existing entries.
 - Persona: Data safety UI engineer; prevent accidental model damage.
 - Success Criteria: UI explains why unsafe relation edits may be blocked by backend.

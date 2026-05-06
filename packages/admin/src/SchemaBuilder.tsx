@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { createSchema, listSchemas, updateSchema } from "./api";
+import { createSchema, listEntries, listSchemas, updateSchema } from "./api";
 import type { FieldType, RelationType, SchemaDraft, SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
 const fieldTypes: FieldType[] = [
@@ -57,6 +57,7 @@ const emptyDraft: SchemaDraft = {
 export function SchemaBuilder() {
   const [schemas, setSchemas] = useState<SchemaRecord[]>([]);
   const [draft, setDraft] = useState<SchemaDraft>({ ...emptyDraft });
+  const [selectedEntryCount, setSelectedEntryCount] = useState(0);
   const [selectedId, setSelectedId] = useState("");
   const [status, setStatus] = useState("Schema list loading");
 
@@ -85,12 +86,14 @@ export function SchemaBuilder() {
 
   function resetDraft() {
     setSelectedId("");
+    setSelectedEntryCount(0);
     setDraft({ ...emptyDraft, fields: [{ ...emptyField }] });
     setStatus("Ready to create schema");
   }
 
   function selectSchema(schema: SchemaRecord) {
     setSelectedId(schema.id);
+    void refreshSelectedEntryCount(schema.id);
     setDraft({
       name: schema.name,
       slug: schema.slug,
@@ -104,6 +107,11 @@ export function SchemaBuilder() {
         relationType: field.relationType ?? undefined,
       })),
     });
+  }
+
+  async function refreshSelectedEntryCount(schemaId: string) {
+    const result = await listEntries(schemaId);
+    setSelectedEntryCount(result.entries?.length ?? 0);
   }
 
   function updateField(index: number, patch: Partial<SchemaFieldDraft>) {
@@ -130,6 +138,8 @@ export function SchemaBuilder() {
               index={index}
               key={`${field.slug}-${index}`}
               onChange={updateField}
+              selectedEntryCount={selectedEntryCount}
+              selectedSchemaId={selectedId}
               schemas={schemas}
             />
           ))}
@@ -149,11 +159,14 @@ function SchemaFieldRow(props: {
   field: SchemaFieldDraft;
   index: number;
   onChange: (index: number, patch: Partial<SchemaFieldDraft>) => void;
+  selectedEntryCount: number;
+  selectedSchemaId: string;
   schemas: SchemaRecord[];
 }) {
-  const { field, index, onChange, schemas } = props;
+  const { field, index, onChange, schemas, selectedEntryCount, selectedSchemaId } = props;
   const selectedTarget = schemas.find((schema) => schema.id === field.relationSchemaId);
   const selectedRelation = relationTypes.find((relationType) => relationType.value === (field.relationType ?? "manyToOne"));
+  const showEditWarning = Boolean(selectedSchemaId && field.type === "relation" && selectedEntryCount > 0);
   return (
     <fieldset>
       <legend>Field {index + 1}</legend>
@@ -180,6 +193,12 @@ function SchemaFieldRow(props: {
           </label>
           {schemas.length === 0 ? <p className="empty-state">No target schemas available yet.</p> : null}
           {selectedTarget ? <p className="helper-text">Target: {selectedTarget.name} /{selectedTarget.slug}</p> : null}
+          {showEditWarning ? (
+            <p className="warning-text">
+              English: This schema has entries; changing relation type or target may be blocked when saved.
+              Hinglish: Is schema me entries hain; relation type ya target change save par block ho sakta hai.
+            </p>
+          ) : null}
         </>
       ) : null}
       <label><input checked={field.required} type="checkbox" onChange={(event) => onChange(index, { required: event.target.checked })} /> Required</label>

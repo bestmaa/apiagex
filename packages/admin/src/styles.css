@@ -239,6 +239,16 @@ code {
   margin: 0;
 }
 
+.warning-text {
+  background: #fff7ed;
+  border-left: 4px solid #c2410c;
+  border-radius: 6px;
+  color: #7c2d12;
+  font-size: 13px;
+  margin: 0;
+  padding: 8px 10px;
+}
+
 @media (max-width: 700px) {
   .app-header,
   nav,
