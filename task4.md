@@ -199,7 +199,7 @@ Each task uses this structure:
 #### T409 - Improve Mobile Navigation
 
 - Version: `v4.2.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make Admin UI navigation reliable on narrow screens.
 - Persona: Mobile UX engineer; prevent cramped nav and overlapping controls.
 - Success Criteria: Mobile nav can open/close, route links are tappable, current route visible.

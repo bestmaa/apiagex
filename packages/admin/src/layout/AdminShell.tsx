@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { BookOpen, Database, FileText, Home, KeyRound, Network, Users } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { BookOpen, Database, FileText, Home, KeyRound, Menu, Network, Users, X } from "lucide-react";
 import type { AdminNavItem, AdminRoute } from "../app-route.type";
 import type { OwnerSession } from "../session.type";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -44,14 +44,32 @@ export function AdminShell({
   theme: AdminTheme;
 }) {
   const current = navItems.find((item) => item.route === route);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const MenuIcon = mobileNavOpen ? X : Menu;
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar" aria-label="Admin sidebar">
         <div className="admin-brand">
-          <p className="eyebrow">Control plane</p>
-          <h1>Apiagex</h1>
+          <div>
+            <p className="eyebrow">Control plane</p>
+            <h1>Apiagex</h1>
+          </div>
+          <button
+            aria-controls="admin-mobile-nav"
+            aria-expanded={mobileNavOpen}
+            className="mobile-nav-toggle"
+            onClick={() => setMobileNavOpen((open) => !open)}
+            type="button"
+          >
+            <MenuIcon aria-hidden="true" size={18} />
+            <span>{mobileNavOpen ? "Close menu" : "Open menu"}</span>
+          </button>
         </div>
-        <nav className="admin-nav" aria-label="Admin navigation">
+        <nav
+          className={mobileNavOpen ? "admin-nav is-open" : "admin-nav"}
+          id="admin-mobile-nav"
+          aria-label="Admin navigation"
+        >
           {navItems.map((item) => {
             const Icon = navIcons[item.route];
             return (
@@ -60,6 +78,7 @@ export function AdminShell({
                 className={route === item.route ? "active" : undefined}
                 href={`#${item.route}`}
                 key={item.route}
+                onClick={() => setMobileNavOpen(false)}
               >
                 <Icon aria-hidden="true" size={16} />
                 <span>{item.label}</span>
