@@ -657,7 +657,7 @@ Each task uses this structure:
 #### T443 - Verify Admin UI End To End Desktop
 
 - Version: `v4.10.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Run a desktop browser end-to-end check across the redesigned Admin UI.
 - Persona: Release QA engineer; catch broken workflows before release.
 - Success Criteria: Desktop browser verifies login, dashboard, schema create, relation schema, entry create/edit, API page, role/user flow, docs route, light/dark.
@@ -665,6 +665,7 @@ Each task uses this structure:
 - Output: Desktop verification notes in task file or docs.
 - Strict Rule: Do not mark complete with skipped workflow.
 - Verify: Desktop browser flow plus standard verification.
+- Verification Notes: Desktop 1366x900 browser flow passed for owner session, dashboard, light/dark toggle, schema create, relation schema create, entry create/edit, API copy, role create, user create, Docs route, and no horizontal overflow.
 - Commit: `Verify admin desktop flow`
 
 #### T444 - Verify Admin UI End To End Mobile
