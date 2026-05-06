@@ -453,7 +453,7 @@ Each task uses this structure:
 #### T330 - Improve Target Schema Picker
 
 - Version: `v2.4.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Improve target schema selection for relation fields.
 - Persona: CMS builder UI engineer; prevent invalid relation setup.
 - Success Criteria: Target picker lists existing schemas, shows empty state, and blocks save without target.

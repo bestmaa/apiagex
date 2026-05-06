@@ -228,6 +228,12 @@ code {
   padding: 8px 10px;
 }
 
+.helper-text {
+  color: #657187;
+  font-size: 13px;
+  margin: 0;
+}
+
 @media (max-width: 700px) {
   .app-header,
   nav,

@@ -132,6 +132,7 @@ function SchemaFieldRow(props: {
   schemas: SchemaRecord[];
 }) {
   const { field, index, onChange, schemas } = props;
+  const selectedTarget = schemas.find((schema) => schema.id === field.relationSchemaId);
   return (
     <fieldset>
       <legend>Field {index + 1}</legend>
@@ -148,11 +149,15 @@ function SchemaFieldRow(props: {
             </select>
           </label>
           <label>Relation target
-            <select required value={field.relationSchemaId ?? ""} onChange={(event) => onChange(index, { relationSchemaId: event.target.value })}>
-              <option value="">Select schema</option>
-              {schemas.map((schema) => <option key={schema.id} value={schema.id}>{schema.name}</option>)}
+            <select disabled={schemas.length === 0} required value={field.relationSchemaId ?? ""} onChange={(event) => onChange(index, { relationSchemaId: event.target.value })}>
+              <option value="">{schemas.length === 0 ? "Create a schema first" : "Select target schema"}</option>
+              {schemas.map((schema) => (
+                <option key={schema.id} value={schema.id}>{schema.name} /{schema.slug}</option>
+              ))}
             </select>
           </label>
+          {schemas.length === 0 ? <p className="empty-state">No target schemas available yet.</p> : null}
+          {selectedTarget ? <p className="helper-text">Target: {selectedTarget.name} /{selectedTarget.slug}</p> : null}
         </>
       ) : null}
       <label><input checked={field.required} type="checkbox" onChange={(event) => onChange(index, { required: event.target.checked })} /> Required</label>
