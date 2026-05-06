@@ -635,6 +635,46 @@ code {
   gap: var(--admin-space-3);
 }
 
+.entry-selector {
+  align-items: end;
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  display: grid;
+  gap: var(--admin-space-5);
+  grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
+  max-width: 900px;
+  padding: var(--admin-space-5);
+}
+
+.entry-selector h3 {
+  margin: 0 0 var(--admin-space-4);
+}
+
+.entry-selector-summary {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+  min-width: 0;
+}
+
+.entry-selector-summary strong,
+.entry-selector-summary code,
+.entry-selector-summary span {
+  overflow-wrap: anywhere;
+}
+
+.entry-selector-summary span {
+  background: var(--admin-color-surface-muted);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text-soft);
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
+  padding: var(--admin-space-2) var(--admin-space-3);
+}
+
 .entry-summary-list {
   display: flex;
   flex-wrap: wrap;
@@ -736,6 +776,7 @@ code {
   .dashboard-grid,
   .field-builder-grid,
   .field-relation-grid,
+  .entry-selector,
   .quick-action-list,
   .relation-guide dl,
   .schema-basics-grid,

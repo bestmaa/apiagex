@@ -294,7 +294,7 @@ Each task uses this structure:
 #### T416 - Redesign Entry Schema Selector
 
 - Version: `v4.4.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make entry schema selection clearer and more useful.
 - Persona: Content editor UX designer; make switching collections easy.
 - Success Criteria: Selector shows current schema and entry count context.

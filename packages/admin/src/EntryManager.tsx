@@ -84,11 +84,13 @@ export function EntryManager() {
       <h2 id="entry-manager-title">Entries</h2>
       <p>English: Select a schema, create content, then edit or delete entries.</p>
       <p>Hinglish: Schema select karo, content banao, phir entries edit ya delete karo.</p>
-      <label>Entry schema
-        <select value={schemaId} onChange={(event) => void changeSchema(event.target.value)}>
-          {schemas.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-        </select>
-      </label>
+      <EntrySchemaSelector
+        entries={entries.length}
+        onChange={(nextSchemaId) => void changeSchema(nextSchemaId)}
+        schema={schema}
+        schemaId={schemaId}
+        schemas={schemas}
+      />
       {schema ? (
         <GeneratedEntryForm
           editingEntry={editingEntry}
@@ -110,6 +112,43 @@ export function EntryManager() {
           relationEntries={relationEntries}
           schema={schema}
         />
+      ) : null}
+    </section>
+  );
+}
+
+function EntrySchemaSelector({
+  entries,
+  onChange,
+  schema,
+  schemaId,
+  schemas,
+}: {
+  entries: number;
+  onChange: (schemaId: string) => void;
+  schema?: SchemaRecord;
+  schemaId: string;
+  schemas: SchemaRecord[];
+}) {
+  const relationCount = schema?.fields.filter((field) => field.type === "relation").length ?? 0;
+  return (
+    <section className="entry-selector" aria-labelledby="entry-selector-title">
+      <div>
+        <h3 id="entry-selector-title">Collection</h3>
+        <label>Entry schema
+          <select value={schemaId} onChange={(event) => onChange(event.target.value)}>
+            {schemas.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+          </select>
+        </label>
+      </div>
+      {schema ? (
+        <div className="entry-selector-summary">
+          <strong>{schema.name}</strong>
+          <code>/api/content/{schema.slug}</code>
+          <span>{schema.fields.length} fields</span>
+          <span>{relationCount} relations</span>
+          <span>{entries} entries</span>
+        </div>
       ) : null}
     </section>
   );
