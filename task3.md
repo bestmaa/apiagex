@@ -399,7 +399,7 @@ Each task uses this structure:
 #### T326 - Add Relation API Explorer Examples
 
 - Version: `v2.3.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Show relation request payloads and populate examples in Admin UI API Explorer.
 - Persona: Developer experience engineer; make generated relation APIs inspectable.
 - Success Criteria: API Explorer shows relation field payload examples for single and multi relations.

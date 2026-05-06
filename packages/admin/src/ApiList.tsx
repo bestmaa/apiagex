@@ -53,8 +53,10 @@ function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
       <code>x-apiagex-role-id: ROLE_ID</code>
       <strong>Payload</strong>
       <pre><code>{JSON.stringify({ data: sampleData(schema.fields) }, null, 2)}</code></pre>
+      <strong>Populate routes</strong>
+      <pre><code>{JSON.stringify(populateExamples(schema.slug, schema.fields), null, 2)}</code></pre>
       <strong>Response examples</strong>
-      <pre><code>{JSON.stringify(responseExamples(schema.slug), null, 2)}</code></pre>
+      <pre><code>{JSON.stringify(responseExamples(schema), null, 2)}</code></pre>
     </article>
   );
 }
@@ -71,15 +73,58 @@ function sampleValue(field: SchemaFieldDraft): unknown {
   if (field.type === "boolean") return true;
   if (field.type === "date") return "2026-05-05";
   if (field.type === "json") return { key: "value" };
-  if (field.type === "relation") return "RELATED_ENTRY_ID";
+  if (field.type === "relation") return isMultiRelation(field) ? ["RELATED_ENTRY_ID_1", "RELATED_ENTRY_ID_2"] : "RELATED_ENTRY_ID";
   if (field.type === "media") return "/uploads/example.png";
   return `Example ${field.name}`;
 }
 
-function responseExamples(schemaSlug: string) {
+function populateExamples(schemaSlug: string, fields: SchemaFieldDraft[]) {
+  const relationFields = fields.filter((field) => field.type === "relation");
+  if (relationFields.length === 0) {
+    return { note: "No relation fields in this schema" };
+  }
   return {
-    list: { ok: true, schema: schemaSlug, entries: [] },
-    mutation: { ok: true, entry: { id: "ENTRY_ID", data: {} } },
+    list: `/api/content/${schemaSlug}?populate=relations`,
+    read: `/api/content/${schemaSlug}/ENTRY_ID?populate=relations`,
+    aliases: [
+      `/api/content/${schemaSlug}?populate=all`,
+      `/api/content/${schemaSlug}?populate=*`,
+    ],
+  };
+}
+
+function responseExamples(schema: SchemaRecord) {
+  return {
+    list: { ok: true, schema: schema.slug, entries: [] },
+    mutation: { ok: true, entry: { id: "ENTRY_ID", data: sampleData(schema.fields) } },
+    populated: { ok: true, entry: { id: "ENTRY_ID", data: populatedData(schema.fields) } },
     blocked: { ok: false, error: "API_PERMISSION_DENIED" },
   };
+}
+
+function populatedData(fields: SchemaFieldDraft[]): Record<string, unknown> {
+  return fields.reduce<Record<string, unknown>>((data, field) => {
+    if (field.type === "relation") {
+      data[field.slug] = isMultiRelation(field)
+        ? [sampleRelatedEntry(field, 1), sampleRelatedEntry(field, 2)]
+        : sampleRelatedEntry(field, 1);
+      return data;
+    }
+    data[field.slug] = sampleValue(field);
+    return data;
+  }, {});
+}
+
+function sampleRelatedEntry(field: SchemaFieldDraft, index: number) {
+  return {
+    id: `RELATED_ENTRY_ID_${index}`,
+    schemaId: field.relationSchemaId ?? "RELATED_SCHEMA_ID",
+    data: { title: `${field.relationTarget?.name ?? field.name} ${index}` },
+    createdAt: "2026-05-06T00:00:00.000Z",
+    updatedAt: "2026-05-06T00:00:00.000Z",
+  };
+}
+
+function isMultiRelation(field: SchemaFieldDraft): boolean {
+  return field.relationType === "oneToMany" || field.relationType === "manyToMany";
 }
