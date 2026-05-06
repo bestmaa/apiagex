@@ -1,5 +1,6 @@
 export const relationErrors = {
   metadataForNonRelationField: "RELATION_METADATA_FOR_NON_RELATION_FIELD",
+  oneToOneConflict: "RELATION_ONE_TO_ONE_CONFLICT",
   targetEntryInvalid: "RELATION_TARGET_ENTRY_INVALID",
   targetMissing: "RELATION_TARGET_MISSING",
   targetRequired: "RELATION_TARGET_REQUIRED",
@@ -11,6 +12,10 @@ export type RelationErrorCode = (typeof relationErrors)[keyof typeof relationErr
 
 export function relationTargetEntryInvalid(fieldSlug: string): string {
   return `${relationErrors.targetEntryInvalid}:${fieldSlug}`;
+}
+
+export function relationOneToOneConflict(fieldSlug: string): string {
+  return `${relationErrors.oneToOneConflict}:${fieldSlug}`;
 }
 
 export function relationValueShapeInvalid(fieldSlug: string): string {

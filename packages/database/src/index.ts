@@ -40,6 +40,7 @@ export {
   updateSchema,
 } from "./schema-repository.js";
 export {
+  relationOneToOneConflict,
   relationErrors,
   relationTargetEntryInvalid,
   relationValueShapeInvalid,

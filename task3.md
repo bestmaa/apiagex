@@ -189,7 +189,7 @@ Each task uses this structure:
 #### T310 - Validate One-To-One Entry Values
 
 - Version: `v2.2.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Validate `oneToOne` values and prevent duplicate use when uniqueness is required.
 - Persona: Data integrity engineer; preserve one-to-one meaning.
 - Success Criteria: One source entry can point to one target entry; duplicate conflicting relation fails with a clear error.

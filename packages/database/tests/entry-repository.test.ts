@@ -122,6 +122,49 @@ describe("entry repository", () => {
 
     expect(book.data.author).toBe(author.id);
   });
+
+  it("validates one-to-one entry values", () => {
+    const db = openMigratedDb();
+    const authorSchema = createSchema(db, {
+      name: "Author",
+      slug: "author",
+      fields: [{ name: "Name", slug: "name", type: "text", required: true }],
+    });
+    const author = createEntry(db, {
+      schemaId: authorSchema.id,
+      data: { name: "Asha" },
+    });
+    const profileSchema = createSchema(db, {
+      name: "Profile",
+      slug: "profile",
+      fields: [
+        {
+          name: "Author",
+          slug: "author",
+          type: "relation",
+          relationSchemaId: authorSchema.id,
+          relationType: "oneToOne",
+          required: true,
+        },
+      ],
+    });
+
+    const profile = createEntry(db, {
+      schemaId: profileSchema.id,
+      data: { author: author.id },
+    });
+
+    expect(profile.data.author).toBe(author.id);
+    expect(() =>
+      createEntry(db, { schemaId: profileSchema.id, data: { author: author.id } }),
+    ).toThrow("RELATION_ONE_TO_ONE_CONFLICT:author");
+    expect(() =>
+      createEntry(db, { schemaId: profileSchema.id, data: { author: ["not-single"] } }),
+    ).toThrow("RELATION_VALUE_SHAPE_INVALID:author");
+    expect(() =>
+      updateEntry(db, profile.id, { data: { author: author.id } }),
+    ).not.toThrow();
+  });
 });
 
 function openMigratedDb() {

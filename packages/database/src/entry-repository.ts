@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { relationTargetEntryInvalid, relationValueShapeInvalid } from "./relation-errors.js";
+import {
+  relationOneToOneConflict,
+  relationTargetEntryInvalid,
+  relationValueShapeInvalid,
+} from "./relation-errors.js";
 import type { SqliteDatabase } from "./sqlite.js";
 import { getSchemaById } from "./schema-repository.js";
 import type {
@@ -54,7 +58,7 @@ export function updateEntry(
 ): EntryRecord {
   const current = requireEntry(db, id);
   const schema = requireSchema(db, current.schemaId);
-  validateEntryData(db, schema, input.data);
+  validateEntryData(db, schema, input.data, id);
   const now = new Date().toISOString();
   db.prepare("UPDATE entries SET data_json = ?, updated_at = ? WHERE id = ?").run(
     JSON.stringify(input.data),
@@ -75,6 +79,7 @@ function validateEntryData(
   db: SqliteDatabase,
   schema: SchemaRecord,
   data: EntryData,
+  currentEntryId?: string,
 ): void {
   if (!isRecord(data)) {
     throw new Error("ENTRY_DATA_INVALID");
@@ -91,12 +96,18 @@ function validateEntryData(
       throw new Error(`ENTRY_FIELD_REQUIRED:${field.slug}`);
     }
     if (!isMissing(value)) {
-      validateFieldValue(db, field, value);
+      validateFieldValue(db, schema, field, value, currentEntryId);
     }
   }
 }
 
-function validateFieldValue(db: SqliteDatabase, field: FieldRecord, value: unknown): void {
+function validateFieldValue(
+  db: SqliteDatabase,
+  schema: SchemaRecord,
+  field: FieldRecord,
+  value: unknown,
+  currentEntryId?: string,
+): void {
   if (field.type === "text" || field.type === "longText" || field.type === "media") {
     assertType(field, typeof value === "string");
   } else if (field.type === "number") {
@@ -106,12 +117,19 @@ function validateFieldValue(db: SqliteDatabase, field: FieldRecord, value: unkno
   } else if (field.type === "date") {
     assertType(field, typeof value === "string" && !Number.isNaN(Date.parse(value)));
   } else if (field.type === "relation") {
-    assertRelation(db, field, value);
+    assertRelation(db, schema, field, value, currentEntryId);
   }
 }
 
-function assertRelation(db: SqliteDatabase, field: FieldRecord, value: unknown): void {
-  if (relationTypeOf(field) !== "manyToOne") {
+function assertRelation(
+  db: SqliteDatabase,
+  schema: SchemaRecord,
+  field: FieldRecord,
+  value: unknown,
+  currentEntryId?: string,
+): void {
+  const relationType = relationTypeOf(field);
+  if (relationType !== "manyToOne" && relationType !== "oneToOne") {
     throw new Error(relationValueShapeInvalid(field.slug));
   }
   if (typeof value !== "string") {
@@ -121,10 +139,32 @@ function assertRelation(db: SqliteDatabase, field: FieldRecord, value: unknown):
   if (!target || target.schemaId !== field.relationSchemaId) {
     throw new Error(relationTargetEntryInvalid(field.slug));
   }
+  if (relationType === "oneToOne") {
+    assertOneToOneAvailable(db, schema, field, value, currentEntryId);
+  }
 }
 
 function relationTypeOf(field: FieldRecord): RelationType {
   return field.relationType ?? "manyToOne";
+}
+
+function assertOneToOneAvailable(
+  db: SqliteDatabase,
+  schema: SchemaRecord,
+  field: FieldRecord,
+  targetEntryId: string,
+  currentEntryId?: string,
+): void {
+  const rows = db
+    .prepare("SELECT id, data_json as dataJson FROM entries WHERE schema_id = ?")
+    .all(schema.id) as Array<{ dataJson: string; id: string }>;
+  for (const row of rows) {
+    if (row.id === currentEntryId) continue;
+    const data = JSON.parse(row.dataJson) as EntryData;
+    if (data[field.slug] === targetEntryId) {
+      throw new Error(relationOneToOneConflict(field.slug));
+    }
+  }
 }
 
 function assertType(field: FieldRecord, valid: boolean): void {
