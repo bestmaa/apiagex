@@ -383,6 +383,28 @@ code {
   grid-template-columns: minmax(0, 1fr) auto auto;
 }
 
+.schema-form {
+  gap: var(--admin-space-6);
+  max-width: 900px;
+}
+
+.schema-form-section {
+  background: var(--admin-color-surface-raised);
+  box-shadow: var(--admin-shadow-sm);
+}
+
+.schema-basics-grid {
+  display: grid;
+  gap: var(--admin-space-5);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.schema-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+}
+
 .schema-inventory {
   display: grid;
   gap: var(--admin-space-5);
@@ -562,6 +584,7 @@ code {
   .dashboard-metrics,
   .dashboard-grid,
   .quick-action-list,
+  .schema-basics-grid,
   .schema-inventory-row,
   .dashboard-panel .schema-row {
     grid-template-columns: 1fr;

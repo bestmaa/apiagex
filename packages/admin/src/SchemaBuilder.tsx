@@ -130,32 +130,42 @@ export function SchemaBuilder() {
       <h2 id="schema-builder-title">Schemas</h2>
       <p>English: Create schemas, edit schema basics, add fields, and connect relation fields safely.</p>
       <p>Hinglish: Schemas banao, basics edit karo, fields add karo, aur relation fields safely connect karo.</p>
-      <form onSubmit={submitSchema}>
-        <label>Name <input required placeholder="Article" value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
-        <label>Slug <input required pattern="[a-z](?:[a-z0-9]|-)*" placeholder="article" value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value })} /></label>
-        <label>Description <textarea rows={3} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
-        <div className="field-list">
-          {draft.fields.map((field, index) => (
-            <SchemaFieldRow
-              field={field}
-              index={index}
-              key={`${field.slug}-${index}`}
-              onChange={updateField}
-              selectedEntryCount={selectedEntryCount}
-              selectedSchemaId={selectedId}
-              schemas={schemas}
-            />
-          ))}
+      <form className="schema-form" onSubmit={submitSchema}>
+        <fieldset className="schema-form-section">
+          <legend>Schema basics</legend>
+          <div className="schema-basics-grid">
+            <label>Name <input required placeholder="Article" value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
+            <label>Slug <input required pattern="[a-z](?:[a-z0-9]|-)*" placeholder="article" value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value })} /></label>
+          </div>
+          <label>Description <textarea rows={3} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
+        </fieldset>
+        <fieldset className="schema-form-section">
+          <legend>Fields</legend>
+          <div className="field-list">
+            {draft.fields.map((field, index) => (
+              <SchemaFieldRow
+                field={field}
+                index={index}
+                key={`${field.slug}-${index}`}
+                onChange={updateField}
+                selectedEntryCount={selectedEntryCount}
+                selectedSchemaId={selectedId}
+                schemas={schemas}
+              />
+            ))}
+          </div>
+          <button type="button" onClick={() => setDraft({ ...draft, fields: [...draft.fields, { ...emptyField }] })}>
+            <Plus aria-hidden="true" size={16} />
+            Add field
+          </button>
+        </fieldset>
+        <div className="schema-form-actions">
+          <button type="submit">
+            {selectedId ? <Pencil aria-hidden="true" size={16} /> : <FilePlus aria-hidden="true" size={16} />}
+            {selectedId ? "Update schema" : "Create schema"}
+          </button>
+          {selectedId ? <button type="button" onClick={resetDraft}>New schema</button> : null}
         </div>
-        <button type="button" onClick={() => setDraft({ ...draft, fields: [...draft.fields, { ...emptyField }] })}>
-          <Plus aria-hidden="true" size={16} />
-          Add field
-        </button>
-        <button type="submit">
-          {selectedId ? <Pencil aria-hidden="true" size={16} /> : <FilePlus aria-hidden="true" size={16} />}
-          {selectedId ? "Update schema" : "Create schema"}
-        </button>
-        {selectedId ? <button type="button" onClick={resetDraft}>New schema</button> : null}
       </form>
       <StateMessage title="Schema state">{status}</StateMessage>
       <SchemaDetails schema={schemas.find((schema) => schema.id === selectedId)} />

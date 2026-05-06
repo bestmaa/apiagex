@@ -240,7 +240,7 @@ Each task uses this structure:
 #### T412 - Redesign Schema Create Form
 
 - Version: `v4.3.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Improve schema creation form layout and readability.
 - Persona: Form designer; reduce confusion while creating APIs.
 - Success Criteria: Name, slug, description, and fields are grouped with clear controls.
