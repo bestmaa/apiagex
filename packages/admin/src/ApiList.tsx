@@ -33,7 +33,7 @@ export function ApiList() {
       <StateMessage title="API state">{status}</StateMessage>
       {schemas.length === 0 ? (
         <StateMessage title="No generated APIs yet" variant="empty">
-          Create a schema to expose content API routes.
+          Create a schema first. Each schema exposes list, create, read, update, and delete content routes.
         </StateMessage>
       ) : schemas.map((schema) => (
         <ApiExplorerRow key={schema.id} schema={schema} />
@@ -60,7 +60,7 @@ function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
         </div>
         <span>{schema.fields.length} fields</span>
       </div>
-      <p className="api-rbac-note">Use <code>x-apiagex-role-id: ROLE_ID</code> for RBAC checks. Missing or blocked permissions return permission errors.</p>
+      <p className="api-rbac-note">Role permissions must allow the action. Send <code>x-apiagex-role-id: ROLE_ID</code>; blocked requests return <code>API_PERMISSION_DENIED</code>.</p>
       <ul className="api-endpoint-list">
         {actions.map((action) => (
           <li key={action.label}>

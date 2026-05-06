@@ -413,7 +413,7 @@ Each task uses this structure:
 #### T425 - Add API Empty And Permission Hints
 
 - Version: `v4.5.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Explain API page empty states and RBAC implications.
 - Persona: DX writer; help users know why APIs appear or fail.
 - Success Criteria: Empty API page points to schema creation; API rows mention role permission requirement.
