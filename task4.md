@@ -279,7 +279,7 @@ Each task uses this structure:
 #### T415 - Improve Relation Builder UX
 
 - Version: `v4.3.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make relation type and target selection clearer.
 - Persona: CMS teacher; help users choose correct relation semantics.
 - Success Criteria: Relation fields show relation direction, target schema, value shape, and examples.

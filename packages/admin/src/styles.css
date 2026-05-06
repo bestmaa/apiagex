@@ -437,8 +437,48 @@ code {
 
 .field-relation-grid .helper-text,
 .field-relation-grid .warning-text,
-.field-relation-grid .state-message {
+.field-relation-grid .state-message,
+.relation-guide {
   grid-column: 1 / -1;
+}
+
+.relation-guide {
+  background: var(--admin-color-primary-muted);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  display: grid;
+  gap: var(--admin-space-4);
+  padding: var(--admin-space-4);
+}
+
+.relation-guide p,
+.relation-guide dl,
+.relation-guide dd {
+  margin: 0;
+}
+
+.relation-guide dl {
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.relation-guide div {
+  display: grid;
+  gap: var(--admin-space-1);
+  min-width: 0;
+}
+
+.relation-guide dt {
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.relation-guide dd {
+  color: var(--admin-color-text);
+  overflow-wrap: anywhere;
 }
 
 .schema-detail-panel {
@@ -697,6 +737,7 @@ code {
   .field-builder-grid,
   .field-relation-grid,
   .quick-action-list,
+  .relation-guide dl,
   .schema-basics-grid,
   .schema-field-badge-row,
   .schema-inventory-row,

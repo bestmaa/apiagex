@@ -17,28 +17,38 @@ const fieldTypes: FieldType[] = [
 ];
 
 const relationTypes: {
+  example: string;
   hint: string;
   label: string;
+  shape: string;
   value: RelationType;
 }[] = [
   {
+    example: `"author": "entry_123"`,
     hint: "English: Stores one target id; another entry cannot reuse the same target. Hinglish: Ek target id store hoti hai; dusri entry same target reuse nahi kar sakti.",
     label: "One to one",
+    shape: "Single target id",
     value: "oneToOne",
   },
   {
+    example: `"gallery": ["entry_123", "entry_456"]`,
     hint: "English: Stores an array of target ids on this entry. Hinglish: Is entry me target ids ka array store hota hai.",
     label: "One to many",
+    shape: "Array of target ids",
     value: "oneToMany",
   },
   {
+    example: `"category": "entry_123"`,
     hint: "English: Stores one target id; many entries may point to the same target. Hinglish: Ek target id store hoti hai; many entries same target par point kar sakti hain.",
     label: "Many to one",
+    shape: "Single target id",
     value: "manyToOne",
   },
   {
+    example: `"tags": ["entry_123", "entry_456"]`,
     hint: "English: Stores an array of target ids for multi-select links. Hinglish: Multi-select links ke liye target ids ka array store hota hai.",
     label: "Many to many",
+    shape: "Array of target ids",
     value: "manyToMany",
   },
 ];
@@ -223,7 +233,6 @@ function SchemaFieldRow(props: {
               ))}
             </select>
           </label>
-          {selectedRelation ? <p className="helper-text">{selectedRelation.hint}</p> : null}
           <label>Relation target
             <select disabled={schemas.length === 0} required value={field.relationSchemaId ?? ""} onChange={(event) => onChange(index, { relationSchemaId: event.target.value })}>
               <option value="">{schemas.length === 0 ? "Create a schema first" : "Select target schema"}</option>
@@ -238,6 +247,7 @@ function SchemaFieldRow(props: {
             </StateMessage>
           ) : null}
           {selectedTarget ? <p className="helper-text">Target: {selectedTarget.name} /{selectedTarget.slug}</p> : null}
+          {selectedRelation ? <RelationGuide relation={selectedRelation} target={selectedTarget} /> : null}
           {showEditWarning ? (
             <p className="warning-text">
               English: This schema has entries; changing relation type or target may be blocked when saved.
@@ -247,6 +257,34 @@ function SchemaFieldRow(props: {
         </div>
       ) : null}
     </fieldset>
+  );
+}
+
+function RelationGuide({
+  relation,
+  target,
+}: {
+  relation: typeof relationTypes[number];
+  target?: SchemaRecord;
+}) {
+  return (
+    <div className="relation-guide">
+      <p>{relation.hint}</p>
+      <dl>
+        <div>
+          <dt>Direction</dt>
+          <dd>This field points to {target ? target.name : "the selected target schema"}.</dd>
+        </div>
+        <div>
+          <dt>Stored value</dt>
+          <dd>{relation.shape}</dd>
+        </div>
+        <div>
+          <dt>Example</dt>
+          <dd><code>{relation.example}</code></dd>
+        </div>
+      </dl>
+    </div>
   );
 }
 
