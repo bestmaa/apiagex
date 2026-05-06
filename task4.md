@@ -14,6 +14,12 @@ Task 4 ka focus Admin UI ka design aur UX seriously improve karna hai. Free admi
 - Do not implement behavior from future tasks.
 - Keep one server: `/api`, `/adminui`, `/doc`, `/readme`.
 - Keep strict TypeScript and put shared types in `*.type.ts`.
+- Keep files under 250 lines where practical; if a file grows past 250 lines, split it before continuing unless the file is generated or a short-term task note explains why.
+- Do not dump all UI into one file; split Admin UI into clear layout, components, hooks, utils, and type files.
+- Keep Admin UI code inside `packages/admin/src` organized by purpose: reusable UI in `components/`, route/page components in `pages/`, layout shell in `layout/`, hooks in `hooks/`, helpers in `utils/`, and shared types in `*.type.ts`.
+- Keep CSS organized: tokens/theme foundation first, layout styles separate from reusable component styles, and page-specific styles only when necessary.
+- Prefer reusable small components for buttons, panels, badges, lists, dialogs, empty states, and form rows; avoid over-abstracting one-off logic.
+- Do a quick code-quality pass before every commit: file size, duplicated CSS, unclear names, unused code, accessibility labels, and responsive behavior.
 - Keep product docs in English + Hinglish where user-facing.
 - Browser-facing Admin UI tasks must be verified on desktop and mobile.
 - Every visual change must support light and dark mode unless the task says documentation only.
@@ -43,6 +49,9 @@ To save context, scan task headings/status first, then read only the first pendi
 Before code: mark task in_progress. After verified: mark completed and commit exact message.
 Keep one server: /api /adminui /doc /readme. Do not break npm run smoke.
 Strict TS, files <250 lines, shared types in *.type.ts, no future-task behavior.
+Keep Admin UI structured: packages/admin/src/components, pages, layout, hooks, utils, *.type.ts. Split large files before commit.
+Keep CSS structured: tokens/theme first, reusable component styles, then page-specific styles only when needed.
+Before every commit do code-quality pass: file size, duplication, names, unused code, a11y labels, responsive behavior.
 Task4 focus: Admin UI redesign, custom practical SaaS control panel, light/dark mode, responsive desktop/mobile, schemas, entries, APIs, roles, users, docs.
 Design inspiration allowed from free admin dashboards, but do not copy exact screens, colors, spacing, or components.
 Use icons where useful, avoid marketing hero UI, avoid nested cards, keep tables/forms dense and readable.
