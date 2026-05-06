@@ -440,7 +440,7 @@ Each task uses this structure:
 #### T329 - Add Relation Type Picker
 
 - Version: `v2.4.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add relation type picker to the schema field builder.
 - Persona: CMS builder UI engineer; make relation kind explicit.
 - Success Criteria: Relation fields can choose one-to-one, one-to-many, many-to-one, or many-to-many.

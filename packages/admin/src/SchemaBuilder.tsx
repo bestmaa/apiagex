@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { createSchema, listSchemas, updateSchema } from "./api";
-import type { FieldType, SchemaDraft, SchemaFieldDraft, SchemaRecord } from "./schema.type";
+import type { FieldType, RelationType, SchemaDraft, SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
 const fieldTypes: FieldType[] = [
   "text",
@@ -11,6 +11,13 @@ const fieldTypes: FieldType[] = [
   "json",
   "media",
   "relation",
+];
+
+const relationTypes: { label: string; value: RelationType }[] = [
+  { label: "One to one", value: "oneToOne" },
+  { label: "One to many", value: "oneToMany" },
+  { label: "Many to one", value: "manyToOne" },
+  { label: "Many to many", value: "manyToMany" },
 ];
 
 const emptyField: SchemaFieldDraft = {
@@ -74,6 +81,7 @@ export function SchemaBuilder() {
         type: field.type,
         required: field.required,
         relationSchemaId: field.relationSchemaId ?? undefined,
+        relationType: field.relationType ?? undefined,
       })),
     });
   }
@@ -129,18 +137,34 @@ function SchemaFieldRow(props: {
       <legend>Field {index + 1}</legend>
       <label>Field name <input required value={field.name} onChange={(event) => onChange(index, { name: event.target.value })} /></label>
       <label>Field slug <input required pattern="[a-z](?:[a-z0-9]|-)*" value={field.slug} onChange={(event) => onChange(index, { slug: event.target.value })} /></label>
-      <label>Type <select value={field.type} onChange={(event) => onChange(index, { relationSchemaId: "", type: event.target.value as FieldType })}>{fieldTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
+      <label>Type <select value={field.type} onChange={(event) => onChange(index, fieldTypePatch(event.target.value as FieldType))}>{fieldTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
       {field.type === "relation" ? (
-        <label>Relation target
-          <select required value={field.relationSchemaId ?? ""} onChange={(event) => onChange(index, { relationSchemaId: event.target.value })}>
-            <option value="">Select schema</option>
-            {schemas.map((schema) => <option key={schema.id} value={schema.id}>{schema.name}</option>)}
-          </select>
-        </label>
+        <>
+          <label>Relation type
+            <select required value={field.relationType ?? "manyToOne"} onChange={(event) => onChange(index, { relationType: event.target.value as RelationType })}>
+              {relationTypes.map((relationType) => (
+                <option key={relationType.value} value={relationType.value}>{relationType.label}</option>
+              ))}
+            </select>
+          </label>
+          <label>Relation target
+            <select required value={field.relationSchemaId ?? ""} onChange={(event) => onChange(index, { relationSchemaId: event.target.value })}>
+              <option value="">Select schema</option>
+              {schemas.map((schema) => <option key={schema.id} value={schema.id}>{schema.name}</option>)}
+            </select>
+          </label>
+        </>
       ) : null}
       <label><input checked={field.required} type="checkbox" onChange={(event) => onChange(index, { required: event.target.checked })} /> Required</label>
     </fieldset>
   );
+}
+
+function fieldTypePatch(type: FieldType): Partial<SchemaFieldDraft> {
+  if (type === "relation") {
+    return { relationSchemaId: "", relationType: "manyToOne", type };
+  }
+  return { relationSchemaId: undefined, relationType: undefined, type };
 }
 
 function SchemaDetails({ schema }: { schema?: SchemaRecord }) {
@@ -177,5 +201,7 @@ function SchemaList(props: {
 }
 
 function cleanField(field: SchemaFieldDraft): SchemaFieldDraft {
-  return field.type === "relation" ? field : { ...field, relationSchemaId: undefined };
+  return field.type === "relation"
+    ? { ...field, relationType: field.relationType ?? "manyToOne" }
+    : { ...field, relationSchemaId: undefined, relationType: undefined };
 }
