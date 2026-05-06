@@ -480,7 +480,7 @@ Each task uses this structure:
 #### T430 - Improve User Create Form
 
 - Version: `v4.6.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Improve user creation form and validation presentation.
 - Persona: Form UX engineer; make user creation safe.
 - Success Criteria: Email, password, role selector, and status messages are clean and accessible.

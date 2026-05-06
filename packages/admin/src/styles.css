@@ -362,6 +362,28 @@ code {
   margin: 0;
 }
 
+.user-form {
+  background: var(--admin-color-surface);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  max-width: 760px;
+  padding: var(--admin-space-5);
+}
+
+.user-form > div {
+  display: grid;
+  gap: var(--admin-space-2);
+}
+
+.user-form label {
+  color: var(--admin-color-text);
+}
+
+.user-form-actions {
+  justify-items: start;
+}
+
 .user-row {
   background: var(--admin-color-surface-raised);
   border: 1px solid var(--admin-color-border-soft);

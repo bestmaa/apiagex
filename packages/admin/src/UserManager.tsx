@@ -49,19 +49,40 @@ export function UserManager() {
       <h2 id="user-manager-title">Users</h2>
       <p>English: Create users and assign exactly one role for MVP access checks.</p>
       <p>Hinglish: Users banao aur MVP access checks ke liye exactly ek role assign karo.</p>
-      <form onSubmit={submitUser}>
-        <label>User email <input name="email" required type="email" /></label>
-        <label>User password <input name="password" required minLength={8} type="password" /></label>
-        <label>User role
-          <select name="roleId" required>
+      <form className="user-form" aria-describedby="user-form-help" onSubmit={submitUser}>
+        <div>
+          <label htmlFor="user-email">User email</label>
+          <input autoComplete="email" id="user-email" name="email" placeholder="editor@example.com" required type="email" />
+        </div>
+        <div>
+          <label htmlFor="user-password">Temporary password</label>
+          <input
+            autoComplete="new-password"
+            id="user-password"
+            minLength={8}
+            name="password"
+            placeholder="Minimum 8 characters"
+            required
+            type="password"
+          />
+        </div>
+        <div>
+          <label htmlFor="user-role">User role</label>
+          <select disabled={roles.length === 0} id="user-role" name="roleId" required>
             <option value="">Select role</option>
             {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
           </select>
-        </label>
-        <button disabled={roles.length === 0} type="submit">
-          <Plus aria-hidden="true" size={16} />
-          Create user
-        </button>
+          {roles.length === 0 ? <span className="helper-text">Create a role before adding users.</span> : null}
+        </div>
+        <p className="helper-text" id="user-form-help">
+          Passwords are submitted once and never displayed in the user list.
+        </p>
+        <div className="user-form-actions">
+          <button disabled={roles.length === 0} type="submit">
+            <Plus aria-hidden="true" size={16} />
+            Create user
+          </button>
+        </div>
       </form>
       <StateMessage title="User state">{status}</StateMessage>
       <UserList users={users} />
