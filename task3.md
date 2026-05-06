@@ -386,7 +386,7 @@ Each task uses this structure:
 #### T325 - Add Relation Response Shape Docs
 
 - Version: `v2.3.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Document raw relation ids vs populated relation response shapes.
 - Persona: API documentation writer; prevent client confusion.
 - Success Criteria: `/doc` and `/readme` show request and response examples.
