@@ -321,7 +321,7 @@ Each task uses this structure:
 #### T320 - Return Relation Metadata In Schema APIs
 
 - Version: `v2.3.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Ensure schema API responses include relation type and target schema metadata.
 - Persona: API contract engineer; make Admin UI able to render relation controls.
 - Success Criteria: Schema list/read responses include enough relation metadata for UI forms.

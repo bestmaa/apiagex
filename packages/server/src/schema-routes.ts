@@ -6,10 +6,14 @@ import {
   listSchemas,
   updateSchema,
   type SqliteDatabase,
+  type FieldRecord,
+  type SchemaRecord,
 } from "@apiagex/database";
 import type {
+  SchemaFieldResponse,
   SchemaCreateBody,
   SchemaParams,
+  SchemaResponseRecord,
   SchemaUpdateBody,
 } from "./schema-routes.type.js";
 
@@ -19,12 +23,15 @@ export function registerSchemaRoutes(
 ): void {
   server.get("/api/admin/schemas", async () => ({
     ok: true,
-    schemas: listSchemas(database),
+    schemas: listSchemas(database).map((schema) => toSchemaResponse(database, schema)),
   }));
 
   server.post<{ Body: SchemaCreateBody }>("/api/admin/schemas", async (request, reply) => {
     try {
-      return { ok: true, schema: createSchema(database, request.body) };
+      return {
+        ok: true,
+        schema: toSchemaResponse(database, createSchema(database, request.body)),
+      };
     } catch (error) {
       return sendSchemaError(reply, error, 400);
     }
@@ -35,7 +42,7 @@ export function registerSchemaRoutes(
     if (!schema) {
       return reply.code(404).send({ ok: false, error: "SCHEMA_NOT_FOUND" });
     }
-    return { ok: true, schema };
+    return { ok: true, schema: toSchemaResponse(database, schema) };
   });
 
   server.put<{ Body: SchemaUpdateBody; Params: SchemaParams }>(
@@ -44,7 +51,7 @@ export function registerSchemaRoutes(
       try {
         return {
           ok: true,
-          schema: updateSchema(database, request.params.id, request.body),
+          schema: toSchemaResponse(database, updateSchema(database, request.params.id, request.body)),
         };
       } catch (error) {
         const statusCode = errorCode(error) === "SCHEMA_NOT_FOUND" ? 404 : 400;
@@ -62,6 +69,27 @@ export function registerSchemaRoutes(
       return sendSchemaError(reply, error, statusCode);
     }
   });
+}
+
+function toSchemaResponse(database: SqliteDatabase, schema: SchemaRecord): SchemaResponseRecord {
+  return {
+    ...schema,
+    fields: schema.fields.map((field) => toFieldResponse(database, field)),
+  };
+}
+
+function toFieldResponse(database: SqliteDatabase, field: FieldRecord): SchemaFieldResponse {
+  if (field.type !== "relation" || !field.relationSchemaId) return field;
+  const target = getSchemaById(database, field.relationSchemaId);
+  if (!target) return field;
+  return {
+    ...field,
+    relationTarget: {
+      id: target.id,
+      name: target.name,
+      slug: target.slug,
+    },
+  };
 }
 
 function sendSchemaError(reply: FastifyReply, error: unknown, statusCode: number): FastifyReply {

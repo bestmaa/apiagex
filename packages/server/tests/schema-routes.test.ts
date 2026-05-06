@@ -99,6 +99,15 @@ describe("schema admin APIs", () => {
     });
     expect(book.statusCode).toBe(200);
     expect(book.json().schema.fields[0].relationSchemaId).toBe(authorId);
+    expect(book.json().schema.fields[0].relationType).toBe("manyToOne");
+    expect(book.json().schema.fields[0].relationTarget).toMatchObject({
+      id: authorId,
+      slug: "author",
+    });
+
+    const list = await server.inject({ method: "GET", url: "/api/admin/schemas" });
+    const listedBook = list.json().schemas.find((schema: { slug: string }) => schema.slug === "book");
+    expect(listedBook.fields[0].relationTarget).toMatchObject({ id: authorId, slug: "author" });
 
     const bad = await server.inject({
       method: "POST",

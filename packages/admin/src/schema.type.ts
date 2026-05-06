@@ -27,6 +27,12 @@ export type RelationFieldContract = {
   valueShape: "single" | "multi";
 };
 
+export type RelationTargetSummary = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 export type SchemaFieldDraft = {
   name: string;
   slug: string;
@@ -34,6 +40,7 @@ export type SchemaFieldDraft = {
   required: boolean;
   relationSchemaId?: string;
   relationType?: RelationType;
+  relationTarget?: RelationTargetSummary;
 };
 
 export type SchemaDraft = {
