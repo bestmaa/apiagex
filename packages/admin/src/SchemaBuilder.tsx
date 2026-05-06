@@ -3,6 +3,7 @@ import { FilePlus, Pencil, Plus, Trash2 } from "lucide-react";
 import { createSchema, listEntries, listSchemas, updateSchema } from "./api";
 import { SchemaInventoryList } from "./components/SchemaInventoryList";
 import { StateMessage } from "./components/StateMessage";
+import { StatusToast } from "./components/StatusToast";
 import type { FieldType, RelationType, SchemaDraft, SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
 const fieldTypes: FieldType[] = [
@@ -188,7 +189,7 @@ export function SchemaBuilder() {
           {selectedId ? <button type="button" onClick={resetDraft}>New schema</button> : null}
         </div>
       </form>
-      <StateMessage title="Schema state">{status}</StateMessage>
+      <StatusToast title="Schema status">{status}</StatusToast>
       <SchemaDetails schema={schemas.find((schema) => schema.id === selectedId)} />
       <SchemaInventoryList onSelect={selectSchema} schemas={schemas} selectedId={selectedId} />
     </section>

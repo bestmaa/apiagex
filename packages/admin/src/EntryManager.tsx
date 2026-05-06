@@ -3,6 +3,7 @@ import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { createEntry, deleteEntry, listEntries, listSchemas, updateEntry } from "./api";
 import { ConfirmDialog } from "./components/ConfirmDialog";
 import { StateMessage } from "./components/StateMessage";
+import { StatusToast } from "./components/StatusToast";
 import type { EntryData, EntryRecord, EntryFormProps } from "./entry.type";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
@@ -104,7 +105,7 @@ export function EntryManager() {
       ) : (
         <StateMessage title="No schema available" variant="empty">Create a schema first.</StateMessage>
       )}
-      <StateMessage title="Entry state">{status}</StateMessage>
+      <StatusToast title="Entry status">{status}</StatusToast>
       {schema ? (
         <EntryList
           entries={entries}
@@ -206,7 +207,7 @@ function GeneratedEntryForm({
           </button>
         ) : null}
       </div>
-      <StateMessage title="Entry form state">{status || "Entry form ready"}</StateMessage>
+      <StatusToast title="Entry form status">{status || "Entry form ready"}</StatusToast>
     </form>
   );
 }

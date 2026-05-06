@@ -1333,6 +1333,43 @@ code {
   margin: 0;
 }
 
+.status-toast {
+  background: var(--admin-color-surface-muted);
+  border: 1px solid var(--admin-color-border-soft);
+  border-left: var(--admin-space-1) solid var(--admin-color-disabled);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text-soft);
+  display: grid;
+  gap: var(--admin-space-1);
+  margin: 0;
+  padding: var(--admin-space-3) var(--admin-space-4);
+  user-select: text;
+}
+
+.status-toast strong {
+  color: var(--admin-color-text-strong);
+}
+
+.status-toast p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.status-toast-success,
+.status-toast-status {
+  border-left-color: var(--admin-color-primary);
+}
+
+.status-toast-loading {
+  border-left-color: var(--admin-color-disabled);
+}
+
+.status-toast-error {
+  background: var(--admin-color-warning-bg);
+  border-color: var(--admin-color-warning-border);
+  color: var(--admin-color-warning-text);
+}
+
 .state-message strong {
   color: var(--admin-color-text-strong);
 }

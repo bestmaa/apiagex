@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Copy } from "lucide-react";
 import { listSchemas } from "./api";
 import { StateMessage } from "./components/StateMessage";
+import { StatusToast } from "./components/StatusToast";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
 const actions = [
@@ -30,7 +31,7 @@ export function ApiList() {
       <h2 id="api-list-title">API Explorer</h2>
       <p>English: Inspect generated content endpoints, payloads, role headers, and responses.</p>
       <p>Hinglish: Generated content endpoints, payloads, role headers, aur responses inspect karo.</p>
-      <StateMessage title="API state">{status}</StateMessage>
+      <StatusToast title="API status">{status}</StatusToast>
       {schemas.length === 0 ? (
         <StateMessage title="No generated APIs yet" variant="empty">
           Create a schema first. Each schema exposes list, create, read, update, and delete content routes.
@@ -81,7 +82,7 @@ function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
         <ApiExample onCopy={copy} title="Response examples" value={responseExamples(schema)} />
         <ApiExample onCopy={copy} title="RBAC request hint" value={{ headers: { "x-apiagex-role-id": "ROLE_ID" }, blocked: { ok: false, error: "API_PERMISSION_DENIED" } }} />
       </div>
-      {copied ? <p className="status-line">{copied}</p> : null}
+      {copied ? <StatusToast title="Copy status">{copied}</StatusToast> : null}
     </article>
   );
 }

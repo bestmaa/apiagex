@@ -8,6 +8,7 @@ import {
   saveRolePermissions,
 } from "./api";
 import { StateMessage } from "./components/StateMessage";
+import { StatusToast } from "./components/StatusToast";
 import type {
   PermissionAction,
   PermissionDraft,
@@ -125,7 +126,7 @@ export function RoleManager() {
         <Save aria-hidden="true" size={16} />
         Save permissions
       </button>
-      <StateMessage title="Role state">{status}</StateMessage>
+      <StatusToast title="Role status">{status}</StatusToast>
     </section>
   );
 }

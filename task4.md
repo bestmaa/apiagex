@@ -588,7 +588,7 @@ Each task uses this structure:
 #### T438 - Add Toast Status System
 
 - Version: `v4.8.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Replace scattered status text with a consistent toast/status pattern where appropriate.
 - Persona: Feedback UX engineer; make save/create/delete outcomes clear.
 - Success Criteria: Core actions show consistent success/error feedback without hiding inline errors.

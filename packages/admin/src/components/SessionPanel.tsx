@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import type { OwnerSession } from "../session.type";
+import { StatusToast } from "./StatusToast";
 
 export function SessionPanel({
   onReset,
@@ -24,7 +25,7 @@ export function SessionPanel({
           <button type="button" onClick={onReset}>Reset session</button>
         </div>
       )}
-      <p className="status-line" id="owner-session-status">{status}</p>
+      <StatusToast title="Owner session status">{status}</StatusToast>
     </section>
   );
 }
