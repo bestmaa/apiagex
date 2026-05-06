@@ -65,6 +65,40 @@
   margin-bottom: 0;
 }
 
+.page-heading {
+  display: grid;
+  gap: var(--admin-space-2);
+  min-width: 0;
+}
+
+.page-heading p {
+  color: var(--admin-color-text-soft);
+  margin: 0;
+  max-width: 560px;
+}
+
+.admin-breadcrumb {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--admin-color-text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
+  gap: var(--admin-space-2);
+  padding: 0;
+  text-transform: uppercase;
+}
+
+.admin-breadcrumb a {
+  color: inherit;
+}
+
+.admin-breadcrumb span:last-child {
+  color: var(--admin-color-text-strong);
+}
+
 @media (max-width: 800px) {
   .admin-shell {
     grid-template-columns: 1fr;

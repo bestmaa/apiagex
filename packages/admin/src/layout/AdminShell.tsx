@@ -16,6 +16,16 @@ const navIcons = {
   users: Users,
 } satisfies Record<AdminRoute, typeof Home>;
 
+const pageDescriptions = {
+  apis: "Inspect generated content APIs and examples.",
+  dashboard: "Review workspace health and next actions.",
+  docs: "Read the owner workflow and API notes.",
+  entries: "Create, edit, and connect content entries.",
+  roles: "Configure role permissions for each API.",
+  schemas: "Design fields, relations, and generated APIs.",
+  users: "Invite users and assign exactly one role.",
+} satisfies Record<AdminRoute, string>;
+
 export function AdminShell({
   children,
   navItems,
@@ -60,9 +70,14 @@ export function AdminShell({
       </aside>
       <div className="admin-workspace">
         <header className="admin-topbar">
-          <div>
-            <p className="eyebrow">Headless CMS admin</p>
+          <div className="page-heading">
+            <nav aria-label="Breadcrumb" className="admin-breadcrumb">
+              <a href="#dashboard">Admin</a>
+              <span aria-hidden="true">/</span>
+              <span>{current?.label ?? "Dashboard"}</span>
+            </nav>
             <h2>{current?.label ?? "Dashboard"}</h2>
+            <p>{pageDescriptions[route]}</p>
           </div>
           <div className="header-actions">
             <ThemeToggle onToggle={onToggleTheme} theme={theme} />
