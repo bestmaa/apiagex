@@ -387,7 +387,7 @@ Each task uses this structure:
 #### T423 - Improve Payload Examples
 
 - Version: `v4.5.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make generated payload examples more useful.
 - Persona: Developer advocate; show realistic schema and relation payloads.
 - Success Criteria: Examples show single relation, multi relation, populate, and RBAC header hints where relevant.

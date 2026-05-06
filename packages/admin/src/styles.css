@@ -717,6 +717,18 @@ code {
   color: var(--admin-color-warning-text);
 }
 
+.api-example-grid {
+  display: grid;
+  gap: var(--admin-space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.api-example {
+  display: grid;
+  gap: var(--admin-space-3);
+  min-width: 0;
+}
+
 .api-row ul {
   display: flex;
   flex-wrap: wrap;
@@ -1018,6 +1030,7 @@ code {
   .dashboard-metrics,
   .dashboard-grid,
   .api-endpoint-list li,
+  .api-example-grid,
   .field-builder-grid,
   .field-relation-grid,
   .entry-selector,

@@ -63,13 +63,22 @@ function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
           </li>
         ))}
       </ul>
-      <strong>Payload</strong>
-      <pre><code>{JSON.stringify({ data: sampleData(schema.fields) }, null, 2)}</code></pre>
-      <strong>Populate routes</strong>
-      <pre><code>{JSON.stringify(populateExamples(schema.slug, schema.fields), null, 2)}</code></pre>
-      <strong>Response examples</strong>
-      <pre><code>{JSON.stringify(responseExamples(schema), null, 2)}</code></pre>
+      <div className="api-example-grid">
+        <ApiExample title="Create or update payload" value={{ data: sampleData(schema.fields) }} />
+        <ApiExample title="Populate routes" value={populateExamples(schema.slug, schema.fields)} />
+        <ApiExample title="Response examples" value={responseExamples(schema)} />
+        <ApiExample title="RBAC request hint" value={{ headers: { "x-apiagex-role-id": "ROLE_ID" }, blocked: { ok: false, error: "API_PERMISSION_DENIED" } }} />
+      </div>
     </article>
+  );
+}
+
+function ApiExample({ title, value }: { title: string; value: unknown }) {
+  return (
+    <section className="api-example">
+      <strong>{title}</strong>
+      <pre><code>{JSON.stringify(value, null, 2)}</code></pre>
+    </section>
   );
 }
 
@@ -85,7 +94,7 @@ function sampleValue(field: SchemaFieldDraft): unknown {
   if (field.type === "boolean") return true;
   if (field.type === "date") return "2026-05-05";
   if (field.type === "json") return { key: "value" };
-  if (field.type === "relation") return isMultiRelation(field) ? ["RELATED_ENTRY_ID_1", "RELATED_ENTRY_ID_2"] : "RELATED_ENTRY_ID";
+  if (field.type === "relation") return isMultiRelation(field) ? [`${field.slug.toUpperCase()}_ENTRY_ID_1`, `${field.slug.toUpperCase()}_ENTRY_ID_2`] : `${field.slug.toUpperCase()}_ENTRY_ID`;
   if (field.type === "media") return "/uploads/example.png";
   return `Example ${field.name}`;
 }
