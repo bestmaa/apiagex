@@ -3,17 +3,17 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid #8ab4ff;
+  outline: 3px solid var(--admin-color-focus);
   outline-offset: 2px;
 }
 
 pre {
-  background: #eef3f8;
-  border-radius: 6px;
+  background: var(--admin-color-surface-muted);
+  border-radius: var(--admin-radius-sm);
   margin: 0;
   max-width: 100%;
   overflow: auto;
-  padding: 10px;
+  padding: var(--admin-space-4);
 }
 
 pre code {
@@ -25,15 +25,15 @@ pre code {
 .action-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--admin-space-3);
 }
 
 .status-line {
-  border-left: 4px solid #175cd3;
+  border-left: var(--admin-space-1) solid var(--admin-color-primary);
 }
 
 .empty-state {
-  border-left: 4px solid #9aa7b8;
+  border-left: var(--admin-space-1) solid var(--admin-color-disabled);
 }
 
 @media (max-width: 700px) {

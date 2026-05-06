@@ -93,7 +93,7 @@ Each task uses this structure:
 #### T401 - Define Admin UI Design Tokens
 
 - Version: `v4.1.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a design token foundation for colors, spacing, typography, radii, borders, shadows, and focus states.
 - Persona: Design system engineer; make UI changes consistent before redesigning screens.
 - Success Criteria: Admin UI uses named CSS variables for light and dark mode foundations.

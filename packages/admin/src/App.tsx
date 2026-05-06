@@ -7,6 +7,7 @@ import { RoleManager } from "./RoleManager";
 import { SchemaBuilder } from "./SchemaBuilder";
 import { UserManager } from "./UserManager";
 import type { OwnerSession } from "./session.type";
+import "./tokens.css";
 import "./styles.css";
 import "./polish.css";
 
