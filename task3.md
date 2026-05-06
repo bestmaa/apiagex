@@ -215,7 +215,7 @@ Each task uses this structure:
 #### T312 - Validate Many-To-Many Entry Values
 
 - Version: `v2.2.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Validate `manyToMany` values as arrays of target entry ids.
 - Persona: Data integrity engineer; make multi-select relation safe.
 - Success Criteria: Valid tag-like arrays save; duplicates are normalized or rejected consistently; wrong-schema ids fail.

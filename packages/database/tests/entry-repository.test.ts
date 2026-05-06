@@ -212,6 +212,53 @@ describe("entry repository", () => {
       createEntry(db, { schemaId: authorSchema.id, data: { articles: ["missing"] } }),
     ).toThrow("RELATION_TARGET_ENTRY_INVALID:articles");
   });
+
+  it("validates many-to-many entry values", () => {
+    const db = openMigratedDb();
+    const tagSchema = createSchema(db, {
+      name: "Tag",
+      slug: "tag",
+      fields: [{ name: "Name", slug: "name", type: "text", required: true }],
+    });
+    const firstTag = createEntry(db, { schemaId: tagSchema.id, data: { name: "CMS" } });
+    const secondTag = createEntry(db, { schemaId: tagSchema.id, data: { name: "API" } });
+    const articleSchema = createSchema(db, {
+      name: "Article",
+      slug: "article",
+      fields: [
+        { name: "Title", slug: "title", type: "text", required: true },
+        {
+          name: "Tags",
+          slug: "tags",
+          type: "relation",
+          relationSchemaId: tagSchema.id,
+          relationType: "manyToMany",
+        },
+      ],
+    });
+
+    const article = createEntry(db, {
+      schemaId: articleSchema.id,
+      data: { tags: [firstTag.id, secondTag.id], title: "Tagged" },
+    });
+
+    expect(article.data.tags).toEqual([firstTag.id, secondTag.id]);
+    expect(() =>
+      createEntry(db, { schemaId: articleSchema.id, data: { tags: firstTag.id, title: "Bad" } }),
+    ).toThrow("RELATION_VALUE_SHAPE_INVALID:tags");
+    expect(() =>
+      createEntry(db, {
+        schemaId: articleSchema.id,
+        data: { tags: [firstTag.id, firstTag.id], title: "Duplicate" },
+      }),
+    ).toThrow("RELATION_VALUE_SHAPE_INVALID:tags");
+    expect(() =>
+      createEntry(db, {
+        schemaId: articleSchema.id,
+        data: { tags: ["missing"], title: "Missing" },
+      }),
+    ).toThrow("RELATION_TARGET_ENTRY_INVALID:tags");
+  });
 });
 
 function openMigratedDb() {
