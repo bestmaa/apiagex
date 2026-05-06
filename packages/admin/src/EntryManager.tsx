@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { createEntry, deleteEntry, listEntries, listSchemas, updateEntry } from "./api";
 import type { EntryData, EntryRecord, EntryFormProps } from "./entry.type";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
@@ -148,8 +149,16 @@ function GeneratedEntryForm({
           relationEntries={relationEntries[field.slug] ?? []}
         />
       ))}
-      <button type="submit">{editingEntry ? "Update entry" : "Create entry"}</button>
-      {editingEntry ? <button type="button" onClick={onCancelEdit}>Cancel edit</button> : null}
+      <button type="submit">
+        {editingEntry ? <Pencil aria-hidden="true" size={16} /> : <Plus aria-hidden="true" size={16} />}
+        {editingEntry ? "Update entry" : "Create entry"}
+      </button>
+      {editingEntry ? (
+        <button type="button" onClick={onCancelEdit}>
+          <X aria-hidden="true" size={16} />
+          Cancel edit
+        </button>
+      ) : null}
       <p className="status-line">{status || "Entry form ready"}</p>
     </form>
   );
@@ -234,8 +243,14 @@ function EntryList(props: {
               </li>
             ))}
           </ul>
-          <button type="button" onClick={() => onEdit(entry)}>Edit</button>
-          <button type="button" onClick={() => onDelete(entry)}>Delete</button>
+          <button type="button" onClick={() => onEdit(entry)}>
+            <Pencil aria-hidden="true" size={16} />
+            Edit
+          </button>
+          <button type="button" onClick={() => onDelete(entry)}>
+            <Trash2 aria-hidden="true" size={16} />
+            Delete
+          </button>
         </article>
       ))}
     </div>

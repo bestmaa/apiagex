@@ -1,3 +1,4 @@
+import { Moon, Sun } from "lucide-react";
 import type { AdminTheme } from "../theme.type";
 import "./theme-toggle.css";
 
@@ -9,6 +10,7 @@ export function ThemeToggle({
   theme: AdminTheme;
 }) {
   const nextTheme = theme === "dark" ? "light" : "dark";
+  const Icon = theme === "dark" ? Moon : Sun;
   return (
     <button
       aria-label={`Switch to ${nextTheme} mode`}
@@ -16,7 +18,7 @@ export function ThemeToggle({
       onClick={onToggle}
       type="button"
     >
-      <span aria-hidden="true">{theme === "dark" ? "D" : "L"}</span>
+      <Icon aria-hidden="true" size={16} />
       <span>{theme === "dark" ? "Dark" : "Light"}</span>
     </button>
   );

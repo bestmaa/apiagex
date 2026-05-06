@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
+import { FilePlus, Pencil, Plus } from "lucide-react";
 import { createSchema, listEntries, listSchemas, updateSchema } from "./api";
 import type { FieldType, RelationType, SchemaDraft, SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
@@ -144,8 +145,14 @@ export function SchemaBuilder() {
             />
           ))}
         </div>
-        <button type="button" onClick={() => setDraft({ ...draft, fields: [...draft.fields, { ...emptyField }] })}>Add field</button>
-        <button type="submit">{selectedId ? "Update schema" : "Create schema"}</button>
+        <button type="button" onClick={() => setDraft({ ...draft, fields: [...draft.fields, { ...emptyField }] })}>
+          <Plus aria-hidden="true" size={16} />
+          Add field
+        </button>
+        <button type="submit">
+          {selectedId ? <Pencil aria-hidden="true" size={16} /> : <FilePlus aria-hidden="true" size={16} />}
+          {selectedId ? "Update schema" : "Create schema"}
+        </button>
         {selectedId ? <button type="button" onClick={resetDraft}>New schema</button> : null}
       </form>
       <p className="status-line">{status}</p>
@@ -260,6 +267,7 @@ function SchemaList(props: {
           <strong>{schema.name}</strong>
           <span>/{schema.slug}</span>
           <button type="button" onClick={() => onSelect(schema)}>
+            <Pencil aria-hidden="true" size={16} />
             {selectedId === schema.id ? "Selected" : "Edit"}
           </button>
         </article>

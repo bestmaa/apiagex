@@ -1,9 +1,20 @@
 import type { ReactNode } from "react";
+import { BookOpen, Database, FileText, Home, KeyRound, Network, Users } from "lucide-react";
 import type { AdminNavItem, AdminRoute } from "../app-route.type";
 import type { OwnerSession } from "../session.type";
 import { ThemeToggle } from "../components/ThemeToggle";
 import type { AdminTheme } from "../theme.type";
 import "./admin-shell.css";
+
+const navIcons = {
+  apis: Network,
+  dashboard: Home,
+  docs: BookOpen,
+  entries: FileText,
+  roles: KeyRound,
+  schemas: Database,
+  users: Users,
+} satisfies Record<AdminRoute, typeof Home>;
 
 export function AdminShell({
   children,
@@ -31,16 +42,20 @@ export function AdminShell({
           <h1>Apiagex</h1>
         </div>
         <nav className="admin-nav" aria-label="Admin navigation">
-          {navItems.map((item) => (
-            <a
-              aria-current={route === item.route ? "page" : undefined}
-              className={route === item.route ? "active" : undefined}
-              href={`#${item.route}`}
-              key={item.route}
-            >
-              {item.label}
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const Icon = navIcons[item.route];
+            return (
+              <a
+                aria-current={route === item.route ? "page" : undefined}
+                className={route === item.route ? "active" : undefined}
+                href={`#${item.route}`}
+                key={item.route}
+              >
+                <Icon aria-hidden="true" size={16} />
+                <span>{item.label}</span>
+              </a>
+            );
+          })}
         </nav>
       </aside>
       <div className="admin-workspace">

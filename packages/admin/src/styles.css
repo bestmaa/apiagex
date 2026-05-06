@@ -145,12 +145,16 @@ textarea {
 }
 
 button {
+  align-items: center;
   background: var(--admin-color-primary);
   border: 0;
   border-radius: var(--admin-radius-sm);
   color: var(--admin-color-text-inverse);
   cursor: pointer;
+  display: inline-flex;
   font-weight: 700;
+  gap: var(--admin-space-2);
+  justify-content: center;
   min-height: var(--admin-control-height);
   padding: var(--admin-space-3) var(--admin-space-6);
   width: fit-content;

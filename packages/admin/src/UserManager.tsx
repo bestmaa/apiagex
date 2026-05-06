@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import { createUser, listRoles, listUsers } from "./api";
 import type { RoleRecord } from "./role.type";
 import type { UserRecord } from "./user.type";
@@ -56,7 +57,10 @@ export function UserManager() {
             {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
           </select>
         </label>
-        <button disabled={roles.length === 0} type="submit">Create user</button>
+        <button disabled={roles.length === 0} type="submit">
+          <Plus aria-hidden="true" size={16} />
+          Create user
+        </button>
       </form>
       <p className="status-line">{status}</p>
       <UserList users={users} />

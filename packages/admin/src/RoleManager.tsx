@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
+import { Plus, Save } from "lucide-react";
 import {
   createRole,
   listRolePermissions,
@@ -106,7 +107,10 @@ export function RoleManager() {
       <form onSubmit={submitRole}>
         <label>Role name <input name="name" pattern="[a-z](?:[a-z0-9]|-)*" required /></label>
         <label>Role description <input name="description" /></label>
-        <button type="submit">Create role</button>
+        <button type="submit">
+          <Plus aria-hidden="true" size={16} />
+          Create role
+        </button>
       </form>
       <RoleList activeRoleId={roleId} roles={roles} />
       <label>Active role
@@ -117,6 +121,7 @@ export function RoleManager() {
       </label>
       <PermissionGrid permissions={permissions} schemas={schemas} toggle={toggle} />
       <button disabled={!roleId || schemas.length === 0} onClick={() => void savePermissions()}>
+        <Save aria-hidden="true" size={16} />
         Save permissions
       </button>
       <p className="status-line">{status}</p>

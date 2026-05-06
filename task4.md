@@ -132,7 +132,7 @@ Each task uses this structure:
 #### T404 - Add Admin Icon System
 
 - Version: `v4.1.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add consistent icons for navigation and key actions.
 - Persona: Interface designer; improve scan speed without adding clutter.
 - Success Criteria: Dashboard, Schemas, Entries, APIs, Roles, Users, Docs, theme toggle, create, edit, delete have consistent icons.

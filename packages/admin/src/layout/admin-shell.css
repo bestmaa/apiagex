@@ -33,8 +33,10 @@
 }
 
 .admin-nav a {
+  align-items: center;
   color: var(--admin-color-text-soft);
-  display: block;
+  display: flex;
+  gap: var(--admin-space-3);
 }
 
 .admin-nav a:hover,
@@ -87,6 +89,7 @@
   }
 
   .admin-nav a {
+    justify-content: center;
     flex: 1 1 110px;
     text-align: center;
   }
