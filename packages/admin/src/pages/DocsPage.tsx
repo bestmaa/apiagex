@@ -1,4 +1,49 @@
-import { useState } from "react";
+import { BookOpen, ClipboardList, Database, KeyRound, Network, ShieldCheck, Table2, UserRound } from "lucide-react";
+
+const workflowSummaries = [
+  {
+    icon: UserRound,
+    title: "Owner setup",
+    route: "#dashboard",
+    routeLabel: "Open dashboard",
+    summary: "Bootstrap or log in as the owner, then use the same session to manage every protected admin workflow.",
+  },
+  {
+    icon: Database,
+    title: "Schema builder",
+    route: "#schemas",
+    routeLabel: "Build schemas",
+    summary: "Create collections with text, number, boolean, date, JSON, and relation fields before adding content.",
+  },
+  {
+    icon: Table2,
+    title: "Entries",
+    route: "#entries",
+    routeLabel: "Manage entries",
+    summary: "Select a schema, create entries, edit saved content, and fill relation fields with existing entry IDs.",
+  },
+  {
+    icon: KeyRound,
+    title: "Dynamic APIs",
+    route: "#apis",
+    routeLabel: "Review APIs",
+    summary: "Use generated endpoints for each schema and copy request examples from the API route list.",
+  },
+  {
+    icon: Network,
+    title: "Relations",
+    route: "#schemas",
+    routeLabel: "Model relations",
+    summary: "Choose one-to-one, one-to-many, many-to-one, or many-to-many when a field points to another schema.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "RBAC",
+    route: "#roles",
+    routeLabel: "Configure roles",
+    summary: "Create roles, assign allow/block permissions per schema and API method, then assign users to exactly one role.",
+  },
+];
 
 const relationSchemaExamples = [
   {
@@ -74,33 +119,55 @@ const relationSchemaExamples = [
 ];
 
 export function DocsPage() {
-  const [copied, setCopied] = useState("");
-
-  async function copyExample(title: string, payload: unknown) {
-    await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
-    setCopied(title);
-  }
-
   return (
-    <section>
-      <h2>Docs</h2>
-      <p>English: Product docs and readable project summary are served by the same API server.</p>
-      <p>Hinglish: Product docs aur readable project summary same API server se serve hote hain.</p>
-      <div className="action-row">
-        <a href="/doc">Open Docs</a>
-        <a href="/readme">Open Readme</a>
+    <section className="admin-docs" aria-labelledby="admin-docs-title">
+      <div className="admin-docs-hero">
+        <div>
+          <span className="section-kicker">Admin docs</span>
+          <h2 id="admin-docs-title">Build Apiagex in the right order</h2>
+          <p>English: Use this page as the short in-app map for owner, schema, entry, API, relation, role, and user workflows.</p>
+          <p>Hinglish: Ye page app ke andar short map hai, jisse setup aur admin flow order me samajh aaye.</p>
+        </div>
+        <div className="admin-docs-links" aria-label="Public documentation links">
+          <a href="/doc">
+            <BookOpen aria-hidden="true" size={16} />
+            Public docs
+          </a>
+          <a href="/readme">
+            <ClipboardList aria-hidden="true" size={16} />
+            Readme
+          </a>
+        </div>
       </div>
-      <h3>Relation Schema Examples</h3>
-      {relationSchemaExamples.map((example) => (
-        <article className="api-row" key={example.title}>
-          <strong>{example.title}</strong>
-          <pre><code>{JSON.stringify(example.payload, null, 2)}</code></pre>
-          <button type="button" onClick={() => void copyExample(example.title, example.payload)}>
-            Copy JSON
-          </button>
-        </article>
-      ))}
-      {copied ? <p className="status-line">Copied: {copied}</p> : null}
+
+      <div className="admin-doc-grid" aria-label="Admin workflow summary">
+        {workflowSummaries.map((item) => {
+          const Icon = item.icon;
+          return (
+            <article className="admin-doc-card" key={item.title}>
+              <div className="admin-doc-card-header">
+                <span className="admin-doc-icon"><Icon aria-hidden="true" size={18} /></span>
+                <h3>{item.title}</h3>
+              </div>
+              <p>{item.summary}</p>
+              <a href={item.route}>{item.routeLabel}</a>
+            </article>
+          );
+        })}
+      </div>
+
+      <section className="admin-doc-relations" aria-labelledby="relation-examples-title">
+        <div>
+          <span className="section-kicker">Relation examples</span>
+          <h3 id="relation-examples-title">Schema payload patterns</h3>
+        </div>
+        {relationSchemaExamples.map((example) => (
+          <article className="api-row" key={example.title}>
+            <strong>{example.title}</strong>
+            <pre><code>{JSON.stringify(example.payload, null, 2)}</code></pre>
+          </article>
+        ))}
+      </section>
     </section>
   );
 }

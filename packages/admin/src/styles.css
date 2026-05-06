@@ -414,6 +414,97 @@ code {
   margin: 0;
 }
 
+.admin-docs {
+  display: grid;
+  gap: var(--admin-space-6);
+}
+
+.admin-docs-hero {
+  align-items: start;
+  background: var(--admin-color-surface);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  display: grid;
+  gap: var(--admin-space-5);
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: var(--admin-space-6);
+}
+
+.admin-docs-hero h2,
+.admin-docs-hero p {
+  max-width: 760px;
+}
+
+.admin-docs-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+  justify-content: flex-end;
+}
+
+.admin-docs-links a,
+.admin-doc-card a {
+  align-items: center;
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-strong);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text);
+  display: inline-flex;
+  font-weight: 700;
+  gap: var(--admin-space-2);
+  min-height: var(--admin-control-height);
+  padding: var(--admin-space-2) var(--admin-space-4);
+  text-decoration: none;
+}
+
+.admin-doc-grid {
+  display: grid;
+  gap: var(--admin-space-4);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-doc-card {
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  display: grid;
+  gap: var(--admin-space-4);
+  padding: var(--admin-space-5);
+}
+
+.admin-doc-card p {
+  color: var(--admin-color-text-soft);
+  margin: 0;
+}
+
+.admin-doc-card-header {
+  align-items: center;
+  display: flex;
+  gap: var(--admin-space-3);
+}
+
+.admin-doc-card-header h3 {
+  margin: 0;
+}
+
+.admin-doc-icon {
+  align-items: center;
+  background: var(--admin-color-primary-soft);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-primary-strong);
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.admin-doc-relations {
+  display: grid;
+  gap: var(--admin-space-4);
+}
+
 .dashboard-metrics {
   display: grid;
   gap: var(--admin-space-5);
@@ -1228,6 +1319,8 @@ code {
   .entry-selector,
   .entry-form-grid,
   .entry-summary-list,
+  .admin-doc-grid,
+  .admin-docs-hero,
   .quick-action-list,
   .relation-guide dl,
   .role-row,
@@ -1240,6 +1333,10 @@ code {
 
   .user-row {
     grid-template-columns: 1fr;
+  }
+
+  .admin-docs-links {
+    justify-content: flex-start;
   }
 
   .field-builder-header,

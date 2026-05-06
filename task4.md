@@ -495,7 +495,7 @@ Each task uses this structure:
 #### T431 - Redesign Admin Docs View
 
 - Version: `v4.7.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make the Admin UI Docs route useful and visually consistent.
 - Persona: Product educator; explain current workflows inside the app.
 - Success Criteria: Docs route summarizes owner, schema, entry, API, relation, RBAC workflows with links.
