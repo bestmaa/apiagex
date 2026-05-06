@@ -241,7 +241,7 @@ Each task uses this structure:
 #### T314 - Add Relation Readback Tests
 
 - Version: `v2.2.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Verify relation values can be read back exactly after create and update.
 - Persona: Regression test engineer; catch persistence mismatches.
 - Success Criteria: Tests cover all four relation types after create/update/read.
