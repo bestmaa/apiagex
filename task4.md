@@ -671,7 +671,7 @@ Each task uses this structure:
 #### T444 - Verify Admin UI End To End Mobile
 
 - Version: `v4.10.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Run a mobile browser end-to-end check across the redesigned Admin UI.
 - Persona: Mobile QA engineer; catch mobile layout and workflow issues.
 - Success Criteria: Mobile browser verifies navigation, schema relation controls, entry pickers, API page, roles/users, docs route, light/dark.
@@ -679,6 +679,7 @@ Each task uses this structure:
 - Output: Mobile verification notes in task file or docs.
 - Strict Rule: No horizontal overflow or overlapping critical controls.
 - Verify: Mobile browser flow plus standard verification.
+- Verification Notes: Mobile 390x844 browser flow passed for mobile nav open/escape close, dark mode, schema route, relation entry picker, API page, role create, user create, Docs route, and no horizontal overflow.
 - Commit: `Verify admin mobile flow`
 
 #### T445 - Verify Admin Theme Coverage
