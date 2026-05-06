@@ -719,7 +719,7 @@ Each task uses this structure:
 #### T350 - Release Apiagex Task 3
 
 - Version: `v3.0.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Final Task 3 release gate for relation modeling.
 - Persona: Release engineer; only release what is verified.
 - Success Criteria: Standard verification passes, relation smoke passes, browser checks cover `/adminui`, `/doc`, `/readme`, and manual API/RBAC relation flow passes.
@@ -727,4 +727,5 @@ Each task uses this structure:
 - Output: Task 3 release checkpoint update.
 - Strict Rule: Do not mark complete with skipped browser checks unless the user explicitly accepts the risk.
 - Verify: Standard verification, Browser checks desktop/mobile, `/doc`, `/readme`, manual relation API/RBAC flow.
+- Verification Notes: Standard verification passed, relation smoke passed, browser checked `/adminui` desktop/mobile plus `/doc` and `/readme`, and live relation API/RBAC flow returned raw 200, populated 200, allowed 200, blocked 403.
 - Commit: `Release Apiagex task 3`
