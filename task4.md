@@ -575,7 +575,7 @@ Each task uses this structure:
 #### T437 - Polish Responsive Tables
 
 - Version: `v4.8.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make table/list content usable on mobile.
 - Persona: Responsive UI engineer; avoid horizontal overflow.
 - Success Criteria: Schema, entry, API, role, user lists fit at 390px without broken layout.

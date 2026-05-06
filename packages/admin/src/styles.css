@@ -687,7 +687,26 @@ code {
   border-top: 1px solid var(--admin-color-border-soft);
   display: grid;
   gap: var(--admin-space-3);
+  min-width: 0;
   padding: var(--admin-space-5) 0;
+}
+
+.schema-row *,
+.api-row *,
+.role-row *,
+.user-row *,
+.entry-row *,
+.schema-inventory-row * {
+  min-width: 0;
+}
+
+.schema-row code,
+.api-row code,
+.role-row code,
+.user-row code,
+.entry-row code,
+.schema-inventory-row code {
+  overflow-wrap: anywhere;
 }
 
 .schema-row {
@@ -1397,8 +1416,16 @@ code {
   }
 
   .field-builder-header,
+  .entry-row-actions,
+  .role-row-badges,
   .schema-form-actions {
     align-items: stretch;
+    display: grid;
+  }
+
+  .api-schema-heading,
+  .api-example-heading,
+  .entry-row-heading {
     display: grid;
   }
 
