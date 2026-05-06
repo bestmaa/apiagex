@@ -360,7 +360,7 @@ Each task uses this structure:
 #### T323 - Add Basic Relation Populate
 
 - Version: `v2.3.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add `?populate=relations` for one-level relation expansion.
 - Persona: API consumer advocate; reduce extra client round trips.
 - Success Criteria: Dynamic read/list can return related entries for relation fields.

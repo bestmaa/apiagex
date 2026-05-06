@@ -15,18 +15,35 @@ import type {
   ContentBody,
   ContentEntryParams,
   ContentListParams,
+  ContentPopulateQuery,
 } from "./content-routes.type.js";
+import { populateEntryRelations, shouldPopulateRelations } from "./relation-populate.js";
 
 export function registerContentRoutes(
   server: FastifyInstance,
   database: SqliteDatabase,
 ): void {
-  server.get<{ Params: ContentListParams }>("/api/content/:schemaSlug", async (request, reply) => {
-    const schema = findSchema(database, request.params.schemaSlug, reply);
-    if (!schema) return reply;
-    if (!canAccess(database, request, schema, "read")) return forbidden(reply);
-    return { ok: true, schema: schema.slug, entries: listEntries(database, schema.id) };
-  });
+  server.get<{ Params: ContentListParams; Querystring: ContentPopulateQuery }>(
+    "/api/content/:schemaSlug",
+    async (request, reply) => {
+      const schema = findSchema(database, request.params.schemaSlug, reply);
+      if (!schema) return reply;
+      if (!canAccess(database, request, schema, "read")) return forbidden(reply);
+      const entries = listEntries(database, schema.id);
+      if (!shouldPopulateRelations(request.query.populate)) {
+        return { ok: true, schema: schema.slug, entries };
+      }
+      return {
+        ok: true,
+        schema: schema.slug,
+        entries: entries.map((entry) =>
+          populateEntryRelations(database, schema, entry, (targetSchema) =>
+            canAccess(database, request, targetSchema, "read"),
+          ),
+        ),
+      };
+    },
+  );
 
   server.post<{ Body: ContentBody; Params: ContentListParams }>(
     "/api/content/:schemaSlug",
@@ -42,7 +59,7 @@ export function registerContentRoutes(
     },
   );
 
-  server.get<{ Params: ContentEntryParams }>(
+  server.get<{ Params: ContentEntryParams; Querystring: ContentPopulateQuery }>(
     "/api/content/:schemaSlug/:entryId",
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
@@ -51,6 +68,14 @@ export function registerContentRoutes(
       const entry = getEntryById(database, request.params.entryId);
       if (!entry || entry.schemaId !== schema.id) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
+      }
+      if (shouldPopulateRelations(request.query.populate)) {
+        return {
+          ok: true,
+          entry: populateEntryRelations(database, schema, entry, (targetSchema) =>
+            canAccess(database, request, targetSchema, "read"),
+          ),
+        };
       }
       return { ok: true, entry };
     },

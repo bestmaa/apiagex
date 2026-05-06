@@ -139,6 +139,56 @@ describe("dynamic content APIs", () => {
     expect(validUpdate.statusCode).toBe(200);
     expect(validUpdate.json().entry.data.author).toBe(authorId);
   });
+
+  it("populates one-level relation entries for dynamic read and list", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const authorSchemaId = await createAuthorSchema(server);
+    const bookSchemaId = await createBookSchema(server, authorSchemaId);
+    const author = await server.inject({
+      method: "POST",
+      url: "/api/content/author",
+      payload: { data: { name: "N. K. Jemisin" } },
+    });
+    const authorId = author.json().entry.id as string;
+    const book = await server.inject({
+      method: "POST",
+      url: "/api/content/book",
+      payload: { data: { title: "The Fifth Season", author: authorId } },
+    });
+    const bookId = book.json().entry.id as string;
+
+    const list = await server.inject({
+      method: "GET",
+      url: "/api/content/book?populate=relations",
+    });
+    expect(list.statusCode).toBe(200);
+    expect(list.json().entries[0].data.author).toMatchObject({
+      id: authorId,
+      schemaId: authorSchemaId,
+      data: { name: "N. K. Jemisin" },
+    });
+
+    const read = await server.inject({
+      method: "GET",
+      url: `/api/content/book/${bookId}?populate=relations`,
+    });
+    expect(read.statusCode).toBe(200);
+    expect(read.json().entry.data.author.data.name).toBe("N. K. Jemisin");
+
+    const bookReader = await createRole(server, "book-reader");
+    await server.inject({
+      method: "PUT",
+      url: `/api/admin/roles/${bookReader}/permissions`,
+      payload: { permissions: [{ schemaId: bookSchemaId, action: "read", allowed: true }] },
+    });
+    const blockedTarget = await server.inject({
+      method: "GET",
+      url: `/api/content/book/${bookId}?populate=relations`,
+      headers: { "x-apiagex-role-id": bookReader },
+    });
+    expect(blockedTarget.statusCode).toBe(200);
+    expect(blockedTarget.json().entry.data.author).toBeNull();
+  });
 });
 
 async function createArticleSchema(server: ReturnType<typeof createServer>): Promise<string> {
