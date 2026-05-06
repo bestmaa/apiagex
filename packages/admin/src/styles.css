@@ -458,6 +458,23 @@ code {
   text-decoration: none;
 }
 
+.admin-docs-links a {
+  display: grid;
+  gap: var(--admin-space-1);
+}
+
+.admin-docs-links a span {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--admin-space-2);
+}
+
+.admin-docs-links a code {
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  padding: 0;
+}
+
 .admin-doc-grid {
   display: grid;
   gap: var(--admin-space-4);

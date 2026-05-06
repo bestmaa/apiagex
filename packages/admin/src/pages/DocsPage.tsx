@@ -164,13 +164,19 @@ export function DocsPage() {
           <p>Hinglish: Ye page app ke andar short map hai, jisse setup aur admin flow order me samajh aaye.</p>
         </div>
         <div className="admin-docs-links" aria-label="Public documentation links">
-          <a href="/doc">
-            <BookOpen aria-hidden="true" size={16} />
-            Public docs
+          <a aria-label="Open public docs at /doc" href="/doc">
+            <span>
+              <BookOpen aria-hidden="true" size={16} />
+              Public docs
+            </span>
+            <code>/doc</code>
           </a>
-          <a href="/readme">
-            <ClipboardList aria-hidden="true" size={16} />
-            Readme
+          <a aria-label="Open readable project summary at /readme" href="/readme">
+            <span>
+              <ClipboardList aria-hidden="true" size={16} />
+              Readme
+            </span>
+            <code>/readme</code>
           </a>
         </div>
       </div>

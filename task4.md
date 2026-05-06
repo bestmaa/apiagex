@@ -521,7 +521,7 @@ Each task uses this structure:
 #### T433 - Link Public Docs From Admin UI
 
 - Version: `v4.7.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add clear links from Admin UI to `/doc` and `/readme`.
 - Persona: Documentation UX engineer; reduce confusion between in-app and public docs.
 - Success Criteria: Links are visible and open correct pages.
