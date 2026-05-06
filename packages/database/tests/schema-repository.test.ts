@@ -41,6 +41,7 @@ describe("schema repository", () => {
           slug: "author",
           type: "relation",
           relationSchemaId: author.id,
+          relationType: "manyToOne",
         },
       ],
     });
@@ -65,6 +66,55 @@ describe("schema repository", () => {
         ],
       }),
     ).toThrow("RELATION_TARGET_MISSING");
+  });
+
+  it("blocks invalid relation type metadata", () => {
+    const db = openMigratedDb();
+    const author = createSchema(db, {
+      name: "Author",
+      slug: "author",
+      fields: [{ name: "Name", slug: "name", type: "text" }],
+    });
+
+    expect(() =>
+      createSchema(db, {
+        name: "Book",
+        slug: "book",
+        fields: [
+          {
+            name: "Author",
+            slug: "author",
+            type: "relation",
+            relationSchemaId: author.id,
+            relationType: "wrong",
+          },
+        ],
+      }),
+    ).toThrow("RELATION_TYPE_INVALID");
+  });
+
+  it("blocks relation metadata on non-relation fields", () => {
+    const db = openMigratedDb();
+    const author = createSchema(db, {
+      name: "Author",
+      slug: "author",
+      fields: [{ name: "Name", slug: "name", type: "text" }],
+    });
+
+    expect(() =>
+      createSchema(db, {
+        name: "Book",
+        slug: "book",
+        fields: [
+          {
+            name: "Title",
+            slug: "title",
+            type: "text",
+            relationSchemaId: author.id,
+          },
+        ],
+      }),
+    ).toThrow("RELATION_METADATA_FOR_NON_RELATION_FIELD");
   });
 });
 

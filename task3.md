@@ -96,7 +96,7 @@ Each task uses this structure:
 #### T303 - Add Relation Field Metadata Validation
 
 - Version: `v2.1.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Validate relation metadata when schemas are created or updated.
 - Persona: Backend validation engineer; reject ambiguous relation definitions early.
 - Success Criteria: Relation fields require target schema id and relation type; invalid relation type fails with a clear error.

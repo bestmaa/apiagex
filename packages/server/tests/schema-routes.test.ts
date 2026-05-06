@@ -87,7 +87,13 @@ describe("schema admin APIs", () => {
         name: "Book",
         slug: "book",
         fields: [
-          { name: "Author", slug: "author", type: "relation", relationSchemaId: authorId },
+          {
+            name: "Author",
+            slug: "author",
+            type: "relation",
+            relationSchemaId: authorId,
+            relationType: "manyToOne",
+          },
         ],
       },
     });
@@ -105,5 +111,25 @@ describe("schema admin APIs", () => {
     });
     expect(bad.statusCode).toBe(400);
     expect(bad.json()).toEqual({ ok: false, error: "RELATION_TARGET_REQUIRED" });
+
+    const invalidType = await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Invalid Book",
+        slug: "invalid-book",
+        fields: [
+          {
+            name: "Author",
+            slug: "author",
+            type: "relation",
+            relationSchemaId: authorId,
+            relationType: "wrong",
+          },
+        ],
+      },
+    });
+    expect(invalidType.statusCode).toBe(400);
+    expect(invalidType.json()).toEqual({ ok: false, error: "RELATION_TYPE_INVALID" });
   });
 });

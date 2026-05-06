@@ -5,6 +5,7 @@ import type {
   CreateSchemaInput,
   FieldRecord,
   FieldType,
+  RelationType,
   SchemaRecord,
   UpdateSchemaInput,
 } from "./schema-repository.type.js";
@@ -19,6 +20,12 @@ const fieldTypes: FieldType[] = [
   "json",
   "media",
   "relation",
+];
+const relationTypes: RelationType[] = [
+  "oneToOne",
+  "oneToMany",
+  "manyToOne",
+  "manyToMany",
 ];
 
 export function createSchema(
@@ -149,12 +156,25 @@ function validateSchemaInput(db: SqliteDatabase, input: CreateSchemaInput): void
     if (!fieldTypes.includes(field.type)) {
       throw new Error("FIELD_TYPE_INVALID");
     }
-    if (field.type === "relation" && !field.relationSchemaId) {
-      throw new Error("RELATION_TARGET_REQUIRED");
+    validateRelationMetadata(db, field);
+  }
+}
+
+function validateRelationMetadata(db: SqliteDatabase, field: CreateFieldInput): void {
+  if (field.type !== "relation") {
+    if (field.relationSchemaId || field.relationType) {
+      throw new Error("RELATION_METADATA_FOR_NON_RELATION_FIELD");
     }
-    if (field.relationSchemaId && !getSchemaById(db, field.relationSchemaId)) {
-      throw new Error("RELATION_TARGET_MISSING");
-    }
+    return;
+  }
+  if (!field.relationSchemaId) {
+    throw new Error("RELATION_TARGET_REQUIRED");
+  }
+  if (!getSchemaById(db, field.relationSchemaId)) {
+    throw new Error("RELATION_TARGET_MISSING");
+  }
+  if (field.relationType && !relationTypes.includes(field.relationType)) {
+    throw new Error("RELATION_TYPE_INVALID");
   }
 }
 
