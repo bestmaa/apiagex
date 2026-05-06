@@ -175,6 +175,20 @@ describe("dynamic content APIs", () => {
     expect(read.statusCode).toBe(200);
     expect(read.json().entry.data.author.data.name).toBe("N. K. Jemisin");
 
+    const aliasRead = await server.inject({
+      method: "GET",
+      url: `/api/content/book/${bookId}?populate=*`,
+    });
+    expect(aliasRead.statusCode).toBe(200);
+    expect(aliasRead.json().entry.data.author.data.name).toBe("N. K. Jemisin");
+
+    const unknownPopulate = await server.inject({
+      method: "GET",
+      url: `/api/content/book/${bookId}?populate=deep`,
+    });
+    expect(unknownPopulate.statusCode).toBe(200);
+    expect(unknownPopulate.json().entry.data.author).toBe(authorId);
+
     const bookReader = await createRole(server, "book-reader");
     await server.inject({
       method: "PUT",

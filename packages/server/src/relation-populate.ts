@@ -12,7 +12,7 @@ export type PopulatedEntryRecord = Omit<EntryRecord, "data"> & {
 };
 
 export function shouldPopulateRelations(populate: unknown): boolean {
-  return populate === "relations";
+  return populate === "relations" || populate === "all" || populate === "*";
 }
 
 export function populateEntryRelations(

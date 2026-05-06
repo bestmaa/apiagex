@@ -373,7 +373,7 @@ Each task uses this structure:
 #### T324 - Add Populate All Alias
 
 - Version: `v2.3.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Support `?populate=all` and `?populate=*` aliases.
 - Persona: API ergonomics engineer; make developer usage predictable.
 - Success Criteria: Aliases behave the same as relation populate for current MVP.
