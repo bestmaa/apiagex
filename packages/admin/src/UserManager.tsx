@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { createUser, listRoles, listUsers } from "./api";
+import { StateMessage } from "./components/StateMessage";
 import type { RoleRecord } from "./role.type";
 import type { UserRecord } from "./user.type";
 
@@ -62,7 +63,7 @@ export function UserManager() {
           Create user
         </button>
       </form>
-      <p className="status-line">{status}</p>
+      <StateMessage title="User state">{status}</StateMessage>
       <UserList users={users} />
     </section>
   );
@@ -72,7 +73,11 @@ function UserList({ users }: { users: UserRecord[] }) {
   return (
     <div>
       <h3>Created Users</h3>
-      {users.length === 0 ? <p className="empty-state">No users yet</p> : users.map((user) => (
+      {users.length === 0 ? (
+        <StateMessage title="No users yet" variant="empty">
+          Create a user after at least one role is available.
+        </StateMessage>
+      ) : users.map((user) => (
         <article className="api-row" key={user.id}>
           <strong>{user.email}</strong>
           <span>Role: {user.roleName}</span>

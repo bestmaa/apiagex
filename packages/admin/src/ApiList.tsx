@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { listSchemas } from "./api";
+import { StateMessage } from "./components/StateMessage";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
 const actions = [
@@ -28,8 +29,12 @@ export function ApiList() {
       <h2 id="api-list-title">API Explorer</h2>
       <p>English: Inspect generated content endpoints, payloads, role headers, and responses.</p>
       <p>Hinglish: Generated content endpoints, payloads, role headers, aur responses inspect karo.</p>
-      <p className="status-line">{status}</p>
-      {schemas.length === 0 ? <p className="empty-state">No generated APIs yet</p> : schemas.map((schema) => (
+      <StateMessage title="API state">{status}</StateMessage>
+      {schemas.length === 0 ? (
+        <StateMessage title="No generated APIs yet" variant="empty">
+          Create a schema to expose content API routes.
+        </StateMessage>
+      ) : schemas.map((schema) => (
         <ApiExplorerRow key={schema.id} schema={schema} />
       ))}
     </section>

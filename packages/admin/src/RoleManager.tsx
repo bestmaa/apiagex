@@ -7,6 +7,7 @@ import {
   listSchemas,
   saveRolePermissions,
 } from "./api";
+import { StateMessage } from "./components/StateMessage";
 import type {
   PermissionAction,
   PermissionDraft,
@@ -124,13 +125,15 @@ export function RoleManager() {
         <Save aria-hidden="true" size={16} />
         Save permissions
       </button>
-      <p className="status-line">{status}</p>
+      <StateMessage title="Role state">{status}</StateMessage>
     </section>
   );
 }
 
 function RoleList({ activeRoleId, roles }: { activeRoleId: string; roles: RoleRecord[] }) {
-  if (roles.length === 0) return <p className="empty-state">No roles yet</p>;
+  if (roles.length === 0) {
+    return <StateMessage title="No roles yet" variant="empty">Create a role to start access setup.</StateMessage>;
+  }
   return (
     <div className="field-list">
       <h3>Role list</h3>
@@ -151,7 +154,11 @@ function PermissionGrid(props: {
 }) {
   return (
     <div className="permission-grid">
-      {props.schemas.length === 0 ? <p className="empty-state">Create a schema before assigning permissions.</p> : props.schemas.map((schema) => (
+      {props.schemas.length === 0 ? (
+        <StateMessage title="No schemas for permissions" variant="empty">
+          Create a schema before assigning permissions.
+        </StateMessage>
+      ) : props.schemas.map((schema) => (
         <fieldset key={schema.id}>
           <legend>{schema.name} API - /api/content/{schema.slug}</legend>
           {actions.map((action) => (

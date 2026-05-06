@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { BookOpen, Database, FileText, KeyRound, Network, Users } from "lucide-react";
 import { listEntries, listRoles, listSchemas, listUsers } from "./api";
+import { StateMessage } from "./components/StateMessage";
 import type { RoleRecord } from "./role.type";
 import type { SchemaRecord } from "./schema.type";
 import type { UserRecord } from "./user.type";
@@ -67,7 +68,7 @@ export function DashboardPage({ sessionPanel }: { sessionPanel: ReactNode }) {
       {sessionPanel}
       <section>
         <h2>Workspace Summary</h2>
-        <p className="status-line">{status}</p>
+        <StateMessage title="Dashboard state">{status}</StateMessage>
         {state ? <DashboardSummary state={state} /> : null}
       </section>
     </>

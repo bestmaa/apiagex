@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { FilePlus, Pencil, Plus } from "lucide-react";
 import { createSchema, listEntries, listSchemas, updateSchema } from "./api";
+import { StateMessage } from "./components/StateMessage";
 import type { FieldType, RelationType, SchemaDraft, SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
 const fieldTypes: FieldType[] = [
@@ -155,7 +156,7 @@ export function SchemaBuilder() {
         </button>
         {selectedId ? <button type="button" onClick={resetDraft}>New schema</button> : null}
       </form>
-      <p className="status-line">{status}</p>
+      <StateMessage title="Schema state">{status}</StateMessage>
       <SchemaDetails schema={schemas.find((schema) => schema.id === selectedId)} />
       <SchemaList onSelect={selectSchema} schemas={schemas} selectedId={selectedId} />
     </section>
@@ -198,7 +199,11 @@ function SchemaFieldRow(props: {
               ))}
             </select>
           </label>
-          {schemas.length === 0 ? <p className="empty-state">No target schemas available yet.</p> : null}
+          {schemas.length === 0 ? (
+            <StateMessage title="No target schemas available" variant="empty">
+              Create another schema before selecting a relation target.
+            </StateMessage>
+          ) : null}
           {selectedTarget ? <p className="helper-text">Target: {selectedTarget.name} /{selectedTarget.slug}</p> : null}
           {showEditWarning ? (
             <p className="warning-text">
@@ -221,7 +226,9 @@ function fieldTypePatch(type: FieldType): Partial<SchemaFieldDraft> {
 }
 
 function SchemaDetails({ schema }: { schema?: SchemaRecord }) {
-  if (!schema) return <p className="empty-state">Select a schema to inspect fields.</p>;
+  if (!schema) {
+    return <StateMessage title="No schema selected" variant="empty">Select a schema to inspect fields.</StateMessage>;
+  }
   const relationFields = schema.fields.filter((field) => field.type === "relation");
   return (
     <div className="api-row">
@@ -262,7 +269,11 @@ function SchemaList(props: {
   return (
     <div>
       <h3>Created Schemas</h3>
-      {schemas.length === 0 ? <p className="empty-state">No schemas yet</p> : schemas.map((schema) => (
+      {schemas.length === 0 ? (
+        <StateMessage title="No schemas yet" variant="empty">
+          Create a schema to generate the first API.
+        </StateMessage>
+      ) : schemas.map((schema) => (
         <article className="schema-row" key={schema.id}>
           <strong>{schema.name}</strong>
           <span>/{schema.slug}</span>

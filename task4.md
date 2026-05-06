@@ -212,7 +212,7 @@ Each task uses this structure:
 #### T410 - Add Empty Loading Error States
 
 - Version: `v4.2.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Standardize empty, loading, and error states across Admin UI.
 - Persona: Product UX engineer; make system state understandable.
 - Success Criteria: Schemas, Entries, APIs, Roles, Users have clear states.

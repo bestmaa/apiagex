@@ -431,11 +431,37 @@ code {
 
 .api-row li,
 .status-line,
-.empty-state {
+.empty-state,
+.state-message {
   background: var(--admin-color-surface-muted);
   border-radius: var(--admin-radius-sm);
   color: var(--admin-color-text-soft);
   padding: var(--admin-space-3) var(--admin-space-4);
+}
+
+.state-message {
+  border-left: var(--admin-space-1) solid var(--admin-color-disabled);
+  display: grid;
+  gap: var(--admin-space-1);
+  margin: 0;
+}
+
+.state-message strong {
+  color: var(--admin-color-text-strong);
+}
+
+.state-message p {
+  margin: 0;
+}
+
+.state-message-status,
+.state-message-loading {
+  border-left-color: var(--admin-color-primary);
+}
+
+.state-message-error {
+  border-left-color: var(--admin-color-warning-border);
+  color: var(--admin-color-warning-text);
 }
 
 .helper-text {

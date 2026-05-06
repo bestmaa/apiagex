@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { createEntry, deleteEntry, listEntries, listSchemas, updateEntry } from "./api";
+import { StateMessage } from "./components/StateMessage";
 import type { EntryData, EntryRecord, EntryFormProps } from "./entry.type";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
@@ -97,8 +98,10 @@ export function EntryManager() {
           relationEntries={relationEntries}
           schema={schema}
         />
-      ) : <p className="empty-state">Create a schema first.</p>}
-      <p className="status-line">{status}</p>
+      ) : (
+        <StateMessage title="No schema available" variant="empty">Create a schema first.</StateMessage>
+      )}
+      <StateMessage title="Entry state">{status}</StateMessage>
       {schema ? (
         <EntryList
           entries={entries}
@@ -159,7 +162,7 @@ function GeneratedEntryForm({
           Cancel edit
         </button>
       ) : null}
-      <p className="status-line">{status || "Entry form ready"}</p>
+      <StateMessage title="Entry form state">{status || "Entry form ready"}</StateMessage>
     </form>
   );
 }
@@ -232,7 +235,11 @@ function EntryList(props: {
   return (
     <div>
       <h3>Entries</h3>
-      {entries.length === 0 ? <p className="empty-state">No entries yet</p> : entries.map((entry) => (
+      {entries.length === 0 ? (
+        <StateMessage title="No entries yet" variant="empty">
+          Create the first entry for this schema.
+        </StateMessage>
+      ) : entries.map((entry) => (
         <article className="api-row" key={entry.id}>
           <strong>{entry.id.slice(0, 8)}</strong>
           <ul className="entry-summary-list">
