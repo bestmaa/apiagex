@@ -266,4 +266,31 @@ code {
   .schema-row {
     grid-template-columns: 1fr;
   }
+
+  form {
+    max-width: none;
+    width: 100%;
+  }
+
+  fieldset {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  input,
+  select,
+  textarea {
+    min-width: 0;
+  }
+
+  label,
+  .helper-text,
+  .warning-text {
+    overflow-wrap: anywhere;
+  }
+
+  .helper-text,
+  .warning-text {
+    line-height: 1.45;
+  }
 }

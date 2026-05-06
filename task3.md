@@ -531,7 +531,7 @@ Each task uses this structure:
 #### T336 - Polish Relation Builder Mobile Layout
 
 - Version: `v2.4.7`
-- Status: `pending`
+- Status: `completed`
 - Goal: Ensure relation builder controls fit and remain usable on mobile.
 - Persona: Responsive UI engineer; avoid cramped forms.
 - Success Criteria: Relation type picker, target picker, and hints fit at mobile width without overlap.
