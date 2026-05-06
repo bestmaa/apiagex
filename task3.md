@@ -334,7 +334,7 @@ Each task uses this structure:
 #### T321 - Add Relation-Aware Entry API Validation
 
 - Version: `v2.3.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Ensure admin entry APIs return clear relation validation errors.
 - Persona: API engineer; make request failures actionable.
 - Success Criteria: Create/update admin entry routes reject invalid relation payloads with stable errors.

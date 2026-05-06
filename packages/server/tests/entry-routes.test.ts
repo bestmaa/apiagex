@@ -58,6 +58,48 @@ describe("entry admin APIs", () => {
       error: "ENTRY_FIELD_TYPE_INVALID:title",
     });
   });
+
+  it("returns relation validation errors from entry create and update", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const authorSchemaId = await createAuthorSchema(server);
+    const bookSchemaId = await createBookSchema(server, authorSchemaId);
+    const author = await server.inject({
+      method: "POST",
+      url: `/api/admin/schemas/${authorSchemaId}/entries`,
+      payload: { data: { name: "Octavia Butler" } },
+    });
+    const authorId = author.json().entry.id as string;
+    const book = await server.inject({
+      method: "POST",
+      url: `/api/admin/schemas/${bookSchemaId}/entries`,
+      payload: { data: { title: "Kindred", author: authorId } },
+    });
+    const bookId = book.json().entry.id as string;
+
+    const invalidShape = await server.inject({
+      method: "POST",
+      url: `/api/admin/schemas/${bookSchemaId}/entries`,
+      payload: { data: { title: "Bad shape", author: [authorId] } },
+    });
+
+    expect(invalidShape.statusCode).toBe(400);
+    expect(invalidShape.json()).toEqual({
+      ok: false,
+      error: "RELATION_VALUE_SHAPE_INVALID:author",
+    });
+
+    const invalidTarget = await server.inject({
+      method: "PUT",
+      url: `/api/admin/schemas/${bookSchemaId}/entries/${bookId}`,
+      payload: { data: { title: "Bad target", author: randomUUID() } },
+    });
+
+    expect(invalidTarget.statusCode).toBe(400);
+    expect(invalidTarget.json()).toEqual({
+      ok: false,
+      error: "RELATION_TARGET_ENTRY_INVALID:author",
+    });
+  });
 });
 
 async function createArticleSchema(server: ReturnType<typeof createServer>): Promise<string> {
@@ -70,6 +112,45 @@ async function createArticleSchema(server: ReturnType<typeof createServer>): Pro
       fields: [
         { name: "Title", slug: "title", type: "text", required: true },
         { name: "Views", slug: "views", type: "number" },
+      ],
+    },
+  });
+  return response.json().schema.id as string;
+}
+
+async function createAuthorSchema(server: ReturnType<typeof createServer>): Promise<string> {
+  const response = await server.inject({
+    method: "POST",
+    url: "/api/admin/schemas",
+    payload: {
+      name: "Author",
+      slug: `author-${randomUUID()}`,
+      fields: [{ name: "Name", slug: "name", type: "text", required: true }],
+    },
+  });
+  return response.json().schema.id as string;
+}
+
+async function createBookSchema(
+  server: ReturnType<typeof createServer>,
+  authorSchemaId: string,
+): Promise<string> {
+  const response = await server.inject({
+    method: "POST",
+    url: "/api/admin/schemas",
+    payload: {
+      name: "Book",
+      slug: `book-${randomUUID()}`,
+      fields: [
+        { name: "Title", slug: "title", type: "text", required: true },
+        {
+          name: "Author",
+          slug: "author",
+          type: "relation",
+          relationSchemaId: authorSchemaId,
+          relationType: "manyToOne",
+          required: true,
+        },
       ],
     },
   });
