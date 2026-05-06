@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import {
+  MVP_ADDITIVE_MIGRATIONS_SQL,
   MVP_FOUNDATION_SQL,
   MVP_MIGRATION_ID,
   MVP_TABLES,
@@ -16,6 +17,7 @@ export function openSqliteDatabase(path = ":memory:"): SqliteDatabase {
 
 export function migrateMvpDatabase(db: SqliteDatabase): void {
   db.exec(MVP_FOUNDATION_SQL);
+  applyAdditiveMigrations(db);
   const existing = db
     .prepare("SELECT id, applied_at FROM migrations WHERE id = ?")
     .get(MVP_MIGRATION_ID) as MigrationRecord | undefined;
@@ -26,6 +28,22 @@ export function migrateMvpDatabase(db: SqliteDatabase): void {
       new Date().toISOString(),
     );
   }
+}
+
+function applyAdditiveMigrations(db: SqliteDatabase): void {
+  for (const sql of MVP_ADDITIVE_MIGRATIONS_SQL) {
+    try {
+      db.exec(sql);
+    } catch (error) {
+      if (!isDuplicateColumnError(error)) {
+        throw error;
+      }
+    }
+  }
+}
+
+function isDuplicateColumnError(error: unknown): boolean {
+  return error instanceof Error && error.message.includes("duplicate column name");
 }
 
 export function listMvpTables(db: SqliteDatabase): string[] {

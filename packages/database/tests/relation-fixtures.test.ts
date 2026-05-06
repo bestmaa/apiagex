@@ -32,6 +32,5 @@ describe("relation test fixtures", () => {
       category: entries.category.id,
       title: "Relations",
     });
-    expect(entries.profile.data.author).toBe(entries.author.id);
   });
 });

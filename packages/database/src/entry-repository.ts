@@ -8,7 +8,7 @@ import type {
   EntryRecord,
   UpdateEntryInput,
 } from "./entry-repository.type.js";
-import type { FieldRecord, SchemaRecord } from "./schema-repository.type.js";
+import type { FieldRecord, RelationType, SchemaRecord } from "./schema-repository.type.js";
 
 type EntryRow = {
   id: string;
@@ -111,6 +111,9 @@ function validateFieldValue(db: SqliteDatabase, field: FieldRecord, value: unkno
 }
 
 function assertRelation(db: SqliteDatabase, field: FieldRecord, value: unknown): void {
+  if (relationTypeOf(field) !== "manyToOne") {
+    throw new Error(relationValueShapeInvalid(field.slug));
+  }
   if (typeof value !== "string") {
     throw new Error(relationValueShapeInvalid(field.slug));
   }
@@ -118,6 +121,10 @@ function assertRelation(db: SqliteDatabase, field: FieldRecord, value: unknown):
   if (!target || target.schemaId !== field.relationSchemaId) {
     throw new Error(relationTargetEntryInvalid(field.slug));
   }
+}
+
+function relationTypeOf(field: FieldRecord): RelationType {
+  return field.relationType ?? "manyToOne";
 }
 
 function assertType(field: FieldRecord, valid: boolean): void {

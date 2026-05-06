@@ -176,7 +176,7 @@ Each task uses this structure:
 #### T309 - Validate Many-To-One Entry Values
 
 - Version: `v2.2.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Validate `manyToOne` values when creating or updating entries.
 - Persona: Data integrity engineer; ensure child entries point to valid parent entries.
 - Success Criteria: Valid target entry id saves; missing/invalid target entry fails; required relation is enforced.

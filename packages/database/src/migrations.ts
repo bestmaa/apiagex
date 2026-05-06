@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS fields (
   slug TEXT NOT NULL,
   type TEXT NOT NULL,
   relation_schema_id TEXT REFERENCES schemas(id),
+  relation_type TEXT,
   required INTEGER NOT NULL DEFAULT 0,
   position INTEGER NOT NULL,
   UNIQUE(schema_id, slug)
@@ -72,3 +73,7 @@ CREATE TABLE IF NOT EXISTS permissions (
   UNIQUE(role_id, schema_id, action)
 );
 `;
+
+export const MVP_ADDITIVE_MIGRATIONS_SQL = [
+  "ALTER TABLE fields ADD COLUMN relation_type TEXT",
+] as const;

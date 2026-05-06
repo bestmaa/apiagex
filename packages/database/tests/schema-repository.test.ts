@@ -47,6 +47,7 @@ describe("schema repository", () => {
     });
 
     expect(book.fields[0]?.relationSchemaId).toBe(author.id);
+    expect(book.fields[0]?.relationType).toBe("manyToOne");
   });
 
   it("blocks relation fields without an existing target", () => {

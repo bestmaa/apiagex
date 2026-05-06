@@ -124,7 +124,7 @@ function insertField(
   position: number,
 ): void {
   db.prepare(
-    "INSERT INTO fields (id, schema_id, name, slug, type, relation_schema_id, required, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO fields (id, schema_id, name, slug, type, relation_schema_id, relation_type, required, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
   ).run(
     randomUUID(),
     schemaId,
@@ -132,6 +132,7 @@ function insertField(
     field.slug,
     field.type,
     field.relationSchemaId ?? null,
+    field.relationType ?? null,
     field.required ? 1 : 0,
     position,
   );
@@ -140,7 +141,7 @@ function insertField(
 function listFields(db: SqliteDatabase, schemaId: string): FieldRecord[] {
   const rows = db
     .prepare(
-      "SELECT id, schema_id as schemaId, name, slug, type, relation_schema_id as relationSchemaId, required, position FROM fields WHERE schema_id = ? ORDER BY position ASC",
+      "SELECT id, schema_id as schemaId, name, slug, type, relation_schema_id as relationSchemaId, relation_type as relationType, required, position FROM fields WHERE schema_id = ? ORDER BY position ASC",
     )
     .all(schemaId) as Array<Omit<FieldRecord, "required"> & { required: number }>;
 

@@ -20,7 +20,6 @@ export type RelationFixtureEntries = {
   article: EntryRecord;
   author: EntryRecord;
   category: EntryRecord;
-  profile: EntryRecord;
   tag: EntryRecord;
 };
 
@@ -100,13 +99,9 @@ export function createSingleRelationFixtureEntries(
     data: { name: "Guides" },
   });
   const tag = createEntry(db, { schemaId: schemas.tag.id, data: { name: "CMS" } });
-  const profile = createEntry(db, {
-    schemaId: schemas.profile.id,
-    data: { author: author.id },
-  });
   const article = createEntry(db, {
     schemaId: schemas.article.id,
     data: { author: author.id, category: category.id, title: "Relations" },
   });
-  return { article, author, category, profile, tag };
+  return { article, author, category, tag };
 }

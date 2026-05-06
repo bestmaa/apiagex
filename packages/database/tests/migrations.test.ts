@@ -29,4 +29,15 @@ describe("MVP database foundation", () => {
     const count = db.prepare("SELECT COUNT(*) as count FROM migrations").get();
     expect(count).toEqual({ count: 1 });
   });
+
+  it("adds relation type metadata to fields", () => {
+    const db = openSqliteDatabase();
+
+    migrateMvpDatabase(db);
+
+    const fieldColumns = db.prepare("PRAGMA table_info(fields)").all() as Array<{
+      name: string;
+    }>;
+    expect(fieldColumns.map((column) => column.name)).toContain("relation_type");
+  });
 });

@@ -72,6 +72,7 @@ describe("entry repository", () => {
           slug: "author",
           type: "relation",
           relationSchemaId: authorSchema.id,
+          relationType: "manyToOne",
         },
       ],
     });
@@ -88,6 +89,38 @@ describe("entry repository", () => {
     expect(() =>
       createEntry(db, { schemaId: bookSchema.id, data: { author: ["not-single"] } }),
     ).toThrow("RELATION_VALUE_SHAPE_INVALID:author");
+  });
+
+  it("keeps legacy relation metadata as many-to-one", () => {
+    const db = openMigratedDb();
+    const authorSchema = createSchema(db, {
+      name: "Author",
+      slug: "author",
+      fields: [{ name: "Name", slug: "name", type: "text", required: true }],
+    });
+    const author = createEntry(db, {
+      schemaId: authorSchema.id,
+      data: { name: "Asha" },
+    });
+    const bookSchema = createSchema(db, {
+      name: "Book",
+      slug: "book",
+      fields: [
+        {
+          name: "Author",
+          slug: "author",
+          type: "relation",
+          relationSchemaId: authorSchema.id,
+        },
+      ],
+    });
+
+    const book = createEntry(db, {
+      schemaId: bookSchema.id,
+      data: { author: author.id },
+    });
+
+    expect(book.data.author).toBe(author.id);
   });
 });
 
