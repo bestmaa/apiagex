@@ -603,7 +603,7 @@ Each task uses this structure:
 #### T439 - Add Admin UI Visual QA Checklist
 
 - Version: `v4.9.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Document visual QA expectations for Admin UI.
 - Persona: QA lead; make design verification repeatable.
 - Success Criteria: Checklist covers light/dark, desktop/mobile, nav, forms, tables, dialogs, relation workflows, RBAC workflows.
