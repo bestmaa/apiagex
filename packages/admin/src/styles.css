@@ -405,6 +405,42 @@ code {
   gap: var(--admin-space-3);
 }
 
+.field-builder-row {
+  background: var(--admin-color-surface);
+}
+
+.field-builder-header {
+  align-items: center;
+  display: flex;
+  gap: var(--admin-space-4);
+  justify-content: space-between;
+}
+
+.field-builder-header legend {
+  padding: 0;
+}
+
+.field-builder-grid,
+.field-relation-grid {
+  display: grid;
+  gap: var(--admin-space-5);
+}
+
+.field-builder-grid {
+  align-items: end;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(150px, 0.6fr) auto;
+}
+
+.field-relation-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.field-relation-grid .helper-text,
+.field-relation-grid .warning-text,
+.field-relation-grid .state-message {
+  grid-column: 1 / -1;
+}
+
 .schema-inventory {
   display: grid;
   gap: var(--admin-space-5);
@@ -583,11 +619,19 @@ code {
 
   .dashboard-metrics,
   .dashboard-grid,
+  .field-builder-grid,
+  .field-relation-grid,
   .quick-action-list,
   .schema-basics-grid,
   .schema-inventory-row,
   .dashboard-panel .schema-row {
     grid-template-columns: 1fr;
+  }
+
+  .field-builder-header,
+  .schema-form-actions {
+    align-items: stretch;
+    display: grid;
   }
 
   form {

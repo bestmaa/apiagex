@@ -253,7 +253,7 @@ Each task uses this structure:
 #### T413 - Improve Field Builder Rows
 
 - Version: `v4.3.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make schema field rows compact and understandable.
 - Persona: Data modeling UX designer; make field editing less messy.
 - Success Criteria: Field name, slug, type, required, relation target/type, and remove action are visually organized.

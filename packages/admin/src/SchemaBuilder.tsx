@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { FilePlus, Pencil, Plus } from "lucide-react";
+import { FilePlus, Pencil, Plus, Trash2 } from "lucide-react";
 import { createSchema, listEntries, listSchemas, updateSchema } from "./api";
 import { SchemaInventoryList } from "./components/SchemaInventoryList";
 import { StateMessage } from "./components/StateMessage";
@@ -125,6 +125,15 @@ export function SchemaBuilder() {
     }));
   }
 
+  function removeField(index: number) {
+    setDraft((current) => ({
+      ...current,
+      fields: current.fields.length > 1
+        ? current.fields.filter((_, fieldIndex) => fieldIndex !== index)
+        : current.fields,
+    }));
+  }
+
   return (
     <section aria-labelledby="schema-builder-title">
       <h2 id="schema-builder-title">Schemas</h2>
@@ -148,6 +157,8 @@ export function SchemaBuilder() {
                 index={index}
                 key={`${field.slug}-${index}`}
                 onChange={updateField}
+                onRemove={removeField}
+                removable={draft.fields.length > 1}
                 selectedEntryCount={selectedEntryCount}
                 selectedSchemaId={selectedId}
                 schemas={schemas}
@@ -178,22 +189,33 @@ function SchemaFieldRow(props: {
   field: SchemaFieldDraft;
   index: number;
   onChange: (index: number, patch: Partial<SchemaFieldDraft>) => void;
+  onRemove: (index: number) => void;
+  removable: boolean;
   selectedEntryCount: number;
   selectedSchemaId: string;
   schemas: SchemaRecord[];
 }) {
-  const { field, index, onChange, schemas, selectedEntryCount, selectedSchemaId } = props;
+  const { field, index, onChange, onRemove, removable, schemas, selectedEntryCount, selectedSchemaId } = props;
   const selectedTarget = schemas.find((schema) => schema.id === field.relationSchemaId);
   const selectedRelation = relationTypes.find((relationType) => relationType.value === (field.relationType ?? "manyToOne"));
   const showEditWarning = Boolean(selectedSchemaId && field.type === "relation" && selectedEntryCount > 0);
   return (
-    <fieldset>
-      <legend>Field {index + 1}</legend>
-      <label>Field name <input required value={field.name} onChange={(event) => onChange(index, { name: event.target.value })} /></label>
-      <label>Field slug <input required pattern="[a-z](?:[a-z0-9]|-)*" value={field.slug} onChange={(event) => onChange(index, { slug: event.target.value })} /></label>
-      <label>Type <select value={field.type} onChange={(event) => onChange(index, fieldTypePatch(event.target.value as FieldType))}>{fieldTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
+    <fieldset className="field-builder-row">
+      <div className="field-builder-header">
+        <legend>Field {index + 1}</legend>
+        <button disabled={!removable} type="button" onClick={() => onRemove(index)}>
+          <Trash2 aria-hidden="true" size={16} />
+          Remove
+        </button>
+      </div>
+      <div className="field-builder-grid">
+        <label>Field name <input required value={field.name} onChange={(event) => onChange(index, { name: event.target.value })} /></label>
+        <label>Field slug <input required pattern="[a-z](?:[a-z0-9]|-)*" value={field.slug} onChange={(event) => onChange(index, { slug: event.target.value })} /></label>
+        <label>Type <select value={field.type} onChange={(event) => onChange(index, fieldTypePatch(event.target.value as FieldType))}>{fieldTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
+        <label><input checked={field.required} type="checkbox" onChange={(event) => onChange(index, { required: event.target.checked })} /> Required</label>
+      </div>
       {field.type === "relation" ? (
-        <>
+        <div className="field-relation-grid">
           <label>Relation type
             <select required value={field.relationType ?? "manyToOne"} onChange={(event) => onChange(index, { relationType: event.target.value as RelationType })}>
               {relationTypes.map((relationType) => (
@@ -222,9 +244,8 @@ function SchemaFieldRow(props: {
               Hinglish: Is schema me entries hain; relation type ya target change save par block ho sakta hai.
             </p>
           ) : null}
-        </>
+        </div>
       ) : null}
-      <label><input checked={field.required} type="checkbox" onChange={(event) => onChange(index, { required: event.target.checked })} /> Required</label>
     </fieldset>
   );
 }
