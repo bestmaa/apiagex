@@ -65,6 +65,10 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - MVP RBAC checkpoint version `v0.5.8` par ready hai.
 - Admin UI has cleaner layout, form controls, empty states, and responsive styling.
 - Admin UI me cleaner layout, form controls, empty states, aur responsive styling hai.
+- Task4 Admin UI redesign work now includes a custom app shell, light/dark theme toggle, responsive list polish, accessible keyboard navigation, confirm dialogs, and consistent status toasts.
+- Task4 Admin UI redesign work me custom app shell, light/dark theme toggle, responsive list polish, accessible keyboard navigation, confirm dialogs, aur consistent status toasts include hain.
+- Admin UI visual QA expectations are documented at [docs/admin-ui-visual-qa.md](./docs/admin-ui-visual-qa.md).
+- Admin UI visual QA expectations [docs/admin-ui-visual-qa.md](./docs/admin-ui-visual-qa.md) me documented hain.
 - MVP manual QA checklist is available at [docs/qa-checklist.md](./docs/qa-checklist.md).
 - MVP manual QA checklist [docs/qa-checklist.md](./docs/qa-checklist.md) me available hai.
 - `npm run smoke` covers the full MVP owner/schema/entry/dynamic API/RBAC flow.
@@ -87,6 +91,10 @@ The rebuilt product should let an owner:
 - allow/block APIs per role.
 
 Primary MVP paths: `/doc`, `/readme`, `/adminui`, and `/api`.
+
+Admin redesign note: `/adminui` remains the React Admin UI served by the API server, while `/doc` and `/readme` remain public static docs routes from the docs package. The redesign changes the visible Admin UI, not these server paths.
+
+Admin redesign note Hinglish: `/adminui` API server se served React Admin UI hi rahta hai, aur `/doc` plus `/readme` docs package ke public static docs routes hi rahte hain. Redesign visible Admin UI change karta hai, server paths nahi.
 
 ## Schema Builder Quick Use
 

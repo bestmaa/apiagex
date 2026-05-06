@@ -616,7 +616,7 @@ Each task uses this structure:
 #### T440 - Update Root Docs For Admin Redesign
 
 - Version: `v4.9.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Update README and PROJECT_CONTEXT with Task 4 design goals and completed UI behavior.
 - Persona: Project maintainer; keep context current.
 - Success Criteria: Root docs mention custom Admin UI redesign, light/dark mode, responsive verification, and preserved server paths.

@@ -71,6 +71,10 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - MVP RBAC checkpoint v0.5.8 ready hai.
 - Admin UI has polished layout, form controls, empty states, and responsive styling.
 - Admin UI me polished layout, form controls, empty states, aur responsive styling hai.
+- Task4 Admin UI redesign work adds a custom shell, theme tokens, light/dark mode, responsive list polish, keyboard navigation, accessible confirm dialogs, and status toasts.
+- Task4 Admin UI redesign work custom shell, theme tokens, light/dark mode, responsive list polish, keyboard navigation, accessible confirm dialogs, aur status toasts add karta hai.
+- Admin UI visual QA checklist is documented in `docs/admin-ui-visual-qa.md`.
+- Admin UI visual QA checklist `docs/admin-ui-visual-qa.md` me documented hai.
 - Manual QA checklist is documented in `docs/qa-checklist.md`.
 - Manual QA checklist `docs/qa-checklist.md` me documented hai.
 - `npm run smoke` covers the full MVP owner/schema/entry/dynamic API/RBAC flow.
@@ -112,6 +116,8 @@ One server must serve exactly these primary paths:
 - `/readme` gives a concise product/workspace summary.
 - `/adminui` is the browser UI for owner/admin/user workflows.
 - The current `/adminui` page includes Dashboard, Schemas, APIs, Roles, Users, and Docs navigation.
+- Current Task4 Admin UI status: Dashboard, Schemas, Entries, APIs, Roles, Users, and Docs use the redesigned shell, light/dark theme, responsive list patterns, keyboard skip/focus handling, accessible delete confirmation, and status toast pattern.
+- Current Task4 Admin UI status Hinglish: Dashboard, Schemas, Entries, APIs, Roles, Users, aur Docs redesigned shell, light/dark theme, responsive list patterns, keyboard skip/focus handling, accessible delete confirmation, aur status toast pattern use karte hain.
 
 ### Owner And Auth
 
@@ -197,6 +203,8 @@ One server must serve exactly these primary paths:
 - The API server serves built docs assets through stable `/doc` and `/readme` routes.
 - `/doc` loads the main docs page, and `/readme` loads the readable project summary page.
 - Missing docs build should return a clear fallback telling the developer to run the docs build.
+- Admin UI redesign must preserve the same server paths: `/adminui` for the React app, `/doc` for product/API docs, and `/readme` for the readable summary.
+- Admin UI redesign same server paths preserve karega: React app ke liye `/adminui`, product/API docs ke liye `/doc`, aur readable summary ke liye `/readme`.
 
 ## Local Persistence
 
