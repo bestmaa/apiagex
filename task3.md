@@ -585,7 +585,7 @@ Each task uses this structure:
 #### T340 - Add Relation Entry Labels
 
 - Version: `v2.5.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Display human-readable labels for related entries.
 - Persona: Content editor; make relation choices understandable.
 - Success Criteria: Picker options use a sensible title/name/id fallback.

@@ -260,8 +260,17 @@ function isEntryPickerRelationField(field: SchemaFieldDraft): boolean {
 }
 
 function entryLabel(entry: EntryRecord): string {
-  const firstValue = Object.values(entry.data).find((value) => typeof value === "string" || typeof value === "number");
+  const preferredKeys = ["title", "name", "label", "slug"];
+  for (const key of preferredKeys) {
+    const value = entry.data[key];
+    if (isLabelValue(value)) return `${String(value)} (${entry.id.slice(0, 8)})`;
+  }
+  const firstValue = Object.values(entry.data).find(isLabelValue);
   return firstValue ? `${String(firstValue)} (${entry.id.slice(0, 8)})` : entry.id.slice(0, 8);
+}
+
+function isLabelValue(value: unknown): value is string | number {
+  return (typeof value === "string" && value.trim() !== "") || typeof value === "number";
 }
 
 function formatValue(value: unknown): string {
