@@ -741,7 +741,7 @@ Each task uses this structure:
 #### T449 - Add Admin Redesign Release Notes
 
 - Version: `v4.10.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add concise release notes for Task 4 Admin UI redesign.
 - Persona: Release writer; summarize what changed.
 - Success Criteria: Notes mention custom design, light/dark mode, responsive layout, improved core workflows, and verification.
