@@ -544,7 +544,7 @@ Each task uses this structure:
 #### T337 - Schema Builder Relation Gate
 
 - Version: `v2.4.8`
-- Status: `pending`
+- Status: `completed`
 - Goal: Verify relation schema builder end-to-end before entry UI work.
 - Persona: Release engineer; checkpoint builder quality.
 - Success Criteria: Owner can create relation schemas of all four types in Admin UI.
