@@ -148,7 +148,7 @@ Each task uses this structure:
 #### T307 - Add Relation Migration Plan
 
 - Version: `v2.1.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Document migration steps for relation storage without breaking existing entries.
 - Persona: Migration engineer; protect existing local data.
 - Success Criteria: Notes cover existing relation values, new multi relation values, and rollback risk.

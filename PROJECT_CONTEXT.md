@@ -144,6 +144,16 @@ One server must serve exactly these primary paths:
 - Suggested future index shape: source schema id, source entry id, field slug, relation type, target schema id, target entry id, and position.
 - The JSON payload remains the API contract; any index table is derived data and must be rebuilt safely if needed.
 
+### Relation Migration Plan
+
+- Existing relation fields that only have `relationSchemaId` should be treated as legacy single relations until a later strict migration assigns an explicit relation type.
+- Existing entry relation values that are strings should remain valid for legacy single relations.
+- New multi relation values must be arrays of entry ids; migration code must not convert comma-separated strings into relations automatically.
+- If a relation index table is added, build it from `entries.data_json` inside a transaction and fail without deleting original JSON data.
+- Rollback should be able to drop or ignore the derived index table while keeping `entries.data_json` unchanged.
+- Before strict enforcement, run a validation report that lists wrong-schema ids, missing target entries, duplicate multi ids, and unsafe relation type changes.
+- Destructive rewrites require an explicit future task and must not happen as part of planning.
+
 ### Dynamic APIs
 
 - Every schema creates API routes under `/api/content/:schemaSlug`.
