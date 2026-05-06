@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { relationErrors } from "./relation-errors.js";
 import type { SqliteDatabase } from "./sqlite.js";
 import type {
   CreateFieldInput,
@@ -163,18 +164,18 @@ function validateSchemaInput(db: SqliteDatabase, input: CreateSchemaInput): void
 function validateRelationMetadata(db: SqliteDatabase, field: CreateFieldInput): void {
   if (field.type !== "relation") {
     if (field.relationSchemaId || field.relationType) {
-      throw new Error("RELATION_METADATA_FOR_NON_RELATION_FIELD");
+      throw new Error(relationErrors.metadataForNonRelationField);
     }
     return;
   }
   if (!field.relationSchemaId) {
-    throw new Error("RELATION_TARGET_REQUIRED");
+    throw new Error(relationErrors.targetRequired);
   }
   if (!getSchemaById(db, field.relationSchemaId)) {
-    throw new Error("RELATION_TARGET_MISSING");
+    throw new Error(relationErrors.targetMissing);
   }
   if (field.relationType && !relationTypes.includes(field.relationType)) {
-    throw new Error("RELATION_TYPE_INVALID");
+    throw new Error(relationErrors.typeInvalid);
   }
 }
 

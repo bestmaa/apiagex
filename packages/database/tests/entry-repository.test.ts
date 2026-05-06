@@ -84,7 +84,10 @@ describe("entry repository", () => {
     expect(book.data.author).toBe(author.id);
     expect(() =>
       createEntry(db, { schemaId: bookSchema.id, data: { author: "missing" } }),
-    ).toThrow("ENTRY_RELATION_TARGET_INVALID:author");
+    ).toThrow("RELATION_TARGET_ENTRY_INVALID:author");
+    expect(() =>
+      createEntry(db, { schemaId: bookSchema.id, data: { author: ["not-single"] } }),
+    ).toThrow("RELATION_VALUE_SHAPE_INVALID:author");
   });
 });
 

@@ -39,6 +39,11 @@ export {
   listSchemas,
   updateSchema,
 } from "./schema-repository.js";
+export {
+  relationErrors,
+  relationTargetEntryInvalid,
+  relationValueShapeInvalid,
+} from "./relation-errors.js";
 export type { MvpTableName, MigrationRecord, TableInfoRow } from "./schema.type.js";
 export type {
   CreateEntryInput,
@@ -70,4 +75,5 @@ export type {
   SingleRelationValue,
   UpdateSchemaInput,
 } from "./schema-repository.type.js";
+export type { RelationErrorCode } from "./relation-errors.js";
 export type { SqliteDatabase } from "./sqlite.js";

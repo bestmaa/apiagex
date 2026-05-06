@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { relationTargetEntryInvalid, relationValueShapeInvalid } from "./relation-errors.js";
 import type { SqliteDatabase } from "./sqlite.js";
 import { getSchemaById } from "./schema-repository.js";
 import type {
@@ -110,10 +111,12 @@ function validateFieldValue(db: SqliteDatabase, field: FieldRecord, value: unkno
 }
 
 function assertRelation(db: SqliteDatabase, field: FieldRecord, value: unknown): void {
-  assertType(field, typeof value === "string");
+  if (typeof value !== "string") {
+    throw new Error(relationValueShapeInvalid(field.slug));
+  }
   const target = getEntryById(db, String(value));
   if (!target || target.schemaId !== field.relationSchemaId) {
-    throw new Error(`ENTRY_RELATION_TARGET_INVALID:${field.slug}`);
+    throw new Error(relationTargetEntryInvalid(field.slug));
   }
 }
 

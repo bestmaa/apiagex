@@ -122,7 +122,7 @@ Each task uses this structure:
 #### T305 - Add Relation Error Codes
 
 - Version: `v2.1.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add stable error messages/codes for invalid relation type, missing target schema, invalid target entry, and invalid relation value shape.
 - Persona: API reliability engineer; make failures testable and easy to debug.
 - Success Criteria: Tests can assert clear relation errors without relying on vague messages.
