@@ -536,7 +536,7 @@ Each task uses this structure:
 #### T434 - Audit Admin Contrast
 
 - Version: `v4.8.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Check and fix contrast issues in light and dark mode.
 - Persona: Accessibility engineer; make UI readable.
 - Success Criteria: Text, badges, buttons, form controls, focus rings are readable in both themes.

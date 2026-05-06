@@ -8,7 +8,7 @@
   --admin-color-surface-strong: #102238;
   --admin-color-text: #162033;
   --admin-color-text-strong: #102238;
-  --admin-color-text-muted: #657187;
+  --admin-color-text-muted: #59657a;
   --admin-color-text-soft: #4b5870;
   --admin-color-text-inverse: #ffffff;
   --admin-color-text-inverse-muted: #d8e2ef;
@@ -16,14 +16,15 @@
   --admin-color-border-soft: #e5ebf2;
   --admin-color-border-strong: #b9c4d3;
   --admin-color-primary: #175cd3;
+  --admin-color-primary-strong: #0f3f8f;
   --admin-color-primary-hover: #124cad;
   --admin-color-primary-soft: #dbeafe;
   --admin-color-primary-muted: #edf4ff;
-  --admin-color-disabled: #9aa7b8;
+  --admin-color-disabled: #59677a;
   --admin-color-warning-bg: #fff7ed;
   --admin-color-warning-border: #c2410c;
   --admin-color-warning-text: #7c2d12;
-  --admin-color-focus: #8ab4ff;
+  --admin-color-focus: #124cad;
   --admin-shadow-sm: 0 1px 2px rgba(22, 32, 51, 0.04);
   --admin-radius-xs: 4px;
   --admin-radius-sm: 6px;
@@ -67,6 +68,7 @@
   --admin-color-border-soft: #263449;
   --admin-color-border-strong: #4b5f7a;
   --admin-color-primary: #78a6ff;
+  --admin-color-primary-strong: #c8dcff;
   --admin-color-primary-hover: #9dbfff;
   --admin-color-primary-soft: #1e3a62;
   --admin-color-primary-muted: #172b4a;
