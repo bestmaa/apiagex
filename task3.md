@@ -624,7 +624,7 @@ Each task uses this structure:
 #### T343 - Add Relation Edit Roundtrip Browser Check
 
 - Version: `v2.5.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Verify relation values survive create, edit, save, and reload in Admin UI.
 - Persona: Browser QA engineer; protect editor workflow.
 - Success Criteria: Browser check covers single and multi relation fields.
@@ -632,6 +632,7 @@ Each task uses this structure:
 - Output: Browser verification notes or test.
 - Strict Rule: Do not mark complete without reload check.
 - Verify: Browser roundtrip plus standard verification.
+- Verification Notes: Browser checked create, edit, save, and reload for required single relation plus multi relation values on `T343 Article`.
 - Commit: `Test relation entry roundtrip`
 
 #### T344 - Entry Relation UI Gate
