@@ -505,7 +505,7 @@ Each task uses this structure:
 #### T334 - Add Relation Schema Creation Flow Test
 
 - Version: `v2.4.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Verify schema builder can create schemas using every relation type.
 - Persona: Browser QA engineer; catch form regressions.
 - Success Criteria: Browser or UI test covers one-to-one, one-to-many, many-to-one, and many-to-many creation.
