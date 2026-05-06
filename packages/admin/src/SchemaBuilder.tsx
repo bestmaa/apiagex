@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { FilePlus, Pencil, Plus } from "lucide-react";
 import { createSchema, listEntries, listSchemas, updateSchema } from "./api";
+import { SchemaInventoryList } from "./components/SchemaInventoryList";
 import { StateMessage } from "./components/StateMessage";
 import type { FieldType, RelationType, SchemaDraft, SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
@@ -158,7 +159,7 @@ export function SchemaBuilder() {
       </form>
       <StateMessage title="Schema state">{status}</StateMessage>
       <SchemaDetails schema={schemas.find((schema) => schema.id === selectedId)} />
-      <SchemaList onSelect={selectSchema} schemas={schemas} selectedId={selectedId} />
+      <SchemaInventoryList onSelect={selectSchema} schemas={schemas} selectedId={selectedId} />
     </section>
   );
 }
@@ -258,33 +259,6 @@ function targetLabel(field: SchemaFieldDraft): string {
     return `${field.relationTarget.name} /${field.relationTarget.slug}`;
   }
   return field.relationSchemaId ?? "Target missing";
-}
-
-function SchemaList(props: {
-  onSelect: (schema: SchemaRecord) => void;
-  schemas: SchemaRecord[];
-  selectedId: string;
-}) {
-  const { onSelect, schemas, selectedId } = props;
-  return (
-    <div>
-      <h3>Created Schemas</h3>
-      {schemas.length === 0 ? (
-        <StateMessage title="No schemas yet" variant="empty">
-          Create a schema to generate the first API.
-        </StateMessage>
-      ) : schemas.map((schema) => (
-        <article className="schema-row" key={schema.id}>
-          <strong>{schema.name}</strong>
-          <span>/{schema.slug}</span>
-          <button type="button" onClick={() => onSelect(schema)}>
-            <Pencil aria-hidden="true" size={16} />
-            {selectedId === schema.id ? "Selected" : "Edit"}
-          </button>
-        </article>
-      ))}
-    </div>
-  );
 }
 
 function cleanField(field: SchemaFieldDraft): SchemaFieldDraft {

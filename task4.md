@@ -227,7 +227,7 @@ Each task uses this structure:
 #### T411 - Redesign Schema List
 
 - Version: `v4.3.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make schema list easier to scan and manage.
 - Persona: CMS admin designer; help owners understand schema inventory.
 - Success Criteria: List shows name, slug, field count, relation count, and actions cleanly.
