@@ -425,7 +425,7 @@ Each task uses this structure:
 #### T328 - Relation API Gate
 
 - Version: `v2.3.8`
-- Status: `pending`
+- Status: `completed`
 - Goal: Verify relation APIs, populate, docs examples, and RBAC behavior together.
 - Persona: Release engineer; checkpoint API layer before UI work.
 - Success Criteria: Manual API flow creates relation schemas, entries, populates relations, and verifies blocked role.
