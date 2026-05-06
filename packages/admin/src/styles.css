@@ -353,6 +353,45 @@ code {
   padding: var(--admin-space-2) var(--admin-space-3);
 }
 
+.user-list {
+  display: grid;
+  gap: var(--admin-space-4);
+}
+
+.user-list h3 {
+  margin: 0;
+}
+
+.user-row {
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  display: grid;
+  gap: var(--admin-space-4);
+  grid-template-columns: minmax(0, 1fr) minmax(240px, auto);
+  padding: var(--admin-space-5);
+}
+
+.user-row div {
+  display: grid;
+  gap: var(--admin-space-1);
+  min-width: 0;
+}
+
+.user-row strong,
+.user-row span,
+.user-row code,
+.user-row p {
+  overflow-wrap: anywhere;
+}
+
+.user-row p {
+  color: var(--admin-color-text-soft);
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 .dashboard-metrics {
   display: grid;
   gap: var(--admin-space-5);
@@ -1174,6 +1213,10 @@ code {
   .schema-field-badge-row,
   .schema-inventory-row,
   .dashboard-panel .schema-row {
+    grid-template-columns: 1fr;
+  }
+
+  .user-row {
     grid-template-columns: 1fr;
   }
 

@@ -71,19 +71,22 @@ export function UserManager() {
 
 function UserList({ users }: { users: UserRecord[] }) {
   return (
-    <div>
+    <section className="user-list" aria-labelledby="user-list-title">
       <h3>Created Users</h3>
       {users.length === 0 ? (
         <StateMessage title="No users yet" variant="empty">
           Create a user after at least one role is available.
         </StateMessage>
       ) : users.map((user) => (
-        <article className="api-row" key={user.id}>
-          <strong>{user.email}</strong>
-          <span>Role: {user.roleName}</span>
+        <article className="user-row" key={user.id}>
+          <div>
+            <strong>{user.email}</strong>
+            <span>Role: {user.roleName}</span>
+          </div>
           <code>x-apiagex-role-id: {user.roleId}</code>
+          <p>Created/updated timestamps are not exposed by the current user API.</p>
         </article>
       ))}
-    </div>
+    </section>
   );
 }

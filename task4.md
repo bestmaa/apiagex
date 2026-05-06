@@ -467,7 +467,7 @@ Each task uses this structure:
 #### T429 - Redesign Users List
 
 - Version: `v4.6.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make users page feel like a real admin user manager.
 - Persona: Admin UX designer; clarify user role assignment.
 - Success Criteria: Users list shows email, role, created/updated context where available, and clear empty states.
