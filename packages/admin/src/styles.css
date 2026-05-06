@@ -119,12 +119,14 @@ label {
   font-size: var(--admin-font-sm);
   font-weight: 700;
   gap: var(--admin-space-2);
+  line-height: var(--admin-line-normal);
 }
 
 button,
 input,
 select,
-textarea {
+textarea,
+label:has(input[type="checkbox"]) {
   font: inherit;
 }
 
@@ -136,12 +138,52 @@ textarea {
   border-radius: var(--admin-radius-sm);
   color: var(--admin-color-text);
   min-height: var(--admin-control-height);
+  outline: 0;
   padding: var(--admin-space-3) var(--admin-space-4);
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
   width: 100%;
 }
 
+input::placeholder,
+textarea::placeholder {
+  color: var(--admin-color-text-muted);
+  opacity: 1;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--admin-color-text-muted);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: var(--admin-color-surface-muted);
+  color: var(--admin-color-text-muted);
+  cursor: not-allowed;
+}
+
 textarea {
+  line-height: var(--admin-line-normal);
+  min-height: 96px;
   resize: vertical;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--admin-color-primary);
+  inline-size: 18px;
+  min-height: 18px;
+  min-width: 18px;
+  padding: 0;
+  width: 18px;
+}
+
+label:has(input[type="checkbox"]) {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--admin-space-3);
+  width: fit-content;
 }
 
 button {
@@ -156,7 +198,9 @@ button {
   gap: var(--admin-space-2);
   justify-content: center;
   min-height: var(--admin-control-height);
+  outline: 0;
   padding: var(--admin-space-3) var(--admin-space-6);
+  transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
   width: fit-content;
 }
 
@@ -164,9 +208,14 @@ button:hover {
   background: var(--admin-color-primary-hover);
 }
 
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
 button:disabled {
   background: var(--admin-color-disabled);
   cursor: not-allowed;
+  transform: none;
 }
 
 fieldset {

@@ -145,7 +145,7 @@ Each task uses this structure:
 #### T405 - Normalize Admin Buttons And Controls
 
 - Version: `v4.1.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Create consistent button, input, select, textarea, checkbox, and helper text styles.
 - Persona: Frontend systems engineer; make forms predictable.
 - Success Criteria: Forms across Admin UI share visual styles and focus states.

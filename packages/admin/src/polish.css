@@ -7,6 +7,22 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--admin-color-focus);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--admin-color-focus) 16%, transparent);
+}
+
+input[type="checkbox"]:focus {
+  outline: 3px solid var(--admin-color-focus);
+  outline-offset: 3px;
+}
+
+button:focus-visible {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--admin-color-focus) 18%, transparent);
+}
+
 pre {
   background: var(--admin-color-surface-muted);
   border-radius: var(--admin-radius-sm);
