@@ -699,7 +699,7 @@ Each task uses this structure:
 #### T446 - Verify Relation UI After Redesign
 
 - Version: `v4.10.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Ensure redesign did not break Task 3 relation workflows.
 - Persona: Regression QA engineer; protect relation modeling.
 - Success Criteria: Browser verifies all four relation types, single/multi pickers, create/edit/reload, relation summaries, populate docs link.
@@ -707,6 +707,7 @@ Each task uses this structure:
 - Output: Relation UI regression verification.
 - Strict Rule: Many-to-many must still save arrays.
 - Verify: Browser relation regression plus standard verification.
+- Verification Notes: Browser relation regression passed for one-to-one, many-to-one, one-to-many, and many-to-many schemas; single selects and multi-select arrays saved through entry creation, relation summaries rendered, and desktop/mobile overflow stayed clear.
 - Commit: `Verify redesigned relation UI`
 
 #### T447 - Verify RBAC UI After Redesign
