@@ -70,7 +70,7 @@ Each task uses this structure:
 #### T301 - Define Relation Type Contract
 
 - Version: `v2.1.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Define the relation field contract for `oneToOne`, `oneToMany`, `manyToOne`, and `manyToMany`.
 - Persona: Data model architect; make relation meaning explicit before storage changes.
 - Success Criteria: Shared relation types describe relation kind, target schema id, required flag, and value shape.

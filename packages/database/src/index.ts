@@ -58,7 +58,12 @@ export type {
   CreateSchemaInput,
   FieldRecord,
   FieldType,
+  MultiRelationValue,
+  RelationFieldContract,
+  RelationType,
+  RelationValue,
   SchemaRecord,
+  SingleRelationValue,
   UpdateSchemaInput,
 } from "./schema-repository.type.js";
 export type { SqliteDatabase } from "./sqlite.js";

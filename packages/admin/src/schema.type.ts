@@ -8,12 +8,32 @@ export type FieldType =
   | "media"
   | "relation";
 
+export type RelationType =
+  | "oneToOne"
+  | "oneToMany"
+  | "manyToOne"
+  | "manyToMany";
+
+export type SingleRelationValue = string | null;
+
+export type MultiRelationValue = string[];
+
+export type RelationValue = SingleRelationValue | MultiRelationValue;
+
+export type RelationFieldContract = {
+  relationSchemaId: string;
+  relationType: RelationType;
+  required: boolean;
+  valueShape: "single" | "multi";
+};
+
 export type SchemaFieldDraft = {
   name: string;
   slug: string;
   type: FieldType;
   required: boolean;
   relationSchemaId?: string;
+  relationType?: RelationType;
 };
 
 export type SchemaDraft = {

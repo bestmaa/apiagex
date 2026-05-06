@@ -123,6 +123,9 @@ One server must serve exactly these primary paths:
 - Slugs must be unique and URL safe.
 - Relation fields reference another schema by stable schema id/slug.
 - Relations must validate target schema existence before save.
+- Task3 relation contract defines four relation types: `oneToOne`, `oneToMany`, `manyToOne`, and `manyToMany`.
+- Single relations use one entry id or `null`; multi relations use an array of entry ids.
+- Relation fields carry target schema id, relation type, required flag, and value shape.
 
 ### Dynamic APIs
 
