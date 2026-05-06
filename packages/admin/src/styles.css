@@ -675,6 +675,43 @@ code {
   padding: var(--admin-space-2) var(--admin-space-3);
 }
 
+.entry-form {
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  max-width: 900px;
+  padding: var(--admin-space-5);
+}
+
+.entry-form h3 {
+  margin: 0;
+}
+
+.entry-form-grid {
+  display: grid;
+  gap: var(--admin-space-5);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.entry-field {
+  min-width: 0;
+}
+
+.entry-field-wide {
+  grid-column: 1 / -1;
+}
+
+.entry-field select[multiple] {
+  min-height: 132px;
+}
+
+.entry-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+}
+
 .entry-summary-list {
   display: flex;
   flex-wrap: wrap;
@@ -777,6 +814,7 @@ code {
   .field-builder-grid,
   .field-relation-grid,
   .entry-selector,
+  .entry-form-grid,
   .quick-action-list,
   .relation-guide dl,
   .schema-basics-grid,

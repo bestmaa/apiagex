@@ -181,26 +181,30 @@ function GeneratedEntryForm({
   }
 
   return (
-    <form noValidate onSubmit={submitEntry}>
+    <form className="entry-form" noValidate onSubmit={submitEntry}>
       <h3>{editingEntry ? "Edit entry" : "Create entry"}</h3>
-      {schema.fields.map((field) => (
-        <EntryInput
-          data={editingEntry?.data}
-          field={field}
-          key={field.slug}
-          relationEntries={relationEntries[field.slug] ?? []}
-        />
-      ))}
-      <button type="submit">
-        {editingEntry ? <Pencil aria-hidden="true" size={16} /> : <Plus aria-hidden="true" size={16} />}
-        {editingEntry ? "Update entry" : "Create entry"}
-      </button>
-      {editingEntry ? (
-        <button type="button" onClick={onCancelEdit}>
-          <X aria-hidden="true" size={16} />
-          Cancel edit
+      <div className="entry-form-grid">
+        {schema.fields.map((field) => (
+          <EntryInput
+            data={editingEntry?.data}
+            field={field}
+            key={field.slug}
+            relationEntries={relationEntries[field.slug] ?? []}
+          />
+        ))}
+      </div>
+      <div className="entry-form-actions">
+        <button type="submit">
+          {editingEntry ? <Pencil aria-hidden="true" size={16} /> : <Plus aria-hidden="true" size={16} />}
+          {editingEntry ? "Update entry" : "Create entry"}
         </button>
-      ) : null}
+        {editingEntry ? (
+          <button type="button" onClick={onCancelEdit}>
+            <X aria-hidden="true" size={16} />
+            Cancel edit
+          </button>
+        ) : null}
+      </div>
       <StateMessage title="Entry form state">{status || "Entry form ready"}</StateMessage>
     </form>
   );
@@ -217,9 +221,10 @@ function EntryInput({
 }) {
   const name = field.slug;
   const value = data?.[field.slug];
+  const fieldClass = isWideEntryField(field) ? "entry-field entry-field-wide" : "entry-field";
   if (isSingleRelationField(field)) {
     return (
-      <label>{field.name}
+      <label className={fieldClass}>{field.name}
         <select
           defaultValue={formatValue(value)}
           key={`${name}-${formatValue(value)}-${relationEntries.length}`}
@@ -237,7 +242,7 @@ function EntryInput({
   if (isMultiRelationField(field)) {
     const selectedValues = Array.isArray(value) ? value.map(String) : [];
     return (
-      <label>{field.name}
+      <label className="entry-field entry-field-wide">{field.name}
         <select
           defaultValue={selectedValues}
           key={`${name}-${selectedValues.join(",")}-${relationEntries.length}`}
@@ -254,13 +259,13 @@ function EntryInput({
     );
   }
   if (field.type === "longText" || field.type === "json") {
-    return <label>{field.name} <textarea defaultValue={formatValue(value)} name={name} required={field.required} rows={3} /></label>;
+    return <label className={fieldClass}>{field.name} <textarea defaultValue={formatValue(value)} name={name} required={field.required} rows={3} /></label>;
   }
   if (field.type === "boolean") {
-    return <label><input defaultChecked={value === true} name={name} type="checkbox" /> {field.name}</label>;
+    return <label className={fieldClass}><input defaultChecked={value === true} name={name} type="checkbox" /> {field.name}</label>;
   }
   const type = field.type === "number" ? "number" : field.type === "date" ? "date" : "text";
-  return <label>{field.name} <input defaultValue={formatValue(value)} name={name} required={field.required} type={type} /></label>;
+  return <label className={fieldClass}>{field.name} <input defaultValue={formatValue(value)} name={name} required={field.required} type={type} /></label>;
 }
 
 function EntryList(props: {
@@ -352,6 +357,10 @@ function isSingleRelationField(field: SchemaFieldDraft): boolean {
 
 function isMultiRelationField(field: SchemaFieldDraft): boolean {
   return field.type === "relation" && (field.relationType === "oneToMany" || field.relationType === "manyToMany");
+}
+
+function isWideEntryField(field: SchemaFieldDraft): boolean {
+  return field.type === "longText" || field.type === "json" || field.type === "relation" || field.type === "media";
 }
 
 function isEntryPickerRelationField(field: SchemaFieldDraft): boolean {

@@ -307,7 +307,7 @@ Each task uses this structure:
 #### T417 - Redesign Entry Form Layout
 
 - Version: `v4.4.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Improve generated entry form layout for all field types.
 - Persona: Form UX engineer; make content entry feel reliable.
 - Success Criteria: Text, long text, number, boolean, date, JSON, media, single relation, multi relation fields fit cleanly.
