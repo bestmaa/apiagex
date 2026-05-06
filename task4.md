@@ -642,7 +642,7 @@ Each task uses this structure:
 #### T442 - Add Design Notes Document
 
 - Version: `v4.9.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a design notes document explaining the custom design direction.
 - Persona: Design lead; preserve decisions for future work.
 - Success Criteria: Notes explain inspiration, what was not copied, tokens, layout, themes, and component rules.
