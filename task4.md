@@ -106,7 +106,7 @@ Each task uses this structure:
 #### T402 - Add Light Dark Theme Toggle
 
 - Version: `v4.1.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a persistent light/dark mode toggle to Admin UI.
 - Persona: UX engineer; make theme switching obvious and reliable.
 - Success Criteria: User can switch light/dark mode; preference persists across reload.

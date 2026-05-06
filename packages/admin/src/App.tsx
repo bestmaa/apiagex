@@ -6,6 +6,10 @@ import { EntryManager } from "./EntryManager";
 import { RoleManager } from "./RoleManager";
 import { SchemaBuilder } from "./SchemaBuilder";
 import { UserManager } from "./UserManager";
+import { SessionPanel } from "./components/SessionPanel";
+import { ThemeToggle } from "./components/ThemeToggle";
+import { useAdminTheme } from "./hooks/useAdminTheme";
+import { DocsPage } from "./pages/DocsPage";
 import type { OwnerSession } from "./session.type";
 import "./tokens.css";
 import "./styles.css";
@@ -24,83 +28,11 @@ const navItems: { label: string; route: AdminRoute }[] = [
 ];
 const sessionKey = "apiagexOwner";
 
-const relationSchemaExamples = [
-  {
-    title: "Author to Articles",
-    payload: {
-      name: "Author",
-      slug: "author",
-      fields: [
-        { name: "Name", slug: "name", type: "text", required: true },
-        {
-          name: "Articles",
-          slug: "articles",
-          type: "relation",
-          relationSchemaId: "ARTICLE_SCHEMA_ID",
-          relationType: "oneToMany",
-        },
-      ],
-    },
-  },
-  {
-    title: "Article to Category",
-    payload: {
-      name: "Article",
-      slug: "article",
-      fields: [
-        { name: "Title", slug: "title", type: "text", required: true },
-        {
-          name: "Category",
-          slug: "category",
-          type: "relation",
-          relationSchemaId: "CATEGORY_SCHEMA_ID",
-          relationType: "manyToOne",
-          required: true,
-        },
-      ],
-    },
-  },
-  {
-    title: "Article to Tags",
-    payload: {
-      name: "Article",
-      slug: "article",
-      fields: [
-        { name: "Title", slug: "title", type: "text", required: true },
-        {
-          name: "Tags",
-          slug: "tags",
-          type: "relation",
-          relationSchemaId: "TAG_SCHEMA_ID",
-          relationType: "manyToMany",
-        },
-      ],
-    },
-  },
-  {
-    title: "User Profile to User",
-    payload: {
-      name: "User Profile",
-      slug: "user-profile",
-      fields: [
-        { name: "Bio", slug: "bio", type: "longText" },
-        {
-          name: "User",
-          slug: "user",
-          type: "relation",
-          relationSchemaId: "USER_SCHEMA_ID",
-          relationType: "oneToOne",
-          required: true,
-        },
-      ],
-    },
-  },
-];
-
 export function App() {
   const [session, setSession] = useState<OwnerSession | null>(null);
   const [route, setRoute] = useState<AdminRoute>(readRoute());
   const [status, setStatus] = useState("No owner session");
+  const { theme, toggleTheme } = useAdminTheme();
 
   useEffect(() => {
     const saved = localStorage.getItem(sessionKey);
@@ -149,7 +81,10 @@ export function App() {
           <p className="eyebrow">Headless CMS control plane</p>
           <h1>Apiagex Admin UI</h1>
         </div>
-        {session ? <button onClick={logout}>Logout</button> : null}
+        <div className="header-actions">
+          <ThemeToggle onToggle={toggleTheme} theme={theme} />
+          {session ? <button onClick={logout}>Logout</button> : null}
+        </div>
       </header>
       <nav aria-label="Admin navigation">
         {navItems.map((item) => (
@@ -219,75 +154,5 @@ function LoginRequiredPage({
       <p className="empty-state">Login as owner to use this Admin UI page.</p>
       <SessionPanel onReset={onReset} session={null} status={status} onSubmit={onSubmit} />
     </>
-  );
-}
-
-function DocsPage() {
-  const [copied, setCopied] = useState("");
-
-  async function copyExample(title: string, payload: unknown) {
-    await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
-    setCopied(title);
-  }
-
-  return (
-    <section>
-      <h2>Docs</h2>
-      <p>English: Product docs and readable project summary are served by the same API server.</p>
-      <p>Hinglish: Product docs aur readable project summary same API server se serve hote hain.</p>
-      <div className="action-row">
-        <a href="/doc">Open Docs</a>
-        <a href="/readme">Open Readme</a>
-      </div>
-      <h3>Relation Schema Examples</h3>
-      {relationSchemaExamples.map((example) => (
-        <article className="api-row" key={example.title}>
-          <strong>{example.title}</strong>
-          <pre><code>{JSON.stringify(example.payload, null, 2)}</code></pre>
-          <button type="button" onClick={() => void copyExample(example.title, example.payload)}>
-            Copy JSON
-          </button>
-        </article>
-      ))}
-      {copied ? <p className="status-line">Copied: {copied}</p> : null}
-    </section>
-  );
-}
-
-function SessionPanel({
-  onReset,
-  session,
-  status,
-  onSubmit,
-}: {
-  onReset: () => void;
-  session: OwnerSession | null;
-  status: string;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-}) {
-  return (
-    <section aria-labelledby="owner-login-title">
-      <h2 id="owner-login-title">Owner Setup / Login</h2>
-      <p>English: First submit creates the owner when none exists; later submits log in.</p>
-      <p>Hinglish: Pehla submit owner banata hai jab owner nahi hai; baad me login karta hai.</p>
-      {!session ? <OwnerLoginForm onSubmit={onSubmit} /> : (
-        <div className="api-row">
-          <strong>{session.email}</strong>
-          <span>Local owner session is active.</span>
-          <button type="button" onClick={onReset}>Reset session</button>
-        </div>
-      )}
-      <p className="status-line" id="owner-session-status">{status}</p>
-    </section>
-  );
-}
-
-function OwnerLoginForm({ onSubmit }: { onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
-  return (
-    <form onSubmit={onSubmit}>
-      <label>Email <input name="email" type="email" required /></label>
-      <label>Password <input name="password" type="password" required minLength={8} /></label>
-      <button type="submit">Setup or login owner</button>
-    </form>
   );
 }
