@@ -4,6 +4,23 @@
   min-height: 100vh;
 }
 
+.skip-link {
+  background: var(--admin-color-surface-strong);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text-inverse);
+  font-weight: 800;
+  left: var(--admin-space-5);
+  padding: var(--admin-space-3) var(--admin-space-5);
+  position: fixed;
+  top: var(--admin-space-5);
+  transform: translateY(calc(-100% - var(--admin-space-5)));
+  z-index: 20;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
 .admin-sidebar {
   background: var(--admin-color-surface);
   border-right: 1px solid var(--admin-color-border);
@@ -57,6 +74,10 @@
   display: grid;
   grid-template-rows: auto 1fr;
   min-width: 0;
+}
+
+.admin-workspace main:focus {
+  outline: 0;
 }
 
 .admin-topbar {

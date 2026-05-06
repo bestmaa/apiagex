@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { BookOpen, Database, FileText, Home, KeyRound, Menu, Network, Users, X } from "lucide-react";
 import type { AdminNavItem, AdminRoute } from "../app-route.type";
 import type { OwnerSession } from "../session.type";
@@ -44,11 +44,26 @@ export function AdminShell({
   theme: AdminTheme;
 }) {
   const current = navItems.find((item) => item.route === route);
+  const mainRef = useRef<HTMLElement>(null);
+  const previousRouteRef = useRef(route);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const MenuIcon = mobileNavOpen ? X : Menu;
+
+  useEffect(() => {
+    if (previousRouteRef.current !== route) {
+      mainRef.current?.focus({ preventScroll: true });
+      previousRouteRef.current = route;
+    }
+  }, [route]);
+
+  function closeMobileNavOnEscape(event: KeyboardEvent<HTMLElement>) {
+    if (event.key === "Escape") setMobileNavOpen(false);
+  }
+
   return (
     <div className="admin-shell">
-      <aside className="admin-sidebar" aria-label="Admin sidebar">
+      <a className="skip-link" href="#admin-main">Skip to content</a>
+      <aside className="admin-sidebar" aria-label="Admin sidebar" onKeyDown={closeMobileNavOnEscape}>
         <div className="admin-brand">
           <div>
             <p className="eyebrow">Control plane</p>
@@ -103,7 +118,7 @@ export function AdminShell({
             {session ? <button onClick={onLogout}>Logout</button> : null}
           </div>
         </header>
-        <main>{children}</main>
+        <main id="admin-main" ref={mainRef} tabIndex={-1}>{children}</main>
       </div>
     </div>
   );

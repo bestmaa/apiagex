@@ -549,7 +549,7 @@ Each task uses this structure:
 #### T435 - Improve Keyboard Navigation
 
 - Version: `v4.8.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Ensure keyboard users can navigate and operate core Admin UI.
 - Persona: Accessibility engineer; support non-mouse workflows.
 - Success Criteria: Nav, forms, theme toggle, create/edit/delete actions, and modals are keyboard reachable.
