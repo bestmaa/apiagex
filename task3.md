@@ -83,7 +83,7 @@ Each task uses this structure:
 #### T302 - Document Relation Semantics
 
 - Version: `v2.1.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Explain how each relation type behaves in English + Hinglish.
 - Persona: CMS teacher; write so a beginner understands relation direction and examples.
 - Success Criteria: `/doc`, `/readme`, README, or PROJECT_CONTEXT explain one-to-one, one-to-many, many-to-one, and many-to-many with examples.

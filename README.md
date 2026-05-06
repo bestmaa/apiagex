@@ -96,6 +96,12 @@ English: After creating a schema, use `/api/content/:schemaSlug` for list/create
 
 Hinglish: Schema banane ke baad list/create ke liye `/api/content/:schemaSlug` use karo aur read/update/delete ke liye `/api/content/:schemaSlug/:entryId` use karo. Entry payload `{ "data": { ... } }` shape me bhejo.
 
+## Relation Semantics
+
+English: Task3 defines the relation contract before full runtime behavior lands. `oneToOne` connects one entry to one target entry, like User Profile to User. `manyToOne` lets many entries point to one parent, like Articles to Category. `oneToMany` lets one parent hold many child entry ids, like Author to Articles. `manyToMany` lets both sides connect to many entries, like Articles and Tags.
+
+Hinglish: Task3 full runtime behavior se pehle relation contract define karta hai. `oneToOne` one entry ko one target entry se connect karta hai, jaise User Profile to User. `manyToOne` many entries ko one parent par point karne deta hai, jaise Articles to Category. `oneToMany` one parent me many child entry ids rakhta hai, jaise Author to Articles. `manyToMany` dono sides ko many entries se connect karne deta hai, jaise Articles aur Tags.
+
 ## RBAC Quick Use
 
 English: Create a role, assign schema action permissions, create a user with that role, login with `/api/auth/login-user`, then call dynamic APIs with `x-apiagex-role-id`. Allowed roles work; blocked roles receive `API_PERMISSION_DENIED`.
