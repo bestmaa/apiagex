@@ -160,10 +160,22 @@ function RoleList({
             {role.id === activeRoleId ? <span>Active</span> : null}
             <span>{role.id === activeRoleId ? `${allowedCount}/${possibleCount} allowed` : "Select to inspect"}</span>
           </div>
+          {role.id === activeRoleId ? <PermissionSummaryBadges permissions={permissions} /> : null}
           <p>{role.isOwner ? "Owner can manage Admin UI. Content API requests still use role permission checks." : "Use this role id in API requests after permissions are saved."}</p>
         </article>
       ))}
     </section>
+  );
+}
+
+function PermissionSummaryBadges({ permissions }: { permissions: PermissionRecord[] }) {
+  return (
+    <div className="permission-summary-badges" aria-label="Active role permission summary">
+      {actions.map((action) => {
+        const count = permissions.filter((permission) => permission.action === action && permission.allowed).length;
+        return <span key={action}>{action}: {count}</span>;
+      })}
+    </div>
   );
 }
 

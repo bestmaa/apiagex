@@ -454,7 +454,7 @@ Each task uses this structure:
 #### T428 - Add Permission Summary Badges
 
 - Version: `v4.6.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Show compact permission summaries per role.
 - Persona: Security reviewer; make audits faster.
 - Success Criteria: Roles list and user context show manage/read/action summaries.
