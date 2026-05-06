@@ -135,7 +135,7 @@ Each task uses this structure:
 #### T306 - Plan Relation Storage Model
 
 - Version: `v2.1.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Decide how single and multi relation values will be stored.
 - Persona: Database architect; avoid storage shortcuts that block future querying.
 - Success Criteria: PROJECT_CONTEXT explains JSON value storage for single relations and a clear many-to-many/multi relation storage plan.

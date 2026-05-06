@@ -134,6 +134,16 @@ One server must serve exactly these primary paths:
 - `manyToMany`: both sides can connect to many entries, such as Articles and Tags.
 - Current Task3 status documents semantics only; validation, storage, populate, and Admin UI editing are later Task3 tasks.
 
+### Relation Storage Model
+
+- Canonical entry payloads remain in `entries.data_json` so existing entry read/write APIs keep one source of truth.
+- Single relation values (`oneToOne`, `manyToOne`) are stored in `data_json` as one target entry id string or `null`.
+- Multi relation values (`oneToMany`, `manyToMany`) are stored in `data_json` as arrays of target entry id strings.
+- Many-to-many must not be represented as comma-separated strings, labels, or display-only text.
+- A future relation index table can mirror relation values for integrity checks, delete guards, reverse lookup, and faster populate queries.
+- Suggested future index shape: source schema id, source entry id, field slug, relation type, target schema id, target entry id, and position.
+- The JSON payload remains the API contract; any index table is derived data and must be rebuilt safely if needed.
+
 ### Dynamic APIs
 
 - Every schema creates API routes under `/api/content/:schemaSlug`.
