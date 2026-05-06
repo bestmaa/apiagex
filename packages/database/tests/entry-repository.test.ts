@@ -198,7 +198,7 @@ describe("entry repository", () => {
 
     const author = createEntry(db, {
       schemaId: authorSchema.id,
-      data: { articles: [firstArticle.id, secondArticle.id] },
+      data: { articles: [firstArticle.id, secondArticle.id, firstArticle.id] },
     });
 
     expect(author.data.articles).toEqual([firstArticle.id, secondArticle.id]);
@@ -246,12 +246,11 @@ describe("entry repository", () => {
     expect(() =>
       createEntry(db, { schemaId: articleSchema.id, data: { tags: firstTag.id, title: "Bad" } }),
     ).toThrow("RELATION_VALUE_SHAPE_INVALID:tags");
-    expect(() =>
-      createEntry(db, {
-        schemaId: articleSchema.id,
-        data: { tags: [firstTag.id, firstTag.id], title: "Duplicate" },
-      }),
-    ).toThrow("RELATION_VALUE_SHAPE_INVALID:tags");
+    const duplicateTags = createEntry(db, {
+      schemaId: articleSchema.id,
+      data: { tags: [firstTag.id, firstTag.id], title: "Duplicate" },
+    });
+    expect(duplicateTags.data.tags).toEqual([firstTag.id]);
     expect(() =>
       createEntry(db, {
         schemaId: articleSchema.id,

@@ -25,11 +25,12 @@ type EntryRow = {
 export function createEntry(db: SqliteDatabase, input: CreateEntryInput): EntryRecord {
   const schema = requireSchema(db, input.schemaId);
   validateEntryData(db, schema, input.data);
+  const normalizedData = normalizeEntryData(schema, input.data);
   const id = randomUUID();
   const now = new Date().toISOString();
   db.prepare(
     "INSERT INTO entries (id, schema_id, data_json, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
-  ).run(id, input.schemaId, JSON.stringify(input.data), now, now);
+  ).run(id, input.schemaId, JSON.stringify(normalizedData), now, now);
   return requireEntry(db, id);
 }
 
@@ -59,9 +60,10 @@ export function updateEntry(
   const current = requireEntry(db, id);
   const schema = requireSchema(db, current.schemaId);
   validateEntryData(db, schema, input.data, id);
+  const normalizedData = normalizeEntryData(schema, input.data);
   const now = new Date().toISOString();
   db.prepare("UPDATE entries SET data_json = ?, updated_at = ? WHERE id = ?").run(
-    JSON.stringify(input.data),
+    JSON.stringify(normalizedData),
     now,
     id,
   );
@@ -130,7 +132,7 @@ function assertRelation(
 ): void {
   const relationType = relationTypeOf(field);
   if (relationType === "oneToMany" || relationType === "manyToMany") {
-    assertMultiRelation(db, field, value, relationType === "manyToMany");
+    assertMultiRelation(db, field, value);
     return;
   }
   if (typeof value !== "string") {
@@ -149,7 +151,6 @@ function assertMultiRelation(
   db: SqliteDatabase,
   field: FieldRecord,
   value: unknown,
-  rejectDuplicates: boolean,
 ): void {
   if (!Array.isArray(value)) {
     throw new Error(relationValueShapeInvalid(field.slug));
@@ -162,15 +163,27 @@ function assertMultiRelation(
     if (typeof targetEntryId !== "string") {
       throw new Error(relationValueShapeInvalid(field.slug));
     }
-    if (rejectDuplicates && seen.has(targetEntryId)) {
-      throw new Error(relationValueShapeInvalid(field.slug));
-    }
+    if (seen.has(targetEntryId)) continue;
     seen.add(targetEntryId);
     const target = getEntryById(db, targetEntryId);
     if (!target || target.schemaId !== field.relationSchemaId) {
       throw new Error(relationTargetEntryInvalid(field.slug));
     }
   }
+}
+
+function normalizeEntryData(schema: SchemaRecord, data: EntryData): EntryData {
+  const normalized: EntryData = { ...data };
+  for (const field of schema.fields) {
+    if (field.type !== "relation") continue;
+    const value = normalized[field.slug];
+    if (isMissing(value)) continue;
+    const relationType = relationTypeOf(field);
+    if (relationType === "oneToMany" || relationType === "manyToMany") {
+      normalized[field.slug] = Array.isArray(value) ? [...new Set(value)] : value;
+    }
+  }
+  return normalized;
 }
 
 function relationTypeOf(field: FieldRecord): RelationType {

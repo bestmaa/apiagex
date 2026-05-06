@@ -228,7 +228,7 @@ Each task uses this structure:
 #### T313 - Normalize Relation Values
 
 - Version: `v2.2.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Normalize relation values before persistence.
 - Persona: Repository engineer; keep stored data consistent.
 - Success Criteria: Single relations store `string|null`; multi relations store stable arrays without duplicates.
