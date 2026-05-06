@@ -629,7 +629,7 @@ Each task uses this structure:
 #### T441 - Sync Public Docs For Admin Redesign
 
 - Version: `v4.9.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Update `/doc` and `/readme` with current Admin UI design behavior.
 - Persona: Docs maintainer; explain visible UI changes.
 - Success Criteria: Public docs mention Admin UI layout, theme toggle, core workflows, and QA expectations in English + Hinglish.
