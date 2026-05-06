@@ -254,7 +254,7 @@ Each task uses this structure:
 #### T315 - Add Relation Delete Guard
 
 - Version: `v2.2.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Decide and implement delete behavior when a target entry is referenced.
 - Persona: Data safety engineer; prevent broken relations.
 - Success Criteria: Deleting referenced entries is blocked or relations are cleared according to documented MVP rule.

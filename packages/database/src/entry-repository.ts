@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import {
+  relationEntryReferenced,
   relationOneToOneConflict,
   relationTargetEntryInvalid,
   relationValueShapeInvalid,
@@ -71,9 +72,26 @@ export function updateEntry(
 }
 
 export function deleteEntry(db: SqliteDatabase, id: string): void {
+  assertEntryNotReferenced(db, id);
   const result = db.prepare("DELETE FROM entries WHERE id = ?").run(id);
   if (result.changes === 0) {
     throw new Error("ENTRY_NOT_FOUND");
+  }
+}
+
+function assertEntryNotReferenced(db: SqliteDatabase, entryId: string): void {
+  const rows = db.prepare("SELECT id, data_json as dataJson FROM entries").all() as Array<{
+    dataJson: string;
+    id: string;
+  }>;
+  for (const row of rows) {
+    if (row.id === entryId) continue;
+    const data = JSON.parse(row.dataJson) as EntryData;
+    for (const value of Object.values(data)) {
+      if (value === entryId || (Array.isArray(value) && value.includes(entryId))) {
+        throw new Error(relationEntryReferenced(entryId));
+      }
+    }
   }
 }
 

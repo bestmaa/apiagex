@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   createEntry,
+  deleteEntry,
   createSchema,
   listEntries,
   migrateMvpDatabase,
@@ -257,6 +258,39 @@ describe("entry repository", () => {
         data: { tags: ["missing"], title: "Missing" },
       }),
     ).toThrow("RELATION_TARGET_ENTRY_INVALID:tags");
+  });
+
+  it("blocks deleting referenced target entries", () => {
+    const db = openMigratedDb();
+    const authorSchema = createSchema(db, {
+      name: "Author",
+      slug: "author",
+      fields: [{ name: "Name", slug: "name", type: "text", required: true }],
+    });
+    const author = createEntry(db, {
+      schemaId: authorSchema.id,
+      data: { name: "Asha" },
+    });
+    const bookSchema = createSchema(db, {
+      name: "Book",
+      slug: "book",
+      fields: [
+        {
+          name: "Author",
+          slug: "author",
+          type: "relation",
+          relationSchemaId: authorSchema.id,
+          relationType: "manyToOne",
+        },
+      ],
+    });
+    const book = createEntry(db, {
+      schemaId: bookSchema.id,
+      data: { author: author.id },
+    });
+
+    expect(() => deleteEntry(db, author.id)).toThrow(`RELATION_ENTRY_REFERENCED:${author.id}`);
+    expect(() => deleteEntry(db, book.id)).not.toThrow();
   });
 });
 

@@ -153,6 +153,8 @@ One server must serve exactly these primary paths:
 - Rollback should be able to drop or ignore the derived index table while keeping `entries.data_json` unchanged.
 - Before strict enforcement, run a validation report that lists wrong-schema ids, missing target entries, duplicate multi ids, and unsafe relation type changes.
 - Destructive rewrites require an explicit future task and must not happen as part of planning.
+- Conservative delete rule: referenced target entries are blocked from deletion so relation ids do not become dangling.
+- Deleting the source entry is allowed because its relation JSON is deleted with it.
 
 ### Dynamic APIs
 
