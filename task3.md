@@ -611,7 +611,7 @@ Each task uses this structure:
 #### T342 - Show Relation Values In Entry List
 
 - Version: `v2.5.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Show relation summaries in entry lists.
 - Persona: Content editor; make list scanning useful.
 - Success Criteria: Entry list shows related entry labels/counts without overflowing.

@@ -7,6 +7,7 @@ export function EntryManager() {
   const [schemas, setSchemas] = useState<SchemaRecord[]>([]);
   const [schemaId, setSchemaId] = useState("");
   const [entries, setEntries] = useState<EntryRecord[]>([]);
+  const [relationEntries, setRelationEntries] = useState<Record<string, EntryRecord[]>>({});
   const [editingEntry, setEditingEntry] = useState<EntryRecord | null>(null);
   const [status, setStatus] = useState("Entry manager loading");
   const schema = schemas.find((item) => item.id === schemaId);
@@ -14,6 +15,32 @@ export function EntryManager() {
   useEffect(() => {
     void loadSchemas();
   }, []);
+
+  useEffect(() => {
+    if (!schema) {
+      setRelationEntries({});
+      return;
+    }
+    const relationFields = schema.fields.filter(isEntryPickerRelationField);
+    if (relationFields.length === 0) {
+      setRelationEntries({});
+      return;
+    }
+    let active = true;
+    async function loadRelationEntries() {
+      const nextEntries: Record<string, EntryRecord[]> = {};
+      for (const field of relationFields) {
+        if (!field.relationSchemaId) continue;
+        const result = await listEntries(field.relationSchemaId);
+        nextEntries[field.slug] = result.entries ?? [];
+      }
+      if (active) setRelationEntries(nextEntries);
+    }
+    void loadRelationEntries();
+    return () => {
+      active = false;
+    };
+  }, [schema]);
 
   async function loadSchemas() {
     const result = await listSchemas();
@@ -66,40 +93,32 @@ export function EntryManager() {
           key={`${schema.id}-${editingEntry?.id ?? "new"}`}
           onCancelEdit={() => setEditingEntry(null)}
           onCreated={() => loadEntries(schema.id)}
+          relationEntries={relationEntries}
           schema={schema}
         />
       ) : <p className="empty-state">Create a schema first.</p>}
       <p className="status-line">{status}</p>
-      <EntryList entries={entries} onDelete={removeEntry} onEdit={setEditingEntry} />
+      {schema ? (
+        <EntryList
+          entries={entries}
+          onDelete={removeEntry}
+          onEdit={setEditingEntry}
+          relationEntries={relationEntries}
+          schema={schema}
+        />
+      ) : null}
     </section>
   );
 }
 
-function GeneratedEntryForm({ schema, editingEntry, onCancelEdit, onCreated }: EntryFormProps) {
-  const [relationEntries, setRelationEntries] = useState<Record<string, EntryRecord[]>>({});
+function GeneratedEntryForm({
+  schema,
+  editingEntry,
+  onCancelEdit,
+  onCreated,
+  relationEntries,
+}: EntryFormProps & { relationEntries: Record<string, EntryRecord[]> }) {
   const [status, setStatus] = useState("");
-
-  useEffect(() => {
-    const relationFields = schema.fields.filter(isEntryPickerRelationField);
-    if (relationFields.length === 0) {
-      setRelationEntries({});
-      return;
-    }
-    let active = true;
-    async function loadRelationEntries() {
-      const nextEntries: Record<string, EntryRecord[]> = {};
-      for (const field of relationFields) {
-        if (!field.relationSchemaId) continue;
-        const result = await listEntries(field.relationSchemaId);
-        nextEntries[field.slug] = result.entries ?? [];
-      }
-      if (active) setRelationEntries(nextEntries);
-    }
-    void loadRelationEntries();
-    return () => {
-      active = false;
-    };
-  }, [schema]);
 
   async function submitEntry(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -197,15 +216,24 @@ function EntryList(props: {
   entries: EntryRecord[];
   onDelete: (entry: EntryRecord) => void;
   onEdit: (entry: EntryRecord) => void;
+  relationEntries: Record<string, EntryRecord[]>;
+  schema: SchemaRecord;
 }) {
-  const { entries, onDelete, onEdit } = props;
+  const { entries, onDelete, onEdit, relationEntries, schema } = props;
   return (
     <div>
       <h3>Entries</h3>
       {entries.length === 0 ? <p className="empty-state">No entries yet</p> : entries.map((entry) => (
         <article className="api-row" key={entry.id}>
           <strong>{entry.id.slice(0, 8)}</strong>
-          <span>{Object.keys(entry.data).join(", ")}</span>
+          <ul className="entry-summary-list">
+            {entrySummaryItems(entry, schema.fields, relationEntries).map((item) => (
+              <li className="entry-summary-item" key={item.slug}>
+                <span>{item.name}</span>
+                <strong>{item.value}</strong>
+              </li>
+            ))}
+          </ul>
           <button type="button" onClick={() => onEdit(entry)}>Edit</button>
           <button type="button" onClick={() => onDelete(entry)}>Delete</button>
         </article>
@@ -269,6 +297,41 @@ function isEntryPickerRelationField(field: SchemaFieldDraft): boolean {
   return isSingleRelationField(field) || isMultiRelationField(field);
 }
 
+function entrySummaryItems(
+  entry: EntryRecord,
+  fields: SchemaFieldDraft[],
+  relationEntries: Record<string, EntryRecord[]>,
+): { slug: string; name: string; value: string }[] {
+  return fields
+    .filter((field) => entry.data[field.slug] !== undefined)
+    .map((field) => ({
+      slug: field.slug,
+      name: field.name,
+      value: entrySummaryValue(field, entry.data[field.slug], relationEntries[field.slug] ?? []),
+    }));
+}
+
+function entrySummaryValue(field: SchemaFieldDraft, value: unknown, relationEntries: EntryRecord[]): string {
+  if (isSingleRelationField(field)) {
+    return typeof value === "string" && value
+      ? relationLabelForId(value, relationEntries)
+      : "None";
+  }
+  if (isMultiRelationField(field)) {
+    const ids = Array.isArray(value) ? value.map(String).filter(Boolean) : [];
+    if (ids.length === 0) return "0 selected";
+    const labels = ids.slice(0, 3).map((id) => relationLabelForId(id, relationEntries));
+    const suffix = ids.length > labels.length ? `, +${ids.length - labels.length} more` : "";
+    return `${ids.length} selected: ${labels.join(", ")}${suffix}`;
+  }
+  return formatEntryValue(value);
+}
+
+function relationLabelForId(id: string, relationEntries: EntryRecord[]): string {
+  const entry = relationEntries.find((item) => item.id === id);
+  return entry ? entryLabel(entry) : id.slice(0, 8);
+}
+
 function entryLabel(entry: EntryRecord): string {
   const preferredKeys = ["title", "name", "label", "slug"];
   for (const key of preferredKeys) {
@@ -286,4 +349,12 @@ function isLabelValue(value: unknown): value is string | number {
 function formatValue(value: unknown): string {
   if (value === undefined || value === null) return "";
   return typeof value === "object" ? JSON.stringify(value) : String(value);
+}
+
+function formatEntryValue(value: unknown): string {
+  if (value === undefined || value === null || value === "") return "Empty";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (typeof value === "string" || typeof value === "number") return String(value);
+  if (Array.isArray(value)) return `${value.length} items`;
+  return "Object";
 }

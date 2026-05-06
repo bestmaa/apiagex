@@ -224,6 +224,34 @@ code {
   gap: 8px;
 }
 
+.entry-summary-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.entry-summary-item {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.entry-summary-item span,
+.entry-summary-item strong {
+  display: inline;
+}
+
+.entry-summary-item span {
+  color: #657187;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.entry-summary-item strong {
+  color: #102238;
+  overflow-wrap: anywhere;
+}
+
 .api-row li,
 .status-line,
 .empty-state {
