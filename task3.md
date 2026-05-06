@@ -654,7 +654,7 @@ Each task uses this structure:
 #### T345 - Sync Static Relation Docs
 
 - Version: `v2.6.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Sync `/doc` and `/readme` with completed relation behavior.
 - Persona: Documentation maintainer; keep docs aligned with product.
 - Success Criteria: Docs explain relation types, payloads, populate, Admin UI flow, and common errors in English + Hinglish.
