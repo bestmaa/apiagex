@@ -466,7 +466,7 @@ Each task uses this structure:
 #### T331 - Show Relation Direction Hints
 
 - Version: `v2.4.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add concise UI hints explaining relation direction.
 - Persona: Product explainer; help users choose the right relation.
 - Success Criteria: Each relation type has short English + Hinglish guidance.

@@ -13,11 +13,31 @@ const fieldTypes: FieldType[] = [
   "relation",
 ];
 
-const relationTypes: { label: string; value: RelationType }[] = [
-  { label: "One to one", value: "oneToOne" },
-  { label: "One to many", value: "oneToMany" },
-  { label: "Many to one", value: "manyToOne" },
-  { label: "Many to many", value: "manyToMany" },
+const relationTypes: {
+  hint: string;
+  label: string;
+  value: RelationType;
+}[] = [
+  {
+    hint: "English: Stores one target id; another entry cannot reuse the same target. Hinglish: Ek target id store hoti hai; dusri entry same target reuse nahi kar sakti.",
+    label: "One to one",
+    value: "oneToOne",
+  },
+  {
+    hint: "English: Stores an array of target ids on this entry. Hinglish: Is entry me target ids ka array store hota hai.",
+    label: "One to many",
+    value: "oneToMany",
+  },
+  {
+    hint: "English: Stores one target id; many entries may point to the same target. Hinglish: Ek target id store hoti hai; many entries same target par point kar sakti hain.",
+    label: "Many to one",
+    value: "manyToOne",
+  },
+  {
+    hint: "English: Stores an array of target ids for multi-select links. Hinglish: Multi-select links ke liye target ids ka array store hota hai.",
+    label: "Many to many",
+    value: "manyToMany",
+  },
 ];
 
 const emptyField: SchemaFieldDraft = {
@@ -133,6 +153,7 @@ function SchemaFieldRow(props: {
 }) {
   const { field, index, onChange, schemas } = props;
   const selectedTarget = schemas.find((schema) => schema.id === field.relationSchemaId);
+  const selectedRelation = relationTypes.find((relationType) => relationType.value === (field.relationType ?? "manyToOne"));
   return (
     <fieldset>
       <legend>Field {index + 1}</legend>
@@ -148,6 +169,7 @@ function SchemaFieldRow(props: {
               ))}
             </select>
           </label>
+          {selectedRelation ? <p className="helper-text">{selectedRelation.hint}</p> : null}
           <label>Relation target
             <select disabled={schemas.length === 0} required value={field.relationSchemaId ?? ""} onChange={(event) => onChange(index, { relationSchemaId: event.target.value })}>
               <option value="">{schemas.length === 0 ? "Create a schema first" : "Select target schema"}</option>
