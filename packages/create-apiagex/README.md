@@ -25,6 +25,10 @@ Generated starter files:
 
 The generated `.env.example` documents `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite` and `APIAGEX_UPLOADS_PATH=.apiagex/uploads` for local persistence.
 
+The generated starter README points users to `/doc`, `/readme`, and `/adminui`, and includes relation examples for one-to-one, one-to-many, many-to-one, and many-to-many modeling.
+
+The generated `docs/README.md` points relation docs to `/doc`, including payloads, populate options, Admin UI entry pickers, and common errors.
+
 Example:
 
 ```bash
@@ -65,6 +69,10 @@ Generated starter files:
 - `docs/README.md`
 
 Generated `.env.example` local persistence ke liye `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite` aur `APIAGEX_UPLOADS_PATH=.apiagex/uploads` document karta hai.
+
+Generated starter README users ko `/doc`, `/readme`, aur `/adminui` par point karta hai, aur one-to-one, one-to-many, many-to-one, aur many-to-many relation examples include karta hai.
+
+Generated `docs/README.md` relation docs ke liye `/doc` batata hai, including payloads, populate options, Admin UI entry pickers, aur common errors.
 
 Example:
 

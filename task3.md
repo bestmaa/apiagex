@@ -680,7 +680,7 @@ Each task uses this structure:
 #### T347 - Update create-apiagex Relation Starter Notes
 
 - Version: `v2.6.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add relation modeling notes to the scaffold CLI README/starter docs.
 - Persona: Package author; help new projects understand relation setup.
 - Success Criteria: Generated starter docs mention relation examples and `/doc` path.

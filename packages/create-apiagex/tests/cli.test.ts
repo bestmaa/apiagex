@@ -50,5 +50,7 @@ describe("create-apiagex CLI", () => {
     expect(result.stdout).toContain("Created 7 files");
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"name": "my-cms"');
     await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.toContain("ADMIN_EMAIL");
+    await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("many-to-many");
+    await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("/doc explains relation field types");
   });
 });

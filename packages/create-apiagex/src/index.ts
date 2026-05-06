@@ -125,7 +125,7 @@ function createScaffoldFiles(projectName: string): ScaffoldFile[] {
     },
     {
       path: "README.md",
-      content: `# ${projectName}\n\nGenerated Apiagex starter.\n\n## Next commands\n\n\`\`\`bash\nnpm install\nnpm run dev\n\`\`\`\n\nDocs run at /doc and the Admin UI runs at /adminui.\n`,
+      content: `# ${projectName}\n\nGenerated Apiagex starter.\n\n## Next commands\n\n\`\`\`bash\nnpm install\nnpm run dev\n\`\`\`\n\nDocs run at /doc, the readable project summary runs at /readme, and the Admin UI runs at /adminui.\n\n## Relation Modeling\n\nEnglish: Create the target schema first, then add relation fields to the source schema in /adminui. Use one-to-one for Profile to User, many-to-one for Article to Category, one-to-many for Author to Articles, and many-to-many for Articles to Tags.\n\nHinglish: Pehle target schema banao, phir /adminui me source schema par relation fields add karo. Profile to User ke liye one-to-one, Article to Category ke liye many-to-one, Author to Articles ke liye one-to-many, aur Articles to Tags ke liye many-to-many use karo.\n`,
     },
     {
       path: ".gitignore",
@@ -145,7 +145,7 @@ function createScaffoldFiles(projectName: string): ScaffoldFile[] {
     },
     {
       path: "docs/README.md",
-      content: "# Apiagex Project Docs\n\nUse /doc for generated API docs and /readme for the project summary.\n",
+      content: "# Apiagex Project Docs\n\nUse /doc for generated API docs and /readme for the project summary.\n\nRelation docs: /doc explains relation field types, entry payloads, populate query options, Admin UI entry pickers, and common relation errors.\n",
     },
   ];
 }
