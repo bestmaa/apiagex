@@ -347,7 +347,7 @@ Each task uses this structure:
 #### T322 - Add Dynamic API Relation Validation
 
 - Version: `v2.3.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Ensure dynamic content APIs validate relation payloads for create/update.
 - Persona: Public API engineer; keep generated APIs consistent with admin APIs.
 - Success Criteria: Dynamic create/update accepts valid relation payloads and rejects invalid ones.

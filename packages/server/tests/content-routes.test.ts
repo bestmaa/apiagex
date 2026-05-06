@@ -78,6 +78,67 @@ describe("dynamic content APIs", () => {
     expect(blocked.statusCode).toBe(403);
     expect(blocked.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
   });
+
+  it("validates relation payloads after dynamic write permissions pass", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const authorSchemaId = await createAuthorSchema(server);
+    await createBookSchema(server, authorSchemaId);
+    const blockedRole = await createRole(server, "blocked-writer");
+    const author = await server.inject({
+      method: "POST",
+      url: "/api/content/author",
+      payload: { data: { name: "Ursula Le Guin" } },
+    });
+    const authorId = author.json().entry.id as string;
+
+    const blocked = await server.inject({
+      method: "POST",
+      url: "/api/content/book",
+      headers: { "x-apiagex-role-id": blockedRole },
+      payload: { data: { title: "Denied first", author: [authorId] } },
+    });
+
+    expect(blocked.statusCode).toBe(403);
+    expect(blocked.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
+
+    const create = await server.inject({
+      method: "POST",
+      url: "/api/content/book",
+      payload: { data: { title: "The Dispossessed", author: authorId } },
+    });
+    expect(create.statusCode).toBe(200);
+    const bookId = create.json().entry.id as string;
+
+    const invalidCreate = await server.inject({
+      method: "POST",
+      url: "/api/content/book",
+      payload: { data: { title: "Bad shape", author: [authorId] } },
+    });
+    expect(invalidCreate.statusCode).toBe(400);
+    expect(invalidCreate.json()).toEqual({
+      ok: false,
+      error: "RELATION_VALUE_SHAPE_INVALID:author",
+    });
+
+    const invalidUpdate = await server.inject({
+      method: "PUT",
+      url: `/api/content/book/${bookId}`,
+      payload: { data: { title: "Bad target", author: "missing-author-entry" } },
+    });
+    expect(invalidUpdate.statusCode).toBe(400);
+    expect(invalidUpdate.json()).toEqual({
+      ok: false,
+      error: "RELATION_TARGET_ENTRY_INVALID:author",
+    });
+
+    const validUpdate = await server.inject({
+      method: "PUT",
+      url: `/api/content/book/${bookId}`,
+      payload: { data: { title: "The Left Hand of Darkness", author: authorId } },
+    });
+    expect(validUpdate.statusCode).toBe(200);
+    expect(validUpdate.json().entry.data.author).toBe(authorId);
+  });
 });
 
 async function createArticleSchema(server: ReturnType<typeof createServer>): Promise<string> {
@@ -100,4 +161,43 @@ async function createRole(server: ReturnType<typeof createServer>, name: string)
     payload: { name },
   });
   return response.json().role.id as string;
+}
+
+async function createAuthorSchema(server: ReturnType<typeof createServer>): Promise<string> {
+  const response = await server.inject({
+    method: "POST",
+    url: "/api/admin/schemas",
+    payload: {
+      name: "Author",
+      slug: "author",
+      fields: [{ name: "Name", slug: "name", type: "text", required: true }],
+    },
+  });
+  return response.json().schema.id as string;
+}
+
+async function createBookSchema(
+  server: ReturnType<typeof createServer>,
+  authorSchemaId: string,
+): Promise<string> {
+  const response = await server.inject({
+    method: "POST",
+    url: "/api/admin/schemas",
+    payload: {
+      name: "Book",
+      slug: "book",
+      fields: [
+        { name: "Title", slug: "title", type: "text", required: true },
+        {
+          name: "Author",
+          slug: "author",
+          type: "relation",
+          relationSchemaId: authorSchemaId,
+          relationType: "manyToOne",
+          required: true,
+        },
+      ],
+    },
+  });
+  return response.json().schema.id as string;
 }
