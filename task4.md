@@ -160,7 +160,7 @@ Each task uses this structure:
 #### T406 - Redesign Dashboard Overview
 
 - Version: `v4.2.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Turn Dashboard into a useful operational overview.
 - Persona: Product designer; show the owner what exists and what to do next.
 - Success Criteria: Dashboard shows schemas, entries, APIs, roles, users, and relation readiness summaries.

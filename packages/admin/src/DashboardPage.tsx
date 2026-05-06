@@ -1,11 +1,16 @@
 import { ReactNode, useEffect, useState } from "react";
-import { listRoles, listSchemas, listUsers } from "./api";
+import { listEntries, listRoles, listSchemas, listUsers } from "./api";
 import type { RoleRecord } from "./role.type";
 import type { SchemaRecord } from "./schema.type";
 import type { UserRecord } from "./user.type";
 
+type SchemaEntrySummary = {
+  schema: SchemaRecord;
+  entries: number;
+};
+
 type DashboardState = {
-  schemas: SchemaRecord[];
+  schemaSummaries: SchemaEntrySummary[];
   roles: RoleRecord[];
   users: UserRecord[];
 };
@@ -27,8 +32,17 @@ export function DashboardPage({ sessionPanel }: { sessionPanel: ReactNode }) {
         setStatus(schemaResult.error ?? roleResult.error ?? userResult.error ?? "Dashboard load failed");
         return;
       }
+      const schemas = schemaResult.schemas ?? [];
+      const entryResults = await Promise.all(schemas.map(async (schema) => ({
+        schema,
+        result: await listEntries(schema.id),
+      })));
+      if (!active) return;
       setState({
-        schemas: schemaResult.schemas ?? [],
+        schemaSummaries: entryResults.map(({ schema, result }) => ({
+          schema,
+          entries: result.entries?.length ?? 0,
+        })),
         roles: roleResult.roles ?? [],
         users: userResult.users ?? [],
       });
@@ -60,47 +74,92 @@ export function DashboardPage({ sessionPanel }: { sessionPanel: ReactNode }) {
 }
 
 function DashboardSummary({ state }: { state: DashboardState }) {
+  const schemaCount = state.schemaSummaries.length;
+  const entryCount = state.schemaSummaries.reduce((total, item) => total + item.entries, 0);
+  const relationCount = countRelationFields(state.schemaSummaries.map((item) => item.schema));
+  const schemasWithEntries = state.schemaSummaries.filter((item) => item.entries > 0).length;
+
   return (
     <>
-      <div className="field-list">
-        <p className="status-line">Schemas: {state.schemas.length}</p>
-        <p className="status-line">Generated APIs: {state.schemas.length}</p>
-        <p className="status-line">Roles: {state.roles.length}</p>
-        <p className="status-line">Users: {state.users.length}</p>
+      <div className="dashboard-metrics" aria-label="Workspace metrics">
+        <Metric label="Schemas" value={schemaCount} detail={`${schemaCount} generated APIs`} />
+        <Metric label="Entries" value={entryCount} detail={`${schemasWithEntries} schemas contain content`} />
+        <Metric label="Roles" value={state.roles.length} detail="Permission profiles" />
+        <Metric label="Users" value={state.users.length} detail="Assigned admin users" />
       </div>
-      <QuickLinks />
-      <RecentSchemas schemas={state.schemas} />
+      <div className="dashboard-grid">
+        <ReadinessSummary
+          hasRole={state.roles.length > 0}
+          hasSchema={schemaCount > 0}
+          hasUser={state.users.length > 0}
+          relationCount={relationCount}
+        />
+        <RecentSchemas summaries={state.schemaSummaries} />
+      </div>
     </>
   );
 }
 
-function QuickLinks() {
+function Metric({ detail, label, value }: { detail: string; label: string; value: number }) {
   return (
-    <div className="api-row">
-      <strong>Quick actions</strong>
-      <ul>
-        <li><a href="#schemas">Create schema</a></li>
-        <li><a href="#roles">Create role</a></li>
-        <li><a href="#users">Create user</a></li>
-      </ul>
-    </div>
+    <article className="dashboard-metric">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <p>{detail}</p>
+    </article>
   );
 }
 
-function RecentSchemas({ schemas }: { schemas: SchemaRecord[] }) {
-  const recentSchemas = schemas.slice(-3).reverse();
+function ReadinessSummary({
+  hasRole,
+  hasSchema,
+  hasUser,
+  relationCount,
+}: {
+  hasRole: boolean;
+  hasSchema: boolean;
+  hasUser: boolean;
+  relationCount: number;
+}) {
+  const items = [
+    { label: "Schema model", ready: hasSchema, detail: hasSchema ? "Content structure exists" : "Create a schema first" },
+    { label: "Relation fields", ready: relationCount > 0, detail: relationCount ? `${relationCount} relation fields configured` : "Optional, add when content links are needed" },
+    { label: "Roles", ready: hasRole, detail: hasRole ? "Access rules can be assigned" : "Create role before user access" },
+    { label: "Users", ready: hasUser, detail: hasUser ? "Team login is available" : "Add users after roles" },
+  ];
+  return (
+    <section className="dashboard-panel" aria-labelledby="readiness-title">
+      <h3 id="readiness-title">Relation and access readiness</h3>
+      {items.map((item) => (
+        <p className={item.ready ? "readiness-row is-ready" : "readiness-row"} key={item.label}>
+          <strong>{item.label}</strong>
+          <span>{item.detail}</span>
+        </p>
+      ))}
+    </section>
+  );
+}
+
+function RecentSchemas({ summaries }: { summaries: SchemaEntrySummary[] }) {
+  const recentSchemas = summaries.slice(-4).reverse();
   if (recentSchemas.length === 0) {
     return <p className="empty-state">No schemas yet. Create a schema to generate the first API.</p>;
   }
   return (
-    <div className="field-list">
-      <h3>Recent schemas</h3>
-      {recentSchemas.map((schema) => (
-        <div className="api-row" key={schema.id}>
+    <section className="dashboard-panel" aria-labelledby="recent-schemas-title">
+      <h3 id="recent-schemas-title">Recent schemas</h3>
+      {recentSchemas.map(({ entries, schema }) => (
+        <article className="schema-row" key={schema.id}>
           <strong>{schema.name}</strong>
           <code>/api/content/{schema.slug}</code>
-        </div>
+          <span>{schema.fields.length} fields</span>
+          <span>{entries} entries</span>
+        </article>
       ))}
-    </div>
+    </section>
   );
+}
+
+function countRelationFields(schemas: SchemaRecord[]) {
+  return schemas.reduce((total, schema) => total + schema.fields.filter((field) => field.type === "relation").length, 0);
 }
