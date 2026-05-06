@@ -572,7 +572,7 @@ Each task uses this structure:
 #### T339 - Add Multi Relation Entry Picker
 
 - Version: `v2.5.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Render multi relation fields as multi-select target-entry pickers.
 - Persona: Content editor UI engineer; support one-to-many and many-to-many editing.
 - Success Criteria: Editors can select, remove, and save multiple related entries.

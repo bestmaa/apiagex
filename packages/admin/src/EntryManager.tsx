@@ -80,15 +80,15 @@ function GeneratedEntryForm({ schema, editingEntry, onCancelEdit, onCreated }: E
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    const singleRelationFields = schema.fields.filter(isSingleRelationField);
-    if (singleRelationFields.length === 0) {
+    const relationFields = schema.fields.filter(isEntryPickerRelationField);
+    if (relationFields.length === 0) {
       setRelationEntries({});
       return;
     }
     let active = true;
     async function loadRelationEntries() {
       const nextEntries: Record<string, EntryRecord[]> = {};
-      for (const field of singleRelationFields) {
+      for (const field of relationFields) {
         if (!field.relationSchemaId) continue;
         const result = await listEntries(field.relationSchemaId);
         nextEntries[field.slug] = result.entries ?? [];
@@ -164,6 +164,25 @@ function EntryInput({
       </label>
     );
   }
+  if (isMultiRelationField(field)) {
+    const selectedValues = Array.isArray(value) ? value.map(String) : [];
+    return (
+      <label>{field.name}
+        <select
+          defaultValue={selectedValues}
+          key={`${name}-${selectedValues.join(",")}-${relationEntries.length}`}
+          multiple
+          name={name}
+          required={field.required}
+        >
+          {relationEntries.map((entry) => (
+            <option key={entry.id} value={entry.id}>{entryLabel(entry)}</option>
+          ))}
+        </select>
+        <span className="helper-text">Use Ctrl/Cmd to select more than one entry.</span>
+      </label>
+    );
+  }
   if (field.type === "longText" || field.type === "json") {
     return <label>{field.name} <textarea defaultValue={formatValue(value)} name={name} required={field.required} rows={3} /></label>;
   }
@@ -203,6 +222,11 @@ function readEntryData(
   const data: EntryData = {};
   try {
     for (const field of fields) {
+      if (isMultiRelationField(field)) {
+        const values = form.getAll(field.slug).map(String).filter(Boolean);
+        if (values.length > 0 || field.required) data[field.slug] = values;
+        continue;
+      }
       const raw = form.get(field.slug);
       if (field.type === "boolean") {
         data[field.slug] = raw === "on";
@@ -225,6 +249,14 @@ function parseFieldValue(field: SchemaFieldDraft, raw: string): unknown {
 
 function isSingleRelationField(field: SchemaFieldDraft): boolean {
   return field.type === "relation" && (field.relationType === "oneToOne" || field.relationType === "manyToOne");
+}
+
+function isMultiRelationField(field: SchemaFieldDraft): boolean {
+  return field.type === "relation" && (field.relationType === "oneToMany" || field.relationType === "manyToMany");
+}
+
+function isEntryPickerRelationField(field: SchemaFieldDraft): boolean {
+  return isSingleRelationField(field) || isMultiRelationField(field);
 }
 
 function entryLabel(entry: EntryRecord): string {
