@@ -261,24 +261,37 @@ function SchemaDetails({ schema }: { schema?: SchemaRecord }) {
   if (!schema) {
     return <StateMessage title="No schema selected" variant="empty">Select a schema to inspect fields.</StateMessage>;
   }
-  const relationFields = schema.fields.filter((field) => field.type === "relation");
   return (
-    <div className="api-row">
+    <section className="schema-detail-panel" aria-labelledby="schema-detail-title">
       <strong>{schema.name}</strong>
       <code>/api/content/{schema.slug}</code>
-      <span>{schema.fields.length} fields</span>
-      {relationFields.length > 0 ? (
-        <ul className="relation-detail-list">
-          {relationFields.map((field) => (
-            <li key={field.slug}>
+      <div className="schema-field-badge-list">
+        {schema.fields.map((field) => (
+          <article className="schema-field-badge-row" key={field.slug}>
+            <div>
               <strong>{field.name}</strong>
-              <span>{relationLabel(field.relationType)} target: {targetLabel(field)}</span>
-            </li>
-          ))}
-        </ul>
-      ) : <span>No relation fields</span>}
-    </div>
+              <span>/{field.slug}</span>
+            </div>
+            <div className="badge-row">
+              <FieldTypeBadge type={field.type} />
+              <span className="field-badge field-badge-neutral">{field.required ? "Required" : "Optional"}</span>
+              {field.type === "relation" ? (
+                <>
+                  <span className="field-badge field-badge-relation">{relationLabel(field.relationType)}</span>
+                  <span className="field-badge field-badge-neutral">Target: {targetLabel(field)}</span>
+                </>
+              ) : null}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
+}
+
+function FieldTypeBadge({ type }: { type: FieldType }) {
+  const label = type === "longText" ? "Long text" : type === "json" ? "JSON" : type;
+  return <span className={`field-badge field-badge-${type.toLowerCase()}`}>{label}</span>;
 }
 
 function relationLabel(relationType?: RelationType): string {

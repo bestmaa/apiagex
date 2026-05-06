@@ -266,7 +266,7 @@ Each task uses this structure:
 #### T414 - Add Field Type Badges
 
 - Version: `v4.3.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Show clear badges for field types and relation types.
 - Persona: Visual systems designer; make schemas scannable.
 - Success Criteria: Schema details use badges for text, number, boolean, JSON, media, relation, and relation kind.
