@@ -307,6 +307,7 @@ function EntryList(props: {
   schema: SchemaRecord;
 }) {
   const { entries, onDelete, onEdit, relationEntries, schema } = props;
+  const [confirmDeleteId, setConfirmDeleteId] = useState("");
   return (
     <section className="entry-list" aria-labelledby="entry-list-title">
       <h3>Entries</h3>
@@ -336,11 +337,24 @@ function EntryList(props: {
               <Pencil aria-hidden="true" size={16} />
               Edit
             </button>
-            <button type="button" onClick={() => onDelete(entry)}>
+            <button type="button" onClick={() => setConfirmDeleteId(entry.id)}>
               <Trash2 aria-hidden="true" size={16} />
               Delete
             </button>
           </div>
+          {confirmDeleteId === entry.id ? (
+            <div className="entry-delete-confirm" role="alert">
+              <strong>Delete this entry?</strong>
+              <span>This cannot be undone.</span>
+              <div>
+                <button type="button" onClick={() => setConfirmDeleteId("")}>Cancel</button>
+                <button type="button" onClick={() => { setConfirmDeleteId(""); void onDelete(entry); }}>
+                  <Trash2 aria-hidden="true" size={16} />
+                  Confirm delete
+                </button>
+              </div>
+            </div>
+          ) : null}
         </article>
       ))}
     </section>

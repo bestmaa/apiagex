@@ -346,7 +346,7 @@ Each task uses this structure:
 #### T420 - Add Entry Action Confirmations
 
 - Version: `v4.4.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Improve edit/delete action clarity.
 - Persona: Safety UX engineer; prevent accidental destructive actions.
 - Success Criteria: Delete has a clear confirmation; edit/cancel states are obvious.

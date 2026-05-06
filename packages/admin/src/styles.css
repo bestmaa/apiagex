@@ -834,6 +834,22 @@ code {
   gap: var(--admin-space-3);
 }
 
+.entry-delete-confirm {
+  background: var(--admin-color-warning-bg);
+  border: 1px solid var(--admin-color-warning-border);
+  border-radius: var(--admin-radius-md);
+  color: var(--admin-color-warning-text);
+  display: grid;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-4);
+}
+
+.entry-delete-confirm div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+}
+
 .api-row li,
 .status-line,
 .empty-state,
