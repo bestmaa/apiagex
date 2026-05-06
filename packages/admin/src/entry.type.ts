@@ -1,6 +1,21 @@
 import type { SchemaRecord } from "./schema.type";
 
-export type EntryData = Record<string, unknown>;
+export type SingleRelationEntryValue = string | null;
+
+export type MultiRelationEntryValue = string[];
+
+export type RelationEntryValue = SingleRelationEntryValue | MultiRelationEntryValue;
+
+export type EntryFieldValue =
+  | boolean
+  | number
+  | string
+  | null
+  | Record<string, unknown>
+  | unknown[]
+  | RelationEntryValue;
+
+export type EntryData = Record<string, EntryFieldValue | undefined>;
 
 export type EntryRecord = {
   id: string;

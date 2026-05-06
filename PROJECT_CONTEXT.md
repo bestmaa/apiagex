@@ -126,6 +126,8 @@ One server must serve exactly these primary paths:
 - Task3 relation contract defines four relation types: `oneToOne`, `oneToMany`, `manyToOne`, and `manyToMany`.
 - Single relations use one entry id or `null`; multi relations use an array of entry ids.
 - Relation fields carry target schema id, relation type, required flag, and value shape.
+- Entry data relation value shapes are explicit: `oneToOne` and `manyToOne` use a single id or `null`; `oneToMany` and `manyToMany` use `string[]`.
+- Comma-separated relation strings are not part of the Task3 contract.
 - `oneToOne`: one source entry connects to one target entry, such as User Profile to User.
 - `manyToOne`: many source entries can point to one parent entry, such as Articles to Category.
 - `oneToMany`: one source entry can store many child entry ids, such as Author to Articles.

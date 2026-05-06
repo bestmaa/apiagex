@@ -109,7 +109,7 @@ Each task uses this structure:
 #### T304 - Add Relation Value Shape Contract
 
 - Version: `v2.1.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Define entry value shapes for single and multi relation values.
 - Persona: API contract designer; make request/response payloads predictable.
 - Success Criteria: Single relations use one entry id or null; multi relations use an array of entry ids.

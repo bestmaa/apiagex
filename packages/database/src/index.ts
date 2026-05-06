@@ -43,7 +43,11 @@ export type { MvpTableName, MigrationRecord, TableInfoRow } from "./schema.type.
 export type {
   CreateEntryInput,
   EntryData,
+  EntryFieldValue,
   EntryRecord,
+  MultiRelationEntryValue,
+  RelationEntryValue,
+  SingleRelationEntryValue,
   UpdateEntryInput,
 } from "./entry-repository.type.js";
 export type { CreateRoleInput, RoleRecord } from "./role-repository.type.js";
