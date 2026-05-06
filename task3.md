@@ -280,7 +280,7 @@ Each task uses this structure:
 #### T317 - Add Relation Update Migration Safety
 
 - Version: `v2.2.8`
-- Status: `pending`
+- Status: `completed`
 - Goal: Handle relation field edits safely when entries already exist.
 - Persona: Migration safety engineer; avoid invalidating existing content silently.
 - Success Criteria: Changing relation target/type is blocked or clearly validated when existing entries use the field.

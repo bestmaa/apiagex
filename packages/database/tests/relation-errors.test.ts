@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   relationErrors,
   relationEntryReferenced,
+  relationFieldUpdateUnsafe,
   relationOneToOneConflict,
   relationSchemaReferenced,
   relationTargetEntryInvalid,
@@ -13,6 +14,7 @@ describe("relation error codes", () => {
     expect(relationErrors).toEqual({
       metadataForNonRelationField: "RELATION_METADATA_FOR_NON_RELATION_FIELD",
       entryReferenced: "RELATION_ENTRY_REFERENCED",
+      fieldUpdateUnsafe: "RELATION_FIELD_UPDATE_UNSAFE",
       oneToOneConflict: "RELATION_ONE_TO_ONE_CONFLICT",
       schemaReferenced: "RELATION_SCHEMA_REFERENCED",
       targetEntryInvalid: "RELATION_TARGET_ENTRY_INVALID",
@@ -25,6 +27,7 @@ describe("relation error codes", () => {
 
   it("formats field-specific relation errors", () => {
     expect(relationEntryReferenced("entry-1")).toBe("RELATION_ENTRY_REFERENCED:entry-1");
+    expect(relationFieldUpdateUnsafe("author")).toBe("RELATION_FIELD_UPDATE_UNSAFE:author");
     expect(relationOneToOneConflict("author")).toBe("RELATION_ONE_TO_ONE_CONFLICT:author");
     expect(relationSchemaReferenced("schema-1")).toBe("RELATION_SCHEMA_REFERENCED:schema-1");
     expect(relationTargetEntryInvalid("author")).toBe("RELATION_TARGET_ENTRY_INVALID:author");

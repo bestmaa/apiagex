@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { relationErrors, relationSchemaReferenced } from "./relation-errors.js";
+import {
+  relationErrors,
+  relationFieldUpdateUnsafe,
+  relationSchemaReferenced,
+} from "./relation-errors.js";
 import type { SqliteDatabase } from "./sqlite.js";
 import type {
   CreateFieldInput,
@@ -91,6 +95,7 @@ export function updateSchema(
   if (!getSchemaById(db, id)) {
     throw new Error("SCHEMA_NOT_FOUND");
   }
+  assertSafeRelationUpdate(db, id, input);
   validateSchemaInput(db, input);
   const now = new Date().toISOString();
   const description = input.description ?? "";
@@ -108,6 +113,43 @@ export function updateSchema(
     throw new Error("SCHEMA_UPDATE_FAILED");
   }
   return updated;
+}
+
+function assertSafeRelationUpdate(
+  db: SqliteDatabase,
+  schemaId: string,
+  input: UpdateSchemaInput,
+): void {
+  const current = getSchemaById(db, schemaId);
+  if (!current) return;
+  const nextBySlug = new Map(input.fields.map((field) => [field.slug, field]));
+  for (const currentField of current.fields) {
+    if (currentField.type !== "relation") continue;
+    if (!schemaEntriesUseField(db, schemaId, currentField.slug)) continue;
+    const nextField = nextBySlug.get(currentField.slug);
+    if (!nextField || nextField.type !== "relation") {
+      throw new Error(relationFieldUpdateUnsafe(currentField.slug));
+    }
+    const currentRelationType = currentField.relationType ?? "manyToOne";
+    const nextRelationType = nextField.relationType ?? "manyToOne";
+    if (
+      currentField.relationSchemaId !== nextField.relationSchemaId ||
+      currentRelationType !== nextRelationType
+    ) {
+      throw new Error(relationFieldUpdateUnsafe(currentField.slug));
+    }
+  }
+}
+
+function schemaEntriesUseField(db: SqliteDatabase, schemaId: string, fieldSlug: string): boolean {
+  const rows = db
+    .prepare("SELECT data_json as dataJson FROM entries WHERE schema_id = ?")
+    .all(schemaId) as Array<{ dataJson: string }>;
+  return rows.some((row) => {
+    const data = JSON.parse(row.dataJson) as Record<string, unknown>;
+    const value = data[fieldSlug];
+    return value !== undefined && value !== null && value !== "";
+  });
 }
 
 export function deleteSchema(db: SqliteDatabase, id: string): void {

@@ -41,6 +41,7 @@ export {
 } from "./schema-repository.js";
 export {
   relationEntryReferenced,
+  relationFieldUpdateUnsafe,
   relationOneToOneConflict,
   relationSchemaReferenced,
   relationErrors,

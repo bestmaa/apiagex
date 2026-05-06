@@ -1,6 +1,7 @@
 export const relationErrors = {
   metadataForNonRelationField: "RELATION_METADATA_FOR_NON_RELATION_FIELD",
   entryReferenced: "RELATION_ENTRY_REFERENCED",
+  fieldUpdateUnsafe: "RELATION_FIELD_UPDATE_UNSAFE",
   oneToOneConflict: "RELATION_ONE_TO_ONE_CONFLICT",
   schemaReferenced: "RELATION_SCHEMA_REFERENCED",
   targetEntryInvalid: "RELATION_TARGET_ENTRY_INVALID",
@@ -14,6 +15,10 @@ export type RelationErrorCode = (typeof relationErrors)[keyof typeof relationErr
 
 export function relationEntryReferenced(entryId: string): string {
   return `${relationErrors.entryReferenced}:${entryId}`;
+}
+
+export function relationFieldUpdateUnsafe(fieldSlug: string): string {
+  return `${relationErrors.fieldUpdateUnsafe}:${fieldSlug}`;
 }
 
 export function relationSchemaReferenced(schemaId: string): string {

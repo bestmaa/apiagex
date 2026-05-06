@@ -156,6 +156,7 @@ One server must serve exactly these primary paths:
 - Conservative delete rule: referenced target entries are blocked from deletion so relation ids do not become dangling.
 - Deleting the source entry is allowed because its relation JSON is deleted with it.
 - Conservative schema delete rule: schemas referenced as relation targets by another schema are blocked from deletion.
+- Relation field target/type updates are blocked when existing entries already use that relation field.
 
 ### Dynamic APIs
 
