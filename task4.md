@@ -441,7 +441,7 @@ Each task uses this structure:
 #### T427 - Redesign Permission Matrix
 
 - Version: `v4.6.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make role permission editing clearer.
 - Persona: Access-control UX engineer; reduce permission mistakes.
 - Success Criteria: Matrix clearly shows schemas, read/create/update/delete/manage actions, save state, and allowed/blocked meaning.

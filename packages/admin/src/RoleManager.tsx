@@ -121,7 +121,7 @@ export function RoleManager() {
         </select>
       </label>
       <PermissionGrid permissions={permissions} schemas={schemas} toggle={toggle} />
-      <button disabled={!roleId || schemas.length === 0} onClick={() => void savePermissions()}>
+      <button disabled={!roleId || schemas.length === 0} type="button" onClick={() => void savePermissions()}>
         <Save aria-hidden="true" size={16} />
         Save permissions
       </button>
@@ -179,21 +179,42 @@ function PermissionGrid(props: {
           Create a schema before assigning permissions.
         </StateMessage>
       ) : props.schemas.map((schema) => (
-        <fieldset key={schema.id}>
-          <legend>{schema.name} API - /api/content/{schema.slug}</legend>
+        <fieldset className="permission-card" key={schema.id}>
+          <legend>{schema.name}</legend>
+          <code>/api/content/{schema.slug}</code>
           {actions.map((action) => (
-            <label key={action}>
-              <input
-                checked={isAllowed(props.permissions, schema.id, action)}
-                type="checkbox"
-                onChange={(event) => props.toggle(schema.id, action, event.target.checked)}
-              />
-              {action}
-            </label>
+            <PermissionToggle
+              action={action}
+              allowed={isAllowed(props.permissions, schema.id, action)}
+              key={action}
+              onChange={(allowed) => props.toggle(schema.id, action, allowed)}
+            />
           ))}
         </fieldset>
       ))}
     </div>
+  );
+}
+
+function PermissionToggle({
+  action,
+  allowed,
+  onChange,
+}: {
+  action: PermissionAction;
+  allowed: boolean;
+  onChange: (allowed: boolean) => void;
+}) {
+  return (
+    <label className={allowed ? "permission-toggle is-allowed" : "permission-toggle"}>
+      <input
+        checked={allowed}
+        type="checkbox"
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <span>{action}</span>
+      <strong>{allowed ? "Allowed" : "Blocked"}</strong>
+    </label>
   );
 }
 

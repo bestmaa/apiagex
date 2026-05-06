@@ -246,6 +246,37 @@ code {
   gap: var(--admin-space-5);
 }
 
+.permission-card {
+  background: var(--admin-color-surface-raised);
+  box-shadow: var(--admin-shadow-sm);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.permission-card code {
+  width: fit-content;
+}
+
+.permission-toggle {
+  align-items: center;
+  background: var(--admin-color-surface-muted);
+  border-left: var(--admin-space-1) solid var(--admin-color-disabled);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding: var(--admin-space-3);
+}
+
+.permission-toggle.is-allowed {
+  border-left-color: var(--admin-color-primary);
+}
+
+.permission-toggle strong {
+  color: var(--admin-color-text-soft);
+  font-size: var(--admin-font-xs);
+  text-transform: uppercase;
+}
+
 .role-list {
   display: grid;
   gap: var(--admin-space-4);
