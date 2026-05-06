@@ -706,7 +706,7 @@ Each task uses this structure:
 #### T349 - Add Manual Relation QA Checklist
 
 - Version: `v2.6.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a manual QA checklist for relation modeling and editing.
 - Persona: QA lead; make release verification repeatable.
 - Success Criteria: Checklist covers schema relation types, entry pickers, populate, docs, mobile, and RBAC.
