@@ -638,7 +638,7 @@ Each task uses this structure:
 #### T344 - Entry Relation UI Gate
 
 - Version: `v2.5.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Verify relation entry UI with all relation types before docs/release work.
 - Persona: Release engineer; checkpoint editor workflow.
 - Success Criteria: Admin UI can create and edit entries using all four relation types.
@@ -646,6 +646,7 @@ Each task uses this structure:
 - Output: Entry UI checkpoint notes.
 - Strict Rule: Do not skip mobile verification.
 - Verify: Browser desktop/mobile plus standard verification.
+- Verification Notes: Browser checked desktop create/edit/reload and mobile edit/reload for oneToOne, oneToMany, manyToOne, and manyToMany fields on `T344 Source`.
 - Commit: `Verify relation entry UI`
 
 ### Phase 6: Docs, CLI, QA, And Release
