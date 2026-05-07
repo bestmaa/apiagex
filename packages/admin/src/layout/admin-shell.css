@@ -1,6 +1,7 @@
 .admin-shell {
+  background: var(--admin-color-bg);
   display: grid;
-  grid-template-columns: 248px minmax(0, 1fr);
+  grid-template-columns: 244px minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -22,26 +23,46 @@
 }
 
 .admin-sidebar {
-  background: var(--admin-color-surface);
-  border-right: 1px solid var(--admin-color-border);
+  background: var(--admin-color-sidebar);
+  color: var(--admin-color-sidebar-text);
   display: grid;
   grid-template-rows: auto 1fr;
   min-height: 100vh;
-  padding: var(--admin-space-10);
+  padding: var(--admin-space-8);
 }
 
 .admin-brand {
   align-items: center;
-  border-bottom: 1px solid var(--admin-color-border);
+  border-bottom: 1px solid color-mix(in srgb, var(--admin-color-sidebar-text) 12%, transparent);
   display: flex;
-  justify-content: space-between;
   gap: var(--admin-space-5);
-  margin-bottom: var(--admin-space-7);
-  padding-bottom: var(--admin-space-7);
+  justify-content: flex-start;
+  margin-bottom: var(--admin-space-8);
+  padding-bottom: var(--admin-space-8);
+}
+
+.admin-brand .eyebrow {
+  color: var(--admin-color-sidebar-muted);
+}
+
+.admin-brand-mark {
+  align-items: center;
+  background: linear-gradient(135deg, var(--admin-color-primary), #7dd3fc);
+  border-radius: var(--admin-radius-sm);
+  color: #ffffff;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: var(--admin-font-sm);
+  font-weight: 900;
+  height: 30px;
+  justify-content: center;
+  width: 30px;
 }
 
 .admin-brand h1 {
-  font-size: var(--admin-font-xl);
+  color: #ffffff;
+  font-size: var(--admin-font-md);
+  line-height: var(--admin-line-tight);
 }
 
 .mobile-nav-toggle {
@@ -53,21 +74,29 @@
   background: transparent;
   border: 0;
   display: grid;
-  gap: var(--admin-space-2);
+  gap: var(--admin-space-3);
   padding: 0;
 }
 
 .admin-nav a {
   align-items: center;
-  color: var(--admin-color-text-soft);
+  color: var(--admin-color-sidebar-text);
   display: flex;
+  font-size: var(--admin-font-sm);
   gap: var(--admin-space-3);
+  min-height: 38px;
+  padding: var(--admin-space-3) var(--admin-space-4);
 }
 
 .admin-nav a:hover,
 .admin-nav a.active,
 .admin-nav a[aria-current="page"] {
-  color: var(--admin-color-text-strong);
+  background: var(--admin-color-sidebar-active);
+  color: #ffffff;
+}
+
+.admin-nav a[aria-current="page"] {
+  box-shadow: inset 3px 0 0 var(--admin-color-primary);
 }
 
 .admin-workspace {
@@ -76,21 +105,28 @@
   min-width: 0;
 }
 
+.admin-workspace main {
+  justify-self: stretch;
+  max-width: 1220px;
+  width: 100%;
+}
+
 .admin-workspace main:focus {
   outline: 0;
 }
 
 .admin-topbar {
   align-items: center;
-  background: var(--admin-color-surface);
-  border-bottom: 1px solid var(--admin-color-border);
+  background: color-mix(in srgb, var(--admin-color-surface) 92%, transparent);
+  border-bottom: 1px solid var(--admin-color-border-soft);
   display: flex;
   justify-content: space-between;
   min-width: 0;
-  padding: var(--admin-space-7) var(--admin-space-10);
+  padding: var(--admin-space-6) var(--admin-space-10);
 }
 
 .admin-topbar h2 {
+  font-size: var(--admin-font-xl);
   margin-bottom: 0;
 }
 
@@ -134,7 +170,7 @@
   }
 
   .admin-sidebar {
-    border-bottom: 1px solid var(--admin-color-border);
+    border-bottom: 1px solid color-mix(in srgb, var(--admin-color-sidebar-text) 12%, transparent);
     border-right: 0;
     min-height: auto;
     padding: var(--admin-space-7);
@@ -146,6 +182,7 @@
   }
 
   .mobile-nav-toggle {
+    background: var(--admin-color-sidebar-active);
     display: inline-flex;
     flex: 0 0 auto;
     width: auto;
@@ -162,7 +199,7 @@
   }
 
   .admin-nav a {
-    border: 1px solid var(--admin-color-border-soft);
+    border: 1px solid color-mix(in srgb, var(--admin-color-sidebar-text) 12%, transparent);
     border-radius: var(--admin-radius-sm);
     justify-content: center;
     min-height: var(--admin-control-height);

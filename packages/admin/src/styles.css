@@ -9,6 +9,7 @@
 }
 
 body {
+  background: var(--admin-color-bg);
   margin: 0;
 }
 
@@ -84,27 +85,28 @@ a[aria-current="page"] {
 main {
   display: grid;
   gap: var(--admin-space-8);
-  max-width: 1120px;
-  padding: var(--admin-space-10) var(--admin-space-11) var(--admin-space-12);
+  max-width: 1220px;
+  padding: var(--admin-space-10) var(--admin-space-10) var(--admin-space-12);
 }
 
 section {
   background: var(--admin-color-surface);
-  border: 1px solid var(--admin-color-border);
+  border: 1px solid var(--admin-color-border-soft);
   border-radius: var(--admin-radius-md);
   box-shadow: var(--admin-shadow-sm);
   display: grid;
   gap: var(--admin-space-6);
-  padding: var(--admin-space-9);
+  padding: var(--admin-space-8);
 }
 
 .summary-panel {
-  background: var(--admin-color-surface-strong);
-  color: var(--admin-color-text-inverse);
+  background: var(--admin-color-surface);
+  border-left: 4px solid var(--admin-color-primary);
+  color: var(--admin-color-text);
 }
 
 .summary-panel p {
-  color: var(--admin-color-text-inverse-muted);
+  color: var(--admin-color-text-soft);
 }
 
 form {

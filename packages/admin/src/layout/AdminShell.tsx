@@ -65,6 +65,7 @@ export function AdminShell({
       <a className="skip-link" href="#admin-main">Skip to content</a>
       <aside className="admin-sidebar" aria-label="Admin sidebar" onKeyDown={closeMobileNavOnEscape}>
         <div className="admin-brand">
+          <span className="admin-brand-mark" aria-hidden="true">A</span>
           <div>
             <p className="eyebrow">Control plane</p>
             <h1>Apiagex</h1>
