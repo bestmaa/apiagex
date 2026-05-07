@@ -121,3 +121,16 @@ Run npm run check, npm run smoke, npm audit --audit-level=high, git diff --check
 - Strict Rule: Do not change backend schema behavior.
 - Verify: Browser Schemas desktop/mobile light/dark plus standard verification.
 - Commit: `Tighten schemas page spacing`
+
+#### T506 - Remove Duplicate Schemas Heading
+
+- Version: `v5.0.6`
+- Status: `completed`
+- Goal: Fix the Schemas page visual hierarchy by removing the duplicate page heading and making the schema list compact.
+- Persona: Admin UI reviewer; remove wasted space and make the list feel intentional.
+- Success Criteria: Schemas route shows one topbar title, a compact Add schema action, and schema rows without large empty vertical gaps.
+- Constraints: Keep add/edit/delete/list behavior from T503-T505.
+- Output: Clean Schemas page hierarchy and tighter inventory panel/rows.
+- Strict Rule: Do not change schema CRUD behavior.
+- Verify: Browser Schemas desktop/mobile light/dark plus standard verification.
+- Commit: `Remove duplicate schemas heading`

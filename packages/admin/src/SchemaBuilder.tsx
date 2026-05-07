@@ -172,9 +172,8 @@ export function SchemaBuilder() {
   }
 
   return (
-    <section aria-labelledby="schema-builder-title" className="schema-page">
+    <section aria-label="Schema management" className="schema-page">
       <div className="schema-page-heading">
-        <h2 id="schema-builder-title">Schemas</h2>
         <button type="button" onClick={openCreateSchema}>
           <Plus aria-hidden="true" size={16} />
           Add schema
