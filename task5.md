@@ -134,3 +134,16 @@ Run npm run check, npm run smoke, npm audit --audit-level=high, git diff --check
 - Strict Rule: Do not change schema CRUD behavior.
 - Verify: Browser Schemas desktop/mobile light/dark plus standard verification.
 - Commit: `Remove duplicate schemas heading`
+
+#### T507 - Stop Schemas Grid Stretch
+
+- Version: `v5.0.7`
+- Status: `completed`
+- Goal: Stop CSS grid stretch from creating huge empty vertical space on the Schemas page.
+- Persona: Layout debugger; fix the actual computed spacing instead of cosmetic padding only.
+- Success Criteria: Add schema button, Created Schemas heading, and schema rows render at natural height near the top of the page.
+- Constraints: Keep current topbar, list-first flow, and add/edit/delete behavior.
+- Output: CSS alignment fix for Schemas page and inventory grid.
+- Strict Rule: Do not change schema CRUD logic.
+- Verify: Browser Schemas desktop/mobile light/dark with computed spacing plus standard verification.
+- Commit: `Stop schemas grid stretch`

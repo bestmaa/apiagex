@@ -797,6 +797,8 @@ code {
 }
 
 .schema-page {
+  align-content: start;
+  align-self: start;
   background: transparent;
   border: 0;
   box-shadow: none;
@@ -990,6 +992,7 @@ code {
 }
 
 .schema-inventory {
+  align-content: start;
   background: var(--admin-color-surface-raised);
   border: 1px solid var(--admin-color-border-soft);
   border-radius: var(--admin-radius-md);
@@ -1010,6 +1013,7 @@ code {
 
 .schema-inventory-row {
   align-items: center;
+  align-self: start;
   background: var(--admin-color-surface-raised);
   border: 1px solid var(--admin-color-border-soft);
   border-left: var(--admin-space-1) solid var(--admin-color-disabled);
@@ -1594,7 +1598,12 @@ code {
 
   .schema-inventory-actions {
     display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     justify-content: stretch;
+  }
+
+  .schema-inventory-actions button {
+    width: auto;
   }
 
   .api-schema-heading,
