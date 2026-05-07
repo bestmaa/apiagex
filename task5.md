@@ -95,3 +95,16 @@ Run npm run check, npm run smoke, npm audit --audit-level=high, git diff --check
 - Strict Rule: Do not change schema persistence behavior beyond exposing existing delete route in the UI.
 - Verify: Browser Schemas desktop/mobile light/dark plus standard verification.
 - Commit: `Make schemas page list first`
+
+#### T504 - Remove Schemas Intro And Status Panel
+
+- Version: `v5.0.4`
+- Status: `completed`
+- Goal: Keep Schemas page header minimal with only the page title and a compact Add schema button.
+- Persona: Admin UI cleanup engineer; remove non-essential text and bulky status UI.
+- Success Criteria: Schemas route no longer shows English/Hinglish intro text or the large Schema status panel by default.
+- Constraints: Keep add, edit, delete, and list-first schema behavior from T503.
+- Output: Minimal Schemas page header and removed page-level status toast.
+- Strict Rule: Do not remove field/form validation or schema CRUD actions.
+- Verify: Browser Schemas desktop/mobile light/dark plus standard verification.
+- Commit: `Remove schemas intro and status panel`

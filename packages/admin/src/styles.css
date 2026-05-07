@@ -797,25 +797,15 @@ code {
 }
 
 .schema-page-heading {
-  align-items: start;
+  align-items: center;
   display: flex;
   gap: var(--admin-space-5);
   justify-content: space-between;
 }
 
-.schema-page-heading div {
-  display: grid;
-  gap: var(--admin-space-2);
-  min-width: 0;
-}
-
-.schema-page-heading h2,
-.schema-page-heading p {
+.schema-page-heading h2 {
   margin: 0;
-}
-
-.schema-page-heading p {
-  color: var(--admin-color-text-soft);
+  min-width: 0;
 }
 
 .schema-page-heading > button {

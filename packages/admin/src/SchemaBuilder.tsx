@@ -3,7 +3,6 @@ import { FilePlus, Pencil, Plus, Trash2 } from "lucide-react";
 import { createSchema, deleteSchema, listEntries, listSchemas, updateSchema } from "./api";
 import { SchemaInventoryList } from "./components/SchemaInventoryList";
 import { StateMessage } from "./components/StateMessage";
-import { StatusToast } from "./components/StatusToast";
 import type { FieldType, RelationType, SchemaDraft, SchemaFieldDraft, SchemaRecord } from "./schema.type";
 
 const fieldTypes: FieldType[] = [
@@ -74,7 +73,7 @@ export function SchemaBuilder() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedEntryCount, setSelectedEntryCount] = useState(0);
   const [selectedId, setSelectedId] = useState("");
-  const [status, setStatus] = useState("Schema list loading");
+  const [, setStatus] = useState("Schema list loading");
 
   useEffect(() => {
     void refreshSchemas();
@@ -175,11 +174,7 @@ export function SchemaBuilder() {
   return (
     <section aria-labelledby="schema-builder-title">
       <div className="schema-page-heading">
-        <div>
-          <h2 id="schema-builder-title">Schemas</h2>
-          <p>English: Manage created schemas first, then add or edit when needed.</p>
-          <p>Hinglish: Pehle schema list dekho, phir zarurat par add ya edit karo.</p>
-        </div>
+        <h2 id="schema-builder-title">Schemas</h2>
         <button type="button" onClick={openCreateSchema}>
           <Plus aria-hidden="true" size={16} />
           Add schema
@@ -226,7 +221,6 @@ export function SchemaBuilder() {
           </div>
         </form>
       ) : null}
-      <StatusToast title="Schema status">{status}</StatusToast>
       {selectedId && !editorOpen ? <SchemaDetails schema={schemas.find((schema) => schema.id === selectedId)} /> : null}
       <SchemaInventoryList
         onDelete={(schema) => void removeSchema(schema)}
