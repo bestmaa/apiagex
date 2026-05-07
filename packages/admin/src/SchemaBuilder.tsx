@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { FilePlus, Pencil, Plus, Trash2 } from "lucide-react";
-import { createSchema, listEntries, listSchemas, updateSchema } from "./api";
+import { createSchema, deleteSchema, listEntries, listSchemas, updateSchema } from "./api";
 import { SchemaInventoryList } from "./components/SchemaInventoryList";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
@@ -71,6 +71,7 @@ const emptyDraft: SchemaDraft = {
 export function SchemaBuilder() {
   const [schemas, setSchemas] = useState<SchemaRecord[]>([]);
   const [draft, setDraft] = useState<SchemaDraft>({ ...emptyDraft });
+  const [editorOpen, setEditorOpen] = useState(false);
   const [selectedEntryCount, setSelectedEntryCount] = useState(0);
   const [selectedId, setSelectedId] = useState("");
   const [status, setStatus] = useState("Schema list loading");
@@ -96,6 +97,7 @@ export function SchemaBuilder() {
     const successStatus = `${selectedId ? "Updated" : "Created"} schema: ${result.schema?.slug ?? input.slug}`;
     await refreshSchemas(successStatus);
     if (result.schema) selectSchema(result.schema);
+    setEditorOpen(false);
   }
 
   function resetDraft() {
@@ -103,6 +105,11 @@ export function SchemaBuilder() {
     setSelectedEntryCount(0);
     setDraft({ ...emptyDraft, fields: [{ ...emptyField }] });
     setStatus("Ready to create schema");
+  }
+
+  function openCreateSchema() {
+    resetDraft();
+    setEditorOpen(true);
   }
 
   function selectSchema(schema: SchemaRecord) {
@@ -121,6 +128,26 @@ export function SchemaBuilder() {
         relationType: field.relationType ?? undefined,
       })),
     });
+  }
+
+  function editSchema(schema: SchemaRecord) {
+    selectSchema(schema);
+    setEditorOpen(true);
+  }
+
+  async function removeSchema(schema: SchemaRecord) {
+    const confirmed = window.confirm(`Delete schema "${schema.name}"? This also removes its fields and generated admin entry area.`);
+    if (!confirmed) return;
+    const result = await deleteSchema(schema.id);
+    if (!result.ok) {
+      setStatus(result.error ?? "Schema delete failed");
+      return;
+    }
+    if (selectedId === schema.id) {
+      resetDraft();
+      setEditorOpen(false);
+    }
+    await refreshSchemas(`Deleted schema: ${schema.slug}`);
   }
 
   async function refreshSelectedEntryCount(schemaId: string) {
@@ -147,51 +174,67 @@ export function SchemaBuilder() {
 
   return (
     <section aria-labelledby="schema-builder-title">
-      <h2 id="schema-builder-title">Schemas</h2>
-      <p>English: Create schemas, edit schema basics, add fields, and connect relation fields safely.</p>
-      <p>Hinglish: Schemas banao, basics edit karo, fields add karo, aur relation fields safely connect karo.</p>
-      <form className="schema-form" onSubmit={submitSchema}>
-        <fieldset className="schema-form-section">
-          <legend>Schema basics</legend>
-          <div className="schema-basics-grid">
-            <label>Name <input required placeholder="Article" value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
-            <label>Slug <input required pattern="[a-z](?:[a-z0-9]|-)*" placeholder="article" value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value })} /></label>
-          </div>
-          <label>Description <textarea rows={3} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
-        </fieldset>
-        <fieldset className="schema-form-section">
-          <legend>Fields</legend>
-          <div className="field-list">
-            {draft.fields.map((field, index) => (
-              <SchemaFieldRow
-                field={field}
-                index={index}
-                key={`${field.slug}-${index}`}
-                onChange={updateField}
-                onRemove={removeField}
-                removable={draft.fields.length > 1}
-                selectedEntryCount={selectedEntryCount}
-                selectedSchemaId={selectedId}
-                schemas={schemas}
-              />
-            ))}
-          </div>
-          <button type="button" onClick={() => setDraft({ ...draft, fields: [...draft.fields, { ...emptyField }] })}>
-            <Plus aria-hidden="true" size={16} />
-            Add field
-          </button>
-        </fieldset>
-        <div className="schema-form-actions">
-          <button type="submit">
-            {selectedId ? <Pencil aria-hidden="true" size={16} /> : <FilePlus aria-hidden="true" size={16} />}
-            {selectedId ? "Update schema" : "Create schema"}
-          </button>
-          {selectedId ? <button type="button" onClick={resetDraft}>New schema</button> : null}
+      <div className="schema-page-heading">
+        <div>
+          <h2 id="schema-builder-title">Schemas</h2>
+          <p>English: Manage created schemas first, then add or edit when needed.</p>
+          <p>Hinglish: Pehle schema list dekho, phir zarurat par add ya edit karo.</p>
         </div>
-      </form>
+        <button type="button" onClick={openCreateSchema}>
+          <Plus aria-hidden="true" size={16} />
+          Add schema
+        </button>
+      </div>
+      {editorOpen ? (
+        <form className="schema-form" onSubmit={submitSchema}>
+          <fieldset className="schema-form-section">
+            <legend>{selectedId ? "Edit schema basics" : "New schema basics"}</legend>
+            <div className="schema-basics-grid">
+              <label>Name <input required placeholder="Article" value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
+              <label>Slug <input required pattern="[a-z](?:[a-z0-9]|-)*" placeholder="article" value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value })} /></label>
+            </div>
+            <label>Description <textarea rows={3} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
+          </fieldset>
+          <fieldset className="schema-form-section">
+            <legend>Fields</legend>
+            <div className="field-list">
+              {draft.fields.map((field, index) => (
+                <SchemaFieldRow
+                  field={field}
+                  index={index}
+                  key={`${field.slug}-${index}`}
+                  onChange={updateField}
+                  onRemove={removeField}
+                  removable={draft.fields.length > 1}
+                  selectedEntryCount={selectedEntryCount}
+                  selectedSchemaId={selectedId}
+                  schemas={schemas}
+                />
+              ))}
+            </div>
+            <button type="button" onClick={() => setDraft({ ...draft, fields: [...draft.fields, { ...emptyField }] })}>
+              <Plus aria-hidden="true" size={16} />
+              Add field
+            </button>
+          </fieldset>
+          <div className="schema-form-actions">
+            <button type="submit">
+              {selectedId ? <Pencil aria-hidden="true" size={16} /> : <FilePlus aria-hidden="true" size={16} />}
+              {selectedId ? "Update schema" : "Create schema"}
+            </button>
+            <button type="button" onClick={() => setEditorOpen(false)}>Cancel</button>
+          </div>
+        </form>
+      ) : null}
       <StatusToast title="Schema status">{status}</StatusToast>
-      <SchemaDetails schema={schemas.find((schema) => schema.id === selectedId)} />
-      <SchemaInventoryList onSelect={selectSchema} schemas={schemas} selectedId={selectedId} />
+      {selectedId && !editorOpen ? <SchemaDetails schema={schemas.find((schema) => schema.id === selectedId)} /> : null}
+      <SchemaInventoryList
+        onDelete={(schema) => void removeSchema(schema)}
+        onEdit={editSchema}
+        onSelect={selectSchema}
+        schemas={schemas}
+        selectedId={selectedId}
+      />
     </section>
   );
 }

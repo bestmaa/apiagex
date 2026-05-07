@@ -65,3 +65,9 @@ export type SchemaMutationResponse = {
   schema?: SchemaRecord;
   error?: string;
 };
+
+export type SchemaDeleteResponse = {
+  ok: boolean;
+  deleted?: boolean;
+  error?: string;
+};

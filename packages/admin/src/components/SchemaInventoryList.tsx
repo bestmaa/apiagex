@@ -1,12 +1,16 @@
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import type { SchemaRecord } from "../schema.type";
 import { StateMessage } from "./StateMessage";
 
 export function SchemaInventoryList({
+  onDelete,
+  onEdit,
   onSelect,
   schemas,
   selectedId,
 }: {
+  onDelete: (schema: SchemaRecord) => void;
+  onEdit: (schema: SchemaRecord) => void;
   onSelect: (schema: SchemaRecord) => void;
   schemas: SchemaRecord[];
   selectedId: string;
@@ -39,10 +43,19 @@ export function SchemaInventoryList({
                 <span>{schema.fields.length} fields</span>
                 <span>{relationCount} relations</span>
               </div>
-              <button type="button" onClick={() => onSelect(schema)}>
-                <Pencil aria-hidden="true" size={16} />
-                {selected ? "Selected" : "Edit"}
-              </button>
+              <div className="schema-inventory-actions">
+                <button type="button" onClick={() => onSelect(schema)}>
+                  {selected ? "Selected" : "View"}
+                </button>
+                <button type="button" onClick={() => onEdit(schema)}>
+                  <Pencil aria-hidden="true" size={16} />
+                  Edit
+                </button>
+                <button className="danger-button" type="button" onClick={() => onDelete(schema)}>
+                  <Trash2 aria-hidden="true" size={16} />
+                  Delete
+                </button>
+              </div>
             </article>
           );
         })}

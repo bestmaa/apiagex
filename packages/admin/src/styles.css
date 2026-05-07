@@ -796,6 +796,32 @@ code {
   grid-template-columns: minmax(0, 1fr) auto auto;
 }
 
+.schema-page-heading {
+  align-items: start;
+  display: flex;
+  gap: var(--admin-space-5);
+  justify-content: space-between;
+}
+
+.schema-page-heading div {
+  display: grid;
+  gap: var(--admin-space-2);
+  min-width: 0;
+}
+
+.schema-page-heading h2,
+.schema-page-heading p {
+  margin: 0;
+}
+
+.schema-page-heading p {
+  color: var(--admin-color-text-soft);
+}
+
+.schema-page-heading > button {
+  flex: 0 0 auto;
+}
+
 .schema-form {
   gap: var(--admin-space-6);
   max-width: 900px;
@@ -992,7 +1018,7 @@ code {
   box-shadow: var(--admin-shadow-sm);
   display: grid;
   gap: var(--admin-space-5);
-  grid-template-columns: minmax(0, 1.5fr) minmax(170px, 0.7fr) auto;
+  grid-template-columns: minmax(0, 1.4fr) minmax(170px, 0.6fr) auto;
   padding: var(--admin-space-5);
 }
 
@@ -1028,6 +1054,29 @@ code {
   font-size: var(--admin-font-xs);
   font-weight: 800;
   padding: var(--admin-space-2) var(--admin-space-3);
+}
+
+.schema-inventory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-2);
+  justify-content: flex-end;
+}
+
+.schema-inventory-actions button {
+  min-height: 34px;
+  padding: var(--admin-space-2) var(--admin-space-3);
+}
+
+.danger-button {
+  background: var(--admin-color-warning-bg);
+  border-color: var(--admin-color-warning-border);
+  color: var(--admin-color-warning-text);
+}
+
+.danger-button:hover {
+  background: var(--admin-color-warning-border);
+  color: var(--admin-color-text-inverse);
 }
 
 .api-row {
@@ -1538,9 +1587,15 @@ code {
   .field-builder-header,
   .entry-row-actions,
   .role-row-badges,
+  .schema-page-heading,
   .schema-form-actions {
     align-items: stretch;
     display: grid;
+  }
+
+  .schema-inventory-actions {
+    display: grid;
+    justify-content: stretch;
   }
 
   .api-schema-heading,

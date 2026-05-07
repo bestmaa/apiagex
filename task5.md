@@ -82,3 +82,16 @@ Run npm run check, npm run smoke, npm audit --audit-level=high, git diff --check
 - Strict Rule: No marketing hero and no nested cards.
 - Verify: Browser dashboard desktop/mobile light/dark plus standard verification.
 - Commit: `Redesign dashboard panels for selected style`
+
+#### T503 - Make Schemas Page List First
+
+- Version: `v5.0.3`
+- Status: `completed`
+- Goal: Open Schemas on the created schema list, with a compact Add button that reveals the schema form only when needed.
+- Persona: Admin workflow engineer; make schema management feel direct and low-clutter.
+- Success Criteria: Schemas route defaults to list view, Add opens create form, Edit opens selected schema in edit form, Delete removes a schema and refreshes the list.
+- Constraints: Keep existing schema builder fields, relation options, validations, and backend routes.
+- Output: Updated schema page flow, inventory actions, and Admin API delete helper.
+- Strict Rule: Do not change schema persistence behavior beyond exposing existing delete route in the UI.
+- Verify: Browser Schemas desktop/mobile light/dark plus standard verification.
+- Commit: `Make schemas page list first`

@@ -14,6 +14,7 @@ import type {
 import type { UserListResponse, UserMutationResponse } from "./user.type";
 import type {
   SchemaDraft,
+  SchemaDeleteResponse,
   SchemaListResponse,
   SchemaMutationResponse,
 } from "./schema.type";
@@ -66,6 +67,13 @@ export async function updateSchema(
     body: JSON.stringify(input),
   });
   return (await response.json()) as SchemaMutationResponse;
+}
+
+export async function deleteSchema(schemaId: string): Promise<SchemaDeleteResponse> {
+  const response = await fetch(`/api/admin/schemas/${schemaId}`, {
+    method: "DELETE",
+  });
+  return (await response.json()) as SchemaDeleteResponse;
 }
 
 export async function listEntries(schemaId: string): Promise<EntryListResponse> {
