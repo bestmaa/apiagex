@@ -8,8 +8,9 @@ export function resolveLocalServerConfig(
   env: ServerConfigEnv = process.env,
   cwd = process.cwd(),
 ): LocalServerConfig {
-  const databasePath = resolve(cwd, env.APIAGEX_DATABASE_PATH ?? `${defaultDataDir}/apiagex.sqlite`);
-  const uploadsPath = resolve(cwd, env.APIAGEX_UPLOADS_PATH ?? `${defaultDataDir}/uploads`);
+  const baseCwd = env.INIT_CWD ?? cwd;
+  const databasePath = resolve(baseCwd, env.APIAGEX_DATABASE_PATH ?? `${defaultDataDir}/apiagex.sqlite`);
+  const uploadsPath = resolve(baseCwd, env.APIAGEX_UPLOADS_PATH ?? `${defaultDataDir}/uploads`);
   return { databasePath, uploadsPath };
 }
 

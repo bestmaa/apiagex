@@ -29,6 +29,16 @@ describe("local server configuration", () => {
     expect(config.uploadsPath).toBe("/workspace/app/storage/uploads");
   });
 
+  it("uses npm INIT_CWD for workspace dev persistence defaults", () => {
+    const config = resolveLocalServerConfig(
+      { INIT_CWD: "/workspace/app" },
+      "/workspace/app/packages/server",
+    );
+
+    expect(config.databasePath).toBe("/workspace/app/.apiagex/apiagex.sqlite");
+    expect(config.uploadsPath).toBe("/workspace/app/.apiagex/uploads");
+  });
+
   it("creates local persistence directories only when explicitly requested", async () => {
     const root = await mkdtemp(join(tmpdir(), "apiagex-config-"));
     const config = resolveLocalServerConfig({}, root);

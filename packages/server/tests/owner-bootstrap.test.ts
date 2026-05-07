@@ -58,6 +58,40 @@ describe("owner bootstrap API", () => {
     });
   });
 
+  it("allows owner bootstrap when only non-owner users already exist", async () => {
+    const database = openSqliteDatabase();
+    const server = createServer({ database });
+    const now = new Date().toISOString();
+    database
+      .prepare(
+        "INSERT INTO roles (id, name, description, is_owner, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+      )
+      .run("role_editor", "editor", "Editor", 0, now, now);
+    database
+      .prepare(
+        "INSERT INTO users (id, email, password_hash, role_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+      )
+      .run("user_editor", "editor@apiagex.local", "hash", "role_editor", now, now);
+
+    const response = await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: {
+        email: "owner@apiagex.local",
+        password: "OwnerPass123!",
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      ok: true,
+      user: {
+        email: "owner@apiagex.local",
+        role: "owner",
+      },
+    });
+  });
+
   it("logs in an existing owner", async () => {
     const database = openSqliteDatabase();
     const server = createServer({ database });

@@ -20,17 +20,27 @@ export function bootstrapOwner(
     throw new Error("OWNER_PASSWORD_TOO_SHORT");
   }
 
-  const userCount = db.prepare("SELECT COUNT(*) as count FROM users").get() as {
+  const ownerCount = db
+    .prepare(
+      "SELECT COUNT(*) as count FROM users JOIN roles ON roles.id = users.role_id WHERE roles.is_owner = 1",
+    )
+    .get() as {
     count: number;
   };
-  if (userCount.count > 0) {
+  if (ownerCount.count > 0) {
     throw new Error("OWNER_ALREADY_BOOTSTRAPPED");
   }
 
   const now = new Date().toISOString();
   const userId = randomUUID();
   db.prepare(
-    "INSERT INTO roles (id, name, description, is_owner, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+    `INSERT INTO roles (id, name, description, is_owner, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET
+       name = excluded.name,
+       description = excluded.description,
+       is_owner = excluded.is_owner,
+       updated_at = excluded.updated_at`,
   ).run(OWNER_ROLE_ID, "owner", "System owner", 1, now, now);
   db.prepare(
     "INSERT INTO users (id, email, password_hash, role_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
