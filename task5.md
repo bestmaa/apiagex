@@ -73,7 +73,7 @@ Run npm run check, npm run smoke, npm audit --audit-level=high, git diff --check
 #### T502 - Redesign Dashboard Panels To Match Direction
 
 - Version: `v5.0.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make dashboard metrics, readiness, quick actions, and recent schemas match the selected compact dashboard feel.
 - Persona: Dashboard UX engineer; improve scan speed and visual hierarchy.
 - Success Criteria: Dashboard feels close to the selected operational layout while staying Apiagex-specific.

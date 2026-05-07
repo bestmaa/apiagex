@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import { BookOpen, Database, FileText, KeyRound, Network, Users } from "lucide-react";
+import { BookOpen, Database, FileText, KeyRound, Network, Users, type LucideIcon } from "lucide-react";
 import { listEntries, listRoles, listSchemas, listUsers } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
@@ -67,7 +67,7 @@ export function DashboardPage({ sessionPanel }: { sessionPanel: ReactNode }) {
         <p>Hinglish: Schemas, generated APIs, roles, aur users ek jagah se monitor karo.</p>
       </section>
       {sessionPanel}
-      <section>
+      <section className="dashboard-summary-section">
         <h2>Workspace Summary</h2>
         <StatusToast title="Dashboard status">{status}</StatusToast>
         {state ? <DashboardSummary state={state} /> : null}
@@ -85,10 +85,10 @@ function DashboardSummary({ state }: { state: DashboardState }) {
   return (
     <>
       <div className="dashboard-metrics" aria-label="Workspace metrics">
-        <Metric label="Schemas" value={schemaCount} detail={`${schemaCount} generated APIs`} />
-        <Metric label="Entries" value={entryCount} detail={`${schemasWithEntries} schemas contain content`} />
-        <Metric label="Roles" value={state.roles.length} detail="Permission profiles" />
-        <Metric label="Users" value={state.users.length} detail="Assigned admin users" />
+        <Metric icon={Database} label="Schemas" value={schemaCount} detail={`${schemaCount} generated APIs`} tone="blue" />
+        <Metric icon={FileText} label="Entries" value={entryCount} detail={`${schemasWithEntries} schemas contain content`} tone="orange" />
+        <Metric icon={KeyRound} label="Roles" value={state.roles.length} detail="Permission profiles" tone="violet" />
+        <Metric icon={Users} label="Users" value={state.users.length} detail="Assigned admin users" tone="green" />
       </div>
       <div className="dashboard-grid">
         <ReadinessSummary
@@ -104,11 +104,26 @@ function DashboardSummary({ state }: { state: DashboardState }) {
   );
 }
 
-function Metric({ detail, label, value }: { detail: string; label: string; value: number }) {
+function Metric({
+  detail,
+  icon: Icon,
+  label,
+  tone,
+  value,
+}: {
+  detail: string;
+  icon: LucideIcon;
+  label: string;
+  tone: "blue" | "green" | "orange" | "violet";
+  value: number;
+}) {
   return (
-    <article className="dashboard-metric">
-      <span>{label}</span>
+    <article className={`dashboard-metric dashboard-metric-${tone}`}>
+      <span className="dashboard-metric-label">{label}</span>
       <strong>{value}</strong>
+      <span className="dashboard-metric-icon">
+        <Icon aria-hidden="true" size={18} />
+      </span>
       <p>{detail}</p>
     </article>
   );

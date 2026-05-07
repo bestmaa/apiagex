@@ -561,8 +561,19 @@ code {
 
 .dashboard-metrics {
   display: grid;
-  gap: var(--admin-space-5);
+  gap: var(--admin-space-4);
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.dashboard-summary-section {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.dashboard-summary-section > h2 {
+  margin-bottom: var(--admin-space-4);
 }
 
 .dashboard-metric,
@@ -574,13 +585,16 @@ code {
 }
 
 .dashboard-metric {
+  align-items: start;
   display: grid;
-  gap: var(--admin-space-2);
+  gap: var(--admin-space-2) var(--admin-space-4);
+  grid-template-columns: minmax(0, 1fr) 38px;
   min-width: 0;
-  padding: var(--admin-space-6);
+  min-height: 116px;
+  padding: var(--admin-space-7);
 }
 
-.dashboard-metric span {
+.dashboard-metric-label {
   color: var(--admin-color-text-muted);
   font-size: var(--admin-font-xs);
   font-weight: 800;
@@ -590,42 +604,98 @@ code {
 .dashboard-metric strong {
   color: var(--admin-color-text-strong);
   font-size: var(--admin-font-xl);
+  grid-column: 1;
   line-height: var(--admin-line-tight);
 }
 
 .dashboard-metric p {
   color: var(--admin-color-text-soft);
+  grid-column: 1 / -1;
   margin: 0;
+}
+
+.dashboard-metric-icon {
+  align-items: center;
+  border-radius: var(--admin-radius-sm);
+  display: inline-flex;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  height: 38px;
+  justify-content: center;
+  justify-self: end;
+  width: 38px;
+}
+
+.dashboard-metric-blue .dashboard-metric-icon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.dashboard-metric-orange .dashboard-metric-icon {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.dashboard-metric-violet .dashboard-metric-icon {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.dashboard-metric-green .dashboard-metric-icon {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+[data-theme="dark"] .dashboard-metric-blue .dashboard-metric-icon {
+  background: #1d355f;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .dashboard-metric-orange .dashboard-metric-icon {
+  background: #4a2817;
+  color: #fdba74;
+}
+
+[data-theme="dark"] .dashboard-metric-violet .dashboard-metric-icon {
+  background: #35235f;
+  color: #c4b5fd;
+}
+
+[data-theme="dark"] .dashboard-metric-green .dashboard-metric-icon {
+  background: #183b2a;
+  color: #86efac;
 }
 
 .dashboard-grid {
   display: grid;
-  gap: var(--admin-space-6);
-  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.3fr);
-  margin-top: var(--admin-space-6);
+  gap: var(--admin-space-4);
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
+  margin-top: var(--admin-space-4);
 }
 
 .dashboard-panel {
   display: grid;
-  gap: var(--admin-space-5);
-  padding: var(--admin-space-6);
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-7);
 }
 
 .dashboard-panel h3 {
+  font-size: var(--admin-font-md);
   margin: 0;
 }
 
 .dashboard-panel .schema-row {
   grid-template-columns: minmax(0, 1fr) auto auto auto;
+  padding: var(--admin-space-4);
 }
 
 .quick-actions {
-  margin-top: var(--admin-space-6);
+  margin-top: var(--admin-space-4);
 }
 
 .quick-action-list {
   display: grid;
-  gap: var(--admin-space-4);
+  gap: var(--admin-space-3);
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -636,11 +706,21 @@ code {
   border-radius: var(--admin-radius-sm);
   color: var(--admin-color-text);
   display: flex;
-  gap: var(--admin-space-4);
+  gap: var(--admin-space-3);
   min-width: 0;
-  padding: var(--admin-space-4);
+  padding: var(--admin-space-3);
   text-decoration: none;
   transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.quick-action-list a > svg {
+  background: var(--admin-color-surface);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-primary);
+  flex: 0 0 auto;
+  height: 34px;
+  padding: var(--admin-space-2);
+  width: 34px;
 }
 
 .quick-action-list a:hover {
@@ -666,6 +746,7 @@ code {
 
 .readiness-row {
   align-items: center;
+  background: var(--admin-color-surface-muted);
   border-left: var(--admin-space-1) solid var(--admin-color-warning-border);
   border-radius: var(--admin-radius-sm);
   display: grid;
