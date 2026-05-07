@@ -108,3 +108,16 @@ Run npm run check, npm run smoke, npm audit --audit-level=high, git diff --check
 - Strict Rule: Do not remove field/form validation or schema CRUD actions.
 - Verify: Browser Schemas desktop/mobile light/dark plus standard verification.
 - Commit: `Remove schemas intro and status panel`
+
+#### T505 - Tighten Schemas Page Spacing
+
+- Version: `v5.0.5`
+- Status: `completed`
+- Goal: Remove the oversized Schemas page card spacing and hide the schema list while the add/edit form is open.
+- Persona: Practical admin UI engineer; make the page compact and focused.
+- Success Criteria: Schemas route has tight page spacing, only a small Add schema button in the header, and add/edit mode does not show the existing schema list underneath.
+- Constraints: Keep schema create, edit, delete, field, and relation behavior unchanged.
+- Output: Compact Schemas page layout and focused add/edit mode.
+- Strict Rule: Do not change backend schema behavior.
+- Verify: Browser Schemas desktop/mobile light/dark plus standard verification.
+- Commit: `Tighten schemas page spacing`

@@ -796,6 +796,14 @@ code {
   grid-template-columns: minmax(0, 1fr) auto auto;
 }
 
+.schema-page {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  gap: var(--admin-space-5);
+  padding: 0;
+}
+
 .schema-page-heading {
   align-items: center;
   display: flex;
@@ -810,10 +818,12 @@ code {
 
 .schema-page-heading > button {
   flex: 0 0 auto;
+  min-height: 34px;
+  padding: var(--admin-space-2) var(--admin-space-4);
 }
 
 .schema-form {
-  gap: var(--admin-space-6);
+  gap: var(--admin-space-4);
   max-width: 900px;
 }
 

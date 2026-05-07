@@ -172,7 +172,7 @@ export function SchemaBuilder() {
   }
 
   return (
-    <section aria-labelledby="schema-builder-title">
+    <section aria-labelledby="schema-builder-title" className="schema-page">
       <div className="schema-page-heading">
         <h2 id="schema-builder-title">Schemas</h2>
         <button type="button" onClick={openCreateSchema}>
@@ -221,14 +221,18 @@ export function SchemaBuilder() {
           </div>
         </form>
       ) : null}
-      {selectedId && !editorOpen ? <SchemaDetails schema={schemas.find((schema) => schema.id === selectedId)} /> : null}
-      <SchemaInventoryList
-        onDelete={(schema) => void removeSchema(schema)}
-        onEdit={editSchema}
-        onSelect={selectSchema}
-        schemas={schemas}
-        selectedId={selectedId}
-      />
+      {!editorOpen ? (
+        <>
+          {selectedId ? <SchemaDetails schema={schemas.find((schema) => schema.id === selectedId)} /> : null}
+          <SchemaInventoryList
+            onDelete={(schema) => void removeSchema(schema)}
+            onEdit={editSchema}
+            onSelect={selectSchema}
+            schemas={schemas}
+            selectedId={selectedId}
+          />
+        </>
+      ) : null}
     </section>
   );
 }
