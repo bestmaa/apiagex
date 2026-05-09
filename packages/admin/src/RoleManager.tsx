@@ -104,21 +104,21 @@ export function RoleManager() {
   return (
     <section aria-labelledby="role-manager-title">
       <h2 id="role-manager-title">Roles</h2>
-      <p>English: Checked actions are allowed for requests sent with that role id.</p>
-      <p>Hinglish: Checked actions us role id ke saath bheje gaye requests ke liye allowed hain.</p>
+      <p>English: These are API roles only; owner and admin panel roles are kept separate.</p>
+      <p>Hinglish: Ye sirf API roles hain; owner aur admin panel roles alag rakhe gaye hain.</p>
       <p>Unchecked actions are blocked when <code>x-apiagex-role-id</code> is provided. <code>manage</code> allows every action for that schema.</p>
       <form onSubmit={submitRole}>
-        <label>Role name <input name="name" pattern="[a-z](?:[a-z0-9]|-)*" required /></label>
-        <label>Role description <input name="description" /></label>
+        <label>API role name <input name="name" pattern="[a-z](?:[a-z0-9]|-)*" required /></label>
+        <label>API role description <input name="description" /></label>
         <button type="submit">
           <Plus aria-hidden="true" size={16} />
-          Create role
+          Create API role
         </button>
       </form>
       <RoleList activeRoleId={roleId} permissions={permissions} roles={roles} schemas={schemas} />
-      <label>Active role
+      <label>Active API role
         <select value={roleId} onChange={(event) => void changeRole(event.target.value)}>
-          <option value="">Select role</option>
+          <option value="">Select API role</option>
           {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
         </select>
       </label>

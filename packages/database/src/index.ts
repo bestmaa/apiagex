@@ -69,7 +69,7 @@ export type {
   SingleRelationEntryValue,
   UpdateEntryInput,
 } from "./entry-repository.type.js";
-export type { CreateRoleInput, RoleRecord } from "./role-repository.type.js";
+export type { CreateRoleInput, RoleKind, RoleRecord } from "./role-repository.type.js";
 export type {
   PermissionAction,
   PermissionRecord,

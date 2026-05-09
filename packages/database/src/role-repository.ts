@@ -5,20 +5,21 @@ import type { CreateRoleInput, RoleRecord } from "./role-repository.type.js";
 type RoleRow = Omit<RoleRecord, "isOwner"> & { isOwner: number };
 
 const roleNamePattern = /^[a-z][a-z0-9-]*$/;
+const adminRoleNames = new Set(["owner", "admin", "schema-manager", "user-manager"]);
 
 export function createRole(db: SqliteDatabase, input: CreateRoleInput): RoleRecord {
   validateRole(input);
   const id = randomUUID();
   const now = new Date().toISOString();
   db.prepare(
-    "INSERT INTO roles (id, name, description, is_owner, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
-  ).run(id, input.name, input.description ?? "", 0, now, now);
+    "INSERT INTO roles (id, name, description, is_owner, role_kind, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+  ).run(id, input.name, input.description ?? "", 0, "api", now, now);
   return requireRole(db, id);
 }
 
 export function listRoles(db: SqliteDatabase): RoleRecord[] {
   const rows = db
-    .prepare(roleSelectSql("ORDER BY created_at ASC"))
+    .prepare(roleSelectSql("WHERE role_kind = 'api' ORDER BY created_at ASC"))
     .all() as RoleRow[];
   return rows.map(rowToRole);
 }
@@ -35,6 +36,9 @@ function validateRole(input: CreateRoleInput): void {
   if (input.name === "owner") {
     throw new Error("ROLE_OWNER_RESERVED");
   }
+  if (adminRoleNames.has(input.name)) {
+    throw new Error("ROLE_ADMIN_RESERVED");
+  }
 }
 
 function requireRole(db: SqliteDatabase, id: string): RoleRecord {
@@ -50,5 +54,5 @@ function rowToRole(row: RoleRow): RoleRecord {
 }
 
 function roleSelectSql(suffix: string): string {
-  return `SELECT id, name, description, is_owner as isOwner, created_at as createdAt, updated_at as updatedAt FROM roles ${suffix}`;
+  return `SELECT id, name, description, is_owner as isOwner, role_kind as roleKind, created_at as createdAt, updated_at as updatedAt FROM roles ${suffix}`;
 }

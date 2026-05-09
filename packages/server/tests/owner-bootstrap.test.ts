@@ -25,9 +25,75 @@ describe("owner bootstrap API", () => {
         role: "owner",
       },
     });
-    expect(database.prepare("SELECT name FROM roles").get()).toEqual({
+    expect(database.prepare("SELECT name, role_kind as roleKind FROM roles WHERE id = ?").get("role_owner")).toEqual({
       name: "owner",
+      roleKind: "admin",
     });
+  });
+
+  it("seeds admin roles and lists API roles only", async () => {
+    const database = openSqliteDatabase();
+    const server = createServer({ database });
+
+    await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: {
+        email: "owner@apiagex.local",
+        password: "OwnerPass123!",
+      },
+    });
+
+    const adminRoles = database
+      .prepare("SELECT name FROM roles WHERE role_kind = 'admin' ORDER BY name")
+      .all() as Array<{ name: string }>;
+    expect(adminRoles.map((role) => role.name)).toEqual([
+      "admin",
+      "owner",
+      "schema-manager",
+      "user-manager",
+    ]);
+
+    const response = await server.inject({ method: "GET", url: "/api/admin/roles" });
+    expect(response.json().roles.map((role: { name: string }) => role.name).sort()).toEqual([
+      "editor",
+      "public",
+      "reader",
+      "single-reader",
+      "writer",
+    ]);
+  });
+
+  it("does not let owner role bypass content API permissions", async () => {
+    const database = openSqliteDatabase();
+    const server = createServer({ database });
+
+    await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: {
+        email: "owner@apiagex.local",
+        password: "OwnerPass123!",
+      },
+    });
+    await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Article",
+        slug: "article",
+        fields: [{ name: "Title", slug: "title", type: "text" }],
+      },
+    });
+
+    const response = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { "x-apiagex-role-id": "role_owner" },
+    });
+
+    expect(response.statusCode).toBe(403);
+    expect(response.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
   });
 
   it("blocks a second owner bootstrap", async () => {

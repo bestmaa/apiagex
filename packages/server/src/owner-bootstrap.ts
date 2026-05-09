@@ -7,6 +7,19 @@ import type {
 } from "./owner-bootstrap.type.js";
 
 const OWNER_ROLE_ID = "role_owner";
+const adminRoleCatalog = [
+  [OWNER_ROLE_ID, "owner", "System owner", true],
+  ["role_admin", "admin", "Admin panel administrator", false],
+  ["role_schema_manager", "schema-manager", "Schema manager", false],
+  ["role_user_manager", "user-manager", "User manager", false],
+] as const;
+const apiRoleCatalog = [
+  ["role_api_reader", "reader", "List reader"],
+  ["role_api_single_reader", "single-reader", "Single entry reader"],
+  ["role_api_writer", "writer", "Content writer"],
+  ["role_api_editor", "editor", "Content editor"],
+  ["role_api_public", "public", "Public API role"],
+] as const;
 
 export function bootstrapOwner(
   db: SqliteDatabase,
@@ -33,15 +46,7 @@ export function bootstrapOwner(
 
   const now = new Date().toISOString();
   const userId = randomUUID();
-  db.prepare(
-    `INSERT INTO roles (id, name, description, is_owner, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?)
-     ON CONFLICT(id) DO UPDATE SET
-       name = excluded.name,
-       description = excluded.description,
-       is_owner = excluded.is_owner,
-       updated_at = excluded.updated_at`,
-  ).run(OWNER_ROLE_ID, "owner", "System owner", 1, now, now);
+  seedDefaultRoles(db, now);
   db.prepare(
     "INSERT INTO users (id, email, password_hash, role_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
   ).run(userId, email, hashPassword(input.password), OWNER_ROLE_ID, now, now);
@@ -77,4 +82,33 @@ export function loginOwner(
 
 function hashPassword(password: string): string {
   return createHash("sha256").update(password).digest("hex");
+}
+
+function seedDefaultRoles(db: SqliteDatabase, now: string): void {
+  for (const [id, name, description, isOwner] of adminRoleCatalog) {
+    seedRole(db, id, name, description, isOwner, "admin", now);
+  }
+  for (const [id, name, description] of apiRoleCatalog) {
+    seedRole(db, id, name, description, false, "api", now);
+  }
+}
+
+function seedRole(
+  db: SqliteDatabase,
+  id: string,
+  name: string,
+  description: string,
+  isOwner: boolean,
+  roleKind: "admin" | "api",
+  now: string,
+): void {
+  db.prepare(
+    `INSERT INTO roles (id, name, description, is_owner, role_kind, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(name) DO UPDATE SET
+       description = excluded.description,
+       is_owner = excluded.is_owner,
+       role_kind = excluded.role_kind,
+       updated_at = excluded.updated_at`,
+  ).run(id, name, description, isOwner ? 1 : 0, roleKind, now, now);
 }

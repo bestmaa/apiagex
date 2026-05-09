@@ -57,7 +57,7 @@ export function canRoleAccess(
 ): boolean {
   const role = getRoleById(db, roleId);
   if (!role) return false;
-  if (role.isOwner) return true;
+  if (role.roleKind !== "api") return false;
   const manage = findPermission(db, roleId, schemaId, "manage");
   if (manage?.allowed) return true;
   const permission = findPermission(db, roleId, schemaId, action);
@@ -68,8 +68,12 @@ function validatePermissionInput(db: SqliteDatabase, input: SetPermissionInput):
   if (!permissionActions.includes(input.action)) {
     throw new Error("PERMISSION_ACTION_INVALID");
   }
-  if (!getRoleById(db, input.roleId)) {
+  const role = getRoleById(db, input.roleId);
+  if (!role) {
     throw new Error("ROLE_NOT_FOUND");
+  }
+  if (role.roleKind !== "api") {
+    throw new Error("ROLE_API_REQUIRED");
   }
   if (!getSchemaById(db, input.schemaId)) {
     throw new Error("SCHEMA_NOT_FOUND");

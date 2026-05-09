@@ -2,11 +2,14 @@ import type { SchemaRecord } from "./schema.type";
 
 export type PermissionAction = "getAll" | "get" | "create" | "update" | "delete" | "manage";
 
+export type RoleKind = "admin" | "api";
+
 export type RoleRecord = {
   id: string;
   name: string;
   description: string;
   isOwner: boolean;
+  roleKind: RoleKind;
 };
 
 export type PermissionRecord = {

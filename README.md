@@ -49,16 +49,18 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Dynamic API checkpoint version `v0.4.6` par ready hai.
 - Role admin APIs are available at `/api/admin/roles`.
 - Role admin APIs `/api/admin/roles` par available hain.
-- Permission model supports getAll, get, create, update, delete, and manage per role and schema.
-- Permission model role aur schema ke hisab se getAll, get, create, update, delete, aur manage support karta hai.
-- Admin UI role permissions screen shows dynamic API action checkboxes.
-- Admin UI role permissions screen dynamic API action checkboxes dikhata hai.
+- `/api/admin/roles` lists API roles only; owner/admin control-plane roles are hidden from content API permissions.
+- `/api/admin/roles` sirf API roles list karta hai; owner/admin control-plane roles content API permissions se hidden hain.
+- Permission model supports getAll, get, create, update, delete, and manage per API role and schema.
+- Permission model API role aur schema ke hisab se getAll, get, create, update, delete, aur manage support karta hai.
+- Admin UI role permissions screen shows dynamic API action checkboxes for API roles.
+- Admin UI role permissions screen API roles ke liye dynamic API action checkboxes dikhata hai.
 - Dynamic APIs enforce role permissions when `x-apiagex-role-id` is provided.
 - Dynamic APIs `x-apiagex-role-id` provide hone par role permissions enforce karte hain.
-- User admin APIs are available at `/api/admin/users` with one role per user.
-- User admin APIs `/api/admin/users` par available hain, har user ke liye ek role.
-- Admin UI Users screen can create and list users with role assignment.
-- Admin UI Users screen role assignment ke saath users create aur list kar sakta hai.
+- User admin APIs are available at `/api/admin/users` with one API role per user.
+- User admin APIs `/api/admin/users` par available hain, har user ke liye ek API role.
+- Admin UI Users screen can create and list users with API role assignment.
+- Admin UI Users screen API role assignment ke saath users create aur list kar sakta hai.
 - RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.
 - RBAC end-to-end flow user login aur allowed/blocked dynamic API access verify karta hai.
 - MVP RBAC checkpoint is ready at version `v0.5.8`.
@@ -88,7 +90,7 @@ The rebuilt product should let an owner:
 - create entries,
 - get generated API endpoints under `/api`,
 - read generated docs,
-- allow/block APIs per role.
+- allow/block APIs per API role.
 
 Primary MVP paths: `/doc`, `/readme`, `/adminui`, and `/api`.
 
@@ -120,9 +122,9 @@ Hinglish: Single relations ek entry id string ya `null` store karte hain; multi 
 
 ## RBAC Quick Use
 
-English: Create a role, assign schema action permissions, create a user with that role, login with `/api/auth/login-user`, then call dynamic APIs with `x-apiagex-role-id`. Allowed roles work; blocked roles receive `API_PERMISSION_DENIED`.
+English: Create or select an API role, assign schema action permissions, create a user with that API role, login with `/api/auth/login-user`, then call dynamic APIs with `x-apiagex-role-id`. Allowed API roles work; blocked roles receive `API_PERMISSION_DENIED`. Admin roles are `owner`, `admin`, `schema-manager`, and `user-manager`; API roles include `reader`, `single-reader`, `writer`, `editor`, and `public`. `manage` allows all content API actions for one schema, but only for API roles.
 
-Hinglish: Role banao, schema action permissions assign karo, us role ke saath user banao, `/api/auth/login-user` se login karo, phir dynamic APIs ko `x-apiagex-role-id` ke saath call karo. Allowed roles work karte hain; blocked roles ko `API_PERMISSION_DENIED` milta hai.
+Hinglish: API role banao ya select karo, schema action permissions assign karo, us API role ke saath user banao, `/api/auth/login-user` se login karo, phir dynamic APIs ko `x-apiagex-role-id` ke saath call karo. Allowed API roles work karte hain; blocked roles ko `API_PERMISSION_DENIED` milta hai. Admin roles `owner`, `admin`, `schema-manager`, `user-manager` hain; API roles me `reader`, `single-reader`, `writer`, `editor`, aur `public` hain. `manage` one schema ke sab content API actions allow karta hai, lekin sirf API roles ke liye.
 
 ## Local Persistence
 

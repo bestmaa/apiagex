@@ -51,20 +51,24 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `/doc` aur `/readme` dynamic API usage examples include karte hain.
 - Dynamic API checkpoint v0.4.6 is ready.
 - Dynamic API checkpoint v0.4.6 ready hai.
-- Role repository and `/api/admin/roles` APIs can create, list, and read non-owner roles.
-- Role repository aur `/api/admin/roles` APIs non-owner roles create, list, aur read kar sakte hain.
-- Permission model supports getAll, get, create, update, delete, and manage per role and schema.
-- Permission model role aur schema ke hisab se getAll, get, create, update, delete, aur manage support karta hai.
-- `getAll` controls dynamic list routes, `get` controls dynamic single-entry reads, and `manage` allows every action for that schema.
-- `getAll` dynamic list routes control karta hai, `get` dynamic single-entry reads control karta hai, aur `manage` us schema ke sab actions allow karta hai.
-- Admin UI Role Permissions screen can create roles and save dynamic API action checkboxes.
-- Admin UI Role Permissions screen roles create kar sakta hai aur dynamic API action checkboxes save kar sakta hai.
+- Role repository and `/api/admin/roles` APIs create, list, and read API roles only.
+- Role repository aur `/api/admin/roles` APIs sirf API roles create, list, aur read karte hain.
+- Bootstrap seeds admin roles `owner`, `admin`, `schema-manager`, `user-manager` and API roles `reader`, `single-reader`, `writer`, `editor`, `public`.
+- Bootstrap admin roles `owner`, `admin`, `schema-manager`, `user-manager` aur API roles `reader`, `single-reader`, `writer`, `editor`, `public` seed karta hai.
+- Permission model supports getAll, get, create, update, delete, and manage per API role and schema.
+- Permission model API role aur schema ke hisab se getAll, get, create, update, delete, aur manage support karta hai.
+- `getAll` controls dynamic list routes, `get` controls dynamic single-entry reads, and `manage` allows every action for that schema for API roles only.
+- `getAll` dynamic list routes control karta hai, `get` dynamic single-entry reads control karta hai, aur `manage` sirf API roles ke liye us schema ke sab actions allow karta hai.
+- Admin UI Role Permissions screen can create API roles and save dynamic API action checkboxes.
+- Admin UI Role Permissions screen API roles create kar sakta hai aur dynamic API action checkboxes save kar sakta hai.
 - Dynamic APIs enforce allow/block when `x-apiagex-role-id` is present.
 - Dynamic APIs `x-apiagex-role-id` present hone par allow/block enforce karte hain.
-- User repository and `/api/admin/users` APIs create users assigned to exactly one role.
-- User repository aur `/api/admin/users` APIs users ko exactly one role ke saath create karte hain.
-- Admin UI Users screen creates and lists users with role assignment.
-- Admin UI Users screen role assignment ke saath users create aur list karta hai.
+- Admin/control-plane roles are not accepted by content API permission checks or API-user assignment.
+- Admin/control-plane roles content API permission checks ya API-user assignment me accept nahi hote.
+- User repository and `/api/admin/users` APIs create content API users assigned to exactly one API role.
+- User repository aur `/api/admin/users` APIs content API users ko exactly one API role ke saath create karte hain.
+- Admin UI Users screen creates and lists users with API role assignment.
+- Admin UI Users screen API role assignment ke saath users create aur list karta hai.
 - RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.
 - RBAC end-to-end flow user login aur allowed/blocked dynamic API access verify karta hai.
 - `/doc` and `/readme` document RBAC allow/block examples.
@@ -134,9 +138,14 @@ One server must serve exactly these primary paths:
 ### Owner And Auth
 
 - The first successful bootstrap login creates or activates the owner.
-- Owner has full access and cannot be blocked by role permissions.
-- Later users must be created by an allowed owner/admin flow.
-- A user belongs to exactly one role for MVP simplicity.
+- Owner can manage the Admin UI and control-plane setup.
+- Owner Admin UI aur control-plane setup manage kar sakta hai.
+- Owner/admin panel roles are separate from content API permission roles.
+- Owner/admin panel roles content API permission roles se alag hain.
+- Content API requests use API roles when `x-apiagex-role-id` is provided; owner/admin roles do not bypass content API checks.
+- Content API requests `x-apiagex-role-id` aane par API roles use karte hain; owner/admin roles content API checks bypass nahi karte.
+- Later content API users must be created by an allowed owner/admin flow.
+- A content API user belongs to exactly one API role for MVP simplicity.
 
 ### Schema Builder
 
@@ -208,10 +217,12 @@ One server must serve exactly these primary paths:
 
 ### RBAC
 
-- Owner can create unlimited roles.
-- Permissions are assigned per role, per dynamic API, per action.
+- Admin roles are `owner`, `admin`, `schema-manager`, and `user-manager`.
+- API roles are `reader`, `single-reader`, `writer`, `editor`, and `public`, plus any created API roles.
+- Owner can create unlimited API roles.
+- Permissions are assigned per API role, per dynamic API, per action.
 - Actions: getAll, get, create, update, delete, manage.
-- `manage` is a schema-level override that allows every action for that schema.
+- `manage` is a schema-level API-role override that allows every content API action for that schema.
 - Checked means allowed; unchecked means blocked by default.
 - Permission verification must test an allowed user and blocked user.
 

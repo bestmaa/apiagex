@@ -21,9 +21,9 @@ const pageDescriptions = {
   dashboard: "Review workspace health and next actions.",
   docs: "Read the owner workflow and API notes.",
   entries: "Create, edit, and connect content entries.",
-  roles: "Configure role permissions for each API.",
+  roles: "Configure API role permissions for each API.",
   schemas: "Design fields, relations, and generated APIs.",
-  users: "Invite users and assign exactly one role.",
+  users: "Invite users and assign exactly one API role.",
 } satisfies Record<AdminRoute, string>;
 
 export function AdminShell({

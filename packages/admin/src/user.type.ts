@@ -3,6 +3,7 @@ export type UserRecord = {
   email: string;
   roleId: string;
   roleName: string;
+  roleKind: "api";
 };
 
 export type UserListResponse = {

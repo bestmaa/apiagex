@@ -46,4 +46,40 @@ describe("user admin APIs", () => {
     expect(response.statusCode).toBe(400);
     expect(response.json()).toEqual({ ok: false, error: "ROLE_NOT_FOUND" });
   });
+
+  it("rejects users assigned to admin roles", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: { email: "owner@apiagex.local", password: "OwnerPass123!" },
+    });
+
+    const response = await server.inject({
+      method: "POST",
+      url: "/api/admin/users",
+      payload: {
+        email: "admin@apiagex.local",
+        password: "UserPass123!",
+        roleId: "role_admin",
+      },
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({ ok: false, error: "ROLE_API_REQUIRED" });
+  });
+
+  it("hides owner users from content API user list", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: { email: "owner@apiagex.local", password: "OwnerPass123!" },
+    });
+
+    const list = await server.inject({ method: "GET", url: "/api/admin/users" });
+
+    expect(list.statusCode).toBe(200);
+    expect(list.json().users).toEqual([]);
+  });
 });

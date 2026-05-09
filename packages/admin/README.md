@@ -4,6 +4,8 @@
 
 This package owns the first admin UI scaffold. It provides a small local screen for listing, creating, editing, and deleting content types through the starter admin API.
 
+MVP note: the current `/adminui` Role screen shows API roles only. Owner/admin control-plane roles are hidden from content API permissions, and the Users screen assigns exactly one API role to each content API user.
+
 The UI starts with a login screen and stores the bearer token in localStorage after `/auth/login` succeeds.
 
 The returned role is also stored with the session so the UI can hide admin-only content type actions and editor/viewer read-only controls.
@@ -75,6 +77,8 @@ The UI expects the API server to run at `http://127.0.0.1:4000` by default.
 ## Hindi
 
 Ye package first admin UI scaffold ka owner hai. Ye starter admin API ke through content types ko list, create, edit, aur delete karne ka local screen deta hai.
+
+MVP note: current `/adminui` Role screen sirf API roles dikhata hai. Owner/admin control-plane roles content API permissions se hidden hain, aur Users screen har content API user ko exactly one API role assign karta hai.
 
 UI login screen se start hota hai aur `/auth/login` successful hone ke baad bearer token localStorage me store karta hai.
 

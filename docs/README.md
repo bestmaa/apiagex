@@ -208,31 +208,31 @@ Hinglish: v0.4.6 schema creation, entry creation, generated dynamic API CRUD, Ad
 
 ### English
 
-Use `POST /api/admin/roles` with `{ "name": "editor", "description": "..." }` to create roles. Use `GET /api/admin/roles` to list roles and `GET /api/admin/roles/:roleId` to read one role. The `owner` role name is reserved.
+Use `POST /api/admin/roles` with `{ "name": "editor", "description": "..." }` to create API roles. Use `GET /api/admin/roles` to list API roles and `GET /api/admin/roles/:roleId` to read one API role. Admin roles are `owner`, `admin`, `schema-manager`, and `user-manager`; they are seeded for control-plane use and hidden from this API role list.
 
 ### Hinglish
 
-Roles create karne ke liye `POST /api/admin/roles` par `{ "name": "editor", "description": "..." }` bhejo. Roles list ke liye `GET /api/admin/roles` aur one role read ke liye `GET /api/admin/roles/:roleId` use karo. `owner` role name reserved hai.
+API roles create karne ke liye `POST /api/admin/roles` par `{ "name": "editor", "description": "..." }` bhejo. API roles list ke liye `GET /api/admin/roles` aur one API role read ke liye `GET /api/admin/roles/:roleId` use karo. Admin roles `owner`, `admin`, `schema-manager`, aur `user-manager` control-plane ke liye seeded hain aur is API role list se hidden hain.
 
 ## Permission Model
 
 ### English
 
-Permissions are stored per role, schema, and action. Actions are `read`, `create`, `update`, `delete`, and `manage`. Missing permission means blocked. `manage` allows every action for that schema. Owner roles bypass checks.
+Permissions are stored per API role, schema, and action. Actions are `getAll`, `get`, `create`, `update`, `delete`, and `manage`. Missing permission means blocked. `manage` allows every content API action for that schema. Owner/admin roles do not bypass content API permission checks.
 
 ### Hinglish
 
-Permissions role, schema, aur action ke hisab se store hote hain. Actions `read`, `create`, `update`, `delete`, aur `manage` hain. Missing permission ka matlab block hai. `manage` us schema ke liye har action allow karta hai. Owner roles checks bypass karte hain.
+Permissions API role, schema, aur action ke hisab se store hote hain. Actions `getAll`, `get`, `create`, `update`, `delete`, aur `manage` hain. Missing permission ka matlab block hai. `manage` us schema ke sab content API actions allow karta hai. Owner/admin roles content API permission checks bypass nahi karte.
 
 ## Admin UI Role Permissions
 
 ### English
 
-The Role Permissions screen creates roles, selects an active role, shows every generated schema API, and saves action checkboxes for `read`, `create`, `update`, `delete`, and `manage`.
+The Role Permissions screen shows API roles only, selects an active API role, shows every generated schema API, and saves action checkboxes for `getAll`, `get`, `create`, `update`, `delete`, and `manage`.
 
 ### Hinglish
 
-Role Permissions screen roles create karta hai, active role select karta hai, har generated schema API dikhata hai, aur `read`, `create`, `update`, `delete`, `manage` action checkboxes save karta hai.
+Role Permissions screen sirf API roles dikhata hai, active API role select karta hai, har generated schema API dikhata hai, aur `getAll`, `get`, `create`, `update`, `delete`, `manage` action checkboxes save karta hai.
 
 ## Dynamic API Permission Enforcement
 
@@ -248,52 +248,52 @@ Dynamic APIs permission tab check karte hain jab request `x-apiagex-role-id` bhe
 
 ### English
 
-Use `POST /api/admin/users` with `email`, `password`, and `roleId` to create a user assigned to exactly one role. Use `GET /api/admin/users` to list users and `GET /api/admin/users/:userId` to read one user.
+Use `POST /api/admin/users` with `email`, `password`, and `roleId` to create a content API user assigned to exactly one API role. Use `GET /api/admin/users` to list users and `GET /api/admin/users/:userId` to read one user.
 
 ### Hinglish
 
-Ek role assigned user create karne ke liye `POST /api/admin/users` par `email`, `password`, aur `roleId` bhejo. Users list ke liye `GET /api/admin/users` aur one user read ke liye `GET /api/admin/users/:userId` use karo.
+Exactly ek API role assigned content API user create karne ke liye `POST /api/admin/users` par `email`, `password`, aur `roleId` bhejo. Users list ke liye `GET /api/admin/users` aur one user read ke liye `GET /api/admin/users/:userId` use karo.
 
 ## Admin UI Users
 
 ### English
 
-The Users screen loads roles, creates users with email/password/role, and lists created users with their assigned role. MVP users belong to exactly one role.
+The Users screen loads API roles, creates users with email/password/API role, and lists created users with their assigned API role. MVP content API users belong to exactly one API role.
 
 ### Hinglish
 
-Users screen roles load karta hai, email/password/role ke saath users create karta hai, aur created users ko assigned role ke saath list karta hai. MVP me har user exactly ek role me hota hai.
+Users screen API roles load karta hai, email/password/API role ke saath users create karta hai, aur created users ko assigned API role ke saath list karta hai. MVP me har content API user exactly ek API role me hota hai.
 
 ## RBAC End-To-End Flow
 
 ### English
 
-The verified RBAC flow creates a schema API, creates roles, assigns `getAll` for list reads or `get` for one-entry reads, creates users, logs in users through `POST /api/auth/login-user`, then checks that the allowed role can access the intended API and the blocked role receives `API_PERMISSION_DENIED`. `manage` allows every action for that schema.
+The verified RBAC flow creates a schema API, uses API roles, assigns `getAll` for list reads or `get` for one-entry reads, creates content API users, logs in users through `POST /api/auth/login-user`, then checks that the allowed API role can access the intended API and the blocked API role receives `API_PERMISSION_DENIED`. `manage` allows every content API action for that schema.
 
 ### Hinglish
 
-Verified RBAC flow schema API banata hai, roles create karta hai, list reads ke liye `getAll` ya one-entry reads ke liye `get` assign karta hai, users create karta hai, `POST /api/auth/login-user` se users login karta hai, phir check karta hai ki allowed role intended API access kar sakta hai aur blocked role ko `API_PERMISSION_DENIED` milta hai. `manage` us schema ke sab actions allow karta hai.
+Verified RBAC flow schema API banata hai, API roles use karta hai, list reads ke liye `getAll` ya one-entry reads ke liye `get` assign karta hai, content API users create karta hai, `POST /api/auth/login-user` se users login karta hai, phir check karta hai ki allowed API role intended API access kar sakta hai aur blocked API role ko `API_PERMISSION_DENIED` milta hai. `manage` us schema ke sab content API actions allow karta hai.
 
 ## RBAC Allow/Block Examples
 
 ### English
 
-Create a role, then save permissions for a schema API:
+Create an API role or use one seeded API role (`reader`, `single-reader`, `writer`, `editor`, `public`), then save permissions for a schema API:
 
 ```bash
 curl -X POST http://127.0.0.1:4000/api/admin/roles \
   -H "content-type: application/json" \
-  -d '{"name":"reader"}'
+  -d '{"name":"custom-reader"}'
 curl -X PUT http://127.0.0.1:4000/api/admin/roles/ROLE_ID/permissions \
   -H "content-type: application/json" \
   -d '{"permissions":[{"schemaId":"SCHEMA_ID","action":"getAll","allowed":true},{"schemaId":"SCHEMA_ID","action":"get","allowed":true}]}'
 ```
 
-Create a user in that role, login, then pass the returned `roleId` as `x-apiagex-role-id` when calling dynamic APIs. If permission is missing, the API returns `403 API_PERMISSION_DENIED`. Use `getAll` for `GET /api/content/:schemaSlug`, `get` for `GET /api/content/:schemaSlug/:entryId`, and `manage` when the role should have every action on that schema.
+Create a user in that API role, login, then pass the returned `roleId` as `x-apiagex-role-id` when calling dynamic APIs. If permission is missing, the API returns `403 API_PERMISSION_DENIED`. Use `getAll` for `GET /api/content/:schemaSlug`, `get` for `GET /api/content/:schemaSlug/:entryId`, and `manage` when the API role should have every action on that schema.
 
 ### Hinglish
 
-Pehle role banao, phir schema API ke liye permissions save karo:
+Pehle API role banao ya seeded API role (`reader`, `single-reader`, `writer`, `editor`, `public`) use karo, phir schema API ke liye permissions save karo:
 
 ```bash
 curl -X POST http://127.0.0.1:4000/api/admin/users \
@@ -306,7 +306,7 @@ curl http://127.0.0.1:4000/api/content/article \
   -H "x-apiagex-role-id: ROLE_ID"
 ```
 
-Jis role ko permission mili hai uska request pass hota hai. Jis role ko permission nahi mili usko `403 API_PERMISSION_DENIED` milta hai. `GET /api/content/:schemaSlug` ke liye `getAll`, `GET /api/content/:schemaSlug/:entryId` ke liye `get`, aur schema ke sab actions ke liye `manage` use karo.
+Jis API role ko permission mili hai uska request pass hota hai. Jis API role ko permission nahi mili usko `403 API_PERMISSION_DENIED` milta hai. `GET /api/content/:schemaSlug` ke liye `getAll`, `GET /api/content/:schemaSlug/:entryId` ke liye `get`, aur schema ke sab actions ke liye `manage` use karo.
 
 ## MVP RBAC Checkpoint
 
@@ -338,7 +338,7 @@ Apiagex MVP runs on one server with four paths: `/api`, `/adminui`, `/doc`, and 
 The owner logs in first, creates schemas from Admin UI, adds fields, creates entries, and receives generated APIs under `/api/content/:schemaSlug`.
 Schema fields must support text, long text, number, boolean, date, JSON, media, and relation.
 Relations must point to an existing schema before the schema can be saved.
-The Admin UI must list every generated API, show docs/examples, create roles, assign API permissions with checkboxes, create users, and assign one role per user.
+The Admin UI must list every generated API, show docs/examples, create API roles, assign API permissions with checkboxes, create users, and assign one API role per user.
 Allowed users must access the API; blocked users must fail.
 
 ### Hinglish

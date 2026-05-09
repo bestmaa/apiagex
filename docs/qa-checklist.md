@@ -10,8 +10,9 @@
 - Create a schema with one text field.
 - Create an entry from the generated entry form.
 - Confirm Generated APIs shows `/api/content/:schemaSlug`.
-- Create a role and save at least one permission checkbox.
-- Create a user assigned to that role.
+- Confirm the Role screen shows API roles only, with no `owner` or `admin` role in the list.
+- Create an API role and save at least one permission checkbox.
+- Create a user assigned to that API role.
 - Confirm there are no current-page console errors.
 - Check desktop and narrow mobile-sized layouts for readable text and non-overlapping controls.
 
@@ -36,15 +37,16 @@
 - `POST /api/admin/schemas` creates a schema.
 - `POST /api/admin/schemas/:schemaId/entries` creates an entry.
 - `POST /api/content/:schemaSlug` creates dynamic content.
-- `POST /api/admin/roles` creates a role.
+- `GET /api/admin/roles` lists API roles only and excludes `owner`, `admin`, `schema-manager`, and `user-manager`.
+- `POST /api/admin/roles` creates an API role.
 - `PUT /api/admin/roles/:roleId/permissions` saves permissions.
-- `POST /api/admin/users` creates a user with one role.
+- `POST /api/admin/users` creates a user with one API role.
 - `POST /api/auth/login-user` logs in the user and returns `roleId`.
 - Allowed dynamic API request returns `200`.
 - Blocked dynamic API request returns `403 API_PERMISSION_DENIED`.
 - Create relation schemas and entries, then call `GET /api/content/:schemaSlug/:entryId?populate=relations`.
 - Expected: raw reads return relation ids, populated reads return related entry objects for readable target schemas, and populate stays one level deep.
-- Create one allowed role with `get` permission on source and target schemas, and one blocked role with no `get` permission.
+- Create one allowed API role with `get` permission on source and target schemas, and one blocked API role with no `get` permission.
 - Expected allowed outcome: populated relation request returns `200` and expands the related entry.
 - Expected blocked outcome: source schema without `get` permission returns `403 API_PERMISSION_DENIED`; target schema without `get` permission returns `200` with that relation as `null`.
 
@@ -58,8 +60,9 @@
 - Ek text field ke saath schema create karo.
 - Generated entry form se entry create karo.
 - Generated APIs me `/api/content/:schemaSlug` confirm karo.
-- Role create karo aur ek permission checkbox save karo.
-- Us role ke saath user create karo.
+- Confirm karo ki Role screen sirf API roles dikhaye, aur list me `owner` ya `admin` na ho.
+- API role create karo aur ek permission checkbox save karo.
+- Us API role ke saath user create karo.
 - Current page console errors nahi hone chahiye.
 - Desktop aur narrow mobile layout me text readable aur controls non-overlap hone chahiye.
 
@@ -84,14 +87,15 @@
 - `POST /api/admin/schemas` schema create kare.
 - `POST /api/admin/schemas/:schemaId/entries` entry create kare.
 - `POST /api/content/:schemaSlug` dynamic content create kare.
-- `POST /api/admin/roles` role create kare.
+- `GET /api/admin/roles` sirf API roles list kare aur `owner`, `admin`, `schema-manager`, `user-manager` exclude kare.
+- `POST /api/admin/roles` API role create kare.
 - `PUT /api/admin/roles/:roleId/permissions` permissions save kare.
-- `POST /api/admin/users` one-role user create kare.
+- `POST /api/admin/users` one-API-role user create kare.
 - `POST /api/auth/login-user` user login kare aur `roleId` return kare.
 - Allowed dynamic API request `200` return kare.
 - Blocked dynamic API request `403 API_PERMISSION_DENIED` return kare.
 - Relation schemas aur entries create karo, phir `GET /api/content/:schemaSlug/:entryId?populate=relations` call karo.
 - Expected: raw reads relation ids return karein, populated reads readable target schemas ke liye related entry objects return karein, aur populate one level deep rahe.
-- Ek allowed role source aur target schemas ke `get` permission ke saath banao, aur ek blocked role bina `get` permission ke banao.
+- Ek allowed API role source aur target schemas ke `get` permission ke saath banao, aur ek blocked API role bina `get` permission ke banao.
 - Expected allowed outcome: populated relation request `200` return kare aur related entry expand kare.
 - Expected blocked outcome: source schema `get` permission missing ho to `403 API_PERMISSION_DENIED`; target schema `get` permission missing ho to `200` ke saath relation `null`.

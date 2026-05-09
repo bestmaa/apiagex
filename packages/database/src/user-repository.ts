@@ -17,12 +17,16 @@ export function createUser(db: SqliteDatabase, input: CreateUserInput): UserReco
 }
 
 export function listUsers(db: SqliteDatabase): UserRecord[] {
-  const rows = db.prepare(userSelectSql("ORDER BY users.created_at ASC")).all() as UserRow[];
+  const rows = db
+    .prepare(userSelectSql("WHERE roles.role_kind = 'api' ORDER BY users.created_at ASC"))
+    .all() as UserRow[];
   return rows;
 }
 
 export function getUserById(db: SqliteDatabase, id: string): UserRecord | undefined {
-  return db.prepare(userSelectSql("WHERE users.id = ?")).get(id) as UserRow | undefined;
+  return db
+    .prepare(userSelectSql("WHERE users.id = ? AND roles.role_kind = 'api'"))
+    .get(id) as UserRow | undefined;
 }
 
 export function getUserPasswordHashByEmail(
@@ -30,7 +34,11 @@ export function getUserPasswordHashByEmail(
   email: string,
 ): { id: string; passwordHash: string; roleId: string } | undefined {
   return db
-    .prepare("SELECT id, password_hash as passwordHash, role_id as roleId FROM users WHERE email = ?")
+    .prepare(
+      `SELECT users.id, users.password_hash as passwordHash, users.role_id as roleId
+       FROM users JOIN roles ON roles.id = users.role_id
+       WHERE users.email = ? AND roles.role_kind = 'api'`,
+    )
     .get(normalizeEmail(email)) as { id: string; passwordHash: string; roleId: string } | undefined;
 }
 
@@ -41,8 +49,12 @@ function validateUser(db: SqliteDatabase, input: CreateUserInput): void {
   if (!input.passwordHash) {
     throw new Error("USER_PASSWORD_HASH_REQUIRED");
   }
-  if (!getRoleById(db, input.roleId)) {
+  const role = getRoleById(db, input.roleId);
+  if (!role) {
     throw new Error("ROLE_NOT_FOUND");
+  }
+  if (role.roleKind !== "api") {
+    throw new Error("ROLE_API_REQUIRED");
   }
 }
 
@@ -59,5 +71,5 @@ function normalizeEmail(email: string): string {
 }
 
 function userSelectSql(suffix: string): string {
-  return `SELECT users.id, users.email, users.role_id as roleId, roles.name as roleName, users.created_at as createdAt, users.updated_at as updatedAt FROM users JOIN roles ON roles.id = users.role_id ${suffix}`;
+  return `SELECT users.id, users.email, users.role_id as roleId, roles.name as roleName, roles.role_kind as roleKind, users.created_at as createdAt, users.updated_at as updatedAt FROM users JOIN roles ON roles.id = users.role_id ${suffix}`;
 }

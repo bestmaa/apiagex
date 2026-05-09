@@ -24,7 +24,7 @@ export function UserManager() {
     }
     setRoles(roleResult.roles ?? []);
     setUsers(userResult.users ?? []);
-    setStatus((roleResult.roles ?? []).length ? "Users ready" : "Create a role first");
+    setStatus((roleResult.roles ?? []).length ? "Users ready" : "Create an API role first");
   }
 
   async function submitUser(event: FormEvent<HTMLFormElement>) {
@@ -48,8 +48,8 @@ export function UserManager() {
   return (
     <section aria-labelledby="user-manager-title">
       <h2 id="user-manager-title">Users</h2>
-      <p>English: Create users and assign exactly one role for MVP access checks.</p>
-      <p>Hinglish: Users banao aur MVP access checks ke liye exactly ek role assign karo.</p>
+      <p>English: Create content API users and assign exactly one API role.</p>
+      <p>Hinglish: Content API users banao aur exactly ek API role assign karo.</p>
       <form className="user-form" aria-describedby="user-form-help" onSubmit={submitUser}>
         <div>
           <label htmlFor="user-email">User email</label>
@@ -68,12 +68,12 @@ export function UserManager() {
           />
         </div>
         <div>
-          <label htmlFor="user-role">User role</label>
+          <label htmlFor="user-role">API role</label>
           <select disabled={roles.length === 0} id="user-role" name="roleId" required>
-            <option value="">Select role</option>
+            <option value="">Select API role</option>
             {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
           </select>
-          {roles.length === 0 ? <span className="helper-text">Create a role before adding users.</span> : null}
+          {roles.length === 0 ? <span className="helper-text">Create an API role before adding users.</span> : null}
         </div>
         <p className="helper-text" id="user-form-help">
           Passwords are submitted once and never displayed in the user list.
@@ -97,13 +97,13 @@ function UserList({ users }: { users: UserRecord[] }) {
       <h3>Created Users</h3>
       {users.length === 0 ? (
         <StateMessage title="No users yet" variant="empty">
-          Create a user after at least one role is available.
+          Create a user after at least one API role is available.
         </StateMessage>
       ) : users.map((user) => (
         <article className="user-row" key={user.id}>
           <div>
-            <strong>{user.email}</strong>
-            <span>Role: {user.roleName}</span>
+          <strong>{user.email}</strong>
+            <span>API role: {user.roleName}</span>
           </div>
           <code>x-apiagex-role-id: {user.roleId}</code>
           <p>Created/updated timestamps are not exposed by the current user API.</p>

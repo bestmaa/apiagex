@@ -24,8 +24,8 @@ describe("MVP release smoke", () => {
     const dynamic = await server.inject({ method: "GET", url: "/api/content/article" });
     expect(dynamic.json().entries[0].id).toBe(entry.id);
 
-    const allowedRole = await createRole(server, "reader");
-    const blockedRole = await createRole(server, "blocked");
+    const allowedRole = await createRole(server, "smoke-reader");
+    const blockedRole = await createRole(server, "smoke-blocked");
     await saveGetAllPermission(server, allowedRole.id, schema.id);
     await createUser(server, "reader@apiagex.local", allowedRole.id);
     await createUser(server, "blocked@apiagex.local", blockedRole.id);

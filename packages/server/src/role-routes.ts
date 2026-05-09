@@ -25,7 +25,7 @@ export function registerRoleRoutes(server: FastifyInstance, database: SqliteData
 
   server.get<{ Params: RoleParams }>("/api/admin/roles/:roleId", async (request, reply) => {
     const role = getRoleById(database, request.params.roleId);
-    if (!role) {
+    if (!role || role.roleKind !== "api") {
       return reply.code(404).send({ ok: false, error: "ROLE_NOT_FOUND" });
     }
     return { ok: true, role };
@@ -34,7 +34,8 @@ export function registerRoleRoutes(server: FastifyInstance, database: SqliteData
   server.get<{ Params: RoleParams }>(
     "/api/admin/roles/:roleId/permissions",
     async (request, reply) => {
-      if (!getRoleById(database, request.params.roleId)) {
+      const role = getRoleById(database, request.params.roleId);
+      if (!role || role.roleKind !== "api") {
         return reply.code(404).send({ ok: false, error: "ROLE_NOT_FOUND" });
       }
       return { ok: true, permissions: listRolePermissions(database, request.params.roleId) };

@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS roles (
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL DEFAULT '',
   is_owner INTEGER NOT NULL DEFAULT 0,
+  role_kind TEXT NOT NULL DEFAULT 'api',
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -76,4 +77,6 @@ CREATE TABLE IF NOT EXISTS permissions (
 
 export const MVP_ADDITIVE_MIGRATIONS_SQL = [
   "ALTER TABLE fields ADD COLUMN relation_type TEXT",
+  "ALTER TABLE roles ADD COLUMN role_kind TEXT NOT NULL DEFAULT 'api'",
+  "UPDATE roles SET role_kind = 'admin' WHERE is_owner = 1 OR name IN ('owner', 'admin', 'schema-manager', 'user-manager')",
 ] as const;

@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import {
+  getRoleById,
   getUserById,
   getUserPasswordHashByEmail,
   type SqliteDatabase,
@@ -17,6 +18,10 @@ export function loginUser(
   const user = getUserById(db, row.id);
   if (!user) {
     throw new Error("USER_NOT_FOUND");
+  }
+  const role = getRoleById(db, user.roleId);
+  if (!role || role.roleKind !== "api") {
+    throw new Error("ROLE_API_REQUIRED");
   }
   return {
     ok: true,

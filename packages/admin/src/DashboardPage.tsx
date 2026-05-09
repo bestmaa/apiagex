@@ -143,7 +143,7 @@ function ReadinessSummary({
   const items = [
     { label: "Schema model", ready: hasSchema, detail: hasSchema ? "Content structure exists" : "Create a schema first" },
     { label: "Relation fields", ready: relationCount > 0, detail: relationCount ? `${relationCount} relation fields configured` : "Optional, add when content links are needed" },
-    { label: "Roles", ready: hasRole, detail: hasRole ? "Access rules can be assigned" : "Create role before user access" },
+    { label: "API roles", ready: hasRole, detail: hasRole ? "Access rules can be assigned" : "Create API role before user access" },
     { label: "Users", ready: hasUser, detail: hasUser ? "Team login is available" : "Add users after roles" },
   ];
   return (
@@ -164,7 +164,7 @@ function QuickActions({ hasRoles, hasSchemas }: { hasRoles: boolean; hasSchemas:
     { href: "#schemas", icon: Database, label: "Create schema", meta: "Define fields and relations" },
     { href: "#entries", icon: FileText, label: "Create entry", meta: hasSchemas ? "Add content to a schema" : "Needs a schema first" },
     { href: "#apis", icon: Network, label: "View APIs", meta: "Inspect generated endpoints" },
-    { href: "#roles", icon: KeyRound, label: "Create role", meta: "Prepare allow/block rules" },
+    { href: "#roles", icon: KeyRound, label: "Create API role", meta: "Prepare allow/block rules" },
     { href: "#users", icon: Users, label: "Create user", meta: hasRoles ? "Assign role-based access" : "Needs a role first" },
     { href: "#docs", icon: BookOpen, label: "Read docs", meta: "Review owner workflow" },
   ];

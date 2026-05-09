@@ -41,7 +41,7 @@ const workflowSummaries = [
     title: "RBAC",
     route: "#roles",
     routeLabel: "Configure roles",
-    summary: "Create roles, assign allow/block permissions per schema and API method, then assign users to exactly one role.",
+    summary: "Configure API roles, assign allow/block permissions per schema and API method, then assign users to exactly one API role.",
   },
 ];
 
@@ -146,9 +146,9 @@ const workflowChecklists = [
   {
     title: "RBAC setup",
     items: [
-      "Create roles before creating non-owner users.",
+      "Use API roles for content API users; owner/admin roles stay outside this permission matrix.",
       "Set allowed schema/API actions in the permission matrix.",
-      "Assign each user exactly one role and test allow/block behavior with headers.",
+      "Assign each content API user exactly one API role and test allow/block behavior with headers.",
     ],
   },
 ];

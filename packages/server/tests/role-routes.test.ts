@@ -16,6 +16,7 @@ describe("role admin APIs", () => {
 
     const list = await server.inject({ method: "GET", url: "/api/admin/roles" });
     expect(list.json().roles).toHaveLength(1);
+    expect(list.json().roles[0].roleKind).toBe("api");
 
     const read = await server.inject({ method: "GET", url: `/api/admin/roles/${role.id}` });
     expect(read.json().role.name).toBe("editor");
@@ -32,6 +33,33 @@ describe("role admin APIs", () => {
 
     expect(response.statusCode).toBe(400);
     expect(response.json()).toEqual({ ok: false, error: "ROLE_NAME_INVALID" });
+  });
+
+  it("hides admin roles from API role routes", async () => {
+    const database = openSqliteDatabase();
+    const server = createServer({ database });
+    await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: { email: "owner@apiagex.local", password: "OwnerPass123!" },
+    });
+
+    const list = await server.inject({ method: "GET", url: "/api/admin/roles" });
+    const names = list.json().roles.map((role: { name: string }) => role.name);
+    expect(names).not.toContain("owner");
+    expect(names).not.toContain("admin");
+    expect(names).toContain("reader");
+
+    const readOwner = await server.inject({ method: "GET", url: "/api/admin/roles/role_owner" });
+    expect(readOwner.statusCode).toBe(404);
+
+    const createAdmin = await server.inject({
+      method: "POST",
+      url: "/api/admin/roles",
+      payload: { name: "admin" },
+    });
+    expect(createAdmin.statusCode).toBe(400);
+    expect(createAdmin.json()).toEqual({ ok: false, error: "ROLE_ADMIN_RESERVED" });
   });
 
   it("saves role permissions for schema actions", async () => {

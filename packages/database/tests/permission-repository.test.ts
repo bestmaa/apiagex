@@ -57,19 +57,27 @@ describe("permission repository", () => {
     expect(canRoleAccess(db, role.id, schema.id, "delete")).toBe(true);
   });
 
-  it("always allows owner roles", () => {
+  it("blocks admin roles from content API permissions", () => {
     const db = openMigratedDb();
     const now = new Date().toISOString();
     db.prepare(
-      "INSERT INTO roles (id, name, description, is_owner, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
-    ).run("owner-role", "owner", "Owner", 1, now, now);
+      "INSERT INTO roles (id, name, description, is_owner, role_kind, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    ).run("owner-role", "owner", "Owner", 1, "admin", now, now);
     const schema = createSchema(db, {
       name: "Article",
       slug: "article",
       fields: [{ name: "Title", slug: "title", type: "text" }],
     });
 
-    expect(canRoleAccess(db, "owner-role", schema.id, "delete")).toBe(true);
+    expect(canRoleAccess(db, "owner-role", schema.id, "delete")).toBe(false);
+    expect(() =>
+      setPermission(db, {
+        roleId: "owner-role",
+        schemaId: schema.id,
+        action: "manage",
+        allowed: true,
+      }),
+    ).toThrow("ROLE_API_REQUIRED");
   });
 });
 

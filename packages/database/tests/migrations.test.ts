@@ -40,4 +40,15 @@ describe("MVP database foundation", () => {
     }>;
     expect(fieldColumns.map((column) => column.name)).toContain("relation_type");
   });
+
+  it("adds role kind metadata to roles", () => {
+    const db = openSqliteDatabase();
+
+    migrateMvpDatabase(db);
+
+    const roleColumns = db.prepare("PRAGMA table_info(roles)").all() as Array<{
+      name: string;
+    }>;
+    expect(roleColumns.map((column) => column.name)).toContain("role_kind");
+  });
 });

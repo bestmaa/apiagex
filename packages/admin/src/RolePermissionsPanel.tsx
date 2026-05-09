@@ -33,7 +33,7 @@ export function RoleList(props: {
 }) {
   const { activeRoleId, permissions, roles, schemas } = props;
   if (roles.length === 0) {
-    return <StateMessage title="No roles yet" variant="empty">Create a role to start access setup.</StateMessage>;
+    return <StateMessage title="No API roles yet" variant="empty">Create an API role to start access setup.</StateMessage>;
   }
   const allowedCount = permissions.filter((permission) => permission.allowed).length;
   const possibleCount = schemas.length * permissionActions.length;
@@ -47,12 +47,12 @@ export function RoleList(props: {
             <span>{role.description || "No description"}</span>
           </div>
           <div className="role-row-badges">
-            <span>{role.isOwner ? "Owner" : "Custom role"}</span>
+            <span>API role</span>
             {role.id === activeRoleId ? <span>Active</span> : null}
             <span>{role.id === activeRoleId ? `${allowedCount}/${possibleCount} allowed` : "Select to inspect"}</span>
           </div>
           {role.id === activeRoleId ? <PermissionSummaryBadges permissions={permissions} /> : null}
-          <p>{role.isOwner ? "Owner can manage Admin UI. Content API requests still use role permission checks." : "Use this role id in API requests after permissions are saved."}</p>
+          <p>Use this role id in content API requests after permissions are saved.</p>
         </article>
       ))}
     </section>

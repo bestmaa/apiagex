@@ -9,6 +9,7 @@ export type UserRecord = {
   email: string;
   roleId: string;
   roleName: string;
+  roleKind: "api";
   createdAt: string;
   updatedAt: string;
 };
