@@ -1,4 +1,4 @@
-export type PermissionAction = "read" | "create" | "update" | "delete" | "manage";
+export type PermissionAction = "getAll" | "get" | "create" | "update" | "delete" | "manage";
 
 export type SetPermissionInput = {
   roleId: string;

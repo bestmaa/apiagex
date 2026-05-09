@@ -49,8 +49,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Dynamic API checkpoint version `v0.4.6` par ready hai.
 - Role admin APIs are available at `/api/admin/roles`.
 - Role admin APIs `/api/admin/roles` par available hain.
-- Permission model supports read, create, update, delete, and manage per role and schema.
-- Permission model role aur schema ke hisab se read, create, update, delete, aur manage support karta hai.
+- Permission model supports getAll, get, create, update, delete, and manage per role and schema.
+- Permission model role aur schema ke hisab se getAll, get, create, update, delete, aur manage support karta hai.
 - Admin UI role permissions screen shows dynamic API action checkboxes.
 - Admin UI role permissions screen dynamic API action checkboxes dikhata hai.
 - Dynamic APIs enforce role permissions when `x-apiagex-role-id` is provided.

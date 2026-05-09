@@ -108,7 +108,7 @@ describe("dynamic content APIs", () => {
     await server.inject({
       method: "PUT",
       url: `/api/admin/roles/${allowedRole}/permissions`,
-      payload: { permissions: [{ schemaId, action: "read", allowed: true }] },
+      payload: { permissions: [{ schemaId, action: "getAll", allowed: true }] },
     });
 
     const allowed = await server.inject({
@@ -125,6 +125,48 @@ describe("dynamic content APIs", () => {
     });
     expect(blocked.statusCode).toBe(403);
     expect(blocked.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
+  });
+
+  it("separates getAll list access from get single-entry access", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+    const entry = await server.inject({
+      method: "POST",
+      url: "/api/content/article",
+      payload: { data: { title: "Split read", views: 7 } },
+    });
+    const entryId = entry.json().entry.id as string;
+    const listRole = await createRole(server, "list-only");
+    const getRole = await createRole(server, "get-only");
+    await savePermission(server, listRole, schemaId, "getAll");
+    await savePermission(server, getRole, schemaId, "get");
+
+    const listAllowed = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { "x-apiagex-role-id": listRole },
+    });
+    const readBlocked = await server.inject({
+      method: "GET",
+      url: `/api/content/article/${entryId}`,
+      headers: { "x-apiagex-role-id": listRole },
+    });
+    const listBlocked = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { "x-apiagex-role-id": getRole },
+    });
+    const readAllowed = await server.inject({
+      method: "GET",
+      url: `/api/content/article/${entryId}`,
+      headers: { "x-apiagex-role-id": getRole },
+    });
+
+    expect(listAllowed.statusCode).toBe(200);
+    expect(readBlocked.statusCode).toBe(403);
+    expect(listBlocked.statusCode).toBe(403);
+    expect(readAllowed.statusCode).toBe(200);
+    expect(readAllowed.json().entry.data.title).toBe("Split read");
   });
 
   it("validates relation payloads after dynamic write permissions pass", async () => {
@@ -241,7 +283,7 @@ describe("dynamic content APIs", () => {
     await server.inject({
       method: "PUT",
       url: `/api/admin/roles/${bookReader}/permissions`,
-      payload: { permissions: [{ schemaId: bookSchemaId, action: "read", allowed: true }] },
+      payload: { permissions: [{ schemaId: bookSchemaId, action: "get", allowed: true }] },
     });
     const blockedTarget = await server.inject({
       method: "GET",
@@ -276,6 +318,19 @@ async function createRole(server: ReturnType<typeof createServer>, name: string)
     payload: { name },
   });
   return response.json().role.id as string;
+}
+
+async function savePermission(
+  server: ReturnType<typeof createServer>,
+  roleId: string,
+  schemaId: string,
+  action: "getAll" | "get",
+): Promise<void> {
+  await server.inject({
+    method: "PUT",
+    url: `/api/admin/roles/${roleId}/permissions`,
+    payload: { permissions: [{ schemaId, action, allowed: true }] },
+  });
 }
 
 async function createAuthorSchema(server: ReturnType<typeof createServer>): Promise<string> {

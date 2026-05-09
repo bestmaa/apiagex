@@ -26,7 +26,7 @@ describe("MVP release smoke", () => {
 
     const allowedRole = await createRole(server, "reader");
     const blockedRole = await createRole(server, "blocked");
-    await saveReadPermission(server, allowedRole.id, schema.id);
+    await saveGetAllPermission(server, allowedRole.id, schema.id);
     await createUser(server, "reader@apiagex.local", allowedRole.id);
     await createUser(server, "blocked@apiagex.local", blockedRole.id);
 
@@ -71,8 +71,8 @@ describe("MVP release smoke", () => {
 
     const allowedRole = await createRole(server, "relation-reader");
     const blockedRole = await createRole(server, "relation-blocked");
-    await saveReadPermission(server, allowedRole.id, bookSchema.id);
-    await saveReadPermission(server, allowedRole.id, authorSchema.id);
+    await saveGetPermission(server, allowedRole.id, bookSchema.id);
+    await saveGetPermission(server, allowedRole.id, authorSchema.id);
     await createUser(server, "relation-reader@apiagex.local", allowedRole.id);
     await createUser(server, "relation-blocked@apiagex.local", blockedRole.id);
     const allowedLogin = await loginUser(server, "relation-reader@apiagex.local");
@@ -163,7 +163,7 @@ async function createRole(server: ReturnType<typeof createServer>, name: string)
   return response.json().role as { id: string };
 }
 
-async function saveReadPermission(
+async function saveGetAllPermission(
   server: ReturnType<typeof createServer>,
   roleId: string,
   schemaId: string,
@@ -171,7 +171,19 @@ async function saveReadPermission(
   await server.inject({
     method: "PUT",
     url: `/api/admin/roles/${roleId}/permissions`,
-    payload: { permissions: [{ schemaId, action: "read", allowed: true }] },
+    payload: { permissions: [{ schemaId, action: "getAll", allowed: true }] },
+  });
+}
+
+async function saveGetPermission(
+  server: ReturnType<typeof createServer>,
+  roleId: string,
+  schemaId: string,
+): Promise<void> {
+  await server.inject({
+    method: "PUT",
+    url: `/api/admin/roles/${roleId}/permissions`,
+    payload: { permissions: [{ schemaId, action: "get", allowed: true }] },
   });
 }
 

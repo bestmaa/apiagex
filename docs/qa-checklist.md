@@ -44,9 +44,9 @@
 - Blocked dynamic API request returns `403 API_PERMISSION_DENIED`.
 - Create relation schemas and entries, then call `GET /api/content/:schemaSlug/:entryId?populate=relations`.
 - Expected: raw reads return relation ids, populated reads return related entry objects for readable target schemas, and populate stays one level deep.
-- Create one allowed role with read permission on source and target schemas, and one blocked role with no read permission.
+- Create one allowed role with `get` permission on source and target schemas, and one blocked role with no `get` permission.
 - Expected allowed outcome: populated relation request returns `200` and expands the related entry.
-- Expected blocked outcome: source schema without read permission returns `403 API_PERMISSION_DENIED`; target schema without read permission returns `200` with that relation as `null`.
+- Expected blocked outcome: source schema without `get` permission returns `403 API_PERMISSION_DENIED`; target schema without `get` permission returns `200` with that relation as `null`.
 
 ## Hinglish
 
@@ -92,6 +92,6 @@
 - Blocked dynamic API request `403 API_PERMISSION_DENIED` return kare.
 - Relation schemas aur entries create karo, phir `GET /api/content/:schemaSlug/:entryId?populate=relations` call karo.
 - Expected: raw reads relation ids return karein, populated reads readable target schemas ke liye related entry objects return karein, aur populate one level deep rahe.
-- Ek allowed role source aur target schemas ke read permission ke saath banao, aur ek blocked role bina read permission ke banao.
+- Ek allowed role source aur target schemas ke `get` permission ke saath banao, aur ek blocked role bina `get` permission ke banao.
 - Expected allowed outcome: populated relation request `200` return kare aur related entry expand kare.
-- Expected blocked outcome: source schema read permission missing ho to `403 API_PERMISSION_DENIED`; target schema read permission missing ho to `200` ke saath relation `null`.
+- Expected blocked outcome: source schema `get` permission missing ho to `403 API_PERMISSION_DENIED`; target schema `get` permission missing ho to `200` ke saath relation `null`.

@@ -53,8 +53,10 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Dynamic API checkpoint v0.4.6 ready hai.
 - Role repository and `/api/admin/roles` APIs can create, list, and read non-owner roles.
 - Role repository aur `/api/admin/roles` APIs non-owner roles create, list, aur read kar sakte hain.
-- Permission model supports read, create, update, delete, and manage per role and schema.
-- Permission model role aur schema ke hisab se read, create, update, delete, aur manage support karta hai.
+- Permission model supports getAll, get, create, update, delete, and manage per role and schema.
+- Permission model role aur schema ke hisab se getAll, get, create, update, delete, aur manage support karta hai.
+- `getAll` controls dynamic list routes, `get` controls dynamic single-entry reads, and `manage` allows every action for that schema.
+- `getAll` dynamic list routes control karta hai, `get` dynamic single-entry reads control karta hai, aur `manage` us schema ke sab actions allow karta hai.
 - Admin UI Role Permissions screen can create roles and save dynamic API action checkboxes.
 - Admin UI Role Permissions screen roles create kar sakta hai aur dynamic API action checkboxes save kar sakta hai.
 - Dynamic APIs enforce allow/block when `x-apiagex-role-id` is present.
@@ -193,18 +195,23 @@ One server must serve exactly these primary paths:
 - MVP actions: list, read, create, update, delete.
 - Admin UI must show every generated API with docs and examples.
 - API behavior must match schema validation and relation rules.
+- Dynamic list routes require `getAll` permission when `x-apiagex-role-id` is sent.
+- Dynamic list routes `x-apiagex-role-id` bhejne par `getAll` permission require karte hain.
+- Dynamic single-entry read routes require `get` permission when `x-apiagex-role-id` is sent.
+- Dynamic single-entry read routes `x-apiagex-role-id` bhejne par `get` permission require karte hain.
 - Dynamic list APIs support `fields`, `search`, `limit`, and `offset` for projected and paginated reads.
 - Dynamic list APIs projected aur paginated reads ke liye `fields`, `search`, `limit`, aur `offset` support karte hain.
 - Dynamic read APIs support `fields` for selecting one or more entry data fields.
 - Dynamic read APIs one ya more entry data fields select karne ke liye `fields` support karte hain.
 - Relation reads/lists support one-level populate with `?populate=relations`, `?populate=all`, and `?populate=*`.
-- Populate must respect RBAC: related entries only expand when the request role can read the target schema.
+- Populate must respect RBAC: related entries only expand when the request role has `get` on the target schema.
 
 ### RBAC
 
 - Owner can create unlimited roles.
 - Permissions are assigned per role, per dynamic API, per action.
-- Actions: read, create, update, delete, manage.
+- Actions: getAll, get, create, update, delete, manage.
+- `manage` is a schema-level override that allows every action for that schema.
 - Checked means allowed; unchecked means blocked by default.
 - Permission verification must test an allowed user and blocked user.
 

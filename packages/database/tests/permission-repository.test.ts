@@ -18,10 +18,26 @@ describe("permission repository", () => {
       fields: [{ name: "Title", slug: "title", type: "text" }],
     });
 
-    expect(canRoleAccess(db, role.id, schema.id, "read")).toBe(false);
-    setPermission(db, { roleId: role.id, schemaId: schema.id, action: "read", allowed: true });
-    expect(canRoleAccess(db, role.id, schema.id, "read")).toBe(true);
+    expect(canRoleAccess(db, role.id, schema.id, "get")).toBe(false);
+    setPermission(db, { roleId: role.id, schemaId: schema.id, action: "get", allowed: true });
+    expect(canRoleAccess(db, role.id, schema.id, "get")).toBe(true);
+    expect(canRoleAccess(db, role.id, schema.id, "getAll")).toBe(false);
     expect(canRoleAccess(db, role.id, schema.id, "delete")).toBe(false);
+  });
+
+  it("keeps list and single get permissions separate", () => {
+    const db = openMigratedDb();
+    const role = createRole(db, { name: "list-reader" });
+    const schema = createSchema(db, {
+      name: "Article",
+      slug: "article",
+      fields: [{ name: "Title", slug: "title", type: "text" }],
+    });
+
+    setPermission(db, { roleId: role.id, schemaId: schema.id, action: "getAll", allowed: true });
+
+    expect(canRoleAccess(db, role.id, schema.id, "getAll")).toBe(true);
+    expect(canRoleAccess(db, role.id, schema.id, "get")).toBe(false);
   });
 
   it("lets manage allow all actions for a schema", () => {
@@ -35,6 +51,8 @@ describe("permission repository", () => {
 
     setPermission(db, { roleId: role.id, schemaId: schema.id, action: "manage", allowed: true });
 
+    expect(canRoleAccess(db, role.id, schema.id, "getAll")).toBe(true);
+    expect(canRoleAccess(db, role.id, schema.id, "get")).toBe(true);
     expect(canRoleAccess(db, role.id, schema.id, "create")).toBe(true);
     expect(canRoleAccess(db, role.id, schema.id, "delete")).toBe(true);
   });

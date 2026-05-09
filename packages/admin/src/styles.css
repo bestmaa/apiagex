@@ -265,7 +265,7 @@ code {
   border-radius: var(--admin-radius-sm);
   display: grid;
   gap: var(--admin-space-3);
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(70px, 0.45fr) minmax(0, 1fr) auto;
   padding: var(--admin-space-3);
 }
 
@@ -277,6 +277,18 @@ code {
   color: var(--admin-color-text-soft);
   font-size: var(--admin-font-xs);
   text-transform: uppercase;
+}
+
+.permission-toggle small,
+.permission-help {
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.permission-help {
+  margin: 0;
 }
 
 .role-list {

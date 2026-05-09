@@ -56,12 +56,13 @@ describe("role admin APIs", () => {
       url: `/api/admin/roles/${role.json().role.id}/permissions`,
       payload: {
         permissions: [
-          { schemaId: schema.json().schema.id, action: "read", allowed: true },
+          { schemaId: schema.json().schema.id, action: "getAll", allowed: true },
+          { schemaId: schema.json().schema.id, action: "get", allowed: true },
         ],
       },
     });
 
     expect(save.statusCode).toBe(200);
-    expect(save.json().permissions).toHaveLength(1);
+    expect(save.json().permissions).toHaveLength(2);
   });
 });

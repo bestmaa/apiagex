@@ -268,11 +268,11 @@ Users screen roles load karta hai, email/password/role ke saath users create kar
 
 ### English
 
-The verified RBAC flow creates a schema API, creates roles, assigns read permission, creates users, logs in users through `POST /api/auth/login-user`, then checks that the allowed role can read and the blocked role receives `API_PERMISSION_DENIED`.
+The verified RBAC flow creates a schema API, creates roles, assigns `getAll` for list reads or `get` for one-entry reads, creates users, logs in users through `POST /api/auth/login-user`, then checks that the allowed role can access the intended API and the blocked role receives `API_PERMISSION_DENIED`. `manage` allows every action for that schema.
 
 ### Hinglish
 
-Verified RBAC flow schema API banata hai, roles create karta hai, read permission assign karta hai, users create karta hai, `POST /api/auth/login-user` se users login karta hai, phir check karta hai ki allowed role read kar sakta hai aur blocked role ko `API_PERMISSION_DENIED` milta hai.
+Verified RBAC flow schema API banata hai, roles create karta hai, list reads ke liye `getAll` ya one-entry reads ke liye `get` assign karta hai, users create karta hai, `POST /api/auth/login-user` se users login karta hai, phir check karta hai ki allowed role intended API access kar sakta hai aur blocked role ko `API_PERMISSION_DENIED` milta hai. `manage` us schema ke sab actions allow karta hai.
 
 ## RBAC Allow/Block Examples
 
@@ -286,10 +286,10 @@ curl -X POST http://127.0.0.1:4000/api/admin/roles \
   -d '{"name":"reader"}'
 curl -X PUT http://127.0.0.1:4000/api/admin/roles/ROLE_ID/permissions \
   -H "content-type: application/json" \
-  -d '{"permissions":[{"schemaId":"SCHEMA_ID","action":"read","allowed":true}]}'
+  -d '{"permissions":[{"schemaId":"SCHEMA_ID","action":"getAll","allowed":true},{"schemaId":"SCHEMA_ID","action":"get","allowed":true}]}'
 ```
 
-Create a user in that role, login, then pass the returned `roleId` as `x-apiagex-role-id` when calling dynamic APIs. If permission is missing, the API returns `403 API_PERMISSION_DENIED`.
+Create a user in that role, login, then pass the returned `roleId` as `x-apiagex-role-id` when calling dynamic APIs. If permission is missing, the API returns `403 API_PERMISSION_DENIED`. Use `getAll` for `GET /api/content/:schemaSlug`, `get` for `GET /api/content/:schemaSlug/:entryId`, and `manage` when the role should have every action on that schema.
 
 ### Hinglish
 
@@ -306,7 +306,7 @@ curl http://127.0.0.1:4000/api/content/article \
   -H "x-apiagex-role-id: ROLE_ID"
 ```
 
-Jis role ko permission mili hai uska request pass hota hai. Jis role ko permission nahi mili usko `403 API_PERMISSION_DENIED` milta hai.
+Jis role ko permission mili hai uska request pass hota hai. Jis role ko permission nahi mili usko `403 API_PERMISSION_DENIED` milta hai. `GET /api/content/:schemaSlug` ke liye `getAll`, `GET /api/content/:schemaSlug/:entryId` ke liye `get`, aur schema ke sab actions ke liye `manage` use karo.
 
 ## MVP RBAC Checkpoint
 

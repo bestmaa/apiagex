@@ -10,7 +10,7 @@ T328 verifies the Task 3 API layer before Admin UI relation-builder work starts.
 - Created a book entry through `POST /api/content/:bookSlug` using the raw author entry id.
 - Read the book through `GET /api/content/:bookSlug/:entryId?populate=relations`.
 - Verified `data.author` populated to the related entry object and preserved the author data.
-- Created a blocked role with no schema read permission.
+- Created a blocked role with no schema get permission.
 - Verified the blocked role receives `API_PERMISSION_DENIED` on the populated read request.
 
 ## Result

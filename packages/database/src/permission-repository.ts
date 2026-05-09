@@ -11,7 +11,8 @@ import type {
 type PermissionRow = Omit<PermissionRecord, "allowed"> & { allowed: number };
 
 const permissionActions: PermissionAction[] = [
-  "read",
+  "getAll",
+  "get",
   "create",
   "update",
   "delete",

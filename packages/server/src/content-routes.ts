@@ -31,7 +31,7 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
-      if (!canAccess(database, request, schema, "read")) return forbidden(reply);
+      if (!canAccess(database, request, schema, "getAll")) return forbidden(reply);
       let result: { entries: EntryRecord[]; limit?: number; offset?: number; total?: number };
       try {
         result = hasContentListQuery(request.query)
@@ -50,7 +50,7 @@ export function registerContentRoutes(
         ...result,
         entries: entries.map((entry) =>
           populateEntryRelations(database, schema, entry, (targetSchema) =>
-            canAccess(database, request, targetSchema, "read"),
+            canAccess(database, request, targetSchema, "get"),
           ),
         ),
       };
@@ -76,7 +76,7 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
-      if (!canAccess(database, request, schema, "read")) return forbidden(reply);
+      if (!canAccess(database, request, schema, "get")) return forbidden(reply);
       const entry = getEntryById(database, request.params.entryId);
       if (!entry || entry.schemaId !== schema.id) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
@@ -91,7 +91,7 @@ export function registerContentRoutes(
         return {
           ok: true,
           entry: populateEntryRelations(database, schema, selectedEntry, (targetSchema) =>
-            canAccess(database, request, targetSchema, "read"),
+            canAccess(database, request, targetSchema, "get"),
           ),
         };
       }
@@ -152,7 +152,7 @@ function canAccess(
   database: SqliteDatabase,
   request: FastifyRequest,
   schema: SchemaRecord,
-  action: "read" | "create" | "update" | "delete",
+  action: "getAll" | "get" | "create" | "update" | "delete",
 ): boolean {
   const roleId = request.headers["x-apiagex-role-id"];
   if (!roleId || Array.isArray(roleId)) return true;

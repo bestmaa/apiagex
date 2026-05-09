@@ -1,6 +1,6 @@
 import type { SchemaRecord } from "./schema.type";
 
-export type PermissionAction = "read" | "create" | "update" | "delete" | "manage";
+export type PermissionAction = "getAll" | "get" | "create" | "update" | "delete" | "manage";
 
 export type RoleRecord = {
   id: string;
