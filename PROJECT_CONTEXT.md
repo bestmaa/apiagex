@@ -93,8 +93,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `npm run smoke` full MVP owner/schema/entry/dynamic API/RBAC flow cover karta hai.
 - Apiagex MVP release gate is ready at version `v1.0.0`.
 - Apiagex MVP release gate version `v1.0.0` par ready hai.
-- Admin Entries now uses a right-side collection rail, table view, find filter, visible field selection, last 50 default rows, and pagination.
-- Admin Entries ab right-side collection rail, table view, find filter, visible field selection, last 50 default rows, aur pagination use karta hai.
+- Admin Entries now uses an attached left Collections submenu, table view, find filter, visible field selection, last 50 default rows, and pagination.
+- Admin Entries ab attached left Collections submenu, table view, find filter, visible field selection, last 50 default rows, aur pagination use karta hai.
 - Admin Entries create form now opens from a compact Create entry button and closes after save or cancel.
 - Admin Entries create form ab compact Create entry button se open hota hai aur save ya cancel ke baad close hota hai.
 - Admin Entries shows an API query parameter guide for `fields`, `search`, `limit`, and `offset` on the selected collection.

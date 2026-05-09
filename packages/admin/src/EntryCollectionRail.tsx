@@ -12,9 +12,10 @@ export function EntryCollectionRail({
   schemas: SchemaRecord[];
 }) {
   return (
-    <aside className="entry-collection-rail" aria-labelledby="entry-collection-title">
-      <h3 id="entry-collection-title">Collections</h3>
-      <div className="entry-collection-list">
+    <>
+      <p className="eyebrow">Entries</p>
+      <h2 id="entry-collection-title">Collections</h2>
+      <div className="entry-collection-list" aria-labelledby="entry-collection-title">
         {schemas.map((schema) => {
           const active = schema.id === schemaId;
           return (
@@ -25,16 +26,19 @@ export function EntryCollectionRail({
               type="button"
               onClick={() => onSelect(schema.id)}
             >
-              <span>
+              <span className="entry-collection-primary">
                 <strong>{schema.name}</strong>
                 <code>/api/content/{schema.slug}</code>
               </span>
-              <span>{schema.fields.length} fields</span>
-              <span>{entryCounts[schema.id] ?? 0} entries</span>
+              <span className="entry-collection-meta">
+                <span>{schema.fields.length} fields</span>
+                <span>{entryCounts[schema.id] ?? 0} entries</span>
+              </span>
             </button>
           );
         })}
+        {schemas.length === 0 ? <p className="entry-collection-empty">Create a schema first.</p> : null}
       </div>
-    </aside>
+    </>
   );
 }

@@ -8,6 +8,7 @@ import { EntryTable } from "./EntryTable";
 import { isEntryPickerRelationField } from "./entry-display";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
+import { useAdminSubnav } from "./layout/admin-subnav-context";
 import type { EntryListQuery, EntryRecord } from "./entry.type";
 import type { SchemaRecord } from "./schema.type";
 
@@ -28,6 +29,7 @@ export function EntryManager() {
   const [offset, setOffset] = useState(0);
   const [total, setTotal] = useState(0);
   const [status, setStatus] = useState("Entry manager loading");
+  const setAdminSubnav = useAdminSubnav();
   const schema = schemas.find((item) => item.id === schemaId);
 
   useEffect(() => {
@@ -41,6 +43,21 @@ export function EntryManager() {
     }
     void loadRelationEntries(schema);
   }, [schema]);
+
+  useEffect(() => {
+    setAdminSubnav({
+      ariaLabel: "Entry collections navigation",
+      content: (
+        <EntryCollectionRail
+          entryCounts={entryCounts}
+          onSelect={(nextSchemaId) => void changeSchema(nextSchemaId)}
+          schemaId={schemaId}
+          schemas={schemas}
+        />
+      ),
+    });
+    return () => setAdminSubnav(null);
+  }, [entryCounts, limit, schemaId, schemas]);
 
   async function loadSchemas() {
     const result = await listSchemas();
@@ -156,57 +173,49 @@ export function EntryManager() {
         <h2 id="entry-manager-title">Entries</h2>
         <p>Collection select karo, data table me dekho, find/filter lagao, aur fields choose karo.</p>
       </div>
-      <div className="entry-workspace">
-        <div className="entry-main-column">
-          {schema ? (
-            <>
-              <div className="entry-create-bar">
-                <button type="button" onClick={() => { setCreateOpen(true); setEditingEntry(null); }}>
-                  <Plus aria-hidden="true" size={16} />
-                  Create entry
-                </button>
-              </div>
-              {createOpen || editingEntry ? (
-                <GeneratedEntryForm
-                  editingEntry={editingEntry}
-                  key={`${schema.id}-${editingEntry?.id ?? "new"}`}
-                  onCancelCreate={() => setCreateOpen(false)}
-                  onCancelEdit={() => setEditingEntry(null)}
-                  onCreated={refreshAfterSave}
-                  relationEntries={relationEntries}
-                  schema={schema}
-                />
-              ) : null}
-              <EntryTable
-                confirmDeleteId={confirmDeleteId}
-                entries={entries}
-                limit={limit}
-                offset={offset}
-                onDelete={removeEntry}
-                onEdit={startEdit}
-                onFieldToggle={changeFields}
-                onLimitChange={changeLimit}
-                onPageChange={changePage}
-                onSearchChange={changeSearch}
+      <div className="entry-main-column">
+        {schema ? (
+          <>
+            <div className="entry-create-bar">
+              <button type="button" onClick={() => { setCreateOpen(true); setEditingEntry(null); }}>
+                <Plus aria-hidden="true" size={16} />
+                Create entry
+              </button>
+            </div>
+            {createOpen || editingEntry ? (
+              <GeneratedEntryForm
+                editingEntry={editingEntry}
+                key={`${schema.id}-${editingEntry?.id ?? "new"}`}
+                onCancelCreate={() => setCreateOpen(false)}
+                onCancelEdit={() => setEditingEntry(null)}
+                onCreated={refreshAfterSave}
                 relationEntries={relationEntries}
                 schema={schema}
-                search={search}
-                setConfirmDeleteId={setConfirmDeleteId}
-                total={total}
-                visibleFields={visibleFields}
               />
-              <EntryQueryGuide schema={schema} visibleFields={visibleFields} />
-            </>
-          ) : (
-            <StateMessage title="No schema available" variant="empty">Create a schema first.</StateMessage>
-          )}
-        </div>
-        <EntryCollectionRail
-          entryCounts={entryCounts}
-          onSelect={(nextSchemaId) => void changeSchema(nextSchemaId)}
-          schemaId={schemaId}
-          schemas={schemas}
-        />
+            ) : null}
+            <EntryTable
+              confirmDeleteId={confirmDeleteId}
+              entries={entries}
+              limit={limit}
+              offset={offset}
+              onDelete={removeEntry}
+              onEdit={startEdit}
+              onFieldToggle={changeFields}
+              onLimitChange={changeLimit}
+              onPageChange={changePage}
+              onSearchChange={changeSearch}
+              relationEntries={relationEntries}
+              schema={schema}
+              search={search}
+              setConfirmDeleteId={setConfirmDeleteId}
+              total={total}
+              visibleFields={visibleFields}
+            />
+            <EntryQueryGuide schema={schema} visibleFields={visibleFields} />
+          </>
+        ) : (
+          <StateMessage title="No schema available" variant="empty">Create a schema first.</StateMessage>
+        )}
       </div>
       <StatusToast title="Entry status">{status}</StatusToast>
     </section>

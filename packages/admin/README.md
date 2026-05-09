@@ -14,7 +14,7 @@ The UI also stores the token expiry time and automatically returns to the login 
 
 The form also syncs content fields through `/api/content-types/:id/fields`.
 
-The UI also has a field-driven entries panel that loads content type fields and saves entries through `/api/content-types/:id/entries`.
+The UI also has a field-driven entries panel that loads collections from the attached left submenu and saves entries through `/api/content-types/:id/entries`.
 
 Entry widgets adapt to field types like text, number, date, boolean, rich text, and repeatable values.
 
@@ -88,7 +88,7 @@ UI token expiry time bhi store karta hai aur session expire hone ya server ke `4
 
 Form content fields ko bhi `/api/content-types/:id/fields` ke through sync karta hai.
 
-UI me field-driven entries panel bhi hai jo content type fields load karke `/api/content-types/:id/entries` ke through entries save karta hai.
+UI me field-driven entries panel bhi hai jo attached left submenu se collections load karta hai aur `/api/content-types/:id/entries` ke through entries save karta hai.
 
 Entry widgets text, number, date, boolean, rich text, aur repeatable values ke hisaab se adapt hote hain.
 

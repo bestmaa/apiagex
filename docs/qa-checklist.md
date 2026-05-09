@@ -8,6 +8,7 @@
 - Open `/doc` and confirm API examples are visible.
 - Open `/adminui` and login as owner.
 - Create a schema with one text field.
+- Open Entries and confirm collections appear in the attached left submenu.
 - Create an entry from the generated entry form.
 - Confirm Generated APIs shows `/api/content/:schemaSlug`.
 - Open Settings and confirm the left menu compacts with Admin Roles and Content Roles submenu options.
@@ -62,6 +63,7 @@
 - `/doc` open karke API examples confirm karo.
 - `/adminui` open karke owner login karo.
 - Ek text field ke saath schema create karo.
+- Entries open karke confirm karo ki collections attached left submenu me dikhte hain.
 - Generated entry form se entry create karo.
 - Generated APIs me `/api/content/:schemaSlug` confirm karo.
 - Settings open karke confirm karo ki left menu compact hota hai aur Admin Roles plus Content Roles submenu options dikhte hain.
