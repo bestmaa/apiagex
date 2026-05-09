@@ -13,21 +13,10 @@ import {
 } from "./relation-helpers.js";
 import type { SqliteDatabase } from "./sqlite.js";
 import { getSchemaById } from "./schema-repository.js";
-import type {
-  CreateEntryInput,
-  EntryData,
-  EntryRecord,
-  UpdateEntryInput,
-} from "./entry-repository.type.js";
+import type { CreateEntryInput, EntryData, EntryRecord, UpdateEntryInput } from "./entry-repository.type.js";
 import type { FieldRecord, SchemaRecord } from "./schema-repository.type.js";
 
-type EntryRow = {
-  id: string;
-  schemaId: string;
-  dataJson: string;
-  createdAt: string;
-  updatedAt: string;
-};
+type EntryRow = { id: string; schemaId: string; dataJson: string; createdAt: string; updatedAt: string };
 
 export function createEntry(db: SqliteDatabase, input: CreateEntryInput): EntryRecord {
   const schema = requireSchema(db, input.schemaId);
@@ -51,19 +40,12 @@ export function listEntries(db: SqliteDatabase, schemaId: string): EntryRecord[]
   return rows.map(rowToEntry);
 }
 
-export function getEntryById(
-  db: SqliteDatabase,
-  id: string,
-): EntryRecord | undefined {
+export function getEntryById(db: SqliteDatabase, id: string): EntryRecord | undefined {
   const row = db.prepare(entrySelectSql("WHERE id = ?")).get(id) as EntryRow | undefined;
   return row ? rowToEntry(row) : undefined;
 }
 
-export function updateEntry(
-  db: SqliteDatabase,
-  id: string,
-  input: UpdateEntryInput,
-): EntryRecord {
+export function updateEntry(db: SqliteDatabase, id: string, input: UpdateEntryInput): EntryRecord {
   const current = requireEntry(db, id);
   const schema = requireSchema(db, current.schemaId);
   validateEntryData(db, schema, input.data, id);
@@ -80,9 +62,7 @@ export function updateEntry(
 export function deleteEntry(db: SqliteDatabase, id: string): void {
   assertEntryNotReferenced(db, id);
   const result = db.prepare("DELETE FROM entries WHERE id = ?").run(id);
-  if (result.changes === 0) {
-    throw new Error("ENTRY_NOT_FOUND");
-  }
+  if (result.changes === 0) throw new Error("ENTRY_NOT_FOUND");
 }
 
 function assertEntryNotReferenced(db: SqliteDatabase, entryId: string): void {
@@ -95,20 +75,11 @@ function assertEntryNotReferenced(db: SqliteDatabase, entryId: string): void {
   }
 }
 
-function validateEntryData(
-  db: SqliteDatabase,
-  schema: SchemaRecord,
-  data: EntryData,
-  currentEntryId?: string,
-): void {
-  if (!isRecord(data)) {
-    throw new Error("ENTRY_DATA_INVALID");
-  }
+function validateEntryData(db: SqliteDatabase, schema: SchemaRecord, data: EntryData, currentEntryId?: string): void {
+  if (!isRecord(data)) throw new Error("ENTRY_DATA_INVALID");
   const fieldSlugs = new Set(schema.fields.map((field) => field.slug));
   for (const key of Object.keys(data)) {
-    if (!fieldSlugs.has(key)) {
-      throw new Error("ENTRY_FIELD_UNKNOWN");
-    }
+    if (!fieldSlugs.has(key)) throw new Error("ENTRY_FIELD_UNKNOWN");
   }
   for (const field of schema.fields) {
     const value = data[field.slug];
@@ -165,11 +136,7 @@ function assertRelation(
   }
 }
 
-function assertMultiRelation(
-  db: SqliteDatabase,
-  field: FieldRecord,
-  value: unknown,
-): void {
+function assertMultiRelation(db: SqliteDatabase, field: FieldRecord, value: unknown): void {
   if (!Array.isArray(value)) {
     throw new Error(relationValueShapeInvalid(field.slug));
   }
@@ -205,26 +172,18 @@ function normalizeEntryData(schema: SchemaRecord, data: EntryData): EntryData {
 }
 
 function assertOneToOneAvailable(
-  db: SqliteDatabase,
-  schema: SchemaRecord,
-  field: FieldRecord,
-  targetEntryId: string,
-  currentEntryId?: string,
+  db: SqliteDatabase, schema: SchemaRecord, field: FieldRecord, targetEntryId: string, currentEntryId?: string,
 ): void {
   const rows = listEntryDataRows(db, "WHERE schema_id = ?", [schema.id]);
   for (const row of rows) {
     if (row.id === currentEntryId) continue;
     const data = parseEntryData(row.dataJson);
-    if (data[field.slug] === targetEntryId) {
-      throw new Error(relationOneToOneConflict(field.slug));
-    }
+    if (data[field.slug] === targetEntryId) throw new Error(relationOneToOneConflict(field.slug));
   }
 }
 
 function assertType(field: FieldRecord, valid: boolean): void {
-  if (!valid) {
-    throw new Error(`ENTRY_FIELD_TYPE_INVALID:${field.slug}`);
-  }
+  if (!valid) throw new Error(`ENTRY_FIELD_TYPE_INVALID:${field.slug}`);
 }
 
 function isMissing(value: unknown): boolean {
@@ -237,17 +196,13 @@ function isRecord(value: unknown): value is EntryData {
 
 function requireSchema(db: SqliteDatabase, schemaId: string): SchemaRecord {
   const schema = getSchemaById(db, schemaId);
-  if (!schema) {
-    throw new Error("SCHEMA_NOT_FOUND");
-  }
+  if (!schema) throw new Error("SCHEMA_NOT_FOUND");
   return schema;
 }
 
 function requireEntry(db: SqliteDatabase, id: string): EntryRecord {
   const entry = getEntryById(db, id);
-  if (!entry) {
-    throw new Error("ENTRY_NOT_FOUND");
-  }
+  if (!entry) throw new Error("ENTRY_NOT_FOUND");
   return entry;
 }
 

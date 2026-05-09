@@ -5,7 +5,11 @@ export type ContentListParams = {
 };
 
 export type ContentPopulateQuery = {
+  fields?: string;
+  limit?: string;
+  offset?: string;
   populate?: string;
+  search?: string;
 };
 
 export type ContentEntryParams = ContentListParams & {

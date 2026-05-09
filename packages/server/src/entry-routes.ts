@@ -2,24 +2,37 @@ import type { FastifyInstance, FastifyReply } from "fastify";
 import {
   createEntry,
   deleteEntry,
+  type EntryListOptions,
   getEntryById,
   listEntries,
+  queryEntries,
   updateEntry,
   type SqliteDatabase,
 } from "@apiagex/database";
-import type { EntryBody, EntryListParams, EntryParams } from "./entry-routes.type.js";
+import type {
+  EntryBody,
+  EntryListParams,
+  EntryListQuery,
+  EntryParams,
+} from "./entry-routes.type.js";
 
 export function registerEntryRoutes(
   server: FastifyInstance,
   database: SqliteDatabase,
 ): void {
-  server.get<{ Params: EntryListParams }>(
+  server.get<{ Params: EntryListParams; Querystring: EntryListQuery }>(
     "/api/admin/schemas/:schemaId/entries",
     async (request, reply) => {
       try {
-        return { ok: true, entries: listEntries(database, request.params.schemaId) };
+        if (!hasEntryListQuery(request.query)) {
+          return { ok: true, entries: listEntries(database, request.params.schemaId) };
+        }
+        return {
+          ok: true,
+          ...queryEntries(database, request.params.schemaId, entryListOptions(request.query)),
+        };
       } catch (error) {
-        return sendEntryError(reply, error, 404);
+        return sendEntryError(reply, error, statusFor(error));
       }
     },
   );
@@ -79,6 +92,32 @@ export function registerEntryRoutes(
 
 function sendEntryError(reply: FastifyReply, error: unknown, statusCode: number): FastifyReply {
   return reply.code(statusCode).send({ ok: false, error: errorCode(error) });
+}
+
+function hasEntryListQuery(query: EntryListQuery): boolean {
+  return Boolean(query.fields || query.limit || query.offset || query.search);
+}
+
+function parseFields(value: string | undefined): string[] | undefined {
+  return value?.split(",").map((field) => field.trim()).filter(Boolean);
+}
+
+function entryListOptions(query: EntryListQuery): EntryListOptions {
+  const options: EntryListOptions = {};
+  const fields = parseFields(query.fields);
+  const limit = parsePositiveNumber(query.limit);
+  const offset = parsePositiveNumber(query.offset);
+  if (fields) options.fields = fields;
+  if (limit !== undefined) options.limit = limit;
+  if (offset !== undefined) options.offset = offset;
+  if (query.search !== undefined) options.search = query.search;
+  return options;
+}
+
+function parsePositiveNumber(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 function statusFor(error: unknown): number {

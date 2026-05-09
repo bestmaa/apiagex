@@ -28,7 +28,17 @@ export type EntryRecord = {
 export type EntryListResponse = {
   ok: boolean;
   entries?: EntryRecord[];
+  limit?: number;
+  offset?: number;
+  total?: number;
   error?: string;
+};
+
+export type EntryListQuery = {
+  fields?: string[];
+  limit?: number;
+  offset?: number;
+  search?: string;
 };
 
 export type EntryMutationResponse = {

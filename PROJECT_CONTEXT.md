@@ -81,6 +81,12 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `npm run smoke` full MVP owner/schema/entry/dynamic API/RBAC flow cover karta hai.
 - Apiagex MVP release gate is ready at version `v1.0.0`.
 - Apiagex MVP release gate version `v1.0.0` par ready hai.
+- Admin Entries now uses a right-side collection rail, table view, find filter, visible field selection, last 50 default rows, and pagination.
+- Admin Entries ab right-side collection rail, table view, find filter, visible field selection, last 50 default rows, aur pagination use karta hai.
+- Entry list APIs support `fields`, `search`, `limit`, and `offset` query parameters for admin and dynamic content lists.
+- Entry list APIs admin aur dynamic content lists ke liye `fields`, `search`, `limit`, aur `offset` query parameters support karte hain.
+- Dynamic single-entry reads support `fields` projection, such as `/api/content/article/ENTRY_ID?fields=title`.
+- Dynamic single-entry reads `fields` projection support karte hain, jaise `/api/content/article/ENTRY_ID?fields=title`.
 
 ## Required MVP Paths
 
@@ -183,6 +189,10 @@ One server must serve exactly these primary paths:
 - MVP actions: list, read, create, update, delete.
 - Admin UI must show every generated API with docs and examples.
 - API behavior must match schema validation and relation rules.
+- Dynamic list APIs support `fields`, `search`, `limit`, and `offset` for projected and paginated reads.
+- Dynamic list APIs projected aur paginated reads ke liye `fields`, `search`, `limit`, aur `offset` support karte hain.
+- Dynamic read APIs support `fields` for selecting one or more entry data fields.
+- Dynamic read APIs one ya more entry data fields select karne ke liye `fields` support karte hain.
 - Relation reads/lists support one-level populate with `?populate=relations`, `?populate=all`, and `?populate=*`.
 - Populate must respect RBAC: related entries only expand when the request role can read the target schema.
 

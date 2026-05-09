@@ -52,6 +52,54 @@ describe("dynamic content APIs", () => {
     expect(invalid.json()).toEqual({ ok: false, error: "ENTRY_FIELD_REQUIRED:title" });
   });
 
+  it("supports dynamic content search, field projection, and pagination", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    await createArticleSchema(server);
+    for (const [title, views] of [
+      ["Alpha", 1],
+      ["Beta", 2],
+      ["Alpha draft", 3],
+    ] as const) {
+      await server.inject({
+        method: "POST",
+        url: "/api/content/article",
+        payload: { data: { title, views } },
+      });
+    }
+
+    const list = await server.inject({
+      method: "GET",
+      url: "/api/content/article?search=Alpha&fields=title&limit=1&offset=1",
+    });
+
+    expect(list.statusCode).toBe(200);
+    expect(list.json().total).toBe(2);
+    expect(list.json().entries).toHaveLength(1);
+    expect(Object.keys(list.json().entries[0].data)).toEqual(["title"]);
+
+    const entryId = list.json().entries[0].id as string;
+    const read = await server.inject({
+      method: "GET",
+      url: `/api/content/article/${entryId}?fields=title`,
+    });
+
+    expect(read.statusCode).toBe(200);
+    expect(Object.keys(read.json().entry.data)).toEqual(["title"]);
+  });
+
+  it("rejects unknown dynamic content projection fields", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    await createArticleSchema(server);
+
+    const response = await server.inject({
+      method: "GET",
+      url: "/api/content/article?fields=missing",
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({ ok: false, error: "ENTRY_FIELD_UNKNOWN" });
+  });
+
   it("allows and blocks dynamic APIs by role permission header", async () => {
     const server = createServer({ database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
@@ -212,7 +260,10 @@ async function createArticleSchema(server: ReturnType<typeof createServer>): Pro
     payload: {
       name: "Article",
       slug: "article",
-      fields: [{ name: "Title", slug: "title", type: "text", required: true }],
+      fields: [
+        { name: "Title", slug: "title", type: "text", required: true },
+        { name: "Views", slug: "views", type: "number" },
+      ],
     },
   });
   return response.json().schema.id as string;

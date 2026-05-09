@@ -24,6 +24,20 @@ export type UpdateEntryInput = {
   data: EntryData;
 };
 
+export type EntryListOptions = {
+  fields?: string[];
+  limit?: number;
+  offset?: number;
+  search?: string;
+};
+
+export type EntryListResult = {
+  entries: EntryRecord[];
+  limit: number;
+  offset: number;
+  total: number;
+};
+
 export type EntryRecord = {
   id: string;
   schemaId: string;

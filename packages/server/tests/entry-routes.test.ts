@@ -59,6 +59,48 @@ describe("entry admin APIs", () => {
     });
   });
 
+  it("lists entries with search, field projection, and pagination metadata", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+    for (const [title, views] of [
+      ["Alpha", 1],
+      ["Beta", 2],
+      ["Alpha draft", 3],
+    ] as const) {
+      await server.inject({
+        method: "POST",
+        url: `/api/admin/schemas/${schemaId}/entries`,
+        payload: { data: { title, views } },
+      });
+    }
+
+    const response = await server.inject({
+      method: "GET",
+      url: `/api/admin/schemas/${schemaId}/entries?search=Alpha&fields=title&limit=1&offset=1`,
+    });
+    const body = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(body.total).toBe(2);
+    expect(body.limit).toBe(1);
+    expect(body.offset).toBe(1);
+    expect(body.entries).toHaveLength(1);
+    expect(Object.keys(body.entries[0].data)).toEqual(["title"]);
+  });
+
+  it("rejects unknown projected entry fields", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+
+    const response = await server.inject({
+      method: "GET",
+      url: `/api/admin/schemas/${schemaId}/entries?fields=missing`,
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({ ok: false, error: "ENTRY_FIELD_UNKNOWN" });
+  });
+
   it("returns relation validation errors from entry create and update", async () => {
     const server = createServer({ database: openSqliteDatabase() });
     const authorSchemaId = await createAuthorSchema(server);

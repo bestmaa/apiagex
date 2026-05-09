@@ -1350,6 +1350,202 @@ code {
   gap: var(--admin-space-3);
 }
 
+.entry-manager {
+  max-width: none;
+}
+
+.entry-page-heading {
+  display: grid;
+  gap: var(--admin-space-2);
+}
+
+.entry-page-heading p {
+  color: var(--admin-color-text-soft);
+  margin: 0;
+}
+
+.entry-workspace {
+  align-items: start;
+  display: grid;
+  gap: var(--admin-space-6);
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+}
+
+.entry-main-column {
+  display: grid;
+  gap: var(--admin-space-6);
+  min-width: 0;
+}
+
+.entry-collection-rail {
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  display: grid;
+  gap: var(--admin-space-4);
+  padding: var(--admin-space-5);
+  position: sticky;
+  top: var(--admin-space-6);
+}
+
+.entry-collection-rail h3 {
+  margin: 0;
+}
+
+.entry-collection-list {
+  display: grid;
+  gap: var(--admin-space-3);
+}
+
+.entry-collection-button {
+  align-items: stretch;
+  background: var(--admin-color-surface);
+  border: 1px solid var(--admin-color-border-soft);
+  color: var(--admin-color-text);
+  display: grid;
+  gap: var(--admin-space-2);
+  justify-content: stretch;
+  padding: var(--admin-space-4);
+  text-align: left;
+  width: 100%;
+}
+
+.entry-collection-button.is-active {
+  border-color: var(--admin-color-primary);
+  box-shadow: 0 0 0 2px var(--admin-color-primary-muted);
+}
+
+.entry-collection-button span:first-child {
+  display: grid;
+  gap: var(--admin-space-2);
+  min-width: 0;
+}
+
+.entry-collection-button code,
+.entry-collection-button strong {
+  overflow-wrap: anywhere;
+}
+
+.entry-collection-button > span:not(:first-child) {
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
+}
+
+.entry-table-panel {
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  display: grid;
+  gap: var(--admin-space-5);
+  padding: var(--admin-space-5);
+}
+
+.entry-table-toolbar {
+  align-items: end;
+  display: grid;
+  gap: var(--admin-space-4);
+  grid-template-columns: minmax(220px, 1fr) minmax(120px, 160px);
+}
+
+.entry-search-field span {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+.entry-search-field svg {
+  color: var(--admin-color-text-muted);
+  left: var(--admin-space-4);
+  position: absolute;
+}
+
+.entry-search-field input {
+  padding-left: 42px;
+}
+
+.entry-field-filter {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  padding: var(--admin-space-4);
+}
+
+.entry-field-filter label {
+  font-size: var(--admin-font-xs);
+}
+
+.entry-table-meta,
+.entry-pagination {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+  justify-content: space-between;
+}
+
+.entry-table-meta h3 {
+  margin: 0;
+}
+
+.entry-table-meta span,
+.entry-pagination span {
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
+}
+
+.entry-table-scroll {
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-sm);
+  overflow-x: auto;
+}
+
+.entry-table {
+  border-collapse: collapse;
+  min-width: 760px;
+  width: 100%;
+}
+
+.entry-table th,
+.entry-table td {
+  border-bottom: 1px solid var(--admin-color-border-soft);
+  padding: var(--admin-space-3);
+  text-align: left;
+  vertical-align: top;
+}
+
+.entry-table thead th {
+  background: var(--admin-color-surface-muted);
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  text-transform: uppercase;
+}
+
+.entry-table tbody th {
+  display: grid;
+  gap: var(--admin-space-2);
+  min-width: 160px;
+}
+
+.entry-table td {
+  color: var(--admin-color-text-soft);
+  overflow-wrap: anywhere;
+}
+
+.entry-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-2);
+}
+
+.entry-table-actions button,
+.entry-pagination button {
+  min-height: 34px;
+  padding: var(--admin-space-2) var(--admin-space-3);
+}
+
 .entry-list {
   display: grid;
   gap: var(--admin-space-5);
@@ -1565,6 +1761,8 @@ code {
   .field-relation-grid,
   .entry-selector,
   .entry-form-grid,
+  .entry-table-toolbar,
+  .entry-workspace,
   .entry-summary-list,
   .admin-doc-checklist-grid,
   .admin-doc-grid,
@@ -1610,6 +1808,14 @@ code {
   .api-example-heading,
   .entry-row-heading {
     display: grid;
+  }
+
+  .entry-collection-rail {
+    position: static;
+  }
+
+  .entry-table-panel {
+    padding: var(--admin-space-4);
   }
 
   form {

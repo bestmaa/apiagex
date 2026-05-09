@@ -2,6 +2,7 @@ import type { AuthResponse } from "./session.type";
 import type {
   EntryDeleteResponse,
   EntryData,
+  EntryListQuery,
   EntryListResponse,
   EntryMutationResponse,
 } from "./entry.type";
@@ -76,8 +77,17 @@ export async function deleteSchema(schemaId: string): Promise<SchemaDeleteRespon
   return (await response.json()) as SchemaDeleteResponse;
 }
 
-export async function listEntries(schemaId: string): Promise<EntryListResponse> {
-  const response = await fetch(`/api/admin/schemas/${schemaId}/entries`);
+export async function listEntries(
+  schemaId: string,
+  query: EntryListQuery = {},
+): Promise<EntryListResponse> {
+  const params = new URLSearchParams();
+  if (query.fields) params.set("fields", query.fields.join(","));
+  if (query.limit !== undefined) params.set("limit", String(query.limit));
+  if (query.offset !== undefined) params.set("offset", String(query.offset));
+  if (query.search) params.set("search", query.search);
+  const suffix = params.size ? `?${params.toString()}` : "";
+  const response = await fetch(`/api/admin/schemas/${schemaId}/entries${suffix}`);
   return (await response.json()) as EntryListResponse;
 }
 

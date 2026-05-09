@@ -3,9 +3,12 @@ import {
   canRoleAccess,
   createEntry,
   deleteEntry,
+  type EntryListOptions,
+  type EntryRecord,
   getEntryById,
   getSchemaBySlug,
   listEntries,
+  queryEntries,
   updateEntry,
   type SchemaRecord,
   type SqliteDatabase,
@@ -29,13 +32,22 @@ export function registerContentRoutes(
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
       if (!canAccess(database, request, schema, "read")) return forbidden(reply);
-      const entries = listEntries(database, schema.id);
+      let result: { entries: EntryRecord[]; limit?: number; offset?: number; total?: number };
+      try {
+        result = hasContentListQuery(request.query)
+          ? queryEntries(database, schema.id, contentListOptions(request.query))
+          : { entries: listEntries(database, schema.id) };
+      } catch (error) {
+        return sendContentError(reply, error, 400);
+      }
+      const entries = result.entries;
       if (!shouldPopulateRelations(request.query.populate)) {
-        return { ok: true, schema: schema.slug, entries };
+        return { ok: true, schema: schema.slug, ...result, entries };
       }
       return {
         ok: true,
         schema: schema.slug,
+        ...result,
         entries: entries.map((entry) =>
           populateEntryRelations(database, schema, entry, (targetSchema) =>
             canAccess(database, request, targetSchema, "read"),
@@ -69,15 +81,21 @@ export function registerContentRoutes(
       if (!entry || entry.schemaId !== schema.id) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
       }
+      let selectedEntry: EntryRecord;
+      try {
+        selectedEntry = projectContentEntry(schema, entry, parseFields(request.query.fields));
+      } catch (error) {
+        return sendContentError(reply, error, 400);
+      }
       if (shouldPopulateRelations(request.query.populate)) {
         return {
           ok: true,
-          entry: populateEntryRelations(database, schema, entry, (targetSchema) =>
+          entry: populateEntryRelations(database, schema, selectedEntry, (targetSchema) =>
             canAccess(database, request, targetSchema, "read"),
           ),
         };
       }
-      return { ok: true, entry };
+      return { ok: true, entry: selectedEntry };
     },
   );
 
@@ -143,6 +161,47 @@ function canAccess(
 
 function forbidden(reply: FastifyReply): FastifyReply {
   return reply.code(403).send({ ok: false, error: "API_PERMISSION_DENIED" });
+}
+
+function hasContentListQuery(query: ContentPopulateQuery): boolean {
+  return Boolean(query.fields || query.limit || query.offset || query.search);
+}
+
+function contentListOptions(query: ContentPopulateQuery): EntryListOptions {
+  const options: EntryListOptions = {};
+  const fields = parseFields(query.fields);
+  const limit = parsePositiveNumber(query.limit);
+  const offset = parsePositiveNumber(query.offset);
+  if (fields) options.fields = fields;
+  if (limit !== undefined) options.limit = limit;
+  if (offset !== undefined) options.offset = offset;
+  if (query.search !== undefined) options.search = query.search;
+  return options;
+}
+
+function parseFields(value: string | undefined): string[] | undefined {
+  return value?.split(",").map((field) => field.trim()).filter(Boolean);
+}
+
+function parsePositiveNumber(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function projectContentEntry(
+  schema: SchemaRecord,
+  entry: EntryRecord,
+  fields: string[] | undefined,
+): EntryRecord {
+  if (!fields || fields.length === 0) return entry;
+  const allowed = new Set(schema.fields.map((field) => field.slug));
+  const data: EntryRecord["data"] = {};
+  for (const field of [...new Set(fields)]) {
+    if (!allowed.has(field)) throw new Error("ENTRY_FIELD_UNKNOWN");
+    data[field] = entry.data[field];
+  }
+  return { ...entry, data };
 }
 
 function sendContentError(reply: FastifyReply, error: unknown, statusCode: number): FastifyReply {

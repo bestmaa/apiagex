@@ -15,6 +15,7 @@ export {
   listEntries,
   updateEntry,
 } from "./entry-repository.js";
+export { queryEntries } from "./entry-query.js";
 export {
   createRole,
   getRoleById,
@@ -60,6 +61,8 @@ export type {
   CreateEntryInput,
   EntryData,
   EntryFieldValue,
+  EntryListOptions,
+  EntryListResult,
   EntryRecord,
   MultiRelationEntryValue,
   RelationEntryValue,
