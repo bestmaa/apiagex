@@ -11,6 +11,7 @@
 - Create an entry from the generated entry form.
 - Confirm Generated APIs shows `/api/content/:schemaSlug`.
 - Open Settings and confirm the left menu compacts with Admin Roles and Content Roles submenu options.
+- Confirm Settings submenu items keep normal compact height and scroll inside the 100vh column if content grows.
 - Create a custom admin role in Settings and save one admin permission.
 - Open Settings > Content Roles, create an API role, and save at least one permission checkbox.
 - Create a user assigned to that API role.
@@ -64,6 +65,7 @@
 - Generated entry form se entry create karo.
 - Generated APIs me `/api/content/:schemaSlug` confirm karo.
 - Settings open karke confirm karo ki left menu compact hota hai aur Admin Roles plus Content Roles submenu options dikhte hain.
+- Confirm karo ki Settings submenu items normal compact height me rahen aur content badhne par 100vh column ke andar scroll ho.
 - Settings me custom admin role create karo aur ek admin permission save karo.
 - Settings > Content Roles me API role create karo aur ek permission checkbox save karo.
 - Us API role ke saath user create karo.

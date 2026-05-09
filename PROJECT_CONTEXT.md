@@ -71,6 +71,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Admin UI Users screen API role assignment ke saath users create aur list karta hai.
 - Admin UI Settings now has an attached submenu with Admin Roles and Content Roles subroutes.
 - Admin UI Settings me ab attached submenu hai jisme Admin Roles aur Content Roles subroutes hain.
+- Settings submenu uses compact normal-height items with viewport-height desktop scrolling.
+- Settings submenu compact normal-height items use karta hai aur desktop par viewport-height scrolling rakhta hai.
 - Admin panel permissions are stored separately in `admin_permissions` for schemas, entries, API roles, API users, and settings.
 - Admin panel permissions `admin_permissions` me schemas, entries, API roles, API users, aur settings ke liye alag store hote hain.
 - RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.

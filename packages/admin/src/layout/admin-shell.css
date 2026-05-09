@@ -2,7 +2,9 @@
   background: var(--admin-color-bg);
   display: grid;
   grid-template-columns: 244px minmax(0, 1fr);
+  height: 100vh;
   min-height: 100vh;
+  overflow: hidden;
 }
 
 .admin-shell.has-subnav {
@@ -31,7 +33,9 @@
   color: var(--admin-color-sidebar-text);
   display: grid;
   grid-template-rows: auto 1fr;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  overflow-y: auto;
   padding: var(--admin-space-8);
 }
 
@@ -129,12 +133,15 @@
 }
 
 .admin-subnav {
+  align-content: start;
   background: var(--admin-color-surface);
   border-right: 1px solid var(--admin-color-border-soft);
   display: grid;
   gap: var(--admin-space-5);
-  grid-template-rows: auto auto 1fr;
-  min-height: 100vh;
+  grid-template-rows: auto auto max-content;
+  height: 100vh;
+  min-height: 0;
+  overflow-y: auto;
   padding: var(--admin-space-8) var(--admin-space-5);
 }
 
@@ -144,8 +151,10 @@
 }
 
 .admin-subnav nav {
+  align-content: start;
   display: grid;
   gap: var(--admin-space-3);
+  grid-auto-rows: max-content;
 }
 
 .admin-subnav a {
@@ -174,7 +183,9 @@
 .admin-workspace {
   display: grid;
   grid-template-rows: auto 1fr;
+  height: 100vh;
   min-width: 0;
+  overflow-y: auto;
 }
 
 .admin-workspace main {
@@ -238,7 +249,9 @@
 
 @media (max-width: 800px) {
   .admin-shell {
+    height: auto;
     grid-template-columns: 1fr;
+    overflow: visible;
   }
 
   .admin-shell.has-subnav {
@@ -248,7 +261,9 @@
   .admin-sidebar {
     border-bottom: 1px solid color-mix(in srgb, var(--admin-color-sidebar-text) 12%, transparent);
     border-right: 0;
+    height: auto;
     min-height: auto;
+    overflow-y: visible;
     padding: var(--admin-space-7);
   }
 
@@ -279,7 +294,9 @@
   .admin-subnav {
     border-bottom: 1px solid var(--admin-color-border-soft);
     border-right: 0;
+    height: auto;
     min-height: auto;
+    overflow-y: visible;
     padding: var(--admin-space-6) var(--admin-space-7);
   }
 
@@ -323,5 +340,10 @@
     display: grid;
     gap: var(--admin-space-5);
     padding: var(--admin-space-7);
+  }
+
+  .admin-workspace {
+    height: auto;
+    overflow-y: visible;
   }
 }
