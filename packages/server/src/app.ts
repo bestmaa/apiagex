@@ -15,6 +15,7 @@ import { registerSchemaRoutes } from "./schema-routes.js";
 import { registerEntryRoutes } from "./entry-routes.js";
 import { registerRoleRoutes } from "./role-routes.js";
 import { registerUserRoutes } from "./user-routes.js";
+import { registerSettingsRoutes } from "./settings-routes.js";
 import { loginUser } from "./user-auth.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
@@ -30,6 +31,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   registerContentRoutes(server, database);
   registerRoleRoutes(server, database);
   registerUserRoutes(server, database);
+  registerSettingsRoutes(server, database);
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,

@@ -64,6 +64,31 @@ describe("owner bootstrap API", () => {
     ]);
   });
 
+  it("seeds default admin panel permissions", async () => {
+    const database = openSqliteDatabase();
+    const server = createServer({ database });
+
+    await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: {
+        email: "owner@apiagex.local",
+        password: "OwnerPass123!",
+      },
+    });
+
+    const adminPermissions = database
+      .prepare(
+        `SELECT roles.name as roleName, admin_permissions.action
+         FROM admin_permissions JOIN roles ON roles.id = admin_permissions.role_id
+         ORDER BY roles.name, admin_permissions.action`,
+      )
+      .all() as Array<{ roleName: string; action: string }>;
+    expect(adminPermissions).toContainEqual({ roleName: "schema-manager", action: "schemas" });
+    expect(adminPermissions).toContainEqual({ roleName: "user-manager", action: "apiUsers" });
+    expect(adminPermissions).toContainEqual({ roleName: "admin", action: "settings" });
+  });
+
   it("does not let owner role bypass content API permissions", async () => {
     const database = openSqliteDatabase();
     const server = createServer({ database });

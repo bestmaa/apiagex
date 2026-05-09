@@ -8,6 +8,7 @@ export const MVP_TABLES = [
   "fields",
   "entries",
   "permissions",
+  "admin_permissions",
 ] as const;
 
 export const MVP_FOUNDATION_SQL = `
@@ -73,10 +74,34 @@ CREATE TABLE IF NOT EXISTS permissions (
   allowed INTEGER NOT NULL DEFAULT 0,
   UNIQUE(role_id, schema_id, action)
 );
+
+CREATE TABLE IF NOT EXISTS admin_permissions (
+  id TEXT PRIMARY KEY,
+  role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  action TEXT NOT NULL,
+  allowed INTEGER NOT NULL DEFAULT 0,
+  UNIQUE(role_id, action)
+);
 `;
 
 export const MVP_ADDITIVE_MIGRATIONS_SQL = [
   "ALTER TABLE fields ADD COLUMN relation_type TEXT",
   "ALTER TABLE roles ADD COLUMN role_kind TEXT NOT NULL DEFAULT 'api'",
   "UPDATE roles SET role_kind = 'admin' WHERE is_owner = 1 OR name IN ('owner', 'admin', 'schema-manager', 'user-manager')",
+  `CREATE TABLE IF NOT EXISTS admin_permissions (
+    id TEXT PRIMARY KEY,
+    role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+    action TEXT NOT NULL,
+    allowed INTEGER NOT NULL DEFAULT 0,
+    UNIQUE(role_id, action)
+  )`,
+  "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_admin_schemas', id, 'schemas', 1 FROM roles WHERE name = 'admin' AND role_kind = 'admin'",
+  "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_admin_entries', id, 'entries', 1 FROM roles WHERE name = 'admin' AND role_kind = 'admin'",
+  "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_admin_apiRoles', id, 'apiRoles', 1 FROM roles WHERE name = 'admin' AND role_kind = 'admin'",
+  "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_admin_apiUsers', id, 'apiUsers', 1 FROM roles WHERE name = 'admin' AND role_kind = 'admin'",
+  "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_admin_settings', id, 'settings', 1 FROM roles WHERE name = 'admin' AND role_kind = 'admin'",
+  "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_schema-manager_schemas', id, 'schemas', 1 FROM roles WHERE name = 'schema-manager' AND role_kind = 'admin'",
+  "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_schema-manager_entries', id, 'entries', 1 FROM roles WHERE name = 'schema-manager' AND role_kind = 'admin'",
+  "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_user-manager_apiRoles', id, 'apiRoles', 1 FROM roles WHERE name = 'user-manager' AND role_kind = 'admin'",
+  "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_user-manager_apiUsers', id, 'apiUsers', 1 FROM roles WHERE name = 'user-manager' AND role_kind = 'admin'",
 ] as const;

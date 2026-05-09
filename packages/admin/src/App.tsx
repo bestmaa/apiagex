@@ -11,6 +11,7 @@ import { SessionPanel } from "./components/SessionPanel";
 import { useAdminTheme } from "./hooks/useAdminTheme";
 import { AdminShell } from "./layout/AdminShell";
 import { DocsPage } from "./pages/DocsPage";
+import { SettingsPage } from "./pages/SettingsPage";
 import type { OwnerSession } from "./session.type";
 import "./tokens.css";
 import "./styles.css";
@@ -23,6 +24,7 @@ const navItems: AdminNavItem[] = [
   { label: "APIs", route: "apis" },
   { label: "Roles", route: "roles" },
   { label: "Users", route: "users" },
+  { label: "Settings", route: "settings" },
   { label: "Docs", route: "docs" },
 ];
 const sessionKey = "apiagexOwner";
@@ -119,6 +121,7 @@ function renderRoute(
   if (route === "entries") return <EntryManager />;
   if (route === "apis") return <ApiList />;
   if (route === "roles") return <RoleManager />;
+  if (route === "settings") return <SettingsPage />;
   return <UserManager />;
 }
 

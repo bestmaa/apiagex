@@ -69,6 +69,10 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - User repository aur `/api/admin/users` APIs content API users ko exactly one API role ke saath create karte hain.
 - Admin UI Users screen creates and lists users with API role assignment.
 - Admin UI Users screen API role assignment ke saath users create aur list karta hai.
+- Admin UI Settings now has Access Control with separate Admin Panel Roles and Content API Roles sections.
+- Admin UI Settings me ab Access Control hai jisme Admin Panel Roles aur Content API Roles alag sections me hain.
+- Admin panel permissions are stored separately in `admin_permissions` for schemas, entries, API roles, API users, and settings.
+- Admin panel permissions `admin_permissions` me schemas, entries, API roles, API users, aur settings ke liye alag store hote hain.
 - RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.
 - RBAC end-to-end flow user login aur allowed/blocked dynamic API access verify karta hai.
 - `/doc` and `/readme` document RBAC allow/block examples.
@@ -131,7 +135,7 @@ One server must serve exactly these primary paths:
 - `/doc` explains every completed feature with API examples.
 - `/readme` gives a concise product/workspace summary.
 - `/adminui` is the browser UI for owner/admin/user workflows.
-- The current `/adminui` page includes Dashboard, Schemas, APIs, Roles, Users, and Docs navigation.
+- The current `/adminui` page includes Dashboard, Schemas, Entries, APIs, Roles, Users, Settings, and Docs navigation.
 - Current Task4 Admin UI status: Dashboard, Schemas, Entries, APIs, Roles, Users, and Docs use the redesigned shell, light/dark theme, responsive list patterns, keyboard skip/focus handling, accessible delete confirmation, and status toast pattern.
 - Current Task4 Admin UI status Hinglish: Dashboard, Schemas, Entries, APIs, Roles, Users, aur Docs redesigned shell, light/dark theme, responsive list patterns, keyboard skip/focus handling, accessible delete confirmation, aur status toast pattern use karte hain.
 
@@ -142,6 +146,8 @@ One server must serve exactly these primary paths:
 - Owner Admin UI aur control-plane setup manage kar sakta hai.
 - Owner/admin panel roles are separate from content API permission roles.
 - Owner/admin panel roles content API permission roles se alag hain.
+- Owner can manage the split from Settings > Access Control.
+- Owner Settings > Access Control se is split ko manage kar sakta hai.
 - Content API requests use API roles when `x-apiagex-role-id` is provided; owner/admin roles do not bypass content API checks.
 - Content API requests `x-apiagex-role-id` aane par API roles use karte hain; owner/admin roles content API checks bypass nahi karte.
 - Later content API users must be created by an allowed owner/admin flow.
@@ -217,8 +223,9 @@ One server must serve exactly these primary paths:
 
 ### RBAC
 
-- Admin roles are `owner`, `admin`, `schema-manager`, and `user-manager`.
+- Admin roles are `owner`, `admin`, `schema-manager`, and `user-manager`, plus custom admin roles from Settings.
 - API roles are `reader`, `single-reader`, `writer`, `editor`, and `public`, plus any created API roles.
+- Admin panel permissions are separate actions: schemas, entries, apiRoles, apiUsers, and settings.
 - Owner can create unlimited API roles.
 - Permissions are assigned per API role, per dynamic API, per action.
 - Actions: getAll, get, create, update, delete, manage.

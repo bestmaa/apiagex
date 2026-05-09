@@ -214,6 +214,16 @@ Use `POST /api/admin/roles` with `{ "name": "editor", "description": "..." }` to
 
 API roles create karne ke liye `POST /api/admin/roles` par `{ "name": "editor", "description": "..." }` bhejo. API roles list ke liye `GET /api/admin/roles` aur one API role read ke liye `GET /api/admin/roles/:roleId` use karo. Admin roles `owner`, `admin`, `schema-manager`, aur `user-manager` control-plane ke liye seeded hain aur is API role list se hidden hain.
 
+## Settings Access Control
+
+### English
+
+Use `GET /api/admin/settings/access` to read both catalogs: Admin Panel Roles and Content API Roles. Use `POST /api/admin/settings/access/admin-roles` to create custom admin roles. Use `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` to save admin permissions for `schemas`, `entries`, `apiRoles`, `apiUsers`, and `settings`. These are stored in `admin_permissions`, not in generated content API permissions.
+
+### Hinglish
+
+Dono catalog read karne ke liye `GET /api/admin/settings/access` use karo: Admin Panel Roles aur Content API Roles. Custom admin roles banane ke liye `POST /api/admin/settings/access/admin-roles` use karo. Admin permissions save karne ke liye `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` use karo jisme `schemas`, `entries`, `apiRoles`, `apiUsers`, aur `settings` actions hain. Ye `admin_permissions` me store hote hain, generated content API permissions me nahi.
+
 ## Permission Model
 
 ### English

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { BookOpen, Database, FileText, Home, KeyRound, Menu, Network, Users, X } from "lucide-react";
+import { BookOpen, Database, FileText, Home, KeyRound, Menu, Network, Settings, Users, X } from "lucide-react";
 import type { AdminNavItem, AdminRoute } from "../app-route.type";
 import type { OwnerSession } from "../session.type";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -13,6 +13,7 @@ const navIcons = {
   entries: FileText,
   roles: KeyRound,
   schemas: Database,
+  settings: Settings,
   users: Users,
 } satisfies Record<AdminRoute, typeof Home>;
 
@@ -23,6 +24,7 @@ const pageDescriptions = {
   entries: "Create, edit, and connect content entries.",
   roles: "Configure API role permissions for each API.",
   schemas: "Design fields, relations, and generated APIs.",
+  settings: "Manage admin roles and content API role separation.",
   users: "Invite users and assign exactly one API role.",
 } satisfies Record<AdminRoute, string>;
 

@@ -11,6 +11,8 @@
 - Create an entry from the generated entry form.
 - Confirm Generated APIs shows `/api/content/:schemaSlug`.
 - Confirm the Role screen shows API roles only, with no `owner` or `admin` role in the list.
+- Open Settings and confirm Admin Panel Roles and Content API Roles are separate sections.
+- Create a custom admin role in Settings and save one admin permission.
 - Create an API role and save at least one permission checkbox.
 - Create a user assigned to that API role.
 - Confirm there are no current-page console errors.
@@ -38,6 +40,8 @@
 - `POST /api/admin/schemas/:schemaId/entries` creates an entry.
 - `POST /api/content/:schemaSlug` creates dynamic content.
 - `GET /api/admin/roles` lists API roles only and excludes `owner`, `admin`, `schema-manager`, and `user-manager`.
+- `GET /api/admin/settings/access` lists admin roles and API roles separately.
+- `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` saves admin permissions outside content API permissions.
 - `POST /api/admin/roles` creates an API role.
 - `PUT /api/admin/roles/:roleId/permissions` saves permissions.
 - `POST /api/admin/users` creates a user with one API role.
@@ -61,6 +65,8 @@
 - Generated entry form se entry create karo.
 - Generated APIs me `/api/content/:schemaSlug` confirm karo.
 - Confirm karo ki Role screen sirf API roles dikhaye, aur list me `owner` ya `admin` na ho.
+- Settings open karke confirm karo ki Admin Panel Roles aur Content API Roles alag sections me hain.
+- Settings me custom admin role create karo aur ek admin permission save karo.
 - API role create karo aur ek permission checkbox save karo.
 - Us API role ke saath user create karo.
 - Current page console errors nahi hone chahiye.
@@ -88,6 +94,8 @@
 - `POST /api/admin/schemas/:schemaId/entries` entry create kare.
 - `POST /api/content/:schemaSlug` dynamic content create kare.
 - `GET /api/admin/roles` sirf API roles list kare aur `owner`, `admin`, `schema-manager`, `user-manager` exclude kare.
+- `GET /api/admin/settings/access` admin roles aur API roles ko alag list kare.
+- `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` admin permissions ko content API permissions se alag save kare.
 - `POST /api/admin/roles` API role create kare.
 - `PUT /api/admin/roles/:roleId/permissions` permissions save kare.
 - `POST /api/admin/users` one-API-role user create kare.

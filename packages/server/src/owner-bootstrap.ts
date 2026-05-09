@@ -20,6 +20,11 @@ const apiRoleCatalog = [
   ["role_api_editor", "editor", "Content editor"],
   ["role_api_public", "public", "Public API role"],
 ] as const;
+const defaultAdminPermissions = {
+  admin: ["schemas", "entries", "apiRoles", "apiUsers", "settings"],
+  "schema-manager": ["schemas", "entries"],
+  "user-manager": ["apiRoles", "apiUsers"],
+} as const;
 
 export function bootstrapOwner(
   db: SqliteDatabase,
@@ -47,6 +52,7 @@ export function bootstrapOwner(
   const now = new Date().toISOString();
   const userId = randomUUID();
   seedDefaultRoles(db, now);
+  seedDefaultAdminPermissions(db);
   db.prepare(
     "INSERT INTO users (id, email, password_hash, role_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
   ).run(userId, email, hashPassword(input.password), OWNER_ROLE_ID, now, now);
@@ -111,4 +117,20 @@ function seedRole(
        role_kind = excluded.role_kind,
        updated_at = excluded.updated_at`,
   ).run(id, name, description, isOwner ? 1 : 0, roleKind, now, now);
+}
+
+function seedDefaultAdminPermissions(db: SqliteDatabase): void {
+  for (const [roleName, actions] of Object.entries(defaultAdminPermissions)) {
+    const role = db.prepare("SELECT id FROM roles WHERE name = ? AND role_kind = 'admin'").get(roleName) as
+      | { id: string }
+      | undefined;
+    if (!role) continue;
+    for (const action of actions) {
+      db.prepare(
+        `INSERT INTO admin_permissions (id, role_id, action, allowed)
+         VALUES (?, ?, ?, 1)
+         ON CONFLICT(role_id, action) DO UPDATE SET allowed = excluded.allowed`,
+      ).run(`admin_permission_${roleName}_${action}`, role.id, action);
+    }
+  }
 }

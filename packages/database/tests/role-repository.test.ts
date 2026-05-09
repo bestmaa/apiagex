@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  createAdminRole,
   createRole,
+  listAdminRoles,
   listRoles,
   migrateMvpDatabase,
   openSqliteDatabase,
@@ -38,6 +40,16 @@ describe("role repository", () => {
 
     createRole(db, { name: "reader" });
 
+    expect(listRoles(db).map((role) => role.name)).toEqual(["reader"]);
+  });
+
+  it("creates and lists admin roles separately", () => {
+    const db = openMigratedDb();
+    const adminRole = createAdminRole(db, { name: "content-manager" });
+    createRole(db, { name: "reader" });
+
+    expect(adminRole.roleKind).toBe("admin");
+    expect(listAdminRoles(db).map((role) => role.name)).toEqual(["content-manager"]);
     expect(listRoles(db).map((role) => role.name)).toEqual(["reader"]);
   });
 });

@@ -61,6 +61,10 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - User admin APIs `/api/admin/users` par available hain, har user ke liye ek API role.
 - Admin UI Users screen can create and list users with API role assignment.
 - Admin UI Users screen API role assignment ke saath users create aur list kar sakta hai.
+- Admin UI Settings has Access Control sections for Admin Panel Roles and Content API Roles.
+- Admin UI Settings me Admin Panel Roles aur Content API Roles ke liye Access Control sections hain.
+- Admin panel permissions are stored separately for schemas, entries, API roles, API users, and settings.
+- Admin panel permissions schemas, entries, API roles, API users, aur settings ke liye alag store hote hain.
 - RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.
 - RBAC end-to-end flow user login aur allowed/blocked dynamic API access verify karta hai.
 - MVP RBAC checkpoint is ready at version `v0.5.8`.
@@ -125,6 +129,12 @@ Hinglish: Single relations ek entry id string ya `null` store karte hain; multi 
 English: Create or select an API role, assign schema action permissions, create a user with that API role, login with `/api/auth/login-user`, then call dynamic APIs with `x-apiagex-role-id`. Allowed API roles work; blocked roles receive `API_PERMISSION_DENIED`. Admin roles are `owner`, `admin`, `schema-manager`, and `user-manager`; API roles include `reader`, `single-reader`, `writer`, `editor`, and `public`. `manage` allows all content API actions for one schema, but only for API roles.
 
 Hinglish: API role banao ya select karo, schema action permissions assign karo, us API role ke saath user banao, `/api/auth/login-user` se login karo, phir dynamic APIs ko `x-apiagex-role-id` ke saath call karo. Allowed API roles work karte hain; blocked roles ko `API_PERMISSION_DENIED` milta hai. Admin roles `owner`, `admin`, `schema-manager`, `user-manager` hain; API roles me `reader`, `single-reader`, `writer`, `editor`, aur `public` hain. `manage` one schema ke sab content API actions allow karta hai, lekin sirf API roles ke liye.
+
+## Settings Access Control
+
+English: Open `/adminui#settings` after owner login to manage Admin Panel Roles separately from Content API Roles. Admin permissions cover schemas, entries, API roles, API users, and settings. These permissions are stored outside generated content API permissions, so admin roles still cannot access `/api/content` by role id.
+
+Hinglish: Owner login ke baad `/adminui#settings` open karo. Yaha Admin Panel Roles aur Content API Roles alag manage hote hain. Admin permissions schemas, entries, API roles, API users, aur settings cover karte hain. Ye generated content API permissions se alag store hote hain, isliye admin roles role id se `/api/content` access nahi kar sakte.
 
 ## Local Persistence
 

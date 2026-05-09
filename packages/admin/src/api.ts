@@ -12,6 +12,11 @@ import type {
   RoleListResponse,
   RoleMutationResponse,
 } from "./role.type";
+import type {
+  AccessSettingsResponse,
+  AdminPermissionDraft,
+  AdminPermissionListResponse,
+} from "./settings.type";
 import type { UserListResponse, UserMutationResponse } from "./user.type";
 import type {
   SchemaDraft,
@@ -176,4 +181,40 @@ export async function createUser(input: {
     body: JSON.stringify(input),
   });
   return (await response.json()) as UserMutationResponse;
+}
+
+export async function listAccessSettings(): Promise<AccessSettingsResponse> {
+  const response = await fetch("/api/admin/settings/access");
+  return (await response.json()) as AccessSettingsResponse;
+}
+
+export async function createAdminRole(
+  name: string,
+  description: string,
+): Promise<RoleMutationResponse> {
+  const response = await fetch("/api/admin/settings/access/admin-roles", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name, description }),
+  });
+  return (await response.json()) as RoleMutationResponse;
+}
+
+export async function listAdminRolePermissions(
+  roleId: string,
+): Promise<AdminPermissionListResponse> {
+  const response = await fetch(`/api/admin/settings/access/admin-roles/${roleId}/permissions`);
+  return (await response.json()) as AdminPermissionListResponse;
+}
+
+export async function saveAdminRolePermissions(
+  roleId: string,
+  permissions: AdminPermissionDraft[],
+): Promise<AdminPermissionListResponse> {
+  const response = await fetch(`/api/admin/settings/access/admin-roles/${roleId}/permissions`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ permissions }),
+  });
+  return (await response.json()) as AdminPermissionListResponse;
 }

@@ -367,6 +367,45 @@ code {
   padding: var(--admin-space-2) var(--admin-space-3);
 }
 
+.settings-access-layout,
+.settings-panel,
+.api-role-list {
+  display: grid;
+  gap: var(--admin-space-5);
+}
+
+.settings-panel {
+  background: var(--admin-color-surface);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  padding: var(--admin-space-6);
+}
+
+.settings-panel h3 {
+  align-items: center;
+  display: flex;
+  gap: var(--admin-space-2);
+  margin: 0;
+}
+
+.settings-panel > p {
+  color: var(--admin-color-text-soft);
+  margin: 0;
+}
+
+.api-role-list {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.api-role-list span {
+  background: var(--admin-color-surface-muted);
+  border-radius: var(--admin-radius-sm);
+  font-size: var(--admin-font-sm);
+  font-weight: 800;
+  padding: var(--admin-space-3);
+}
+
 .user-list {
   display: grid;
   gap: var(--admin-space-4);

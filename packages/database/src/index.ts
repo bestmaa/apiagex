@@ -17,10 +17,18 @@ export {
 } from "./entry-repository.js";
 export { queryEntries } from "./entry-query.js";
 export {
+  createAdminRole,
   createRole,
   getRoleById,
+  listAdminRoles,
   listRoles,
 } from "./role-repository.js";
+export {
+  adminPermissionActions,
+  canAdminRoleAccess,
+  listAdminRolePermissions,
+  setAdminPermission,
+} from "./admin-permission-repository.js";
 export {
   canRoleAccess,
   listRolePermissions,
@@ -70,6 +78,11 @@ export type {
   UpdateEntryInput,
 } from "./entry-repository.type.js";
 export type { CreateRoleInput, RoleKind, RoleRecord } from "./role-repository.type.js";
+export type {
+  AdminPermissionAction,
+  AdminPermissionRecord,
+  SetAdminPermissionInput,
+} from "./admin-permission-repository.type.js";
 export type {
   PermissionAction,
   PermissionRecord,

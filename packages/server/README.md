@@ -4,7 +4,7 @@
 
 This package owns the Fastify API server. It serves the docs page at `/docs`, health status at `/health`, and a starter admin content-type API at `/admin/content-types`.
 
-MVP note: current routes use `/api`, `/adminui`, `/doc`, and `/readme`. `/api/admin/roles` exposes content API roles only, while control-plane roles stay separate as `owner`, `admin`, `schema-manager`, and `user-manager`. Content API permission checks reject admin roles even when their ids are sent in `x-apiagex-role-id`.
+MVP note: current routes use `/api`, `/adminui`, `/doc`, and `/readme`. `/api/admin/roles` exposes content API roles only, while `/api/admin/settings/access` manages separate control-plane roles and admin permissions. Content API permission checks reject admin roles even when their ids are sent in `x-apiagex-role-id`.
 
 Every request gets an `x-request-id` response header, and structured request start/end/error logs carry the same request id.
 
@@ -91,7 +91,7 @@ npm run dev -w @apiagex/server
 
 Ye package Fastify API server ka owner hai. Ye `/docs` par docs page, `/health` par health status, aur `/admin/content-types` par starter admin content-type API serve karta hai.
 
-MVP note: current routes `/api`, `/adminui`, `/doc`, aur `/readme` use karte hain. `/api/admin/roles` sirf content API roles expose karta hai, aur control-plane roles `owner`, `admin`, `schema-manager`, `user-manager` ke roop me alag rahte hain. Content API permission checks admin roles reject karte hain, chahe unka id `x-apiagex-role-id` me bheja gaya ho.
+MVP note: current routes `/api`, `/adminui`, `/doc`, aur `/readme` use karte hain. `/api/admin/roles` sirf content API roles expose karta hai, aur `/api/admin/settings/access` separate control-plane roles aur admin permissions manage karta hai. Content API permission checks admin roles reject karte hain, chahe unka id `x-apiagex-role-id` me bheja gaya ho.
 
 Har request ko `x-request-id` response header milta hai, aur structured request start/end/error logs usi request id ko carry karte hain.
 
