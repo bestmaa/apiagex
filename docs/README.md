@@ -26,8 +26,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `/api`, `/doc`, `/readme`, aur `/adminui` ek hi server se serve hote hain.
 - `/doc` and `/readme` render current MVP status in English and Hinglish.
 - `/doc` aur `/readme` current MVP status English aur Hinglish me dikhate hain.
-- `/adminui` renders the MVP navigation shell: Dashboard, Schemas, APIs, Roles, Users, Docs.
-- `/adminui` MVP navigation shell dikhata hai: Dashboard, Schemas, APIs, Roles, Users, Docs.
+- `/adminui` renders the MVP navigation shell: Dashboard, Schemas, Entries, APIs, Users, Settings, Docs.
+- `/adminui` MVP navigation shell dikhata hai: Dashboard, Schemas, Entries, APIs, Users, Settings, Docs.
 - Base path checkpoint verifies `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 - Base path checkpoint `/api`, `/api/health`, `/doc`, `/readme`, aur `/adminui` verify karta hai.
 - SQLite foundation has MVP tables: migrations, roles, users, schemas, fields, entries, permissions.
@@ -218,11 +218,11 @@ API roles create karne ke liye `POST /api/admin/roles` par `{ "name": "editor", 
 
 ### English
 
-Use `GET /api/admin/settings/access` to read both catalogs: Admin Panel Roles and Content API Roles. Use `POST /api/admin/settings/access/admin-roles` to create custom admin roles. Use `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` to save admin permissions for `schemas`, `entries`, `apiRoles`, `apiUsers`, and `settings`. These are stored in `admin_permissions`, not in generated content API permissions.
+Use `/adminui#settings/admin-roles` for Admin Roles and `/adminui#settings/content-roles` for generated Content Roles. Use `GET /api/admin/settings/access` to read both catalogs. Use `POST /api/admin/settings/access/admin-roles` to create custom admin roles. Use `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` to save admin permissions for `schemas`, `entries`, `apiRoles`, `apiUsers`, and `settings`. These are stored in `admin_permissions`, not in generated content API permissions.
 
 ### Hinglish
 
-Dono catalog read karne ke liye `GET /api/admin/settings/access` use karo: Admin Panel Roles aur Content API Roles. Custom admin roles banane ke liye `POST /api/admin/settings/access/admin-roles` use karo. Admin permissions save karne ke liye `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` use karo jisme `schemas`, `entries`, `apiRoles`, `apiUsers`, aur `settings` actions hain. Ye `admin_permissions` me store hote hain, generated content API permissions me nahi.
+Admin Roles ke liye `/adminui#settings/admin-roles` aur generated Content Roles ke liye `/adminui#settings/content-roles` use karo. Dono catalog read karne ke liye `GET /api/admin/settings/access` use karo. Custom admin roles banane ke liye `POST /api/admin/settings/access/admin-roles` use karo. Admin permissions save karne ke liye `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` use karo jisme `schemas`, `entries`, `apiRoles`, `apiUsers`, aur `settings` actions hain. Ye `admin_permissions` me store hote hain, generated content API permissions me nahi.
 
 ## Permission Model
 

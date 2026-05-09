@@ -61,8 +61,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - User admin APIs `/api/admin/users` par available hain, har user ke liye ek API role.
 - Admin UI Users screen can create and list users with API role assignment.
 - Admin UI Users screen API role assignment ke saath users create aur list kar sakta hai.
-- Admin UI Settings has Access Control sections for Admin Panel Roles and Content API Roles.
-- Admin UI Settings me Admin Panel Roles aur Content API Roles ke liye Access Control sections hain.
+- Admin UI Settings has an attached submenu with Admin Roles and Content Roles options.
+- Admin UI Settings me attached submenu hai jisme Admin Roles aur Content Roles options hain.
 - Admin panel permissions are stored separately for schemas, entries, API roles, API users, and settings.
 - Admin panel permissions schemas, entries, API roles, API users, aur settings ke liye alag store hote hain.
 - RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.
@@ -132,9 +132,9 @@ Hinglish: API role banao ya select karo, schema action permissions assign karo, 
 
 ## Settings Access Control
 
-English: Open `/adminui#settings` after owner login to manage Admin Panel Roles separately from Content API Roles. Admin permissions cover schemas, entries, API roles, API users, and settings. These permissions are stored outside generated content API permissions, so admin roles still cannot access `/api/content` by role id.
+English: Open `/adminui#settings` after owner login. The left menu compacts and an attached Settings submenu shows Admin Roles and Content Roles. Admin permissions cover schemas, entries, API roles, API users, and settings. These permissions are stored outside generated content API permissions, so admin roles still cannot access `/api/content` by role id.
 
-Hinglish: Owner login ke baad `/adminui#settings` open karo. Yaha Admin Panel Roles aur Content API Roles alag manage hote hain. Admin permissions schemas, entries, API roles, API users, aur settings cover karte hain. Ye generated content API permissions se alag store hote hain, isliye admin roles role id se `/api/content` access nahi kar sakte.
+Hinglish: Owner login ke baad `/adminui#settings` open karo. Left menu compact hota hai aur attached Settings submenu me Admin Roles aur Content Roles dikhte hain. Admin permissions schemas, entries, API roles, API users, aur settings cover karte hain. Ye generated content API permissions se alag store hote hain, isliye admin roles role id se `/api/content` access nahi kar sakte.
 
 ## Local Persistence
 

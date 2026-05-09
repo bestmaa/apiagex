@@ -3,9 +3,9 @@ import { authenticateOwner } from "./api";
 import { ApiList } from "./ApiList";
 import { DashboardPage } from "./DashboardPage";
 import { EntryManager } from "./EntryManager";
-import { RoleManager } from "./RoleManager";
 import { SchemaBuilder } from "./SchemaBuilder";
 import { UserManager } from "./UserManager";
+import { readAdminRoute } from "./app-route";
 import type { AdminNavItem, AdminRoute } from "./app-route.type";
 import { SessionPanel } from "./components/SessionPanel";
 import { useAdminTheme } from "./hooks/useAdminTheme";
@@ -22,7 +22,6 @@ const navItems: AdminNavItem[] = [
   { label: "Schemas", route: "schemas" },
   { label: "Entries", route: "entries" },
   { label: "APIs", route: "apis" },
-  { label: "Roles", route: "roles" },
   { label: "Users", route: "users" },
   { label: "Settings", route: "settings" },
   { label: "Docs", route: "docs" },
@@ -90,8 +89,7 @@ export function App() {
 }
 
 function readRoute(): AdminRoute {
-  const nextRoute = window.location.hash.replace("#", "");
-  return navItems.some((item) => item.route === nextRoute) ? nextRoute as AdminRoute : "dashboard";
+  return readAdminRoute(window.location.hash);
 }
 
 function renderRoute(
@@ -120,8 +118,7 @@ function renderRoute(
   if (route === "schemas") return <SchemaBuilder />;
   if (route === "entries") return <EntryManager />;
   if (route === "apis") return <ApiList />;
-  if (route === "roles") return <RoleManager />;
-  if (route === "settings") return <SettingsPage />;
+  if (route === "settings" || route.startsWith("settings/")) return <SettingsPage route={route} />;
   return <UserManager />;
 }
 

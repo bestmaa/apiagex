@@ -369,9 +369,41 @@ code {
 
 .settings-access-layout,
 .settings-panel,
-.api-role-list {
+.api-role-list,
+.settings-option-grid,
+.settings-route-panel {
   display: grid;
   gap: var(--admin-space-5);
+}
+
+.settings-option-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: var(--admin-space-6);
+}
+
+.settings-option {
+  background: var(--admin-color-surface);
+  border: 1px solid var(--admin-color-border-soft);
+  border-left: var(--admin-space-1) solid var(--admin-color-primary);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  color: var(--admin-color-text);
+  display: grid;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-6);
+}
+
+.settings-option svg {
+  color: var(--admin-color-primary);
+}
+
+.settings-option span {
+  color: var(--admin-color-text-soft);
+}
+
+.settings-route-panel > .role-manager,
+.settings-route-panel > section {
+  min-width: 0;
 }
 
 .settings-panel {
@@ -1889,6 +1921,7 @@ code {
   .schema-basics-grid,
   .schema-field-badge-row,
   .schema-inventory-row,
+  .settings-option-grid,
   .dashboard-panel .schema-row {
     grid-template-columns: 1fr;
   }

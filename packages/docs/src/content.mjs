@@ -95,8 +95,8 @@ export const docPage = {
         "RBAC split: getAll GET list routes control karta hai aur get GET one-entry routes control karta hai.",
         "Manage permission: manage allows every content API action for that schema for API roles only.",
         "Manage permission: manage sirf API roles ke liye us schema ke sab content API actions allow karta hai.",
-        "Settings: /adminui#settings separates Admin Panel Roles from Content API Roles.",
-        "Settings: /adminui#settings Admin Panel Roles aur Content API Roles ko alag rakhta hai.",
+        "Settings: /adminui#settings opens an attached submenu for Admin Roles and Content Roles.",
+        "Settings: /adminui#settings Admin Roles aur Content Roles ke liye attached submenu kholta hai.",
         "Enforcement: dynamic APIs check x-apiagex-role-id and block missing permissions.",
         "Enforcement: dynamic APIs x-apiagex-role-id check karte hain aur missing permissions block karte hain.",
         "Users: /api/admin/users creates, lists, and reads users assigned to one API role.",
@@ -114,8 +114,8 @@ export const docPage = {
     {
       heading: "QA",
       lines: [
-        "Admin UI redesign: /adminui uses a custom React shell with Dashboard, Schemas, Entries, APIs, Roles, Users, Settings, and Docs navigation.",
-        "Admin UI redesign: /adminui custom React shell use karta hai jisme Dashboard, Schemas, Entries, APIs, Roles, Users, Settings, aur Docs navigation hai.",
+        "Admin UI redesign: /adminui uses a custom React shell with Dashboard, Schemas, Entries, APIs, Users, Settings, and Docs navigation.",
+        "Admin UI redesign: /adminui custom React shell use karta hai jisme Dashboard, Schemas, Entries, APIs, Users, Settings, aur Docs navigation hai.",
         "Theme: the Admin UI has a light/dark toggle, shared design tokens, readable focus rings, and consistent status toasts.",
         "Theme: Admin UI me light/dark toggle, shared design tokens, readable focus rings, aur consistent status toasts hain.",
         "Workflow: core owner, schema, entry, API, relation, RBAC, and user flows remain in the Admin UI with responsive desktop/mobile layouts.",
@@ -212,12 +212,12 @@ export const readmePage = {
     {
       heading: "Roles And Users",
       lines: [
-        "Settings Access Control is available at /adminui#settings with separate Admin Panel Roles and Content API Roles.",
-        "Settings Access Control /adminui#settings par available hai jisme Admin Panel Roles aur Content API Roles alag hain.",
+        "Settings role control is split between /adminui#settings/admin-roles and /adminui#settings/content-roles.",
+        "Settings role control /adminui#settings/admin-roles aur /adminui#settings/content-roles me split hai.",
         "Permission evaluator defaults to block, getAll allows list reads, get allows one-entry reads, and manage allows all content API actions for API roles only.",
         "Permission evaluator default block karta hai, getAll list reads allow karta hai, get one-entry reads allow karta hai, aur manage sirf API roles ke liye all content API actions allow karta hai.",
-        "Role permission UI shows API roles only; Settings manages admin panel roles and admin_permissions.",
-        "Role permission UI sirf API roles dikhata hai; Settings admin panel roles aur admin_permissions manage karta hai.",
+        "Content Roles manages API permissions, while Admin Roles manages admin panel roles and admin_permissions.",
+        "Content Roles API permissions manage karta hai, jabki Admin Roles admin panel roles aur admin_permissions manage karta hai.",
         "Allowed API roles succeed and blocked API roles return API_PERMISSION_DENIED.",
         "Allowed API roles succeed karte hain aur blocked API roles API_PERMISSION_DENIED return karte hain.",
         "User admin APIs are ready for the Admin UI user screen.",

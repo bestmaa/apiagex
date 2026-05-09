@@ -164,7 +164,7 @@ function QuickActions({ hasRoles, hasSchemas }: { hasRoles: boolean; hasSchemas:
     { href: "#schemas", icon: Database, label: "Create schema", meta: "Define fields and relations" },
     { href: "#entries", icon: FileText, label: "Create entry", meta: hasSchemas ? "Add content to a schema" : "Needs a schema first" },
     { href: "#apis", icon: Network, label: "View APIs", meta: "Inspect generated endpoints" },
-    { href: "#roles", icon: KeyRound, label: "Create API role", meta: "Prepare allow/block rules" },
+    { href: "#settings/content-roles", icon: KeyRound, label: "Create API role", meta: "Prepare allow/block rules" },
     { href: "#users", icon: Users, label: "Create user", meta: hasRoles ? "Assign role-based access" : "Needs a role first" },
     { href: "#docs", icon: BookOpen, label: "Read docs", meta: "Review owner workflow" },
   ];

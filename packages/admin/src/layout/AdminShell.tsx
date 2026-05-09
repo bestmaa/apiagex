@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { BookOpen, Database, FileText, Home, KeyRound, Menu, Network, Settings, Users, X } from "lucide-react";
+import { activeNavRoute, isRouteActive, isSettingsRoute, settingsSubnavItems } from "../app-route";
 import type { AdminNavItem, AdminRoute } from "../app-route.type";
 import type { OwnerSession } from "../session.type";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -11,9 +12,10 @@ const navIcons = {
   dashboard: Home,
   docs: BookOpen,
   entries: FileText,
-  roles: KeyRound,
   schemas: Database,
   settings: Settings,
+  "settings/admin-roles": Settings,
+  "settings/content-roles": Settings,
   users: Users,
 } satisfies Record<AdminRoute, typeof Home>;
 
@@ -22,9 +24,10 @@ const pageDescriptions = {
   dashboard: "Review workspace health and next actions.",
   docs: "Read the owner workflow and API notes.",
   entries: "Create, edit, and connect content entries.",
-  roles: "Configure API role permissions for each API.",
   schemas: "Design fields, relations, and generated APIs.",
   settings: "Manage admin roles and content API role separation.",
+  "settings/admin-roles": "Manage Admin UI roles and control-plane permissions.",
+  "settings/content-roles": "Manage generated content API roles and permissions.",
   users: "Invite users and assign exactly one API role.",
 } satisfies Record<AdminRoute, string>;
 
@@ -45,11 +48,12 @@ export function AdminShell({
   session: OwnerSession | null;
   theme: AdminTheme;
 }) {
-  const current = navItems.find((item) => item.route === route);
+  const current = navItems.find((item) => item.route === activeNavRoute(route));
   const mainRef = useRef<HTMLElement>(null);
   const previousRouteRef = useRef(route);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const MenuIcon = mobileNavOpen ? X : Menu;
+  const hasSubnav = isSettingsRoute(route);
 
   useEffect(() => {
     if (previousRouteRef.current !== route) {
@@ -63,7 +67,7 @@ export function AdminShell({
   }
 
   return (
-    <div className="admin-shell">
+    <div className={hasSubnav ? "admin-shell has-subnav" : "admin-shell"}>
       <a className="skip-link" href="#admin-main">Skip to content</a>
       <aside className="admin-sidebar" aria-label="Admin sidebar" onKeyDown={closeMobileNavOnEscape}>
         <div className="admin-brand">
@@ -90,13 +94,15 @@ export function AdminShell({
         >
           {navItems.map((item) => {
             const Icon = navIcons[item.route];
+            const active = isRouteActive(route, item);
             return (
               <a
-                aria-current={route === item.route ? "page" : undefined}
-                className={route === item.route ? "active" : undefined}
+                aria-current={active ? "page" : undefined}
+                className={active ? "active" : undefined}
                 href={`#${item.route}`}
                 key={item.route}
                 onClick={() => setMobileNavOpen(false)}
+                title={item.label}
               >
                 <Icon aria-hidden="true" size={16} />
                 <span>{item.label}</span>
@@ -105,6 +111,25 @@ export function AdminShell({
           })}
         </nav>
       </aside>
+      {hasSubnav ? (
+        <aside className="admin-subnav" aria-label="Settings navigation">
+          <p className="eyebrow">Settings</p>
+          <h2>Access</h2>
+          <nav>
+            {settingsSubnavItems.map((item) => (
+              <a
+                aria-current={route === item.route ? "page" : undefined}
+                className={route === item.route ? "active" : undefined}
+                href={`#${item.route}`}
+                key={item.route}
+              >
+                <strong>{item.label}</strong>
+                <span>{item.description}</span>
+              </a>
+            ))}
+          </nav>
+        </aside>
+      ) : null}
       <div className="admin-workspace">
         <header className="admin-topbar">
           <div className="page-heading">

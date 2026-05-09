@@ -10,10 +10,9 @@
 - Create a schema with one text field.
 - Create an entry from the generated entry form.
 - Confirm Generated APIs shows `/api/content/:schemaSlug`.
-- Confirm the Role screen shows API roles only, with no `owner` or `admin` role in the list.
-- Open Settings and confirm Admin Panel Roles and Content API Roles are separate sections.
+- Open Settings and confirm the left menu compacts with Admin Roles and Content Roles submenu options.
 - Create a custom admin role in Settings and save one admin permission.
-- Create an API role and save at least one permission checkbox.
+- Open Settings > Content Roles, create an API role, and save at least one permission checkbox.
 - Create a user assigned to that API role.
 - Confirm there are no current-page console errors.
 - Check desktop and narrow mobile-sized layouts for readable text and non-overlapping controls.
@@ -64,10 +63,9 @@
 - Ek text field ke saath schema create karo.
 - Generated entry form se entry create karo.
 - Generated APIs me `/api/content/:schemaSlug` confirm karo.
-- Confirm karo ki Role screen sirf API roles dikhaye, aur list me `owner` ya `admin` na ho.
-- Settings open karke confirm karo ki Admin Panel Roles aur Content API Roles alag sections me hain.
+- Settings open karke confirm karo ki left menu compact hota hai aur Admin Roles plus Content Roles submenu options dikhte hain.
 - Settings me custom admin role create karo aur ek admin permission save karo.
-- API role create karo aur ek permission checkbox save karo.
+- Settings > Content Roles me API role create karo aur ek permission checkbox save karo.
 - Us API role ke saath user create karo.
 - Current page console errors nahi hone chahiye.
 - Desktop aur narrow mobile layout me text readable aur controls non-overlap hone chahiye.
