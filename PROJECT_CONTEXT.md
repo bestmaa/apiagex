@@ -83,6 +83,10 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Apiagex MVP release gate version `v1.0.0` par ready hai.
 - Admin Entries now uses a right-side collection rail, table view, find filter, visible field selection, last 50 default rows, and pagination.
 - Admin Entries ab right-side collection rail, table view, find filter, visible field selection, last 50 default rows, aur pagination use karta hai.
+- Admin Entries create form now opens from a compact Create entry button and closes after save or cancel.
+- Admin Entries create form ab compact Create entry button se open hota hai aur save ya cancel ke baad close hota hai.
+- Admin Entries shows an API query parameter guide for `fields`, `search`, `limit`, and `offset` on the selected collection.
+- Admin Entries selected collection par `fields`, `search`, `limit`, aur `offset` ke liye API query parameter guide dikhata hai.
 - Entry list APIs support `fields`, `search`, `limit`, and `offset` query parameters for admin and dynamic content lists.
 - Entry list APIs admin aur dynamic content lists ke liye `fields`, `search`, `limit`, aur `offset` query parameters support karte hain.
 - Dynamic single-entry reads support `fields` projection, such as `/api/content/article/ENTRY_ID?fields=title`.

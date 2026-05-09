@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import { deleteEntry, listEntries, listSchemas } from "./api";
 import { EntryCollectionRail } from "./EntryCollectionRail";
 import { GeneratedEntryForm } from "./EntryForm";
+import { EntryQueryGuide } from "./EntryQueryGuide";
 import { EntryTable } from "./EntryTable";
 import { isEntryPickerRelationField } from "./entry-display";
 import { StateMessage } from "./components/StateMessage";
@@ -18,6 +20,7 @@ export function EntryManager() {
   const [entryCounts, setEntryCounts] = useState<Record<string, number>>({});
   const [relationEntries, setRelationEntries] = useState<Record<string, EntryRecord[]>>({});
   const [editingEntry, setEditingEntry] = useState<EntryRecord | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState("");
   const [visibleFields, setVisibleFields] = useState<string[]>([]);
   const [search, setSearch] = useState("");
@@ -91,6 +94,7 @@ export function EntryManager() {
     const fields = nextSchema ? fieldSlugs(nextSchema) : [];
     setSchemaId(nextSchemaId);
     setEditingEntry(null);
+    setCreateOpen(false);
     setSearch("");
     setOffset(0);
     setVisibleFields(fields);
@@ -114,6 +118,13 @@ export function EntryManager() {
     setOffset(0);
     await loadEntries(schema.id, { offset: 0 });
     await loadEntryCounts();
+    setEditingEntry(null);
+    setCreateOpen(false);
+  }
+
+  function startEdit(entry: EntryRecord) {
+    setEditingEntry(entry);
+    setCreateOpen(false);
   }
 
   function changeSearch(nextSearch: string) {
@@ -149,21 +160,30 @@ export function EntryManager() {
         <div className="entry-main-column">
           {schema ? (
             <>
-              <GeneratedEntryForm
-                editingEntry={editingEntry}
-                key={`${schema.id}-${editingEntry?.id ?? "new"}`}
-                onCancelEdit={() => setEditingEntry(null)}
-                onCreated={refreshAfterSave}
-                relationEntries={relationEntries}
-                schema={schema}
-              />
+              <div className="entry-create-bar">
+                <button type="button" onClick={() => { setCreateOpen(true); setEditingEntry(null); }}>
+                  <Plus aria-hidden="true" size={16} />
+                  Create entry
+                </button>
+              </div>
+              {createOpen || editingEntry ? (
+                <GeneratedEntryForm
+                  editingEntry={editingEntry}
+                  key={`${schema.id}-${editingEntry?.id ?? "new"}`}
+                  onCancelCreate={() => setCreateOpen(false)}
+                  onCancelEdit={() => setEditingEntry(null)}
+                  onCreated={refreshAfterSave}
+                  relationEntries={relationEntries}
+                  schema={schema}
+                />
+              ) : null}
               <EntryTable
                 confirmDeleteId={confirmDeleteId}
                 entries={entries}
                 limit={limit}
                 offset={offset}
                 onDelete={removeEntry}
-                onEdit={setEditingEntry}
+                onEdit={startEdit}
                 onFieldToggle={changeFields}
                 onLimitChange={changeLimit}
                 onPageChange={changePage}
@@ -175,6 +195,7 @@ export function EntryManager() {
                 total={total}
                 visibleFields={visibleFields}
               />
+              <EntryQueryGuide schema={schema} visibleFields={visibleFields} />
             </>
           ) : (
             <StateMessage title="No schema available" variant="empty">Create a schema first.</StateMessage>

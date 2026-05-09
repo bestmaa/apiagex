@@ -19,9 +19,13 @@ export function GeneratedEntryForm({
   schema,
   editingEntry,
   onCancelEdit,
+  onCancelCreate,
   onCreated,
   relationEntries,
-}: EntryFormProps & { relationEntries: Record<string, EntryRecord[]> }) {
+}: EntryFormProps & {
+  onCancelCreate?: () => void;
+  relationEntries: Record<string, EntryRecord[]>;
+}) {
   const [status, setStatus] = useState("");
 
   async function submitEntry(event: FormEvent<HTMLFormElement>) {
@@ -63,6 +67,11 @@ export function GeneratedEntryForm({
           <button type="button" onClick={onCancelEdit}>
             <X aria-hidden="true" size={16} />
             Cancel edit
+          </button>
+        ) : onCancelCreate ? (
+          <button type="button" onClick={onCancelCreate}>
+            <X aria-hidden="true" size={16} />
+            Close form
           </button>
         ) : null}
       </div>
