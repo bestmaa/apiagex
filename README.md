@@ -61,8 +61,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Dynamic APIs `x-apiagex-role-id` provide hone par role permissions enforce karte hain.
 - User admin APIs are available at `/api/admin/users` with one API role per user.
 - User admin APIs `/api/admin/users` par available hain, har user ke liye ek API role.
-- Admin UI Users screen can create and list users with API role assignment.
-- Admin UI Users screen API role assignment ke saath users create aur list kar sakta hai.
+- Admin UI Users screen shows the user list first and opens create from a compact top button.
+- Admin UI Users screen pehle user list dikhata hai aur top compact button se create open karta hai.
 - Admin UI Settings has an attached submenu with Admin Roles and Content Roles options.
 - Admin UI Settings me attached submenu hai jisme Admin Roles aur Content Roles options hain.
 - Admin panel permissions are stored separately for schemas, entries, API roles, API users, and settings.

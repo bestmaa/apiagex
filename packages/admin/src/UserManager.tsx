@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { createUser, listRoles, listUsers } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
@@ -9,6 +9,7 @@ import type { UserRecord } from "./user.type";
 export function UserManager() {
   const [roles, setRoles] = useState<RoleRecord[]>([]);
   const [users, setUsers] = useState<UserRecord[]>([]);
+  const [createOpen, setCreateOpen] = useState(false);
   const [status, setStatus] = useState("User manager loading");
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export function UserManager() {
     }
     form.reset();
     await loadData();
+    setCreateOpen(false);
     setStatus(`Created user: ${result.user?.email ?? "user"}`);
   }
 
@@ -50,43 +52,55 @@ export function UserManager() {
       <h2 id="user-manager-title">Users</h2>
       <p>English: Create content API users and assign exactly one API role.</p>
       <p>Hinglish: Content API users banao aur exactly ek API role assign karo.</p>
-      <form className="user-form" aria-describedby="user-form-help" onSubmit={submitUser}>
-        <div>
-          <label htmlFor="user-email">User email</label>
-          <input autoComplete="email" id="user-email" name="email" placeholder="editor@example.com" required type="email" />
-        </div>
-        <div>
-          <label htmlFor="user-password">Temporary password</label>
-          <input
-            autoComplete="new-password"
-            id="user-password"
-            minLength={8}
-            name="password"
-            placeholder="Minimum 8 characters"
-            required
-            type="password"
-          />
-        </div>
-        <div>
-          <label htmlFor="user-role">API role</label>
-          <select disabled={roles.length === 0} id="user-role" name="roleId" required>
-            <option value="">Select API role</option>
-            {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
-          </select>
-          {roles.length === 0 ? <span className="helper-text">Create an API role before adding users.</span> : null}
-        </div>
-        <p className="helper-text" id="user-form-help">
-          Passwords are submitted once and never displayed in the user list.
-        </p>
-        <div className="user-form-actions">
-          <button disabled={roles.length === 0} type="submit">
-            <Plus aria-hidden="true" size={16} />
-            Create user
-          </button>
-        </div>
-      </form>
-      <StatusToast title="User status">{status}</StatusToast>
+      <div className="user-create-bar">
+        <button disabled={roles.length === 0} type="button" onClick={() => setCreateOpen(true)}>
+          <Plus aria-hidden="true" size={16} />
+          Create user
+        </button>
+        {roles.length === 0 ? <span className="helper-text">Create an API role before adding users.</span> : null}
+      </div>
+      {createOpen ? (
+        <form className="user-form" aria-describedby="user-form-help" onSubmit={submitUser}>
+          <div>
+            <label htmlFor="user-email">User email</label>
+            <input autoComplete="email" id="user-email" name="email" placeholder="editor@example.com" required type="email" />
+          </div>
+          <div>
+            <label htmlFor="user-password">Temporary password</label>
+            <input
+              autoComplete="new-password"
+              id="user-password"
+              minLength={8}
+              name="password"
+              placeholder="Minimum 8 characters"
+              required
+              type="password"
+            />
+          </div>
+          <div>
+            <label htmlFor="user-role">API role</label>
+            <select disabled={roles.length === 0} id="user-role" name="roleId" required>
+              <option value="">Select API role</option>
+              {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
+            </select>
+          </div>
+          <p className="helper-text" id="user-form-help">
+            Passwords are submitted once and never displayed in the user list.
+          </p>
+          <div className="user-form-actions">
+            <button disabled={roles.length === 0} type="submit">
+              <Plus aria-hidden="true" size={16} />
+              Create user
+            </button>
+            <button type="button" onClick={() => setCreateOpen(false)}>
+              <X aria-hidden="true" size={16} />
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : null}
       <UserList users={users} />
+      <StatusToast title="User status">{status}</StatusToast>
     </section>
   );
 }
@@ -94,7 +108,7 @@ export function UserManager() {
 function UserList({ users }: { users: UserRecord[] }) {
   return (
     <section className="user-list" aria-labelledby="user-list-title">
-      <h3>Created Users</h3>
+      <h3 id="user-list-title">User list</h3>
       {users.length === 0 ? (
         <StateMessage title="No users yet" variant="empty">
           Create a user after at least one API role is available.
@@ -102,7 +116,7 @@ function UserList({ users }: { users: UserRecord[] }) {
       ) : users.map((user) => (
         <article className="user-row" key={user.id}>
           <div>
-          <strong>{user.email}</strong>
+            <strong>{user.email}</strong>
             <span>API role: {user.roleName}</span>
           </div>
           <code>x-apiagex-role-id: {user.roleId}</code>

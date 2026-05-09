@@ -4,7 +4,7 @@
 
 This package owns the first admin UI scaffold. It provides a small local screen for listing, creating, editing, and deleting content types through the starter admin API.
 
-MVP note: Settings now owns role configuration with an attached submenu for Admin Roles and Content Roles. Owner/admin control-plane roles are hidden from content API permissions, and the Users screen assigns exactly one API role to each content API user.
+MVP note: Settings now owns role configuration with an attached submenu for Admin Roles and Content Roles. Owner/admin control-plane roles are hidden from content API permissions, and the Users screen shows the user list before opening a one-API-role create form.
 
 The UI starts with a login screen and stores the bearer token in localStorage after `/auth/login` succeeds.
 
@@ -78,7 +78,7 @@ The UI expects the API server to run at `http://127.0.0.1:4000` by default.
 
 Ye package first admin UI scaffold ka owner hai. Ye starter admin API ke through content types ko list, create, edit, aur delete karne ka local screen deta hai.
 
-MVP note: Settings ab role configuration own karta hai jisme Admin Roles aur Content Roles ke liye attached submenu hai. Owner/admin control-plane roles content API permissions se hidden hain, aur Users screen har content API user ko exactly one API role assign karta hai.
+MVP note: Settings ab role configuration own karta hai jisme Admin Roles aur Content Roles ke liye attached submenu hai. Owner/admin control-plane roles content API permissions se hidden hain, aur Users screen one-API-role create form open karne se pehle user list dikhata hai.
 
 UI login screen se start hota hai aur `/auth/login` successful hone ke baad bearer token localStorage me store karta hai.
 

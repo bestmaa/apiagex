@@ -447,6 +447,18 @@ code {
   margin: 0;
 }
 
+.user-create-bar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+}
+
+.user-create-bar button {
+  min-height: 36px;
+  padding: var(--admin-space-2) var(--admin-space-4);
+}
+
 .user-form {
   background: var(--admin-color-surface);
   border: 1px solid var(--admin-color-border-soft);
@@ -466,7 +478,10 @@ code {
 }
 
 .user-form-actions {
-  justify-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+  justify-content: flex-start;
 }
 
 .user-row {

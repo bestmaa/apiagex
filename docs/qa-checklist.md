@@ -15,7 +15,7 @@
 - Confirm Settings submenu items keep normal compact height and scroll inside the 100vh column if content grows.
 - Create a custom admin role in Settings and save one admin permission.
 - Open Settings > Content Roles, create an API role, and save at least one permission checkbox.
-- Create a user assigned to that API role.
+- Open Users, confirm the list is visible first, then click Create user and create a user assigned to that API role.
 - Confirm there are no current-page console errors.
 - Check desktop and narrow mobile-sized layouts for readable text and non-overlapping controls.
 
@@ -100,6 +100,7 @@
 - `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` admin permissions ko content API permissions se alag save kare.
 - `POST /api/admin/roles` API role create kare.
 - `PUT /api/admin/roles/:roleId/permissions` permissions save kare.
+- `/adminui#users` par user list pehle dikhe, phir Create user click karke one-API-role user create karo.
 - `POST /api/admin/users` one-API-role user create kare.
 - `POST /api/auth/login-user` user login kare aur `roleId` return kare.
 - Allowed dynamic API request `200` return kare.

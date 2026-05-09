@@ -67,8 +67,10 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Admin/control-plane roles content API permission checks ya API-user assignment me accept nahi hote.
 - User repository and `/api/admin/users` APIs create content API users assigned to exactly one API role.
 - User repository aur `/api/admin/users` APIs content API users ko exactly one API role ke saath create karte hain.
-- Admin UI Users screen creates and lists users with API role assignment.
-- Admin UI Users screen API role assignment ke saath users create aur list karta hai.
+- Admin UI Users screen lists users with API role assignment.
+- Admin UI Users screen API role assignment ke saath users list karta hai.
+- Admin UI Users screen now shows the user list by default and opens the create form from a compact Create user button.
+- Admin UI Users screen ab default me user list dikhata hai aur compact Create user button se create form open karta hai.
 - Admin UI Settings now has an attached submenu with Admin Roles and Content Roles subroutes.
 - Admin UI Settings me ab attached submenu hai jisme Admin Roles aur Content Roles subroutes hain.
 - Settings submenu uses compact normal-height items with viewport-height desktop scrolling.
