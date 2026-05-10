@@ -105,8 +105,7 @@ export function RoleManager() {
   return (
     <section aria-labelledby="role-manager-title">
       <h2 id="role-manager-title">Roles</h2>
-      <p>English: These are API roles only; owner and admin panel roles are kept separate.</p>
-      <p>Hinglish: Ye sirf API roles hain; owner aur admin panel roles alag rakhe gaye hain.</p>
+      <p>These are API roles only; owner and admin panel roles are kept separate.</p>
       <p>Unchecked actions are blocked when a role id or API token is provided. <code>manage</code> allows every action for that schema.</p>
       <form onSubmit={submitRole}>
         <label>API role name <input name="name" pattern="[a-z](?:[a-z0-9]|-)*" required /></label>

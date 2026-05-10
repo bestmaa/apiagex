@@ -13,8 +13,7 @@ function SettingsOverview() {
   return (
     <section aria-labelledby="settings-title">
       <h2 id="settings-title">Settings</h2>
-      <p>English: Choose which role system you want to manage.</p>
-      <p>Hinglish: Jis role system ko manage karna hai, wahi option choose karo.</p>
+      <p>Choose which role system you want to manage.</p>
       <div className="settings-option-grid">
         <a className="settings-option" href="#settings/admin-roles">
           <Shield aria-hidden="true" size={20} />
@@ -35,8 +34,7 @@ function SettingsContentRoles() {
   return (
     <section aria-labelledby="settings-content-role-title" className="settings-route-panel">
       <h2 id="settings-content-role-title">Content Roles</h2>
-      <p>English: These roles work only with generated `/api/content` routes.</p>
-      <p>Hinglish: Ye roles sirf generated `/api/content` routes ke liye kaam karte hain.</p>
+      <p>These roles work only with generated <code>/api/content</code> routes.</p>
       <RoleManager />
     </section>
   );

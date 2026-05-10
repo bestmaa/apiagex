@@ -50,8 +50,7 @@ export function UserManager() {
   return (
     <section aria-labelledby="user-manager-title">
       <h2 id="user-manager-title">Users</h2>
-      <p>English: Create content API users and assign exactly one API role.</p>
-      <p>Hinglish: Content API users banao aur exactly ek API role assign karo.</p>
+      <p>Create content API users and assign exactly one API role.</p>
       <div className="user-create-bar">
         <button disabled={roles.length === 0} type="button" onClick={() => setCreateOpen(true)}>
           <Plus aria-hidden="true" size={16} />

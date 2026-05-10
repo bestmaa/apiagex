@@ -16,8 +16,7 @@ export function SessionPanel({
   return (
     <section aria-labelledby="owner-login-title">
       <h2 id="owner-login-title">Owner Setup / Login</h2>
-      <p>English: First submit creates the owner when none exists; later submits log in.</p>
-      <p>Hinglish: Pehla submit owner banata hai jab owner nahi hai; baad me login karta hai.</p>
+      <p>First submit creates the owner when none exists; later submits log in.</p>
       {!session ? <OwnerLoginForm onSubmit={onSubmit} /> : (
         <div className="api-row">
           <strong>{session.email}</strong>

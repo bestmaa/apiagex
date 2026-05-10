@@ -75,6 +75,10 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Admin UI Users screen API role assignment ke saath users list karta hai.
 - Admin UI Users screen now shows the user list by default and opens the create form from a compact Create user button.
 - Admin UI Users screen ab default me user list dikhata hai aur compact Create user button se create form open karta hai.
+- Admin UI content sections now align to their content height so single-card screens do not stretch helper rows across the viewport.
+- Admin UI content sections ab apni content height par align hote hain, isliye single-card screens helper rows ko viewport me stretch nahi karte.
+- Admin UI screens outside Docs use English-only helper copy; `/doc` and `/readme` keep English plus Hinglish documentation.
+- Docs ke bahar Admin UI screens English-only helper copy use karte hain; `/doc` aur `/readme` English plus Hinglish documentation preserve karte hain.
 - Admin UI Settings now has an attached submenu with Admin Roles and Content Roles subroutes.
 - Admin UI Settings me ab attached submenu hai jisme Admin Roles aur Content Roles subroutes hain.
 - Settings submenu uses compact normal-height items with viewport-height desktop scrolling.

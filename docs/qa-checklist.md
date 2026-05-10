@@ -17,6 +17,7 @@
 - Open Settings > Content Roles, create an API role, and save at least one permission checkbox.
 - Create an API token for the selected Content Role and confirm the token appears only after creation.
 - Open Users, confirm the list is visible first, then click Create user and create a user assigned to that API role.
+- Confirm Users and other non-doc Admin UI screens keep normal content height and do not show `English:` or `Hinglish:` helper labels.
 - Confirm there are no current-page console errors.
 - Check desktop and narrow mobile-sized layouts for readable text and non-overlapping controls.
 
@@ -76,6 +77,7 @@
 - Settings > Content Roles me API role create karo aur ek permission checkbox save karo.
 - Selected Content Role ke liye API token create karo aur confirm karo ki full token sirf create ke baad dikhta hai.
 - Us API role ke saath user create karo.
+- Confirm karo ki Users aur baaki non-doc Admin UI screens normal content height me rahen aur `English:` ya `Hinglish:` helper labels na dikhayen.
 - Current page console errors nahi hone chahiye.
 - Desktop aur narrow mobile layout me text readable aur controls non-overlap hone chahiye.
 

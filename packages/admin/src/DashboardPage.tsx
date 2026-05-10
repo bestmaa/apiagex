@@ -63,8 +63,7 @@ export function DashboardPage({ sessionPanel }: { sessionPanel: ReactNode }) {
     <>
       <section className="summary-panel">
         <h2>Dashboard</h2>
-        <p>English: Monitor schemas, generated APIs, roles, and users from one place.</p>
-        <p>Hinglish: Schemas, generated APIs, roles, aur users ek jagah se monitor karo.</p>
+        <p>Monitor schemas, generated APIs, roles, and users from one place.</p>
       </section>
       {sessionPanel}
       <section className="dashboard-summary-section">

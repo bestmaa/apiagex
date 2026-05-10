@@ -39,6 +39,7 @@ h1,
 h2,
 h3,
 p {
+  margin-bottom: 0;
   margin-top: 0;
 }
 
@@ -90,6 +91,8 @@ main {
 }
 
 section {
+  align-content: start;
+  align-self: start;
   background: var(--admin-color-surface);
   border: 1px solid var(--admin-color-border-soft);
   border-radius: var(--admin-radius-md);

@@ -29,8 +29,7 @@ export function ApiList() {
   return (
     <section aria-labelledby="api-list-title">
       <h2 id="api-list-title">API Explorer</h2>
-      <p>English: Inspect generated content endpoints, payloads, role headers, and responses.</p>
-      <p>Hinglish: Generated content endpoints, payloads, role headers, aur responses inspect karo.</p>
+      <p>Inspect generated content endpoints, payloads, role headers, and responses.</p>
       <StatusToast title="API status">{status}</StatusToast>
       {schemas.length === 0 ? (
         <StateMessage title="No generated APIs yet" variant="empty">

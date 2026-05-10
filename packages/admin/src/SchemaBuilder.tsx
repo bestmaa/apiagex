@@ -25,28 +25,28 @@ const relationTypes: {
 }[] = [
   {
     example: `"author": "entry_123"`,
-    hint: "English: Stores one target id; another entry cannot reuse the same target. Hinglish: Ek target id store hoti hai; dusri entry same target reuse nahi kar sakti.",
+    hint: "Stores one target id; another entry cannot reuse the same target.",
     label: "One to one",
     shape: "Single target id",
     value: "oneToOne",
   },
   {
     example: `"gallery": ["entry_123", "entry_456"]`,
-    hint: "English: Stores an array of target ids on this entry. Hinglish: Is entry me target ids ka array store hota hai.",
+    hint: "Stores an array of target ids on this entry.",
     label: "One to many",
     shape: "Array of target ids",
     value: "oneToMany",
   },
   {
     example: `"category": "entry_123"`,
-    hint: "English: Stores one target id; many entries may point to the same target. Hinglish: Ek target id store hoti hai; many entries same target par point kar sakti hain.",
+    hint: "Stores one target id; many entries may point to the same target.",
     label: "Many to one",
     shape: "Single target id",
     value: "manyToOne",
   },
   {
     example: `"tags": ["entry_123", "entry_456"]`,
-    hint: "English: Stores an array of target ids for multi-select links. Hinglish: Multi-select links ke liye target ids ka array store hota hai.",
+    hint: "Stores an array of target ids for multi-select links.",
     label: "Many to many",
     shape: "Array of target ids",
     value: "manyToMany",
@@ -291,8 +291,7 @@ function SchemaFieldRow(props: {
           {selectedRelation ? <RelationGuide relation={selectedRelation} target={selectedTarget} /> : null}
           {showEditWarning ? (
             <p className="warning-text">
-              English: This schema has entries; changing relation type or target may be blocked when saved.
-              Hinglish: Is schema me entries hain; relation type ya target change save par block ho sakta hai.
+              This schema has entries; changing relation type or target may be blocked when saved.
             </p>
           ) : null}
         </div>

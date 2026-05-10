@@ -52,6 +52,9 @@ describe("UserManager", () => {
     expect(container.querySelector(".user-form")).toBeNull();
     expect(container.textContent).toContain("User list");
     expect(container.textContent).toContain(existingUser.email);
+    expect(container.textContent).toContain("Create content API users and assign exactly one API role.");
+    expect(container.textContent).not.toContain("English:");
+    expect(container.textContent).not.toContain("Hinglish:");
 
     await clickButton(container, "Create user");
     expect(container.querySelector(".user-form")).not.toBeNull();

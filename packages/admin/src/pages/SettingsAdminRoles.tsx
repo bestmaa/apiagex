@@ -99,8 +99,7 @@ export function SettingsAdminRoles() {
   return (
     <section aria-labelledby="settings-admin-role-title">
       <h2 id="settings-admin-role-title">Admin Roles</h2>
-      <p>English: Admin panel roles and content API roles stay separate.</p>
-      <p>Hinglish: Admin panel roles aur content API roles alag-alag rahenge.</p>
+      <p>Admin panel roles and content API roles stay separate.</p>
       <div className="settings-access-layout">
         <AdminRoleSection
           activeRole={activeRole}
