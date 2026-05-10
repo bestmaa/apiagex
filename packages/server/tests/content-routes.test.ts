@@ -169,6 +169,50 @@ describe("dynamic content APIs", () => {
     expect(readAllowed.json().entry.data.title).toBe("Split read");
   });
 
+  it("uses API tokens to enforce content role permissions", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+    const roleId = await createRole(server, "token-reader");
+    await savePermission(server, roleId, schemaId, "getAll");
+    await server.inject({
+      method: "POST",
+      url: "/api/content/article",
+      payload: { data: { title: "Token article" } },
+    });
+    const created = await server.inject({
+      method: "POST",
+      url: `/api/admin/roles/${roleId}/tokens`,
+      payload: { name: "Partner app" },
+    });
+    const token = created.json().token as string;
+
+    const allowed = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { authorization: `Bearer ${token}` },
+    });
+    const blocked = await server.inject({
+      method: "GET",
+      url: `/api/content/article/${allowed.json().entries[0].id}`,
+      headers: { "x-apiagex-api-token": token },
+    });
+    await server.inject({
+      method: "DELETE",
+      url: `/api/admin/roles/${roleId}/tokens/${created.json().tokenRecord.id}`,
+    });
+    const revoked = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(allowed.statusCode).toBe(200);
+    expect(blocked.statusCode).toBe(403);
+    expect(blocked.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
+    expect(revoked.statusCode).toBe(403);
+    expect(revoked.json()).toEqual({ ok: false, error: "API_TOKEN_INVALID" });
+  });
+
   it("validates relation payloads after dynamic write permissions pass", async () => {
     const server = createServer({ database: openSqliteDatabase() });
     const authorSchemaId = await createAuthorSchema(server);

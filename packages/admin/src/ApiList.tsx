@@ -61,7 +61,7 @@ function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
         </div>
         <span>{schema.fields.length} fields</span>
       </div>
-      <p className="api-rbac-note">Role permissions must allow the action. Send <code>x-apiagex-role-id: ROLE_ID</code>; blocked requests return <code>API_PERMISSION_DENIED</code>.</p>
+      <p className="api-rbac-note">Role permissions must allow the action. Send <code>x-apiagex-role-id: ROLE_ID</code> or <code>Authorization: Bearer TOKEN</code>; blocked requests return <code>API_PERMISSION_DENIED</code>.</p>
       <ul className="api-endpoint-list">
         {actions.map((action) => (
           <li key={action.label}>
@@ -80,7 +80,7 @@ function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
         <ApiExample onCopy={copy} title="Create or update payload" value={{ data: sampleData(schema.fields) }} />
         <ApiExample onCopy={copy} title="Populate routes" value={populateExamples(schema.slug, schema.fields)} />
         <ApiExample onCopy={copy} title="Response examples" value={responseExamples(schema)} />
-        <ApiExample onCopy={copy} title="RBAC request hint" value={{ headers: { "x-apiagex-role-id": "ROLE_ID" }, blocked: { ok: false, error: "API_PERMISSION_DENIED" } }} />
+        <ApiExample onCopy={copy} title="RBAC request hint" value={{ headers: { authorization: "Bearer API_TOKEN", "x-apiagex-role-id": "ROLE_ID" }, blocked: { ok: false, error: "API_PERMISSION_DENIED" } }} />
       </div>
       {copied ? <StatusToast title="Copy status">{copied}</StatusToast> : null}
     </article>

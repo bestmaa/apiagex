@@ -57,8 +57,10 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Permission model API role aur schema ke hisab se getAll, get, create, update, delete, aur manage support karta hai.
 - Admin UI role permissions screen shows dynamic API action checkboxes for API roles.
 - Admin UI role permissions screen API roles ke liye dynamic API action checkboxes dikhata hai.
-- Dynamic APIs enforce role permissions when `x-apiagex-role-id` is provided.
-- Dynamic APIs `x-apiagex-role-id` provide hone par role permissions enforce karte hain.
+- Dynamic APIs enforce role permissions when `x-apiagex-role-id` or an API token is provided.
+- Dynamic APIs `x-apiagex-role-id` ya API token provide hone par role permissions enforce karte hain.
+- Content API tokens can be created for API roles and sent as `Authorization: Bearer TOKEN`.
+- Content API tokens API roles ke liye create ho sakte hain aur `Authorization: Bearer TOKEN` ke roop me bheje ja sakte hain.
 - User admin APIs are available at `/api/admin/users` with one API role per user.
 - User admin APIs `/api/admin/users` par available hain, har user ke liye ek API role.
 - Admin UI Users screen shows the user list first and opens create from a compact top button.
@@ -128,9 +130,9 @@ Hinglish: Single relations ek entry id string ya `null` store karte hain; multi 
 
 ## RBAC Quick Use
 
-English: Create or select an API role, assign schema action permissions, create a user with that API role, login with `/api/auth/login-user`, then call dynamic APIs with `x-apiagex-role-id`. Allowed API roles work; blocked roles receive `API_PERMISSION_DENIED`. Admin roles are `owner`, `admin`, `schema-manager`, and `user-manager`; API roles include `reader`, `single-reader`, `writer`, `editor`, and `public`. `manage` allows all content API actions for one schema, but only for API roles.
+English: Create or select an API role, assign schema action permissions, then either create a user or create an API token for that role. Dynamic APIs accept `x-apiagex-role-id`, `Authorization: Bearer TOKEN`, or `x-apiagex-api-token`. Allowed API roles work; blocked roles receive `API_PERMISSION_DENIED`, and revoked tokens receive `API_TOKEN_INVALID`. Admin roles are `owner`, `admin`, `schema-manager`, and `user-manager`; API roles include `reader`, `single-reader`, `writer`, `editor`, and `public`.
 
-Hinglish: API role banao ya select karo, schema action permissions assign karo, us API role ke saath user banao, `/api/auth/login-user` se login karo, phir dynamic APIs ko `x-apiagex-role-id` ke saath call karo. Allowed API roles work karte hain; blocked roles ko `API_PERMISSION_DENIED` milta hai. Admin roles `owner`, `admin`, `schema-manager`, `user-manager` hain; API roles me `reader`, `single-reader`, `writer`, `editor`, aur `public` hain. `manage` one schema ke sab content API actions allow karta hai, lekin sirf API roles ke liye.
+Hinglish: API role banao ya select karo, schema action permissions assign karo, phir us role ke liye user ya API token banao. Dynamic APIs `x-apiagex-role-id`, `Authorization: Bearer TOKEN`, ya `x-apiagex-api-token` accept karte hain. Allowed API roles work karte hain; blocked roles ko `API_PERMISSION_DENIED` milta hai, aur revoked tokens ko `API_TOKEN_INVALID` milta hai. Admin roles `owner`, `admin`, `schema-manager`, `user-manager` hain; API roles me `reader`, `single-reader`, `writer`, `editor`, aur `public` hain.
 
 ## Settings Access Control
 

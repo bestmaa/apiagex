@@ -15,6 +15,7 @@
 - Confirm Settings submenu items keep normal compact height and scroll inside the 100vh column if content grows.
 - Create a custom admin role in Settings and save one admin permission.
 - Open Settings > Content Roles, create an API role, and save at least one permission checkbox.
+- Create an API token for the selected Content Role and confirm the token appears only after creation.
 - Open Users, confirm the list is visible first, then click Create user and create a user assigned to that API role.
 - Confirm there are no current-page console errors.
 - Check desktop and narrow mobile-sized layouts for readable text and non-overlapping controls.
@@ -45,6 +46,9 @@
 - `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` saves admin permissions outside content API permissions.
 - `POST /api/admin/roles` creates an API role.
 - `PUT /api/admin/roles/:roleId/permissions` saves permissions.
+- `POST /api/admin/roles/:roleId/tokens` creates a one-time visible token.
+- `GET /api/content/:schemaSlug` works with `Authorization: Bearer TOKEN` when that token role has `getAll`.
+- `DELETE /api/admin/roles/:roleId/tokens/:tokenId` revokes the token and the same content request returns `403 API_TOKEN_INVALID`.
 - `POST /api/admin/users` creates a user with one API role.
 - `POST /api/auth/login-user` logs in the user and returns `roleId`.
 - Allowed dynamic API request returns `200`.
@@ -70,6 +74,7 @@
 - Confirm karo ki Settings submenu items normal compact height me rahen aur content badhne par 100vh column ke andar scroll ho.
 - Settings me custom admin role create karo aur ek admin permission save karo.
 - Settings > Content Roles me API role create karo aur ek permission checkbox save karo.
+- Selected Content Role ke liye API token create karo aur confirm karo ki full token sirf create ke baad dikhta hai.
 - Us API role ke saath user create karo.
 - Current page console errors nahi hone chahiye.
 - Desktop aur narrow mobile layout me text readable aur controls non-overlap hone chahiye.
@@ -100,6 +105,9 @@
 - `PUT /api/admin/settings/access/admin-roles/:roleId/permissions` admin permissions ko content API permissions se alag save kare.
 - `POST /api/admin/roles` API role create kare.
 - `PUT /api/admin/roles/:roleId/permissions` permissions save kare.
+- `POST /api/admin/roles/:roleId/tokens` one-time visible token create kare.
+- `GET /api/content/:schemaSlug` `Authorization: Bearer TOKEN` ke saath work kare jab token role ke paas `getAll` ho.
+- `DELETE /api/admin/roles/:roleId/tokens/:tokenId` token revoke kare aur same content request `403 API_TOKEN_INVALID` return kare.
 - `/adminui#users` par user list pehle dikhe, phir Create user click karke one-API-role user create karo.
 - `POST /api/admin/users` one-API-role user create kare.
 - `POST /api/auth/login-user` user login kare aur `roleId` return kare.

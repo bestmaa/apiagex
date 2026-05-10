@@ -61,8 +61,12 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `getAll` dynamic list routes control karta hai, `get` dynamic single-entry reads control karta hai, aur `manage` sirf API roles ke liye us schema ke sab actions allow karta hai.
 - Admin UI Settings > Content Roles can create API roles and save dynamic API action checkboxes.
 - Admin UI Settings > Content Roles API roles create kar sakta hai aur dynamic API action checkboxes save kar sakta hai.
-- Dynamic APIs enforce allow/block when `x-apiagex-role-id` is present.
-- Dynamic APIs `x-apiagex-role-id` present hone par allow/block enforce karte hain.
+- Dynamic APIs enforce allow/block when `x-apiagex-role-id` or an API token is present.
+- Dynamic APIs `x-apiagex-role-id` ya API token present hone par allow/block enforce karte hain.
+- API role tokens are stored hashed in `api_tokens`; content APIs accept `Authorization: Bearer TOKEN` or `x-apiagex-api-token`.
+- API role tokens `api_tokens` me hash hokar store hote hain; content APIs `Authorization: Bearer TOKEN` ya `x-apiagex-api-token` accept karte hain.
+- Admin UI Settings > Content Roles can create, list, and revoke one-time visible API tokens for selected API roles.
+- Admin UI Settings > Content Roles selected API roles ke liye one-time visible API tokens create, list, aur revoke kar sakta hai.
 - Admin/control-plane roles are not accepted by content API permission checks or API-user assignment.
 - Admin/control-plane roles content API permission checks ya API-user assignment me accept nahi hote.
 - User repository and `/api/admin/users` APIs create content API users assigned to exactly one API role.
@@ -152,8 +156,8 @@ One server must serve exactly these primary paths:
 - Owner/admin panel roles content API permission roles se alag hain.
 - Owner can manage the split from Settings > Admin Roles and Settings > Content Roles.
 - Owner Settings > Admin Roles aur Settings > Content Roles se is split ko manage kar sakta hai.
-- Content API requests use API roles when `x-apiagex-role-id` is provided; owner/admin roles do not bypass content API checks.
-- Content API requests `x-apiagex-role-id` aane par API roles use karte hain; owner/admin roles content API checks bypass nahi karte.
+- Content API requests use API roles when `x-apiagex-role-id` or an API token is provided; owner/admin roles do not bypass content API checks.
+- Content API requests `x-apiagex-role-id` ya API token aane par API roles use karte hain; owner/admin roles content API checks bypass nahi karte.
 - Later content API users must be created by an allowed owner/admin flow.
 - A content API user belongs to exactly one API role for MVP simplicity.
 
@@ -214,10 +218,10 @@ One server must serve exactly these primary paths:
 - MVP actions: list, read, create, update, delete.
 - Admin UI must show every generated API with docs and examples.
 - API behavior must match schema validation and relation rules.
-- Dynamic list routes require `getAll` permission when `x-apiagex-role-id` is sent.
-- Dynamic list routes `x-apiagex-role-id` bhejne par `getAll` permission require karte hain.
-- Dynamic single-entry read routes require `get` permission when `x-apiagex-role-id` is sent.
-- Dynamic single-entry read routes `x-apiagex-role-id` bhejne par `get` permission require karte hain.
+- Dynamic list routes require `getAll` permission when `x-apiagex-role-id` or an API token is sent.
+- Dynamic list routes `x-apiagex-role-id` ya API token bhejne par `getAll` permission require karte hain.
+- Dynamic single-entry read routes require `get` permission when `x-apiagex-role-id` or an API token is sent.
+- Dynamic single-entry read routes `x-apiagex-role-id` ya API token bhejne par `get` permission require karte hain.
 - Dynamic list APIs support `fields`, `search`, `limit`, and `offset` for projected and paginated reads.
 - Dynamic list APIs projected aur paginated reads ke liye `fields`, `search`, `limit`, aur `offset` support karte hain.
 - Dynamic read APIs support `fields` for selecting one or more entry data fields.

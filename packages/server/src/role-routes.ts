@@ -1,13 +1,22 @@
 import type { FastifyInstance, FastifyReply } from "fastify";
 import {
+  createApiToken,
   createRole,
   getRoleById,
+  listApiTokens,
   listRolePermissions,
   listRoles,
+  revokeApiToken,
   setPermission,
   type SqliteDatabase,
 } from "@apiagex/database";
-import type { RoleBody, RoleParams, RolePermissionsBody } from "./role-routes.type.js";
+import type {
+  RoleBody,
+  RoleParams,
+  RolePermissionsBody,
+  RoleTokenBody,
+  RoleTokenParams,
+} from "./role-routes.type.js";
 
 export function registerRoleRoutes(server: FastifyInstance, database: SqliteDatabase): void {
   server.get("/api/admin/roles", async () => ({
@@ -50,6 +59,42 @@ export function registerRoleRoutes(server: FastifyInstance, database: SqliteData
           setPermission(database, { ...permission, roleId: request.params.roleId });
         }
         return { ok: true, permissions: listRolePermissions(database, request.params.roleId) };
+      } catch (error) {
+        return sendRoleError(reply, error, 400);
+      }
+    },
+  );
+
+  server.get<{ Params: RoleParams }>("/api/admin/roles/:roleId/tokens", async (request, reply) => {
+    const role = getRoleById(database, request.params.roleId);
+    if (!role || role.roleKind !== "api") {
+      return reply.code(404).send({ ok: false, error: "ROLE_NOT_FOUND" });
+    }
+    return { ok: true, tokens: listApiTokens(database, request.params.roleId) };
+  });
+
+  server.post<{ Body: RoleTokenBody; Params: RoleParams }>(
+    "/api/admin/roles/:roleId/tokens",
+    async (request, reply) => {
+      try {
+        const created = createApiToken(database, {
+          roleId: request.params.roleId,
+          name: request.body.name,
+        });
+        return { ok: true, ...created };
+      } catch (error) {
+        return sendRoleError(reply, error, 400);
+      }
+    },
+  );
+
+  server.delete<{ Params: RoleTokenParams }>(
+    "/api/admin/roles/:roleId/tokens/:tokenId",
+    async (request, reply) => {
+      try {
+        const token = revokeApiToken(database, request.params.roleId, request.params.tokenId);
+        if (!token) return reply.code(404).send({ ok: false, error: "API_TOKEN_NOT_FOUND" });
+        return { ok: true, token };
       } catch (error) {
         return sendRoleError(reply, error, 400);
       }

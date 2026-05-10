@@ -9,6 +9,7 @@ export const MVP_TABLES = [
   "entries",
   "permissions",
   "admin_permissions",
+  "api_tokens",
 ] as const;
 
 export const MVP_FOUNDATION_SQL = `
@@ -82,6 +83,17 @@ CREATE TABLE IF NOT EXISTS admin_permissions (
   allowed INTEGER NOT NULL DEFAULT 0,
   UNIQUE(role_id, action)
 );
+
+CREATE TABLE IF NOT EXISTS api_tokens (
+  id TEXT PRIMARY KEY,
+  role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  token_hash TEXT NOT NULL UNIQUE,
+  token_prefix TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  last_used_at TEXT,
+  revoked_at TEXT
+);
 `;
 
 export const MVP_ADDITIVE_MIGRATIONS_SQL = [
@@ -104,4 +116,14 @@ export const MVP_ADDITIVE_MIGRATIONS_SQL = [
   "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_schema-manager_entries', id, 'entries', 1 FROM roles WHERE name = 'schema-manager' AND role_kind = 'admin'",
   "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_user-manager_apiRoles', id, 'apiRoles', 1 FROM roles WHERE name = 'user-manager' AND role_kind = 'admin'",
   "INSERT OR IGNORE INTO admin_permissions (id, role_id, action, allowed) SELECT 'admin_permission_user-manager_apiUsers', id, 'apiUsers', 1 FROM roles WHERE name = 'user-manager' AND role_kind = 'admin'",
+  `CREATE TABLE IF NOT EXISTS api_tokens (
+    id TEXT PRIMARY KEY,
+    role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    token_hash TEXT NOT NULL UNIQUE,
+    token_prefix TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    last_used_at TEXT,
+    revoked_at TEXT
+  )`,
 ] as const;

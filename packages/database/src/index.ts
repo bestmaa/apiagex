@@ -24,6 +24,12 @@ export {
   listRoles,
 } from "./role-repository.js";
 export {
+  createApiToken,
+  listApiTokens,
+  resolveApiToken,
+  revokeApiToken,
+} from "./api-token-repository.js";
+export {
   adminPermissionActions,
   canAdminRoleAccess,
   listAdminRolePermissions,
@@ -78,6 +84,11 @@ export type {
   UpdateEntryInput,
 } from "./entry-repository.type.js";
 export type { CreateRoleInput, RoleKind, RoleRecord } from "./role-repository.type.js";
+export type {
+  ApiTokenRecord,
+  CreatedApiToken,
+  CreateApiTokenInput,
+} from "./api-token-repository.type.js";
 export type {
   AdminPermissionAction,
   AdminPermissionRecord,

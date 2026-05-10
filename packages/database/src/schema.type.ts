@@ -5,6 +5,8 @@ export type MvpTableName =
   | "fields"
   | "entries"
   | "permissions"
+  | "admin_permissions"
+  | "api_tokens"
   | "migrations";
 
 export type MigrationRecord = {

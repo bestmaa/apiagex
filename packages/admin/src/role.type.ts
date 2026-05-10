@@ -20,6 +20,17 @@ export type PermissionRecord = {
   allowed: boolean;
 };
 
+export type ApiTokenRecord = {
+  id: string;
+  roleId: string;
+  roleName: string;
+  name: string;
+  tokenPrefix: string;
+  createdAt: string;
+  lastUsedAt: string | null;
+  revokedAt: string | null;
+};
+
 export type RoleListResponse = {
   ok: boolean;
   roles?: RoleRecord[];
@@ -42,4 +53,23 @@ export type PermissionDraft = {
   schemaId: SchemaRecord["id"];
   action: PermissionAction;
   allowed: boolean;
+};
+
+export type ApiTokenListResponse = {
+  ok: boolean;
+  tokens?: ApiTokenRecord[];
+  error?: string;
+};
+
+export type ApiTokenCreateResponse = {
+  ok: boolean;
+  token?: string;
+  tokenRecord?: ApiTokenRecord;
+  error?: string;
+};
+
+export type ApiTokenRevokeResponse = {
+  ok: boolean;
+  token?: ApiTokenRecord;
+  error?: string;
 };

@@ -9,6 +9,7 @@ import {
   getSchemaBySlug,
   listEntries,
   queryEntries,
+  resolveApiToken,
   updateEntry,
   type SchemaRecord,
   type SqliteDatabase,
@@ -31,7 +32,8 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
-      if (!canAccess(database, request, schema, "getAll")) return forbidden(reply);
+      const access = canAccess(database, request, schema, "getAll");
+      if (!access.allowed) return forbidden(reply, access.error);
       let result: { entries: EntryRecord[]; limit?: number; offset?: number; total?: number };
       try {
         result = hasContentListQuery(request.query)
@@ -50,7 +52,7 @@ export function registerContentRoutes(
         ...result,
         entries: entries.map((entry) =>
           populateEntryRelations(database, schema, entry, (targetSchema) =>
-            canAccess(database, request, targetSchema, "get"),
+            canAccess(database, request, targetSchema, "get").allowed,
           ),
         ),
       };
@@ -62,7 +64,8 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
-      if (!canAccess(database, request, schema, "create")) return forbidden(reply);
+      const access = canAccess(database, request, schema, "create");
+      if (!access.allowed) return forbidden(reply, access.error);
       try {
         return { ok: true, entry: createEntry(database, { schemaId: schema.id, data: request.body.data }) };
       } catch (error) {
@@ -76,7 +79,8 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
-      if (!canAccess(database, request, schema, "get")) return forbidden(reply);
+      const access = canAccess(database, request, schema, "get");
+      if (!access.allowed) return forbidden(reply, access.error);
       const entry = getEntryById(database, request.params.entryId);
       if (!entry || entry.schemaId !== schema.id) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
@@ -91,7 +95,7 @@ export function registerContentRoutes(
         return {
           ok: true,
           entry: populateEntryRelations(database, schema, selectedEntry, (targetSchema) =>
-            canAccess(database, request, targetSchema, "get"),
+            canAccess(database, request, targetSchema, "get").allowed,
           ),
         };
       }
@@ -104,7 +108,8 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
-      if (!canAccess(database, request, schema, "update")) return forbidden(reply);
+      const access = canAccess(database, request, schema, "update");
+      if (!access.allowed) return forbidden(reply, access.error);
       if (!entryBelongsToSchema(database, request.params.entryId, schema.id)) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
       }
@@ -121,7 +126,8 @@ export function registerContentRoutes(
     async (request, reply) => {
       const schema = findSchema(database, request.params.schemaSlug, reply);
       if (!schema) return reply;
-      if (!canAccess(database, request, schema, "delete")) return forbidden(reply);
+      const access = canAccess(database, request, schema, "delete");
+      if (!access.allowed) return forbidden(reply, access.error);
       if (!entryBelongsToSchema(database, request.params.entryId, schema.id)) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
       }
@@ -153,14 +159,32 @@ function canAccess(
   request: FastifyRequest,
   schema: SchemaRecord,
   action: "getAll" | "get" | "create" | "update" | "delete",
-): boolean {
+): { allowed: boolean; error?: string } {
+  const token = requestApiToken(request);
+  if (token) {
+    const apiToken = resolveApiToken(database, token);
+    if (!apiToken) return { allowed: false, error: "API_TOKEN_INVALID" };
+    return { allowed: canRoleAccess(database, apiToken.roleId, schema.id, action) };
+  }
   const roleId = request.headers["x-apiagex-role-id"];
-  if (!roleId || Array.isArray(roleId)) return true;
-  return canRoleAccess(database, roleId, schema.id, action);
+  if (!roleId || Array.isArray(roleId)) return { allowed: true };
+  return { allowed: canRoleAccess(database, roleId, schema.id, action) };
 }
 
-function forbidden(reply: FastifyReply): FastifyReply {
-  return reply.code(403).send({ ok: false, error: "API_PERMISSION_DENIED" });
+function requestApiToken(request: FastifyRequest): string | undefined {
+  const directToken = headerString(request.headers["x-apiagex-api-token"]);
+  if (directToken) return directToken;
+  const authorization = headerString(request.headers.authorization);
+  if (!authorization?.toLowerCase().startsWith("bearer ")) return undefined;
+  return authorization.slice(7).trim() || "__empty_api_token__";
+}
+
+function headerString(value: string | string[] | undefined): string | undefined {
+  return typeof value === "string" ? value.trim() : undefined;
+}
+
+function forbidden(reply: FastifyReply, error = "API_PERMISSION_DENIED"): FastifyReply {
+  return reply.code(403).send({ ok: false, error });
 }
 
 function hasContentListQuery(query: ContentPopulateQuery): boolean {

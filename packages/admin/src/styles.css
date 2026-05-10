@@ -367,6 +367,76 @@ code {
   padding: var(--admin-space-2) var(--admin-space-3);
 }
 
+.role-token-panel {
+  min-width: 0;
+}
+
+.role-token-form {
+  align-items: end;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  max-width: none;
+}
+
+.role-token-secret {
+  align-items: center;
+  background: var(--admin-color-primary-muted);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: var(--admin-space-3);
+}
+
+.role-token-secret code {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.role-token-secret button {
+  min-height: 34px;
+  padding: var(--admin-space-2);
+}
+
+.role-token-list {
+  display: grid;
+  gap: var(--admin-space-3);
+}
+
+.role-token-row {
+  align-items: center;
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-left: var(--admin-space-1) solid var(--admin-color-primary);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  padding: var(--admin-space-3);
+}
+
+.role-token-row.is-revoked {
+  border-left-color: var(--admin-color-disabled);
+  opacity: 0.72;
+}
+
+.role-token-row div {
+  display: grid;
+  gap: var(--admin-space-1);
+  min-width: 0;
+}
+
+.role-token-row span {
+  color: var(--admin-color-text-soft);
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
+}
+
+.role-token-row button {
+  min-height: 34px;
+  padding: var(--admin-space-2) var(--admin-space-3);
+}
+
 .settings-access-layout,
 .settings-panel,
 .api-role-list,
@@ -1972,6 +2042,8 @@ code {
   .quick-action-list,
   .relation-guide dl,
   .role-row,
+  .role-token-form,
+  .role-token-row,
   .schema-basics-grid,
   .schema-field-badge-row,
   .schema-inventory-row,

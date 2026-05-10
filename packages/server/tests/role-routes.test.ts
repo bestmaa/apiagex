@@ -93,4 +93,54 @@ describe("role admin APIs", () => {
     expect(save.statusCode).toBe(200);
     expect(save.json().permissions).toHaveLength(2);
   });
+
+  it("creates, lists, and revokes API role tokens", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const role = await server.inject({
+      method: "POST",
+      url: "/api/admin/roles",
+      payload: { name: "reader" },
+    });
+    const roleId = role.json().role.id as string;
+
+    const create = await server.inject({
+      method: "POST",
+      url: `/api/admin/roles/${roleId}/tokens`,
+      payload: { name: "Docs client" },
+    });
+    expect(create.statusCode).toBe(200);
+    expect(create.json().token).toMatch(/^agx_/);
+    expect(create.json().tokenRecord.tokenPrefix).toBe(create.json().token.slice(0, 12));
+
+    const list = await server.inject({ method: "GET", url: `/api/admin/roles/${roleId}/tokens` });
+    expect(list.json().tokens).toHaveLength(1);
+    expect(list.json().tokens[0].name).toBe("Docs client");
+    expect(list.json().tokens[0].token).toBeUndefined();
+
+    const revoke = await server.inject({
+      method: "DELETE",
+      url: `/api/admin/roles/${roleId}/tokens/${create.json().tokenRecord.id}`,
+    });
+    expect(revoke.statusCode).toBe(200);
+    expect(revoke.json().token.revokedAt).toBeTruthy();
+  });
+
+  it("rejects token creation for admin roles", async () => {
+    const database = openSqliteDatabase();
+    const server = createServer({ database });
+    await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: { email: "owner@apiagex.local", password: "OwnerPass123!" },
+    });
+
+    const response = await server.inject({
+      method: "POST",
+      url: "/api/admin/roles/role_admin/tokens",
+      payload: { name: "Wrong token" },
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({ ok: false, error: "ROLE_API_REQUIRED" });
+  });
 });

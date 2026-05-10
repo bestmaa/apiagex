@@ -63,6 +63,18 @@ describe("MVP database foundation", () => {
     expect(adminPermissionColumns.map((column) => column.name)).toContain("action");
   });
 
+  it("adds API tokens for content role tokens", () => {
+    const db = openSqliteDatabase();
+
+    migrateMvpDatabase(db);
+
+    const apiTokenColumns = db.prepare("PRAGMA table_info(api_tokens)").all() as Array<{
+      name: string;
+    }>;
+    expect(apiTokenColumns.map((column) => column.name)).toContain("token_hash");
+    expect(listMvpTables(db)).toContain("api_tokens");
+  });
+
   it("seeds existing admin role permissions during additive migration", () => {
     const db = openSqliteDatabase();
     const now = new Date().toISOString();

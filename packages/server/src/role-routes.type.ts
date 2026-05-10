@@ -10,3 +10,11 @@ export type RoleParams = {
 export type RolePermissionsBody = {
   permissions: Array<Omit<SetPermissionInput, "roleId">>;
 };
+
+export type RoleTokenBody = {
+  name?: string;
+};
+
+export type RoleTokenParams = RoleParams & {
+  tokenId: string;
+};

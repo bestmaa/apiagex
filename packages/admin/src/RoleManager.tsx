@@ -13,6 +13,7 @@ import {
   PermissionGrid,
   RoleList,
 } from "./RolePermissionsPanel";
+import { RoleTokenPanel } from "./RoleTokenPanel";
 import type {
   PermissionAction,
   PermissionRecord,
@@ -106,7 +107,7 @@ export function RoleManager() {
       <h2 id="role-manager-title">Roles</h2>
       <p>English: These are API roles only; owner and admin panel roles are kept separate.</p>
       <p>Hinglish: Ye sirf API roles hain; owner aur admin panel roles alag rakhe gaye hain.</p>
-      <p>Unchecked actions are blocked when <code>x-apiagex-role-id</code> is provided. <code>manage</code> allows every action for that schema.</p>
+      <p>Unchecked actions are blocked when a role id or API token is provided. <code>manage</code> allows every action for that schema.</p>
       <form onSubmit={submitRole}>
         <label>API role name <input name="name" pattern="[a-z](?:[a-z0-9]|-)*" required /></label>
         <label>API role description <input name="description" /></label>
@@ -122,6 +123,11 @@ export function RoleManager() {
           {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
         </select>
       </label>
+      <RoleTokenPanel
+        onStatus={setStatus}
+        roleId={roleId}
+        roleName={roles.find((role) => role.id === roleId)?.name ?? ""}
+      />
       <PermissionGrid permissions={permissions} schemas={schemas} toggle={toggle} />
       <button disabled={!roleId || schemas.length === 0} type="button" onClick={() => void savePermissions()}>
         <Save aria-hidden="true" size={16} />

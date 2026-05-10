@@ -7,6 +7,9 @@ import type {
   EntryMutationResponse,
 } from "./entry.type";
 import type {
+  ApiTokenCreateResponse,
+  ApiTokenListResponse,
+  ApiTokenRevokeResponse,
   PermissionDraft,
   PermissionListResponse,
   RoleListResponse,
@@ -163,6 +166,30 @@ export async function saveRolePermissions(
     body: JSON.stringify({ permissions }),
   });
   return (await response.json()) as PermissionListResponse;
+}
+
+export async function listApiTokens(roleId: string): Promise<ApiTokenListResponse> {
+  const response = await fetch(`/api/admin/roles/${roleId}/tokens`);
+  return (await response.json()) as ApiTokenListResponse;
+}
+
+export async function createApiToken(
+  roleId: string,
+  name: string,
+): Promise<ApiTokenCreateResponse> {
+  const response = await fetch(`/api/admin/roles/${roleId}/tokens`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+  return (await response.json()) as ApiTokenCreateResponse;
+}
+
+export async function revokeApiToken(roleId: string, tokenId: string): Promise<ApiTokenRevokeResponse> {
+  const response = await fetch(`/api/admin/roles/${roleId}/tokens/${tokenId}`, {
+    method: "DELETE",
+  });
+  return (await response.json()) as ApiTokenRevokeResponse;
 }
 
 export async function listUsers(): Promise<UserListResponse> {
