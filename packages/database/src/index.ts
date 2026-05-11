@@ -30,6 +30,10 @@ export {
   revokeApiToken,
 } from "./api-token-repository.js";
 export {
+  consumeRealtimeSession,
+  createRealtimeSession,
+} from "./realtime-session-repository.js";
+export {
   countWebhookDeliveryAttempts,
   createWebhook,
   deleteWebhook,
@@ -114,6 +118,11 @@ export type {
   CreatedApiToken,
   CreateApiTokenInput,
 } from "./api-token-repository.type.js";
+export type {
+  CreatedRealtimeSession,
+  CreateRealtimeSessionInput,
+  RealtimeSessionRecord,
+} from "./realtime-session-repository.type.js";
 export type {
   EnqueueWebhookEventInput,
   RecordWebhookDeliveryInput,

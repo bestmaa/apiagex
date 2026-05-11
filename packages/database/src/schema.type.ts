@@ -12,6 +12,7 @@ export type MvpTableName =
   | "webhook_deliveries"
   | "realtime_configs"
   | "realtime_events"
+  | "realtime_sessions"
   | "migrations";
 
 export type MigrationRecord = {

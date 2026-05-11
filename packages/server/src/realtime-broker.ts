@@ -4,6 +4,7 @@ import type { FastifyInstance } from "fastify";
 import { WebSocket, WebSocketServer } from "ws";
 import {
   canRoleAccess,
+  consumeRealtimeSession,
   getRealtimeConfig,
   getSchemaBySlug,
   isRealtimeEventEnabled,
@@ -118,6 +119,13 @@ export function createRealtimeBroker(database: SqliteDatabase): RealtimeBroker &
   }
 
   function canSubscribe(url: URL, schemaId: string): { allowed: boolean; error?: string } {
+    const session = url.searchParams.get("session")?.trim();
+    const schemaSlug = url.searchParams.get("schema")?.trim() ?? "";
+    if (session) {
+      return consumeRealtimeSession(database, session, schemaSlug)
+        ? { allowed: true }
+        : { allowed: false, error: "REALTIME_SESSION_INVALID" };
+    }
     const token = url.searchParams.get("token")?.trim();
     if (token) {
       const apiToken = resolveApiToken(database, token);

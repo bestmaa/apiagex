@@ -56,11 +56,7 @@ describe("realtime WebSocket APIs", () => {
   it("keeps only the latest realtime history rows per schema", async () => {
     const database = openSqliteDatabase();
     const server = createServer({ database });
-    const schema = createSchema(database, {
-      fields: [{ name: "Title", slug: "title", type: "text" }],
-      name: "Article",
-      slug: "article",
-    });
+    const schema = createSchema(database, { fields: [{ name: "Title", slug: "title", type: "text" }], name: "Article", slug: "article" });
     for (let index = 0; index < 1005; index += 1) {
       const entry = createEntry(database, {
         data: { title: `Event ${index}` },
@@ -79,7 +75,8 @@ describe("realtime WebSocket APIs", () => {
   });
 
   it("replays missed schema events after lastEventId on reconnect", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const database = openSqliteDatabase();
+    const server = createServer({ database });
     const schemaId = await createArticleSchema(server);
     await server.inject({
       method: "PUT",
@@ -136,14 +133,64 @@ describe("realtime WebSocket APIs", () => {
       url: `/api/admin/realtime/${schemaId}`,
       payload: { enabled: true, events: ["entry.created"] },
     });
-    const role = await server.inject({
-      method: "POST",
-      url: "/api/admin/roles",
-      payload: { name: "blocked-realtime", description: "" },
-    });
+    const role = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "blocked-realtime", description: "" } });
     const blocked = new WebSocket(`ws://127.0.0.1:${portOf(server)}/api/realtime?schema=article&roleId=${role.json().role.id}`);
     expect(await nextJson(blocked)).toMatchObject({ type: "error", error: "API_PERMISSION_DENIED" });
     await server.close();
+  });
+
+  it("creates one-time realtime sessions for websocket connections", async () => {
+    const database = openSqliteDatabase();
+    const server = createServer({ database });
+    const schemaId = await createArticleSchema(server);
+    await server.inject({
+      method: "PUT",
+      url: `/api/admin/realtime/${schemaId}`,
+      payload: { enabled: true, events: ["entry.created"] },
+    });
+    const role = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "session-reader" } });
+    await server.inject({
+      method: "PUT",
+      url: `/api/admin/roles/${role.json().role.id}/permissions`,
+      payload: { permissions: [{ action: "getAll", allowed: true, schemaId }] },
+    });
+    const token = await server.inject({ method: "POST", url: `/api/admin/roles/${role.json().role.id}/tokens`, payload: { name: "Realtime client" } });
+    const session = await server.inject({
+      method: "POST",
+      url: "/api/realtime/session",
+      headers: { authorization: `Bearer ${token.json().token}` },
+      payload: { schema: "article", ttlSeconds: 60 },
+    });
+    expect(session.statusCode).toBe(200);
+    expect(session.json().token).toMatch(/^rt_/);
+    expect(session.json().tokenPrefix).toBe(session.json().token.slice(0, 12));
+
+    await server.listen({ host: "127.0.0.1", port: 0 });
+    const port = portOf(server);
+    const ws = new WebSocket(`ws://127.0.0.1:${port}/api/realtime?schema=article&session=${session.json().token}`);
+    expect(await nextJson(ws)).toMatchObject({ type: "ready" });
+    const reused = new WebSocket(`ws://127.0.0.1:${port}/api/realtime?schema=article&session=${session.json().token}`);
+    expect(await nextJson(reused)).toMatchObject({ type: "error", error: "REALTIME_SESSION_INVALID" });
+
+    const expiredSession = await server.inject({ method: "POST", url: "/api/realtime/session", headers: { authorization: `Bearer ${token.json().token}` }, payload: { schema: "article", ttlSeconds: 60 } });
+    database.prepare("UPDATE realtime_sessions SET expires_at = ? WHERE token_prefix = ?")
+      .run("2026-01-01T00:00:00.000Z", expiredSession.json().tokenPrefix);
+    const expired = new WebSocket(`ws://127.0.0.1:${port}/api/realtime?schema=article&session=${expiredSession.json().token}`);
+    expect(await nextJson(expired)).toMatchObject({ type: "error", error: "REALTIME_SESSION_INVALID" });
+    ws.close();
+    await server.close();
+  });
+
+  it("rejects realtime session creation without getAll permission", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    await createArticleSchema(server);
+    const role = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "no-session" } });
+    const token = await server.inject({ method: "POST", url: `/api/admin/roles/${role.json().role.id}/tokens`, payload: { name: "Blocked realtime client" } });
+
+    const session = await server.inject({ method: "POST", url: "/api/realtime/session", headers: { authorization: `Bearer ${token.json().token}` }, payload: { schema: "article" } });
+
+    expect(session.statusCode).toBe(403);
+    expect(session.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
   });
 });
 
@@ -151,11 +198,7 @@ async function createArticleSchema(server: ReturnType<typeof createServer>): Pro
   const response = await server.inject({
     method: "POST",
     url: "/api/admin/schemas",
-    payload: {
-      fields: [{ name: "Title", slug: "title", type: "text", required: true }],
-      name: "Article",
-      slug: "article",
-    },
+    payload: { fields: [{ name: "Title", slug: "title", type: "text", required: true }], name: "Article", slug: "article" },
   });
   return response.json().schema.id as string;
 }
@@ -175,10 +218,7 @@ function nextJson(ws: WebSocket): Promise<Record<string, any>> {
   });
 }
 
-function waitForMessage(
-  messages: Array<Record<string, any>>,
-  predicate: (message: Record<string, any>) => boolean,
-): Promise<Record<string, any>> {
+function waitForMessage(messages: Array<Record<string, any>>, predicate: (message: Record<string, any>) => boolean): Promise<Record<string, any>> {
   return new Promise((resolve, reject) => {
     const start = Date.now();
     const timer = setInterval(() => {
@@ -186,8 +226,7 @@ function waitForMessage(
       if (found) {
         clearInterval(timer);
         resolve(found);
-      }
-      if (Date.now() - start > 3000) {
+      } else if (Date.now() - start > 3000) {
         clearInterval(timer);
         reject(new Error("WEBSOCKET_TIMEOUT"));
       }
