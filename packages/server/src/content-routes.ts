@@ -24,11 +24,14 @@ import type {
 import { emitEntryMutationWebhook } from "./entry-webhooks.js";
 import { populateEntryRelations, shouldPopulateRelations } from "./relation-populate.js";
 import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
+import { emitEntryRealtime } from "./entry-realtime.js";
+import type { RealtimeBroker } from "./realtime-broker.type.js";
 
 export function registerContentRoutes(
   server: FastifyInstance,
   database: SqliteDatabase,
   webhookOptions: WebhookDispatcherOptions = {},
+  realtimeBroker?: RealtimeBroker,
 ): void {
   server.get<{ Params: ContentListParams; Querystring: ContentPopulateQuery }>(
     "/api/content/:schemaSlug",
@@ -72,6 +75,7 @@ export function registerContentRoutes(
       try {
         const entry = createEntry(database, { schemaId: schema.id, data: request.body.data });
         await emitEntryMutationWebhook(database, schema, "entry.created", entry, webhookOptions);
+        emitEntryRealtime(realtimeBroker, schema, "entry.created", entry);
         return { ok: true, entry };
       } catch (error) {
         return sendContentError(reply, error, 400);
@@ -121,6 +125,7 @@ export function registerContentRoutes(
       try {
         const entry = updateEntry(database, request.params.entryId, request.body);
         await emitEntryMutationWebhook(database, schema, "entry.updated", entry, webhookOptions);
+        emitEntryRealtime(realtimeBroker, schema, "entry.updated", entry);
         return { ok: true, entry };
       } catch (error) {
         return sendContentError(reply, error, 400);
@@ -141,6 +146,7 @@ export function registerContentRoutes(
       const entry = getEntryById(database, request.params.entryId);
       deleteEntry(database, request.params.entryId);
       if (entry) await emitEntryMutationWebhook(database, schema, "entry.deleted", entry, webhookOptions);
+      if (entry) emitEntryRealtime(realtimeBroker, schema, "entry.deleted", entry);
       return { ok: true, deleted: true };
     },
   );

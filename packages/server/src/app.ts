@@ -18,23 +18,28 @@ import { registerUserRoutes } from "./user-routes.js";
 import { registerSettingsRoutes } from "./settings-routes.js";
 import { registerWebhookRoutes } from "./webhook-routes.js";
 import { loginUser } from "./user-auth.js";
+import { createRealtimeBroker } from "./realtime-broker.js";
+import { registerRealtimeRoutes } from "./realtime-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
   const database = options.database ?? openSqliteDatabase(options.databasePath);
   migrateMvpDatabase(database);
+  const realtimeBroker = createRealtimeBroker(database);
+  realtimeBroker.attach(server);
   server.register(fastifyStatic, {
     prefix: "/adminui/",
     root: resolveAdminUiAsset().root,
   });
   registerSchemaRoutes(server, database);
   const webhookOptions = options.webhookHttpClient ? { httpClient: options.webhookHttpClient } : {};
-  registerEntryRoutes(server, database, webhookOptions);
-  registerContentRoutes(server, database, webhookOptions);
+  registerEntryRoutes(server, database, webhookOptions, realtimeBroker);
+  registerContentRoutes(server, database, webhookOptions, realtimeBroker);
   registerRoleRoutes(server, database);
   registerUserRoutes(server, database);
   registerSettingsRoutes(server, database);
   registerWebhookRoutes(server, database, webhookOptions);
+  registerRealtimeRoutes(server, database, realtimeBroker);
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,

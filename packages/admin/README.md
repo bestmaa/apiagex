@@ -4,7 +4,7 @@
 
 This package owns the first admin UI scaffold. It provides a small local screen for listing, creating, editing, and deleting content types through the starter admin API.
 
-MVP note: Settings now owns role configuration with an attached submenu for Admin Roles, Content Roles, and Webhooks. Owner/admin control-plane roles are hidden from content API permissions, Content Roles can create/revoke content API tokens, Webhooks can register signed content change notifications, and the Users screen shows the user list before opening a one-API-role create form. Admin UI screens outside Docs use English-only helper copy and compact content-height sections.
+MVP note: Settings now owns role configuration with an attached submenu for Admin Roles, Content Roles, Webhooks, and Realtime API. Owner/admin control-plane roles are hidden from content API permissions, Content Roles can create/revoke content API tokens, Webhooks can register signed content change notifications, Realtime API can enable WebSocket events per collection, and the Users screen shows the user list before opening a one-API-role create form. Admin UI screens outside Docs use English-only helper copy and compact content-height sections.
 
 The UI starts with a login screen and stores the bearer token in localStorage after `/auth/login` succeeds.
 
@@ -32,9 +32,7 @@ The UI also includes an admin-only backup panel that exports and restores the fu
 
 The UI also includes an admin-only migrations panel that reads schema history through `/api/migrations`.
 
-Content types also expose a realtime toggle. When enabled, the server can stream live updates for that content type through `/realtime/stream`.
-
-The admin shell subscribes to the realtime stream and refreshes content types, entries, media, and audit data when matching updates arrive.
+Settings includes a Realtime API screen that enables WebSocket create/update/delete events for selected generated content APIs and links to client ack/reconnect docs.
 
 The public read API can now resolve relations and media with `populate`, which makes the admin-managed schema more useful for consumers.
 
@@ -78,7 +76,7 @@ The UI expects the API server to run at `http://127.0.0.1:4000` by default.
 
 Ye package first admin UI scaffold ka owner hai. Ye starter admin API ke through content types ko list, create, edit, aur delete karne ka local screen deta hai.
 
-MVP note: Settings ab role configuration own karta hai jisme Admin Roles, Content Roles, aur Webhooks ke liye attached submenu hai. Owner/admin control-plane roles content API permissions se hidden hain, Content Roles content API tokens create/revoke kar sakta hai, Webhooks signed content change notifications register kar sakta hai, aur Users screen one-API-role create form open karne se pehle user list dikhata hai. Docs ke bahar Admin UI screens English-only helper copy aur compact content-height sections use karte hain.
+MVP note: Settings ab role configuration own karta hai jisme Admin Roles, Content Roles, Webhooks, aur Realtime API ke liye attached submenu hai. Owner/admin control-plane roles content API permissions se hidden hain, Content Roles content API tokens create/revoke kar sakta hai, Webhooks signed content change notifications register kar sakta hai, Realtime API collection-wise WebSocket events enable kar sakta hai, aur Users screen one-API-role create form open karne se pehle user list dikhata hai. Docs ke bahar Admin UI screens English-only helper copy aur compact content-height sections use karte hain.
 
 UI login screen se start hota hai aur `/auth/login` successful hone ke baad bearer token localStorage me store karta hai.
 
@@ -106,9 +104,7 @@ UI me admin-only backup panel bhi hai jo `/api/backups/export` aur `/api/backups
 
 UI me admin-only migrations panel bhi hai jo `/api/migrations` ke through schema history read karta hai.
 
-Content types me realtime toggle bhi hai. Jab ye enabled hota hai, server `/realtime/stream` ke through us content type ke live updates stream kar sakta hai.
-
-Admin shell realtime stream subscribe karta hai aur matching updates par content types, entries, media, aur audit data refresh karta hai.
+Settings me Realtime API screen hai jo selected generated content APIs ke liye WebSocket create/update/delete events enable karta hai aur client ack/reconnect docs link karta hai.
 
 Public read API ab `populate` ke saath relations aur media resolve kar sakti hai, isliye admin-managed schema consumers ke liye zyada useful ho jata hai.
 

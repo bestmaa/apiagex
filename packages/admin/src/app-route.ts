@@ -16,6 +16,11 @@ export const settingsSubnavItems: AdminSubnavItem[] = [
     label: "Webhooks",
     route: "settings/webhooks",
   },
+  {
+    description: "Enable live client screens.",
+    label: "Realtime API",
+    route: "settings/realtime",
+  },
 ];
 
 const standaloneRoutes: AdminRoute[] = [
@@ -27,6 +32,7 @@ const standaloneRoutes: AdminRoute[] = [
   "settings",
   "docs",
   "docs/webhooks",
+  "docs/realtime",
 ];
 const settingsRoutes = settingsSubnavItems.map((item) => item.route);
 const allRoutes: AdminRoute[] = [...standaloneRoutes, ...settingsRoutes];

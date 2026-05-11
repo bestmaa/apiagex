@@ -261,6 +261,19 @@ One server must serve exactly these primary paths:
 - Failed delivery attempts are stored in `webhook_deliveries` with status code/error, attempt number, and next retry time.
 - Webhook failures do not roll back the content create, update, or delete operation.
 
+### Realtime API
+
+- Admins can enable realtime WebSocket events per collection from Settings > Realtime API.
+- Admins Settings > Realtime API se har collection ke liye WebSocket realtime events enable kar sakte hain.
+- Client subscriptions use `/api/realtime?schema=:schemaSlug` and can pass `token=API_TOKEN` or `roleId=ROLE_ID`.
+- Client subscriptions `/api/realtime?schema=:schemaSlug` use karte hain aur `token=API_TOKEN` ya `roleId=ROLE_ID` pass kar sakte hain.
+- Realtime events are `entry.created`, `entry.updated`, and `entry.deleted`, each with `messageId`, schema, entry, and `occurredAt`.
+- Realtime events `entry.created`, `entry.updated`, aur `entry.deleted` hain, har event me `messageId`, schema, entry, aur `occurredAt` hota hai.
+- Clients should ack processed messages and refetch current content after reconnect or ack timeout.
+- Clients processed messages ko ack karein aur reconnect ya ack timeout ke baad current content refetch karein.
+- Realtime delivery failures do not roll back the content create, update, or delete operation.
+- Realtime delivery failure content create, update, ya delete operation ko rollback nahi karta.
+
 ## Static Docs Architecture
 
 - `/doc` and `/readme` must remain public URLs.

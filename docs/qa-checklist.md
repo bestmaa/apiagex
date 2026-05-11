@@ -11,12 +11,13 @@
 - Open Entries and confirm collections appear in the attached left submenu.
 - Create an entry from the generated entry form.
 - Confirm Generated APIs shows `/api/content/:schemaSlug`.
-- Open Settings and confirm the left menu compacts with Admin Roles, Content Roles, and Webhooks submenu options.
+- Open Settings and confirm the left menu compacts with Admin Roles, Content Roles, Webhooks, and Realtime API submenu options.
 - Confirm Settings submenu items keep normal compact height and scroll inside the 100vh column if content grows.
 - Create a custom admin role in Settings and save one admin permission.
 - Open Settings > Content Roles, create an API role, and save at least one permission checkbox.
 - Create an API token for the selected Content Role and confirm the token appears only after creation.
 - Open Settings > Webhooks, open the verification docs link, create a webhook, trigger a matching entry write, and confirm a delivery log appears.
+- Open Settings > Realtime API, enable one collection, open the client docs link, connect a WebSocket client, trigger a matching entry write, and confirm a realtime event plus ack.
 - Open Users, confirm the list is visible first, then click Create user and create a user assigned to that API role.
 - Confirm Users and other non-doc Admin UI screens keep normal content height and do not show `English:` or `Hinglish:` helper labels.
 - Confirm there are no current-page console errors.
@@ -52,6 +53,10 @@
 - `GET /api/content/:schemaSlug` works with `Authorization: Bearer TOKEN` when that token role has `getAll`.
 - `DELETE /api/admin/roles/:roleId/tokens/:tokenId` revokes the token and the same content request returns `403 API_TOKEN_INVALID`.
 - `POST /api/admin/webhooks` creates a webhook for `entry.created`, `entry.updated`, or `entry.deleted`.
+- `PUT /api/admin/realtime/:schemaId` enables realtime for selected `entry.created`, `entry.updated`, or `entry.deleted` events.
+- `GET /api/realtime?schema=:schemaSlug` accepts a WebSocket connection only when realtime is enabled for that schema.
+- A matching content write sends a WebSocket event with `messageId`, `event`, `schema`, `entry`, and `occurredAt`.
+- The WebSocket client can send `{ "type": "ack", "messageId": "..." }` and receives `ack.ok`.
 - A matching content write sends signed headers `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, and `x-apiagex-signature`.
 - Receiver verification docs explain timestamp tolerance, delivery id replay checks, and HMAC validation.
 - Failed webhook calls are logged in `GET /api/admin/webhooks/:webhookId/deliveries` without failing the content write.
@@ -76,12 +81,13 @@
 - Entries open karke confirm karo ki collections attached left submenu me dikhte hain.
 - Generated entry form se entry create karo.
 - Generated APIs me `/api/content/:schemaSlug` confirm karo.
-- Settings open karke confirm karo ki left menu compact hota hai aur Admin Roles, Content Roles, plus Webhooks submenu options dikhte hain.
+- Settings open karke confirm karo ki left menu compact hota hai aur Admin Roles, Content Roles, Webhooks, plus Realtime API submenu options dikhte hain.
 - Confirm karo ki Settings submenu items normal compact height me rahen aur content badhne par 100vh column ke andar scroll ho.
 - Settings me custom admin role create karo aur ek admin permission save karo.
 - Settings > Content Roles me API role create karo aur ek permission checkbox save karo.
 - Selected Content Role ke liye API token create karo aur confirm karo ki full token sirf create ke baad dikhta hai.
 - Settings > Webhooks open karo, verification docs link kholo, webhook create karo, matching entry write trigger karo, aur delivery log dikhna confirm karo.
+- Settings > Realtime API open karo, ek collection enable karo, client docs link kholo, WebSocket client connect karo, matching entry write trigger karo, aur realtime event plus ack confirm karo.
 - Us API role ke saath user create karo.
 - Confirm karo ki Users aur baaki non-doc Admin UI screens normal content height me rahen aur `English:` ya `Hinglish:` helper labels na dikhayen.
 - Current page console errors nahi hone chahiye.
@@ -117,6 +123,10 @@
 - `GET /api/content/:schemaSlug` `Authorization: Bearer TOKEN` ke saath work kare jab token role ke paas `getAll` ho.
 - `DELETE /api/admin/roles/:roleId/tokens/:tokenId` token revoke kare aur same content request `403 API_TOKEN_INVALID` return kare.
 - `POST /api/admin/webhooks` `entry.created`, `entry.updated`, ya `entry.deleted` ke liye webhook create kare.
+- `PUT /api/admin/realtime/:schemaId` selected `entry.created`, `entry.updated`, ya `entry.deleted` events ke liye realtime enable kare.
+- `GET /api/realtime?schema=:schemaSlug` WebSocket connection tabhi accept kare jab schema ke liye realtime enabled ho.
+- Matching content write `messageId`, `event`, `schema`, `entry`, aur `occurredAt` ke saath WebSocket event bheje.
+- WebSocket client `{ "type": "ack", "messageId": "..." }` bhej sake aur `ack.ok` receive kare.
 - Matching content write signed headers `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, aur `x-apiagex-signature` bheje.
 - Receiver verification docs timestamp tolerance, delivery id replay checks, aur HMAC validation explain kare.
 - Failed webhook calls `GET /api/admin/webhooks/:webhookId/deliveries` me log hon aur content write fail na ho.

@@ -6,7 +6,9 @@ describe("admin route helpers", () => {
     expect(readAdminRoute("#settings/admin-roles")).toBe("settings/admin-roles");
     expect(readAdminRoute("#settings/content-roles")).toBe("settings/content-roles");
     expect(readAdminRoute("#settings/webhooks")).toBe("settings/webhooks");
+    expect(readAdminRoute("#settings/realtime")).toBe("settings/realtime");
     expect(readAdminRoute("#docs/webhooks")).toBe("docs/webhooks");
+    expect(readAdminRoute("#docs/realtime")).toBe("docs/realtime");
     expect(readAdminRoute("#roles")).toBe("settings/content-roles");
     expect(readAdminRoute("#missing")).toBe("dashboard");
   });
@@ -20,10 +22,12 @@ describe("admin route helpers", () => {
       "Admin Roles",
       "Content Roles",
       "Webhooks",
+      "Realtime API",
     ]);
   });
 
   it("keeps focused docs pages active under the Docs nav item", () => {
     expect(activeNavRoute("docs/webhooks")).toBe("docs");
+    expect(activeNavRoute("docs/realtime")).toBe("docs");
   });
 });

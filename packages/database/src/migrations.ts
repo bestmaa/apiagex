@@ -13,6 +13,7 @@ export const MVP_TABLES = [
   "webhooks",
   "webhook_events",
   "webhook_deliveries",
+  "realtime_configs",
 ] as const;
 
 export const MVP_FOUNDATION_SQL = `
@@ -137,6 +138,14 @@ CREATE TABLE IF NOT EXISTS webhook_deliveries (
   created_at TEXT NOT NULL,
   next_retry_at TEXT
 );
+
+CREATE TABLE IF NOT EXISTS realtime_configs (
+  schema_id TEXT PRIMARY KEY REFERENCES schemas(id) ON DELETE CASCADE,
+  enabled INTEGER NOT NULL DEFAULT 0,
+  events_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
 `;
 
 export const MVP_ADDITIVE_MIGRATIONS_SQL = [
@@ -205,5 +214,12 @@ export const MVP_ADDITIVE_MIGRATIONS_SQL = [
     attempt INTEGER NOT NULL,
     created_at TEXT NOT NULL,
     next_retry_at TEXT
+  )`,
+  `CREATE TABLE IF NOT EXISTS realtime_configs (
+    schema_id TEXT PRIMARY KEY REFERENCES schemas(id) ON DELETE CASCADE,
+    enabled INTEGER NOT NULL DEFAULT 0,
+    events_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
   )`,
 ] as const;

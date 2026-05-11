@@ -18,11 +18,14 @@ import type {
 } from "./entry-routes.type.js";
 import { emitEntryMutationWebhook } from "./entry-webhooks.js";
 import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
+import { emitEntryRealtime } from "./entry-realtime.js";
+import type { RealtimeBroker } from "./realtime-broker.type.js";
 
 export function registerEntryRoutes(
   server: FastifyInstance,
   database: SqliteDatabase,
   webhookOptions: WebhookDispatcherOptions = {},
+  realtimeBroker?: RealtimeBroker,
 ): void {
   server.get<{ Params: EntryListParams; Querystring: EntryListQuery }>(
     "/api/admin/schemas/:schemaId/entries",
@@ -49,6 +52,7 @@ export function registerEntryRoutes(
         const entry = createEntry(database, { schemaId: request.params.schemaId, data });
         const schema = getSchemaById(database, request.params.schemaId);
         if (schema) await emitEntryMutationWebhook(database, schema, "entry.created", entry, webhookOptions);
+        if (schema) emitEntryRealtime(realtimeBroker, schema, "entry.created", entry);
         return { ok: true, entry };
       } catch (error) {
         return sendEntryError(reply, error, statusFor(error));
@@ -77,6 +81,7 @@ export function registerEntryRoutes(
         const entry = updateEntry(database, request.params.entryId, request.body);
         const schema = getSchemaById(database, request.params.schemaId);
         if (schema) await emitEntryMutationWebhook(database, schema, "entry.updated", entry, webhookOptions);
+        if (schema) emitEntryRealtime(realtimeBroker, schema, "entry.updated", entry);
         return { ok: true, entry };
       } catch (error) {
         return sendEntryError(reply, error, statusFor(error));
@@ -95,6 +100,7 @@ export function registerEntryRoutes(
         const schema = getSchemaById(database, request.params.schemaId);
         deleteEntry(database, request.params.entryId);
         if (entry && schema) await emitEntryMutationWebhook(database, schema, "entry.deleted", entry, webhookOptions);
+        if (entry && schema) emitEntryRealtime(realtimeBroker, schema, "entry.deleted", entry);
         return { ok: true, deleted: true };
       } catch (error) {
         return sendEntryError(reply, error, 404);

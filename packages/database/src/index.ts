@@ -44,6 +44,13 @@ export {
   updateWebhookEventStatus,
 } from "./webhook-repository.js";
 export {
+  getRealtimeConfig,
+  isRealtimeEventEnabled,
+  listRealtimeConfigs,
+  listRealtimeSettings,
+  setRealtimeConfig,
+} from "./realtime-repository.js";
+export {
   adminPermissionActions,
   canAdminRoleAccess,
   listAdminRolePermissions,
@@ -116,6 +123,11 @@ export type {
   WebhookRecord,
   WebhookSecretRecord,
 } from "./webhook-repository.type.js";
+export type {
+  RealtimeConfigRecord,
+  RealtimeEventType,
+  SetRealtimeConfigInput,
+} from "./realtime-repository.type.js";
 export type {
   AdminPermissionAction,
   AdminPermissionRecord,

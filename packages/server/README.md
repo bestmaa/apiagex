@@ -51,9 +51,9 @@ Failed webhook deliveries retry with a short backoff, and each delivery row trac
 
 The admin backup export route lives at `/admin/backups/export`, restore lives at `/admin/backups/restore`, and schema migration history is available at `/admin/migrations`.
 
-Content types now support an opt-in `realtimeEnabled` master flag plus per-action `realtimeActions` settings. When `realtimeEnabled` is true, the server exposes `/realtime/stream` as a Server-Sent Events feed for the enabled create/update/delete actions on that content type.
+Generated content APIs now support opt-in realtime settings per schema. When enabled, clients can connect to `/api/realtime?schema=:schemaSlug` over WebSocket for the enabled create/update/delete actions.
 
-The admin shell can subscribe to the same stream and refresh content types, entries, media, and audit data when matching events arrive.
+Realtime subscriptions can include `token=API_TOKEN` or `roleId=ROLE_ID`; when present, the same content API `getAll` permission is required before the WebSocket is accepted.
 
 Public read routes are available at `/api/:slug` and `/api/:slug/:entryId`. Collection types return published items; single types return one published item.
 
@@ -140,9 +140,9 @@ Failed webhook deliveries short backoff ke saath retry hoti hain, aur har delive
 
 Admin backup export route `/admin/backups/export` par hai, restore `/admin/backups/restore` par hai, aur schema migration history `/admin/migrations` par available hai.
 
-Content types me ab opt-in `realtimeEnabled` master flag aur per-action `realtimeActions` settings support hai. Jab `realtimeEnabled` true hota hai, server `/realtime/stream` par Server-Sent Events feed expose karta hai jo enabled create/update/delete actions ke live updates deta hai.
+Generated content APIs me ab per schema opt-in realtime settings support hai. Enable hone par clients `/api/realtime?schema=:schemaSlug` par WebSocket se enabled create/update/delete actions receive kar sakte hain.
 
-Admin shell isi stream ko subscribe karke matching updates par content types, entries, media, aur audit data refresh kar sakta hai.
+Realtime subscriptions `token=API_TOKEN` ya `roleId=ROLE_ID` include kar sakti hain; present hone par WebSocket accept hone se pehle same content API `getAll` permission required hota hai.
 
 Public read routes `/api/:slug` aur `/api/:slug/:entryId` par available hain. Collection types published items return karti hain; single types ek published item return karti hain.
 

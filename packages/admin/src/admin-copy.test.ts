@@ -3,7 +3,7 @@ import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const sourceRoot = new URL(".", import.meta.url);
-const ignoredFiles = new Set(["pages/DocsPage.tsx", "pages/WebhookVerificationDocs.tsx"]);
+const ignoredFiles = new Set(["pages/DocsPage.tsx", "pages/WebhookVerificationDocs.tsx", "pages/RealtimeClientDocs.tsx"]);
 
 describe("Admin UI copy", () => {
   it("keeps non-doc admin screens English-only", () => {

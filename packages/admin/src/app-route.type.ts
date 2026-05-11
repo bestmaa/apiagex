@@ -8,7 +8,9 @@ export type AdminRoute =
   | "settings/admin-roles"
   | "settings/content-roles"
   | "settings/webhooks"
+  | "settings/realtime"
   | "docs/webhooks"
+  | "docs/realtime"
   | "docs";
 
 export type AdminNavItem = {

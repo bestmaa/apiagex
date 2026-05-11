@@ -19,8 +19,10 @@ const navIcons = {
   "settings/admin-roles": Settings,
   "settings/content-roles": Settings,
   "settings/webhooks": Settings,
+  "settings/realtime": Settings,
   users: Users,
   "docs/webhooks": BookOpen,
+  "docs/realtime": BookOpen,
 } satisfies Record<AdminRoute, typeof Home>;
 
 const pageDescriptions = {
@@ -33,8 +35,10 @@ const pageDescriptions = {
   "settings/admin-roles": "Manage Admin UI roles and control-plane permissions.",
   "settings/content-roles": "Manage generated content API roles and permissions.",
   "settings/webhooks": "Manage signed hooks for content API changes.",
+  "settings/realtime": "Enable WebSocket events for generated content APIs.",
   users: "Invite users and assign exactly one API role.",
   "docs/webhooks": "Verify signed webhook requests in receiver apps.",
+  "docs/realtime": "Build live clients with realtime WebSocket events.",
 } satisfies Record<AdminRoute, string>;
 
 export function AdminShell({

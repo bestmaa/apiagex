@@ -113,7 +113,7 @@ function renderRoute(
       />
     );
   }
-  if (route === "docs" || route === "docs/webhooks") return <DocsPage focus={route === "docs/webhooks" ? "webhooks" : undefined} />;
+  if (route === "docs" || route.startsWith("docs/")) return <DocsPage focus={route === "docs/webhooks" ? "webhooks" : route === "docs/realtime" ? "realtime" : undefined} />;
   if (!session) return <LoginRequiredPage onReset={logout} status={status} onSubmit={submitLogin} />;
   if (route === "schemas") return <SchemaBuilder />;
   if (route === "entries") return <EntryManager />;

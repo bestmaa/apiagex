@@ -69,6 +69,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Admin UI Settings me attached submenu hai jisme Admin Roles aur Content Roles options hain.
 - Admin UI Settings also has Webhooks for signed content change notifications.
 - Admin UI Settings me signed content change notifications ke liye Webhooks bhi hai.
+- Admin UI Settings also has Realtime API for opt-in WebSocket events per generated content API.
+- Admin UI Settings me har generated content API ke liye opt-in WebSocket Realtime API bhi hai.
 - Admin panel permissions are stored separately for schemas, entries, API roles, API users, and settings.
 - Admin panel permissions schemas, entries, API roles, API users, aur settings ke liye alag store hote hain.
 - RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.
@@ -138,15 +140,21 @@ Hinglish: API role banao ya select karo, schema action permissions assign karo, 
 
 ## Settings Access Control
 
-English: Open `/adminui#settings` after owner login. The left menu compacts and an attached Settings submenu shows Admin Roles, Content Roles, and Webhooks. Admin permissions cover schemas, entries, API roles, API users, and settings. These permissions are stored outside generated content API permissions, so admin roles still cannot access `/api/content` by role id.
+English: Open `/adminui#settings` after owner login. The left menu compacts and an attached Settings submenu shows Admin Roles, Content Roles, Webhooks, and Realtime API. Admin permissions cover schemas, entries, API roles, API users, and settings. These permissions are stored outside generated content API permissions, so admin roles still cannot access `/api/content` by role id.
 
-Hinglish: Owner login ke baad `/adminui#settings` open karo. Left menu compact hota hai aur attached Settings submenu me Admin Roles, Content Roles, aur Webhooks dikhte hain. Admin permissions schemas, entries, API roles, API users, aur settings cover karte hain. Ye generated content API permissions se alag store hote hain, isliye admin roles role id se `/api/content` access nahi kar sakte.
+Hinglish: Owner login ke baad `/adminui#settings` open karo. Left menu compact hota hai aur attached Settings submenu me Admin Roles, Content Roles, Webhooks, aur Realtime API dikhte hain. Admin permissions schemas, entries, API roles, API users, aur settings cover karte hain. Ye generated content API permissions se alag store hote hain, isliye admin roles role id se `/api/content` access nahi kar sakte.
 
 ## Webhook Quick Use
 
 English: Open `/adminui#settings/webhooks`, create a hook with a target URL, choose entry events, and optionally choose one collection. Matching content create, update, and delete writes send signed JSON to the URL with `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, and `x-apiagex-signature`. The signature is `HMAC_SHA256(secret, timestamp + "." + deliveryId + "." + rawBody)`, and receivers should reject old timestamps plus already processed delivery ids. Failed hook calls are logged and retried without failing the content write.
 
 Hinglish: `/adminui#settings/webhooks` open karo, target URL ke saath hook banao, entry events choose karo, aur optional collection choose karo. Matching content create, update, aur delete writes signed JSON ko URL par bhejte hain with `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, aur `x-apiagex-signature`. Signature `HMAC_SHA256(secret, timestamp + "." + deliveryId + "." + rawBody)` hota hai, aur receiver old timestamps plus already processed delivery ids reject kare. Failed hook calls log aur retry hote hain, content write fail nahi hota.
+
+## Realtime API Quick Use
+
+English: Open `/adminui#settings/realtime`, enable one collection, then connect clients to `ws://HOST/api/realtime?schema=:schemaSlug`. Add `token=API_TOKEN` or `roleId=ROLE_ID` when the client should use API permissions. Events include `messageId`, `event`, `schema`, `entry`, and `occurredAt`; after rendering, clients should send `{ "type": "ack", "messageId": "..." }`. On reconnect or ack timeout, refetch the current list from `/api/content/:schemaSlug`.
+
+Hinglish: `/adminui#settings/realtime` open karo, collection enable karo, phir client ko `ws://HOST/api/realtime?schema=:schemaSlug` par connect karo. API permission chahiye ho to `token=API_TOKEN` ya `roleId=ROLE_ID` add karo. Event me `messageId`, `event`, `schema`, `entry`, aur `occurredAt` aata hai; render ke baad client `{ "type": "ack", "messageId": "..." }` bheje. Reconnect ya ack timeout par `/api/content/:schemaSlug` se current list refetch karo.
 
 ## Local Persistence
 

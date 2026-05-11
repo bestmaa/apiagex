@@ -1,5 +1,6 @@
 import { BookOpen, ClipboardList, Database, KeyRound, Network, ShieldCheck, Table2, UserRound } from "lucide-react";
 import { WebhookVerificationDocs } from "./WebhookVerificationDocs";
+import { RealtimeClientDocs } from "./RealtimeClientDocs";
 
 const workflowSummaries = [
   {
@@ -161,7 +162,7 @@ const workflowChecklists = [
   },
 ];
 
-export function DocsPage({ focus }: { focus?: "webhooks" }) {
+export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
   return (
     <section className="admin-docs" aria-labelledby="admin-docs-title">
       <div className="admin-docs-hero">
@@ -223,6 +224,7 @@ export function DocsPage({ focus }: { focus?: "webhooks" }) {
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />
+      <RealtimeClientDocs focused={focus === "realtime"} />
 
       <section className="admin-doc-relations" aria-labelledby="relation-examples-title">
         <div>
