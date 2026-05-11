@@ -1,4 +1,5 @@
 import { BookOpen, ClipboardList, Database, KeyRound, Network, ShieldCheck, Table2, UserRound } from "lucide-react";
+import { WebhookVerificationDocs } from "./WebhookVerificationDocs";
 
 const workflowSummaries = [
   {
@@ -42,6 +43,13 @@ const workflowSummaries = [
     route: "#settings/content-roles",
     routeLabel: "Configure content roles",
     summary: "Configure API roles in Settings, assign allow/block permissions per schema and API method, then assign users to exactly one API role.",
+  },
+  {
+    icon: Network,
+    title: "Webhooks",
+    route: "#settings/webhooks",
+    routeLabel: "Configure webhooks",
+    summary: "Send signed entry create, update, and delete events to external systems.",
   },
 ];
 
@@ -153,7 +161,7 @@ const workflowChecklists = [
   },
 ];
 
-export function DocsPage() {
+export function DocsPage({ focus }: { focus?: "webhooks" }) {
   return (
     <section className="admin-docs" aria-labelledby="admin-docs-title">
       <div className="admin-docs-hero">
@@ -213,6 +221,8 @@ export function DocsPage() {
           ))}
         </div>
       </section>
+
+      <WebhookVerificationDocs focused={focus === "webhooks"} />
 
       <section className="admin-doc-relations" aria-labelledby="relation-examples-title">
         <div>

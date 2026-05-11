@@ -255,8 +255,9 @@ One server must serve exactly these primary paths:
 - Webhook events are `entry.created`, `entry.updated`, and `entry.deleted`.
 - Webhooks can apply to all collections or one selected schema.
 - Deliveries send JSON with `event`, `schema`, `entry`, and `occurredAt`.
-- Requests include `x-apiagex-event`, `x-apiagex-webhook-id`, and `x-apiagex-signature`.
-- The signature is `sha256=` plus an HMAC SHA-256 digest of the JSON body using the webhook secret.
+- Requests include `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, and `x-apiagex-signature`.
+- The signature is `sha256=` plus an HMAC SHA-256 digest of `timestamp.deliveryId.rawBody` using the webhook secret.
+- Receivers must reject old timestamps, store processed delivery ids, and verify the signature with a timing-safe compare.
 - Failed delivery attempts are stored in `webhook_deliveries` with status code/error, attempt number, and next retry time.
 - Webhook failures do not roll back the content create, update, or delete operation.
 

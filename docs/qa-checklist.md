@@ -16,7 +16,7 @@
 - Create a custom admin role in Settings and save one admin permission.
 - Open Settings > Content Roles, create an API role, and save at least one permission checkbox.
 - Create an API token for the selected Content Role and confirm the token appears only after creation.
-- Open Settings > Webhooks, create a webhook, trigger a matching entry write, and confirm a delivery log appears.
+- Open Settings > Webhooks, open the verification docs link, create a webhook, trigger a matching entry write, and confirm a delivery log appears.
 - Open Users, confirm the list is visible first, then click Create user and create a user assigned to that API role.
 - Confirm Users and other non-doc Admin UI screens keep normal content height and do not show `English:` or `Hinglish:` helper labels.
 - Confirm there are no current-page console errors.
@@ -52,7 +52,8 @@
 - `GET /api/content/:schemaSlug` works with `Authorization: Bearer TOKEN` when that token role has `getAll`.
 - `DELETE /api/admin/roles/:roleId/tokens/:tokenId` revokes the token and the same content request returns `403 API_TOKEN_INVALID`.
 - `POST /api/admin/webhooks` creates a webhook for `entry.created`, `entry.updated`, or `entry.deleted`.
-- A matching content write sends signed headers `x-apiagex-event`, `x-apiagex-webhook-id`, and `x-apiagex-signature`.
+- A matching content write sends signed headers `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, and `x-apiagex-signature`.
+- Receiver verification docs explain timestamp tolerance, delivery id replay checks, and HMAC validation.
 - Failed webhook calls are logged in `GET /api/admin/webhooks/:webhookId/deliveries` without failing the content write.
 - `POST /api/admin/users` creates a user with one API role.
 - `POST /api/auth/login-user` logs in the user and returns `roleId`.
@@ -80,7 +81,7 @@
 - Settings me custom admin role create karo aur ek admin permission save karo.
 - Settings > Content Roles me API role create karo aur ek permission checkbox save karo.
 - Selected Content Role ke liye API token create karo aur confirm karo ki full token sirf create ke baad dikhta hai.
-- Settings > Webhooks open karo, webhook create karo, matching entry write trigger karo, aur delivery log dikhna confirm karo.
+- Settings > Webhooks open karo, verification docs link kholo, webhook create karo, matching entry write trigger karo, aur delivery log dikhna confirm karo.
 - Us API role ke saath user create karo.
 - Confirm karo ki Users aur baaki non-doc Admin UI screens normal content height me rahen aur `English:` ya `Hinglish:` helper labels na dikhayen.
 - Current page console errors nahi hone chahiye.
@@ -116,7 +117,8 @@
 - `GET /api/content/:schemaSlug` `Authorization: Bearer TOKEN` ke saath work kare jab token role ke paas `getAll` ho.
 - `DELETE /api/admin/roles/:roleId/tokens/:tokenId` token revoke kare aur same content request `403 API_TOKEN_INVALID` return kare.
 - `POST /api/admin/webhooks` `entry.created`, `entry.updated`, ya `entry.deleted` ke liye webhook create kare.
-- Matching content write signed headers `x-apiagex-event`, `x-apiagex-webhook-id`, aur `x-apiagex-signature` bheje.
+- Matching content write signed headers `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, aur `x-apiagex-signature` bheje.
+- Receiver verification docs timestamp tolerance, delivery id replay checks, aur HMAC validation explain kare.
 - Failed webhook calls `GET /api/admin/webhooks/:webhookId/deliveries` me log hon aur content write fail na ho.
 - `/adminui#users` par user list pehle dikhe, phir Create user click karke one-API-role user create karo.
 - `POST /api/admin/users` one-API-role user create kare.

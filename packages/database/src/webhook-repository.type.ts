@@ -73,6 +73,7 @@ export type EnqueueWebhookEventInput = {
 };
 
 export type RecordWebhookDeliveryInput = {
+  id?: string;
   eventId: string;
   webhookId: string;
   url: string;

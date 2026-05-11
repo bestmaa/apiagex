@@ -61,6 +61,8 @@ describe("WebhookManager", () => {
 
     expect(container.textContent).toContain("CRM sync");
     expect(container.textContent).toContain("Deliveries for CRM sync");
+    const docsLink = container.querySelector<HTMLAnchorElement>("a[href='#docs/webhooks']");
+    expect(docsLink?.textContent).toContain("Webhook verification docs");
 
     setInput(container, "input[name='name']", "Partner hook");
     setInput(container, "input[name='url']", "https://example.com/new-hook");

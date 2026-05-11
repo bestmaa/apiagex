@@ -45,6 +45,8 @@ Webhook registrations live at `/api/admin/webhooks`, and webhook deliveries are 
 
 Webhook events are emitted from content admin and dynamic content create/update/delete paths and are delivered to external targets with HMAC signatures.
 
+Webhook requests include `x-apiagex-delivery-id`, `x-apiagex-timestamp`, and `x-apiagex-signature`; the signature covers `timestamp.deliveryId.rawBody`.
+
 Failed webhook deliveries retry with a short backoff, and each delivery row tracks attempt count, status, and next retry time.
 
 The admin backup export route lives at `/admin/backups/export`, restore lives at `/admin/backups/restore`, and schema migration history is available at `/admin/migrations`.
@@ -131,6 +133,8 @@ Admin-only audit log reader `/admin/audit-logs` par available hai.
 Webhook registrations `/api/admin/webhooks` par live hain, aur deliveries `/api/admin/webhooks/:webhookId/deliveries` par list hoti hain.
 
 Webhook events content admin aur dynamic content create/update/delete paths se emit hote hain aur HMAC signatures ke saath external targets tak deliver hote hain.
+
+Webhook requests me `x-apiagex-delivery-id`, `x-apiagex-timestamp`, aur `x-apiagex-signature` hota hai; signature `timestamp.deliveryId.rawBody` ko cover karta hai.
 
 Failed webhook deliveries short backoff ke saath retry hoti hain, aur har delivery row attempt count, status, aur next retry time track karti hai.
 

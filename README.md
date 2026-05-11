@@ -144,9 +144,9 @@ Hinglish: Owner login ke baad `/adminui#settings` open karo. Left menu compact h
 
 ## Webhook Quick Use
 
-English: Open `/adminui#settings/webhooks`, create a hook with a target URL, choose entry events, and optionally choose one collection. Matching content create, update, and delete writes send signed JSON to the URL with `x-apiagex-event`, `x-apiagex-webhook-id`, and `x-apiagex-signature`. Failed hook calls are logged and retried without failing the content write.
+English: Open `/adminui#settings/webhooks`, create a hook with a target URL, choose entry events, and optionally choose one collection. Matching content create, update, and delete writes send signed JSON to the URL with `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, and `x-apiagex-signature`. The signature is `HMAC_SHA256(secret, timestamp + "." + deliveryId + "." + rawBody)`, and receivers should reject old timestamps plus already processed delivery ids. Failed hook calls are logged and retried without failing the content write.
 
-Hinglish: `/adminui#settings/webhooks` open karo, target URL ke saath hook banao, entry events choose karo, aur optional collection choose karo. Matching content create, update, aur delete writes signed JSON ko URL par bhejte hain with `x-apiagex-event`, `x-apiagex-webhook-id`, aur `x-apiagex-signature`. Failed hook calls log aur retry hote hain, content write fail nahi hota.
+Hinglish: `/adminui#settings/webhooks` open karo, target URL ke saath hook banao, entry events choose karo, aur optional collection choose karo. Matching content create, update, aur delete writes signed JSON ko URL par bhejte hain with `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, aur `x-apiagex-signature`. Signature `HMAC_SHA256(secret, timestamp + "." + deliveryId + "." + rawBody)` hota hai, aur receiver old timestamps plus already processed delivery ids reject kare. Failed hook calls log aur retry hote hain, content write fail nahi hota.
 
 ## Local Persistence
 

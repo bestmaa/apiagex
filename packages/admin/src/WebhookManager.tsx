@@ -79,6 +79,9 @@ export function WebhookManager() {
     <section aria-labelledby="webhook-manager-title">
       <h2 id="webhook-manager-title">Webhooks</h2>
       <p>Send signed content API change events to external URLs.</p>
+      <p className="helper-text">
+        Receiver verification examples are in <a href="#docs/webhooks">Webhook verification docs</a>.
+      </p>
       <form className="webhook-form" onSubmit={submitWebhook}>
         <label>Name <input name="name" placeholder="CRM sync" required /></label>
         <label>Target URL <input name="url" placeholder="https://example.com/webhooks/apiagex" required type="url" /></label>

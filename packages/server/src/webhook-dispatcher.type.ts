@@ -28,6 +28,18 @@ export type WebhookDispatchResult = {
 
 export type WebhookSignedRequest = {
   body: string;
+  deliveryId: string;
   headers: Record<string, string>;
+  timestamp: string;
   webhook: WebhookSecretRecord;
+};
+
+export type WebhookVerificationInput = {
+  body: string;
+  deliveryId: string;
+  signature: string;
+  timestamp: string;
+  secret: string;
+  toleranceSeconds?: number;
+  now?: Date;
 };

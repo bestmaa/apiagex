@@ -24,7 +24,7 @@ The UI also includes a media library panel that uploads files through `/api/medi
 
 The UI also includes an admin-only audit log viewer backed by `/api/audit-logs`.
 
-The UI also includes an admin-only webhooks panel that registers outbound targets and inspects delivery history through `/api/webhooks`.
+The UI also includes an admin-only webhooks panel that registers outbound targets, links to receiver verification docs, and inspects delivery history through `/api/webhooks`.
 
 Retrying webhook deliveries show attempt counts and delivery status in the panel.
 
@@ -98,7 +98,7 @@ UI me media library panel bhi hai jo `/api/media-files` ke through files upload 
 
 UI me admin-only audit log viewer bhi hai jo `/api/audit-logs` se data leta hai.
 
-UI me admin-only webhooks panel bhi hai jo outbound targets register karta hai aur `/api/webhooks` ke through delivery history inspect karta hai.
+UI me admin-only webhooks panel bhi hai jo outbound targets register karta hai, receiver verification docs link karta hai, aur `/api/webhooks` ke through delivery history inspect karta hai.
 
 Retrying webhook deliveries panel me attempt count aur delivery status ke saath dikhti hain.
 

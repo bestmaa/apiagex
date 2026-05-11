@@ -1,4 +1,4 @@
-import { createHmac } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import {
   countWebhookDeliveryAttempts,
   enqueueWebhookEvent,
@@ -17,6 +17,7 @@ import type {
   WebhookDispatcherOptions,
   WebhookHttpClient,
   WebhookSignedRequest,
+  WebhookVerificationInput,
 } from "./webhook-dispatcher.type.js";
 
 const maxAttempts = 5;
@@ -44,19 +45,39 @@ export async function dispatchPendingWebhooks(
   return results;
 }
 
-export function signWebhookRequest(event: WebhookEventRecord, webhook: WebhookSecretRecord): WebhookSignedRequest {
+export function signWebhookRequest(
+  event: WebhookEventRecord,
+  webhook: WebhookSecretRecord,
+  deliveryId = `whd_${randomUUID()}`,
+  timestamp = new Date().toISOString(),
+): WebhookSignedRequest {
   const body = JSON.stringify(event.payload);
-  const signature = createHmac("sha256", webhook.secret).update(body).digest("hex");
+  const signature = webhookSignature(webhook.secret, timestamp, deliveryId, body);
   return {
     body,
+    deliveryId,
     headers: {
       "content-type": "application/json",
+      "x-apiagex-delivery-id": deliveryId,
       "x-apiagex-event": event.eventType,
       "x-apiagex-signature": `sha256=${signature}`,
+      "x-apiagex-timestamp": timestamp,
       "x-apiagex-webhook-id": webhook.id,
     },
+    timestamp,
     webhook,
   };
+}
+
+export function verifyWebhookSignature(input: WebhookVerificationInput): boolean {
+  if (!input.deliveryId || !input.timestamp || !input.signature.startsWith("sha256=")) return false;
+  const timestampMs = Date.parse(input.timestamp);
+  if (Number.isNaN(timestampMs)) return false;
+  const now = input.now ?? new Date();
+  const tolerance = (input.toleranceSeconds ?? 300) * 1000;
+  if (Math.abs(now.getTime() - timestampMs) > tolerance) return false;
+  const expected = `sha256=${webhookSignature(input.secret, input.timestamp, input.deliveryId, input.body)}`;
+  return safeEqual(expected, input.signature);
 }
 
 async function dispatchEvent(
@@ -105,11 +126,13 @@ async function deliverOne(
   attempt: number,
   now: Date,
 ): Promise<"failed" | "success"> {
-  const signed = signWebhookRequest(event, webhook);
+  const deliveryId = `whd_${randomUUID()}`;
+  const signed = signWebhookRequest(event, webhook, deliveryId, now.toISOString());
   try {
     const response = await httpClient({ url: webhook.url, body: signed.body, headers: signed.headers });
     const ok = response.statusCode >= 200 && response.statusCode < 300;
     recordWebhookDelivery(database, {
+      id: deliveryId,
       eventId: event.id,
       webhookId: webhook.id,
       url: webhook.url,
@@ -122,6 +145,7 @@ async function deliverOne(
     return ok ? "success" : "failed";
   } catch (error) {
     recordWebhookDelivery(database, {
+      id: deliveryId,
       eventId: event.id,
       webhookId: webhook.id,
       url: webhook.url,
@@ -150,4 +174,14 @@ function earliestRetry(current: string | null, next: string): string {
 
 function maxAttemptsForEvent(database: SqliteDatabase, eventId: string, webhooks: WebhookSecretRecord[]): number {
   return Math.max(0, ...webhooks.map((webhook) => countWebhookDeliveryAttempts(database, eventId, webhook.id)));
+}
+
+function webhookSignature(secret: string, timestamp: string, deliveryId: string, body: string): string {
+  return createHmac("sha256", secret).update(`${timestamp}.${deliveryId}.${body}`).digest("hex");
+}
+
+function safeEqual(left: string, right: string): boolean {
+  const leftBuffer = Buffer.from(left);
+  const rightBuffer = Buffer.from(right);
+  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
 }

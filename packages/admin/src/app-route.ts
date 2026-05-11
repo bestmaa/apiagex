@@ -26,6 +26,7 @@ const standaloneRoutes: AdminRoute[] = [
   "users",
   "settings",
   "docs",
+  "docs/webhooks",
 ];
 const settingsRoutes = settingsSubnavItems.map((item) => item.route);
 const allRoutes: AdminRoute[] = [...standaloneRoutes, ...settingsRoutes];
@@ -37,6 +38,7 @@ export function readAdminRoute(hash: string): AdminRoute {
 }
 
 export function activeNavRoute(route: AdminRoute): AdminRoute {
+  if (route.startsWith("docs/")) return "docs";
   return isSettingsRoute(route) ? "settings" : route;
 }
 

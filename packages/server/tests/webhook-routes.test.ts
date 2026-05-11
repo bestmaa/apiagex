@@ -83,6 +83,8 @@ describe("webhook admin APIs", () => {
     expect(create.statusCode).toBe(200);
     expect(calls).toHaveLength(1);
     expect(calls[0]?.headers["x-apiagex-event"]).toBe("entry.created");
+    expect(calls[0]?.headers["x-apiagex-delivery-id"]).toMatch(/^whd_/);
+    expect(calls[0]?.headers["x-apiagex-timestamp"]).toBeTruthy();
     expect(JSON.parse(calls[0]?.body ?? "{}").entry.data.title).toBe("Webhook content");
     expect(deliveries.json().deliveries[0].status).toBe("success");
   });

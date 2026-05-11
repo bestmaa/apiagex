@@ -110,7 +110,7 @@ export function hasSuccessfulWebhookDelivery(db: SqliteDatabase, eventId: string
 }
 
 export function recordWebhookDelivery(db: SqliteDatabase, input: RecordWebhookDeliveryInput): WebhookDeliveryRecord {
-  const id = randomUUID();
+  const id = input.id ?? randomUUID();
   const now = new Date().toISOString();
   db.prepare(
     `INSERT INTO webhook_deliveries

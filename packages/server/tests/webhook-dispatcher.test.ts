@@ -10,7 +10,7 @@ import {
   openSqliteDatabase,
 } from "@apiagex/database";
 import { describe, expect, it } from "vitest";
-import { dispatchPendingWebhooks, signWebhookRequest } from "../src/webhook-dispatcher.js";
+import { dispatchPendingWebhooks, signWebhookRequest, verifyWebhookSignature } from "../src/webhook-dispatcher.js";
 import type { WebhookHttpRequest } from "../src/webhook-dispatcher.type.js";
 
 describe("webhook dispatcher", () => {
@@ -34,11 +34,18 @@ describe("webhook dispatcher", () => {
       },
     });
 
-    const expectedSignature = createHmac("sha256", "hook-secret").update(calls[0]?.body ?? "").digest("hex");
+    const timestamp = calls[0]?.headers["x-apiagex-timestamp"] ?? "";
+    const deliveryId = calls[0]?.headers["x-apiagex-delivery-id"] ?? "";
+    const expectedSignature = createHmac("sha256", "hook-secret")
+      .update(`${timestamp}.${deliveryId}.${calls[0]?.body ?? ""}`)
+      .digest("hex");
     expect(results[0]?.delivered).toBe(1);
     expect(calls[0]?.url).toBe("https://example.com/hook");
     expect(calls[0]?.headers["x-apiagex-event"]).toBe("entry.created");
+    expect(calls[0]?.headers["x-apiagex-delivery-id"]).toMatch(/^whd_/);
+    expect(calls[0]?.headers["x-apiagex-timestamp"]).toBeTruthy();
     expect(calls[0]?.headers["x-apiagex-signature"]).toBe(`sha256=${expectedSignature}`);
+    expect(listWebhookDeliveries(db, webhook.id)[0]?.id).toBe(deliveryId);
     expect(listWebhookDeliveries(db, webhook.id)[0]?.status).toBe("success");
     expect(listPendingWebhookEvents(db)).toHaveLength(0);
   });
@@ -81,10 +88,56 @@ describe("webhook dispatcher", () => {
     });
     const event = enqueueWebhookEvent(db, { entry, eventType: "entry.created", schemaId: schema.id, schemaSlug: schema.slug });
 
-    const signed = signWebhookRequest(event, { ...webhook, secret: "manual-secret" });
+    const signed = signWebhookRequest(
+      event,
+      { ...webhook, secret: "manual-secret" },
+      "whd_manual",
+      "2026-05-11T00:00:00.000Z",
+    );
 
     expect(signed.headers["x-apiagex-signature"]).toMatch(/^sha256=/);
+    expect(signed.headers["x-apiagex-delivery-id"]).toBe("whd_manual");
+    expect(signed.headers["x-apiagex-timestamp"]).toBe("2026-05-11T00:00:00.000Z");
     expect(JSON.parse(signed.body).entry.data.title).toBe("Signed");
+  });
+
+  it("verifies timestamped webhook signatures and rejects replays outside tolerance", () => {
+    const db = openMigratedDb();
+    const schema = createArticleSchema(db);
+    const entry = createEntry(db, { schemaId: schema.id, data: { title: "Verify" } });
+    const webhook = createWebhook(db, {
+      events: ["entry.created"],
+      name: "Receiver",
+      secret: "verify-secret",
+      url: "https://example.com/hook",
+    });
+    const event = enqueueWebhookEvent(db, { entry, eventType: "entry.created", schemaId: schema.id, schemaSlug: schema.slug });
+    const signed = signWebhookRequest(event, { ...webhook, secret: "verify-secret" }, "whd_verify", "2026-05-11T00:00:00.000Z");
+
+    expect(verifyWebhookSignature({
+      body: signed.body,
+      deliveryId: "whd_verify",
+      secret: "verify-secret",
+      signature: signed.headers["x-apiagex-signature"] ?? "",
+      timestamp: "2026-05-11T00:00:00.000Z",
+      now: new Date("2026-05-11T00:04:00.000Z"),
+    })).toBe(true);
+    expect(verifyWebhookSignature({
+      body: signed.body.replace("Verify", "Fake"),
+      deliveryId: "whd_verify",
+      secret: "verify-secret",
+      signature: signed.headers["x-apiagex-signature"] ?? "",
+      timestamp: "2026-05-11T00:00:00.000Z",
+      now: new Date("2026-05-11T00:04:00.000Z"),
+    })).toBe(false);
+    expect(verifyWebhookSignature({
+      body: signed.body,
+      deliveryId: "whd_verify",
+      secret: "verify-secret",
+      signature: signed.headers["x-apiagex-signature"] ?? "",
+      timestamp: "2026-05-11T00:00:00.000Z",
+      now: new Date("2026-05-11T00:06:00.000Z"),
+    })).toBe(false);
   });
 });
 

@@ -20,6 +20,7 @@ const navIcons = {
   "settings/content-roles": Settings,
   "settings/webhooks": Settings,
   users: Users,
+  "docs/webhooks": BookOpen,
 } satisfies Record<AdminRoute, typeof Home>;
 
 const pageDescriptions = {
@@ -33,6 +34,7 @@ const pageDescriptions = {
   "settings/content-roles": "Manage generated content API roles and permissions.",
   "settings/webhooks": "Manage signed hooks for content API changes.",
   users: "Invite users and assign exactly one API role.",
+  "docs/webhooks": "Verify signed webhook requests in receiver apps.",
 } satisfies Record<AdminRoute, string>;
 
 export function AdminShell({
