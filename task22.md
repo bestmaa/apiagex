@@ -43,7 +43,7 @@ git diff --check
 #### T1017 - Document Practical Realtime Session Client Flow
 
 - Version: `v10.0.13`
-- Status: `in_progress`
+- Status: `completed`
 - Goal: Explain exactly how users create realtime sessions, connect, reconnect, handle expiry, and protect long-lived API tokens.
 - Persona: Frontend developer implementing kitchen boards, dashboards, CRM queues, or any live client screen.
 - Success Criteria: Docs include step-by-step production client flow, complete JS example, what expires and what does not, one-time-use behavior, reconnect with fresh session and `lastEventId`, and fallback to refetch.

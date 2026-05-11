@@ -51,9 +51,9 @@ Failed webhook deliveries retry with a short backoff, and each delivery row trac
 
 The admin backup export route lives at `/admin/backups/export`, restore lives at `/admin/backups/restore`, and schema migration history is available at `/admin/migrations`.
 
-Generated content APIs now support opt-in realtime settings per schema. When enabled, clients can connect to `/api/realtime?schema=:schemaSlug` over WebSocket for the enabled create/update/delete actions, and reconnect with `lastEventId=EVENT_ID` to replay missed schema events.
+Generated content APIs now support opt-in realtime settings per schema. When enabled, a trusted backend creates a one-time WebSocket session with `POST /api/realtime/session`, returns only the `rt_` token to the browser, then the browser connects to `/api/realtime?schema=:schemaSlug&session=rt_...` for the enabled create/update/delete actions and reconnects with a fresh session plus `lastEventId=EVENT_ID` to replay missed schema events.
 
-Realtime subscriptions can include `token=API_TOKEN` or `roleId=ROLE_ID`; when present, the same content API `getAll` permission is required before the WebSocket is accepted.
+Realtime sessions require a content API token whose role has `getAll` on the schema. Session tokens default to 5 minutes, can be used once, and are checked only while accepting a new socket. Existing `token=API_TOKEN` and `roleId=ROLE_ID` WebSocket query modes remain for development compatibility.
 
 Realtime history keeps the latest 1000 events per schema for replay and prunes older rows after new events are recorded.
 
@@ -142,9 +142,9 @@ Failed webhook deliveries short backoff ke saath retry hoti hain, aur har delive
 
 Admin backup export route `/admin/backups/export` par hai, restore `/admin/backups/restore` par hai, aur schema migration history `/admin/migrations` par available hai.
 
-Generated content APIs me ab per schema opt-in realtime settings support hai. Enable hone par clients `/api/realtime?schema=:schemaSlug` par WebSocket se enabled create/update/delete actions receive kar sakte hain, aur missed schema events replay karne ke liye `lastEventId=EVENT_ID` ke saath reconnect kar sakte hain.
+Generated content APIs me ab per schema opt-in realtime settings support hai. Enable hone par trusted backend pehle `POST /api/realtime/session` se one-time WebSocket session create karta hai, browser ko sirf `rt_` token return karta hai, phir browser `/api/realtime?schema=:schemaSlug&session=rt_...` par enabled create/update/delete actions receive karta hai aur missed schema events replay karne ke liye fresh session plus `lastEventId=EVENT_ID` ke saath reconnect karta hai.
 
-Realtime subscriptions `token=API_TOKEN` ya `roleId=ROLE_ID` include kar sakti hain; present hone par WebSocket accept hone se pehle same content API `getAll` permission required hota hai.
+Realtime session ke liye content API token chahiye jiske role ke paas schema par `getAll` ho. Session token default 5 minute valid hota hai, one-time use hota hai, aur sirf naya socket accept karte waqt check hota hai. Existing `token=API_TOKEN` aur `roleId=ROLE_ID` WebSocket query modes development compatibility ke liye abhi supported hain.
 
 Realtime history replay ke liye har schema ke latest 1000 events rakhti hai aur naye events record hone ke baad purane rows prune karti hai.
 

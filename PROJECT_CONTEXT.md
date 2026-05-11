@@ -265,8 +265,10 @@ One server must serve exactly these primary paths:
 
 - Admins can enable realtime WebSocket events per collection from Settings > Realtime API.
 - Admins Settings > Realtime API se har collection ke liye WebSocket realtime events enable kar sakte hain.
-- Client subscriptions use `/api/realtime?schema=:schemaSlug` and can pass `token=API_TOKEN` or `roleId=ROLE_ID`.
-- Client subscriptions `/api/realtime?schema=:schemaSlug` use karte hain aur `token=API_TOKEN` ya `roleId=ROLE_ID` pass kar sakte hain.
+- Production client subscriptions use a trusted backend to create a one-time session with `POST /api/realtime/session`, then the browser connects to `/api/realtime?schema=:schemaSlug&session=rt_...`.
+- Production client subscriptions trusted backend se `POST /api/realtime/session` par one-time session create karte hain, phir browser `/api/realtime?schema=:schemaSlug&session=rt_...` par connect karta hai.
+- Realtime sessions require a content API token with `getAll`, default to 5 minutes, can be used once, and do not close already connected sockets when the session expires.
+- Realtime sessions ke liye `getAll` wala content API token chahiye, default 5 minute valid hote hain, one-time use hote hain, aur session expire hone par already connected sockets close nahi karte.
 - Realtime events are `entry.created`, `entry.updated`, and `entry.deleted`, each with `eventId`, `messageId`, schema, entry, and `occurredAt`.
 - Realtime events `entry.created`, `entry.updated`, aur `entry.deleted` hain, har event me `eventId`, `messageId`, schema, entry, aur `occurredAt` hota hai.
 - Clients should store the latest `eventId`, ack processed messages, reconnect with `lastEventId`, and refetch current content after ack timeout or long offline periods.
