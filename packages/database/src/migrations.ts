@@ -10,6 +10,9 @@ export const MVP_TABLES = [
   "permissions",
   "admin_permissions",
   "api_tokens",
+  "webhooks",
+  "webhook_events",
+  "webhook_deliveries",
 ] as const;
 
 export const MVP_FOUNDATION_SQL = `
@@ -94,6 +97,46 @@ CREATE TABLE IF NOT EXISTS api_tokens (
   last_used_at TEXT,
   revoked_at TEXT
 );
+
+CREATE TABLE IF NOT EXISTS webhooks (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  url TEXT NOT NULL,
+  secret TEXT NOT NULL,
+  events_json TEXT NOT NULL,
+  schema_id TEXT REFERENCES schemas(id) ON DELETE SET NULL,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS webhook_events (
+  id TEXT PRIMARY KEY,
+  event_type TEXT NOT NULL,
+  schema_id TEXT NOT NULL,
+  schema_slug TEXT NOT NULL,
+  entry_id TEXT NOT NULL,
+  payload_json TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  attempts INTEGER NOT NULL DEFAULT 0,
+  next_retry_at TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS webhook_deliveries (
+  id TEXT PRIMARY KEY,
+  event_id TEXT NOT NULL REFERENCES webhook_events(id) ON DELETE CASCADE,
+  webhook_id TEXT NOT NULL REFERENCES webhooks(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  status TEXT NOT NULL,
+  status_code INTEGER,
+  response_body TEXT,
+  error TEXT,
+  attempt INTEGER NOT NULL,
+  created_at TEXT NOT NULL,
+  next_retry_at TEXT
+);
 `;
 
 export const MVP_ADDITIVE_MIGRATIONS_SQL = [
@@ -125,5 +168,42 @@ export const MVP_ADDITIVE_MIGRATIONS_SQL = [
     created_at TEXT NOT NULL,
     last_used_at TEXT,
     revoked_at TEXT
+  )`,
+  `CREATE TABLE IF NOT EXISTS webhooks (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    url TEXT NOT NULL,
+    secret TEXT NOT NULL,
+    events_json TEXT NOT NULL,
+    schema_id TEXT REFERENCES schemas(id) ON DELETE SET NULL,
+    active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS webhook_events (
+    id TEXT PRIMARY KEY,
+    event_type TEXT NOT NULL,
+    schema_id TEXT NOT NULL,
+    schema_slug TEXT NOT NULL,
+    entry_id TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    attempts INTEGER NOT NULL DEFAULT 0,
+    next_retry_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS webhook_deliveries (
+    id TEXT PRIMARY KEY,
+    event_id TEXT NOT NULL REFERENCES webhook_events(id) ON DELETE CASCADE,
+    webhook_id TEXT NOT NULL REFERENCES webhooks(id) ON DELETE CASCADE,
+    url TEXT NOT NULL,
+    status TEXT NOT NULL,
+    status_code INTEGER,
+    response_body TEXT,
+    error TEXT,
+    attempt INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
+    next_retry_at TEXT
   )`,
 ] as const;

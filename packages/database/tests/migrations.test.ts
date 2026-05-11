@@ -75,6 +75,18 @@ describe("MVP database foundation", () => {
     expect(listMvpTables(db)).toContain("api_tokens");
   });
 
+  it("adds webhook tables for content change hooks", () => {
+    const db = openSqliteDatabase();
+
+    migrateMvpDatabase(db);
+
+    expect(listMvpTables(db)).toContain("webhooks");
+    expect(listMvpTables(db)).toContain("webhook_events");
+    expect(listMvpTables(db)).toContain("webhook_deliveries");
+    const columns = db.prepare("PRAGMA table_info(webhooks)").all() as Array<{ name: string }>;
+    expect(columns.map((column) => column.name)).toContain("events_json");
+  });
+
   it("seeds existing admin role permissions during additive migration", () => {
     const db = openSqliteDatabase();
     const now = new Date().toISOString();

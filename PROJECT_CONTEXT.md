@@ -113,6 +113,10 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Entry list APIs admin aur dynamic content lists ke liye `fields`, `search`, `limit`, aur `offset` query parameters support karte hain.
 - Dynamic single-entry reads support `fields` projection, such as `/api/content/article/ENTRY_ID?fields=title`.
 - Dynamic single-entry reads `fields` projection support karte hain, jaise `/api/content/article/ENTRY_ID?fields=title`.
+- Webhook registrations live at `/api/admin/webhooks` and can filter by entry created/updated/deleted events plus optional collection.
+- Webhook registrations `/api/admin/webhooks` par hote hain aur entry created/updated/deleted events plus optional collection se filter ho sakte hain.
+- Content admin and dynamic content create/update/delete writes enqueue webhook events, send signed HMAC requests, log delivery attempts, and keep content writes successful even when hook targets fail.
+- Content admin aur dynamic content create/update/delete writes webhook events enqueue karte hain, signed HMAC requests bhejte hain, delivery attempts log karte hain, aur hook target fail hone par bhi content writes successful rakhte hain.
 
 ## Required MVP Paths
 
@@ -244,6 +248,17 @@ One server must serve exactly these primary paths:
 - `manage` is a schema-level API-role override that allows every content API action for that schema.
 - Checked means allowed; unchecked means blocked by default.
 - Permission verification must test an allowed user and blocked user.
+
+### Webhooks
+
+- Admins can manage webhooks from Settings > Webhooks.
+- Webhook events are `entry.created`, `entry.updated`, and `entry.deleted`.
+- Webhooks can apply to all collections or one selected schema.
+- Deliveries send JSON with `event`, `schema`, `entry`, and `occurredAt`.
+- Requests include `x-apiagex-event`, `x-apiagex-webhook-id`, and `x-apiagex-signature`.
+- The signature is `sha256=` plus an HMAC SHA-256 digest of the JSON body using the webhook secret.
+- Failed delivery attempts are stored in `webhook_deliveries` with status code/error, attempt number, and next retry time.
+- Webhook failures do not roll back the content create, update, or delete operation.
 
 ## Static Docs Architecture
 

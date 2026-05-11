@@ -4,7 +4,7 @@
 
 This package owns the Fastify API server. It serves the docs page at `/docs`, health status at `/health`, and a starter admin content-type API at `/admin/content-types`.
 
-MVP note: current routes use `/api`, `/adminui`, `/doc`, and `/readme`. `/api/admin/roles` exposes content API roles only, while `/api/admin/settings/access` manages separate control-plane roles and admin permissions. Content API permission checks reject admin roles even when their ids are sent in `x-apiagex-role-id`; content role tokens can be sent as `Authorization: Bearer TOKEN` or `x-apiagex-api-token`.
+MVP note: current routes use `/api`, `/adminui`, `/doc`, and `/readme`. `/api/admin/roles` exposes content API roles only, while `/api/admin/settings/access` manages separate control-plane roles and admin permissions. Content API permission checks reject admin roles even when their ids are sent in `x-apiagex-role-id`; content role tokens can be sent as `Authorization: Bearer TOKEN` or `x-apiagex-api-token`. `/api/admin/webhooks` manages signed entry mutation hooks and delivery logs.
 
 Every request gets an `x-request-id` response header, and structured request start/end/error logs carry the same request id.
 
@@ -41,9 +41,9 @@ Audit logs are written to the same SQLite file on every content-type, field, and
 
 The admin-only audit log reader is available at `/admin/audit-logs`.
 
-Webhook registrations live at `/admin/webhooks`, and webhook deliveries are listed at `/admin/webhooks/:id/deliveries`.
+Webhook registrations live at `/api/admin/webhooks`, and webhook deliveries are listed at `/api/admin/webhooks/:webhookId/deliveries`.
 
-Webhook events are emitted from the same audit-backed mutation path and can be delivered to external targets with optional signatures.
+Webhook events are emitted from content admin and dynamic content create/update/delete paths and are delivered to external targets with HMAC signatures.
 
 Failed webhook deliveries retry with a short backoff, and each delivery row tracks attempt count, status, and next retry time.
 
@@ -91,7 +91,7 @@ npm run dev -w @apiagex/server
 
 Ye package Fastify API server ka owner hai. Ye `/docs` par docs page, `/health` par health status, aur `/admin/content-types` par starter admin content-type API serve karta hai.
 
-MVP note: current routes `/api`, `/adminui`, `/doc`, aur `/readme` use karte hain. `/api/admin/roles` sirf content API roles expose karta hai, aur `/api/admin/settings/access` separate control-plane roles aur admin permissions manage karta hai. Content API permission checks admin roles reject karte hain, chahe unka id `x-apiagex-role-id` me bheja gaya ho; content role tokens `Authorization: Bearer TOKEN` ya `x-apiagex-api-token` ke roop me bheje ja sakte hain.
+MVP note: current routes `/api`, `/adminui`, `/doc`, aur `/readme` use karte hain. `/api/admin/roles` sirf content API roles expose karta hai, aur `/api/admin/settings/access` separate control-plane roles aur admin permissions manage karta hai. Content API permission checks admin roles reject karte hain, chahe unka id `x-apiagex-role-id` me bheja gaya ho; content role tokens `Authorization: Bearer TOKEN` ya `x-apiagex-api-token` ke roop me bheje ja sakte hain. `/api/admin/webhooks` signed entry mutation hooks aur delivery logs manage karta hai.
 
 Har request ko `x-request-id` response header milta hai, aur structured request start/end/error logs usi request id ko carry karte hain.
 
@@ -128,9 +128,9 @@ Har content-type, field, aur entry create/update/delete action par audit logs sa
 
 Admin-only audit log reader `/admin/audit-logs` par available hai.
 
-Webhook registrations `/admin/webhooks` par live hain, aur deliveries `/admin/webhooks/:id/deliveries` par list hoti hain.
+Webhook registrations `/api/admin/webhooks` par live hain, aur deliveries `/api/admin/webhooks/:webhookId/deliveries` par list hoti hain.
 
-Webhook events same audit-backed mutation path se emit hote hain aur optional signatures ke saath external targets tak deliver ho sakte hain.
+Webhook events content admin aur dynamic content create/update/delete paths se emit hote hain aur HMAC signatures ke saath external targets tak deliver hote hain.
 
 Failed webhook deliveries short backoff ke saath retry hoti hain, aur har delivery row attempt count, status, aur next retry time track karti hai.
 

@@ -21,11 +21,14 @@ import type {
   ContentListParams,
   ContentPopulateQuery,
 } from "./content-routes.type.js";
+import { emitEntryMutationWebhook } from "./entry-webhooks.js";
 import { populateEntryRelations, shouldPopulateRelations } from "./relation-populate.js";
+import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
 
 export function registerContentRoutes(
   server: FastifyInstance,
   database: SqliteDatabase,
+  webhookOptions: WebhookDispatcherOptions = {},
 ): void {
   server.get<{ Params: ContentListParams; Querystring: ContentPopulateQuery }>(
     "/api/content/:schemaSlug",
@@ -67,7 +70,9 @@ export function registerContentRoutes(
       const access = canAccess(database, request, schema, "create");
       if (!access.allowed) return forbidden(reply, access.error);
       try {
-        return { ok: true, entry: createEntry(database, { schemaId: schema.id, data: request.body.data }) };
+        const entry = createEntry(database, { schemaId: schema.id, data: request.body.data });
+        await emitEntryMutationWebhook(database, schema, "entry.created", entry, webhookOptions);
+        return { ok: true, entry };
       } catch (error) {
         return sendContentError(reply, error, 400);
       }
@@ -114,7 +119,9 @@ export function registerContentRoutes(
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
       }
       try {
-        return { ok: true, entry: updateEntry(database, request.params.entryId, request.body) };
+        const entry = updateEntry(database, request.params.entryId, request.body);
+        await emitEntryMutationWebhook(database, schema, "entry.updated", entry, webhookOptions);
+        return { ok: true, entry };
       } catch (error) {
         return sendContentError(reply, error, 400);
       }
@@ -131,7 +138,9 @@ export function registerContentRoutes(
       if (!entryBelongsToSchema(database, request.params.entryId, schema.id)) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
       }
+      const entry = getEntryById(database, request.params.entryId);
       deleteEntry(database, request.params.entryId);
+      if (entry) await emitEntryMutationWebhook(database, schema, "entry.deleted", entry, webhookOptions);
       return { ok: true, deleted: true };
     },
   );

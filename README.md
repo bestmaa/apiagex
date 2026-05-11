@@ -67,6 +67,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - Admin UI Users screen pehle user list dikhata hai aur top compact button se create open karta hai.
 - Admin UI Settings has an attached submenu with Admin Roles and Content Roles options.
 - Admin UI Settings me attached submenu hai jisme Admin Roles aur Content Roles options hain.
+- Admin UI Settings also has Webhooks for signed content change notifications.
+- Admin UI Settings me signed content change notifications ke liye Webhooks bhi hai.
 - Admin panel permissions are stored separately for schemas, entries, API roles, API users, and settings.
 - Admin panel permissions schemas, entries, API roles, API users, aur settings ke liye alag store hote hain.
 - RBAC end-to-end flow verifies user login plus allowed and blocked dynamic API access.
@@ -136,9 +138,15 @@ Hinglish: API role banao ya select karo, schema action permissions assign karo, 
 
 ## Settings Access Control
 
-English: Open `/adminui#settings` after owner login. The left menu compacts and an attached Settings submenu shows Admin Roles and Content Roles. Admin permissions cover schemas, entries, API roles, API users, and settings. These permissions are stored outside generated content API permissions, so admin roles still cannot access `/api/content` by role id.
+English: Open `/adminui#settings` after owner login. The left menu compacts and an attached Settings submenu shows Admin Roles, Content Roles, and Webhooks. Admin permissions cover schemas, entries, API roles, API users, and settings. These permissions are stored outside generated content API permissions, so admin roles still cannot access `/api/content` by role id.
 
-Hinglish: Owner login ke baad `/adminui#settings` open karo. Left menu compact hota hai aur attached Settings submenu me Admin Roles aur Content Roles dikhte hain. Admin permissions schemas, entries, API roles, API users, aur settings cover karte hain. Ye generated content API permissions se alag store hote hain, isliye admin roles role id se `/api/content` access nahi kar sakte.
+Hinglish: Owner login ke baad `/adminui#settings` open karo. Left menu compact hota hai aur attached Settings submenu me Admin Roles, Content Roles, aur Webhooks dikhte hain. Admin permissions schemas, entries, API roles, API users, aur settings cover karte hain. Ye generated content API permissions se alag store hote hain, isliye admin roles role id se `/api/content` access nahi kar sakte.
+
+## Webhook Quick Use
+
+English: Open `/adminui#settings/webhooks`, create a hook with a target URL, choose entry events, and optionally choose one collection. Matching content create, update, and delete writes send signed JSON to the URL with `x-apiagex-event`, `x-apiagex-webhook-id`, and `x-apiagex-signature`. Failed hook calls are logged and retried without failing the content write.
+
+Hinglish: `/adminui#settings/webhooks` open karo, target URL ke saath hook banao, entry events choose karo, aur optional collection choose karo. Matching content create, update, aur delete writes signed JSON ko URL par bhejte hain with `x-apiagex-event`, `x-apiagex-webhook-id`, aur `x-apiagex-signature`. Failed hook calls log aur retry hote hain, content write fail nahi hota.
 
 ## Local Persistence
 

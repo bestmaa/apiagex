@@ -1,0 +1,153 @@
+import { createHmac } from "node:crypto";
+import {
+  countWebhookDeliveryAttempts,
+  enqueueWebhookEvent,
+  hasSuccessfulWebhookDelivery,
+  listMatchingWebhooks,
+  listPendingWebhookEvents,
+  recordWebhookDelivery,
+  updateWebhookEventStatus,
+  type EnqueueWebhookEventInput,
+  type SqliteDatabase,
+  type WebhookEventRecord,
+  type WebhookSecretRecord,
+} from "@apiagex/database";
+import type {
+  WebhookDispatchResult,
+  WebhookDispatcherOptions,
+  WebhookHttpClient,
+  WebhookSignedRequest,
+} from "./webhook-dispatcher.type.js";
+
+const maxAttempts = 5;
+const retrySeconds = [60, 300, 900, 3600, 10800];
+
+export async function emitWebhookEvent(
+  database: SqliteDatabase,
+  input: EnqueueWebhookEventInput,
+  options: WebhookDispatcherOptions = {},
+): Promise<WebhookDispatchResult[]> {
+  enqueueWebhookEvent(database, input);
+  return dispatchPendingWebhooks(database, options);
+}
+
+export async function dispatchPendingWebhooks(
+  database: SqliteDatabase,
+  options: WebhookDispatcherOptions = {},
+): Promise<WebhookDispatchResult[]> {
+  const now = options.now ?? new Date();
+  const events = listPendingWebhookEvents(database, now.toISOString(), options.limit);
+  const results: WebhookDispatchResult[] = [];
+  for (const event of events) {
+    results.push(await dispatchEvent(database, event, options.httpClient ?? fetchWebhook, now));
+  }
+  return results;
+}
+
+export function signWebhookRequest(event: WebhookEventRecord, webhook: WebhookSecretRecord): WebhookSignedRequest {
+  const body = JSON.stringify(event.payload);
+  const signature = createHmac("sha256", webhook.secret).update(body).digest("hex");
+  return {
+    body,
+    headers: {
+      "content-type": "application/json",
+      "x-apiagex-event": event.eventType,
+      "x-apiagex-signature": `sha256=${signature}`,
+      "x-apiagex-webhook-id": webhook.id,
+    },
+    webhook,
+  };
+}
+
+async function dispatchEvent(
+  database: SqliteDatabase,
+  event: WebhookEventRecord,
+  httpClient: WebhookHttpClient,
+  now: Date,
+): Promise<WebhookDispatchResult> {
+  const webhooks = listMatchingWebhooks(database, event);
+  if (webhooks.length === 0) {
+    updateWebhookEventStatus(database, event.id, "delivered", event.attempts, null);
+    return { event, delivered: 0, failed: 0, skipped: 0 };
+  }
+  let delivered = 0;
+  let failed = 0;
+  let skipped = 0;
+  let nextRetryAt: string | null = null;
+  for (const webhook of webhooks) {
+    if (hasSuccessfulWebhookDelivery(database, event.id, webhook.id)) {
+      skipped += 1;
+      continue;
+    }
+    const attempts = countWebhookDeliveryAttempts(database, event.id, webhook.id);
+    if (attempts >= maxAttempts) {
+      failed += 1;
+      continue;
+    }
+    const result = await deliverOne(database, event, webhook, httpClient, attempts + 1, now);
+    delivered += result === "success" ? 1 : 0;
+    failed += result === "failed" ? 1 : 0;
+    if (result !== "success" && attempts + 1 < maxAttempts) {
+      nextRetryAt = earliestRetry(nextRetryAt, retryAt(now, attempts + 1));
+    }
+  }
+  const attemptCount = maxAttemptsForEvent(database, event.id, webhooks);
+  const eventStatus = failed > 0 ? (nextRetryAt ? "pending" : "failed") : "delivered";
+  updateWebhookEventStatus(database, event.id, eventStatus, attemptCount, nextRetryAt);
+  return { event, delivered, failed, skipped };
+}
+
+async function deliverOne(
+  database: SqliteDatabase,
+  event: WebhookEventRecord,
+  webhook: WebhookSecretRecord,
+  httpClient: WebhookHttpClient,
+  attempt: number,
+  now: Date,
+): Promise<"failed" | "success"> {
+  const signed = signWebhookRequest(event, webhook);
+  try {
+    const response = await httpClient({ url: webhook.url, body: signed.body, headers: signed.headers });
+    const ok = response.statusCode >= 200 && response.statusCode < 300;
+    recordWebhookDelivery(database, {
+      eventId: event.id,
+      webhookId: webhook.id,
+      url: webhook.url,
+      status: ok ? "success" : "failed",
+      statusCode: response.statusCode,
+      responseBody: response.body,
+      attempt,
+      nextRetryAt: ok || attempt >= maxAttempts ? null : retryAt(now, attempt),
+    });
+    return ok ? "success" : "failed";
+  } catch (error) {
+    recordWebhookDelivery(database, {
+      eventId: event.id,
+      webhookId: webhook.id,
+      url: webhook.url,
+      status: "failed",
+      error: error instanceof Error ? error.message : "WEBHOOK_DELIVERY_FAILED",
+      attempt,
+      nextRetryAt: attempt >= maxAttempts ? null : retryAt(now, attempt),
+    });
+    return "failed";
+  }
+}
+
+async function fetchWebhook(request: Parameters<WebhookHttpClient>[0]): Promise<{ statusCode: number; body: string }> {
+  const response = await fetch(request.url, { body: request.body, headers: request.headers, method: "POST" });
+  return { statusCode: response.status, body: await response.text() };
+}
+
+function retryAt(now: Date, attempt: number): string {
+  const seconds = retrySeconds[Math.min(attempt - 1, retrySeconds.length - 1)] ?? 60;
+  return new Date(now.getTime() + seconds * 1000).toISOString();
+}
+
+function earliestRetry(current: string | null, next: string): string {
+  return !current || next < current ? next : current;
+}
+
+function maxAttemptsForEvent(database: SqliteDatabase, eventId: string, webhooks: WebhookSecretRecord[]): number {
+  return Math.max(0, ...webhooks.map((webhook) => countWebhookDeliveryAttempts(database, eventId, webhook.id)));
+}

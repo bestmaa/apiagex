@@ -7,6 +7,9 @@ export type MvpTableName =
   | "permissions"
   | "admin_permissions"
   | "api_tokens"
+  | "webhooks"
+  | "webhook_events"
+  | "webhook_deliveries"
   | "migrations";
 
 export type MigrationRecord = {

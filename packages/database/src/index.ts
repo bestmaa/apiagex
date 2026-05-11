@@ -30,6 +30,20 @@ export {
   revokeApiToken,
 } from "./api-token-repository.js";
 export {
+  countWebhookDeliveryAttempts,
+  createWebhook,
+  deleteWebhook,
+  enqueueWebhookEvent,
+  hasSuccessfulWebhookDelivery,
+  listMatchingWebhooks,
+  listPendingWebhookEvents,
+  listWebhookDeliveries,
+  listWebhooks,
+  recordWebhookDelivery,
+  updateWebhook,
+  updateWebhookEventStatus,
+} from "./webhook-repository.js";
+export {
   adminPermissionActions,
   canAdminRoleAccess,
   listAdminRolePermissions,
@@ -89,6 +103,19 @@ export type {
   CreatedApiToken,
   CreateApiTokenInput,
 } from "./api-token-repository.type.js";
+export type {
+  EnqueueWebhookEventInput,
+  RecordWebhookDeliveryInput,
+  WebhookDeliveryRecord,
+  WebhookDeliveryStatus,
+  WebhookDraft,
+  WebhookEventRecord,
+  WebhookEventStatus,
+  WebhookEventType,
+  WebhookPayload,
+  WebhookRecord,
+  WebhookSecretRecord,
+} from "./webhook-repository.type.js";
 export type {
   AdminPermissionAction,
   AdminPermissionRecord,

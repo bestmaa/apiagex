@@ -1,11 +1,13 @@
-import { KeyRound, Shield } from "lucide-react";
+import { KeyRound, Send, Shield } from "lucide-react";
 import { RoleManager } from "../RoleManager";
 import type { AdminRoute } from "../app-route.type";
 import { SettingsAdminRoles } from "./SettingsAdminRoles";
+import { WebhookManager } from "../WebhookManager";
 
 export function SettingsPage({ route }: { route: AdminRoute }) {
   if (route === "settings/admin-roles") return <SettingsAdminRoles />;
   if (route === "settings/content-roles") return <SettingsContentRoles />;
+  if (route === "settings/webhooks") return <SettingsWebhooks />;
   return <SettingsOverview />;
 }
 
@@ -25,6 +27,11 @@ function SettingsOverview() {
           <strong>Content Roles</strong>
           <span>Generated content API roles and per-API permissions.</span>
         </a>
+        <a className="settings-option" href="#settings/webhooks">
+          <Send aria-hidden="true" size={20} />
+          <strong>Webhooks</strong>
+          <span>Signed content API change notifications.</span>
+        </a>
       </div>
     </section>
   );
@@ -36,6 +43,16 @@ function SettingsContentRoles() {
       <h2 id="settings-content-role-title">Content Roles</h2>
       <p>These roles work only with generated <code>/api/content</code> routes.</p>
       <RoleManager />
+    </section>
+  );
+}
+
+function SettingsWebhooks() {
+  return (
+    <section aria-labelledby="settings-webhook-title" className="settings-route-panel">
+      <h2 id="settings-webhook-title">Webhooks</h2>
+      <p>Trigger external systems when content entries change.</p>
+      <WebhookManager />
     </section>
   );
 }

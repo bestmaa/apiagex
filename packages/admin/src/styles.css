@@ -587,6 +587,86 @@ code {
   margin: 0;
 }
 
+.webhook-form,
+.webhook-list,
+.webhook-delivery-panel {
+  display: grid;
+  gap: var(--admin-space-4);
+}
+
+.webhook-form {
+  background: var(--admin-color-surface);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  box-shadow: var(--admin-shadow-sm);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 920px;
+  padding: var(--admin-space-5);
+}
+
+.webhook-form button,
+.webhook-event-grid {
+  grid-column: 1 / -1;
+}
+
+.webhook-event-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.webhook-row {
+  align-items: center;
+  background: var(--admin-color-surface-raised);
+  border: 1px solid var(--admin-color-border-soft);
+  border-left: var(--admin-space-1) solid var(--admin-color-disabled);
+  border-radius: var(--admin-radius-md);
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+  padding: var(--admin-space-4);
+}
+
+.webhook-row.is-active {
+  border-left-color: var(--admin-color-primary);
+}
+
+.webhook-row div {
+  display: grid;
+  gap: var(--admin-space-1);
+}
+
+.webhook-row span,
+.webhook-delivery-row span,
+.webhook-delivery-row small {
+  color: var(--admin-color-text-soft);
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
+}
+
+.webhook-delivery-panel {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.webhook-delivery-row {
+  background: var(--admin-color-surface-muted);
+  border-left: var(--admin-space-1) solid var(--admin-color-disabled);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-2);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding: var(--admin-space-3);
+}
+
+.webhook-delivery-success {
+  border-left-color: var(--admin-color-primary);
+}
+
+.webhook-delivery-failed {
+  border-left-color: var(--admin-color-warning-border);
+}
+
 .admin-docs {
   display: grid;
   gap: var(--admin-space-6);
@@ -2047,6 +2127,10 @@ code {
   .role-row,
   .role-token-form,
   .role-token-row,
+  .webhook-form,
+  .webhook-event-grid,
+  .webhook-row,
+  .webhook-delivery-row,
   .schema-basics-grid,
   .schema-field-badge-row,
   .schema-inventory-row,

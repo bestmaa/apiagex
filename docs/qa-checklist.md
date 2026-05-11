@@ -11,11 +11,12 @@
 - Open Entries and confirm collections appear in the attached left submenu.
 - Create an entry from the generated entry form.
 - Confirm Generated APIs shows `/api/content/:schemaSlug`.
-- Open Settings and confirm the left menu compacts with Admin Roles and Content Roles submenu options.
+- Open Settings and confirm the left menu compacts with Admin Roles, Content Roles, and Webhooks submenu options.
 - Confirm Settings submenu items keep normal compact height and scroll inside the 100vh column if content grows.
 - Create a custom admin role in Settings and save one admin permission.
 - Open Settings > Content Roles, create an API role, and save at least one permission checkbox.
 - Create an API token for the selected Content Role and confirm the token appears only after creation.
+- Open Settings > Webhooks, create a webhook, trigger a matching entry write, and confirm a delivery log appears.
 - Open Users, confirm the list is visible first, then click Create user and create a user assigned to that API role.
 - Confirm Users and other non-doc Admin UI screens keep normal content height and do not show `English:` or `Hinglish:` helper labels.
 - Confirm there are no current-page console errors.
@@ -50,6 +51,9 @@
 - `POST /api/admin/roles/:roleId/tokens` creates a one-time visible token.
 - `GET /api/content/:schemaSlug` works with `Authorization: Bearer TOKEN` when that token role has `getAll`.
 - `DELETE /api/admin/roles/:roleId/tokens/:tokenId` revokes the token and the same content request returns `403 API_TOKEN_INVALID`.
+- `POST /api/admin/webhooks` creates a webhook for `entry.created`, `entry.updated`, or `entry.deleted`.
+- A matching content write sends signed headers `x-apiagex-event`, `x-apiagex-webhook-id`, and `x-apiagex-signature`.
+- Failed webhook calls are logged in `GET /api/admin/webhooks/:webhookId/deliveries` without failing the content write.
 - `POST /api/admin/users` creates a user with one API role.
 - `POST /api/auth/login-user` logs in the user and returns `roleId`.
 - Allowed dynamic API request returns `200`.
@@ -71,11 +75,12 @@
 - Entries open karke confirm karo ki collections attached left submenu me dikhte hain.
 - Generated entry form se entry create karo.
 - Generated APIs me `/api/content/:schemaSlug` confirm karo.
-- Settings open karke confirm karo ki left menu compact hota hai aur Admin Roles plus Content Roles submenu options dikhte hain.
+- Settings open karke confirm karo ki left menu compact hota hai aur Admin Roles, Content Roles, plus Webhooks submenu options dikhte hain.
 - Confirm karo ki Settings submenu items normal compact height me rahen aur content badhne par 100vh column ke andar scroll ho.
 - Settings me custom admin role create karo aur ek admin permission save karo.
 - Settings > Content Roles me API role create karo aur ek permission checkbox save karo.
 - Selected Content Role ke liye API token create karo aur confirm karo ki full token sirf create ke baad dikhta hai.
+- Settings > Webhooks open karo, webhook create karo, matching entry write trigger karo, aur delivery log dikhna confirm karo.
 - Us API role ke saath user create karo.
 - Confirm karo ki Users aur baaki non-doc Admin UI screens normal content height me rahen aur `English:` ya `Hinglish:` helper labels na dikhayen.
 - Current page console errors nahi hone chahiye.
@@ -110,6 +115,9 @@
 - `POST /api/admin/roles/:roleId/tokens` one-time visible token create kare.
 - `GET /api/content/:schemaSlug` `Authorization: Bearer TOKEN` ke saath work kare jab token role ke paas `getAll` ho.
 - `DELETE /api/admin/roles/:roleId/tokens/:tokenId` token revoke kare aur same content request `403 API_TOKEN_INVALID` return kare.
+- `POST /api/admin/webhooks` `entry.created`, `entry.updated`, ya `entry.deleted` ke liye webhook create kare.
+- Matching content write signed headers `x-apiagex-event`, `x-apiagex-webhook-id`, aur `x-apiagex-signature` bheje.
+- Failed webhook calls `GET /api/admin/webhooks/:webhookId/deliveries` me log hon aur content write fail na ho.
 - `/adminui#users` par user list pehle dikhe, phir Create user click karke one-API-role user create karo.
 - `POST /api/admin/users` one-API-role user create kare.
 - `POST /api/auth/login-user` user login kare aur `roleId` return kare.

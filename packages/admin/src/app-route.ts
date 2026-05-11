@@ -11,6 +11,11 @@ export const settingsSubnavItems: AdminSubnavItem[] = [
     label: "Content Roles",
     route: "settings/content-roles",
   },
+  {
+    description: "Send content change events.",
+    label: "Webhooks",
+    route: "settings/webhooks",
+  },
 ];
 
 const standaloneRoutes: AdminRoute[] = [

@@ -5,6 +5,7 @@ describe("admin route helpers", () => {
   it("reads settings subroutes from hashes", () => {
     expect(readAdminRoute("#settings/admin-roles")).toBe("settings/admin-roles");
     expect(readAdminRoute("#settings/content-roles")).toBe("settings/content-roles");
+    expect(readAdminRoute("#settings/webhooks")).toBe("settings/webhooks");
     expect(readAdminRoute("#roles")).toBe("settings/content-roles");
     expect(readAdminRoute("#missing")).toBe("dashboard");
   });
@@ -12,10 +13,12 @@ describe("admin route helpers", () => {
   it("keeps settings subroutes active under the Settings nav item", () => {
     expect(activeNavRoute("settings/admin-roles")).toBe("settings");
     expect(activeNavRoute("settings/content-roles")).toBe("settings");
+    expect(activeNavRoute("settings/webhooks")).toBe("settings");
     expect(isSettingsRoute("settings/content-roles")).toBe(true);
     expect(settingsSubnavItems.map((item) => item.label)).toEqual([
       "Admin Roles",
       "Content Roles",
+      "Webhooks",
     ]);
   });
 });

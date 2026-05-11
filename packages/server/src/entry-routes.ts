@@ -4,6 +4,7 @@ import {
   deleteEntry,
   type EntryListOptions,
   getEntryById,
+  getSchemaById,
   listEntries,
   queryEntries,
   updateEntry,
@@ -15,10 +16,13 @@ import type {
   EntryListQuery,
   EntryParams,
 } from "./entry-routes.type.js";
+import { emitEntryMutationWebhook } from "./entry-webhooks.js";
+import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
 
 export function registerEntryRoutes(
   server: FastifyInstance,
   database: SqliteDatabase,
+  webhookOptions: WebhookDispatcherOptions = {},
 ): void {
   server.get<{ Params: EntryListParams; Querystring: EntryListQuery }>(
     "/api/admin/schemas/:schemaId/entries",
@@ -42,7 +46,10 @@ export function registerEntryRoutes(
     async (request, reply) => {
       try {
         const data = request.body.data;
-        return { ok: true, entry: createEntry(database, { schemaId: request.params.schemaId, data }) };
+        const entry = createEntry(database, { schemaId: request.params.schemaId, data });
+        const schema = getSchemaById(database, request.params.schemaId);
+        if (schema) await emitEntryMutationWebhook(database, schema, "entry.created", entry, webhookOptions);
+        return { ok: true, entry };
       } catch (error) {
         return sendEntryError(reply, error, statusFor(error));
       }
@@ -67,7 +74,10 @@ export function registerEntryRoutes(
         if (!entryBelongsToSchema(database, request.params.entryId, request.params.schemaId)) {
           return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
         }
-        return { ok: true, entry: updateEntry(database, request.params.entryId, request.body) };
+        const entry = updateEntry(database, request.params.entryId, request.body);
+        const schema = getSchemaById(database, request.params.schemaId);
+        if (schema) await emitEntryMutationWebhook(database, schema, "entry.updated", entry, webhookOptions);
+        return { ok: true, entry };
       } catch (error) {
         return sendEntryError(reply, error, statusFor(error));
       }
@@ -81,7 +91,10 @@ export function registerEntryRoutes(
         if (!entryBelongsToSchema(database, request.params.entryId, request.params.schemaId)) {
           return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
         }
+        const entry = getEntryById(database, request.params.entryId);
+        const schema = getSchemaById(database, request.params.schemaId);
         deleteEntry(database, request.params.entryId);
+        if (entry && schema) await emitEntryMutationWebhook(database, schema, "entry.deleted", entry, webhookOptions);
         return { ok: true, deleted: true };
       } catch (error) {
         return sendEntryError(reply, error, 404);

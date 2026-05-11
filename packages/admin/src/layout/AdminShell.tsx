@@ -18,6 +18,7 @@ const navIcons = {
   settings: Settings,
   "settings/admin-roles": Settings,
   "settings/content-roles": Settings,
+  "settings/webhooks": Settings,
   users: Users,
 } satisfies Record<AdminRoute, typeof Home>;
 
@@ -30,6 +31,7 @@ const pageDescriptions = {
   settings: "Manage admin roles and content API role separation.",
   "settings/admin-roles": "Manage Admin UI roles and control-plane permissions.",
   "settings/content-roles": "Manage generated content API roles and permissions.",
+  "settings/webhooks": "Manage signed hooks for content API changes.",
   users: "Invite users and assign exactly one API role.",
 } satisfies Record<AdminRoute, string>;
 
