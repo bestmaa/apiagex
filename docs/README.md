@@ -17,6 +17,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Generated API usage
 - Role allow/block guide
 - Manual QA checklist
+- Project stabilization audit: [project-stabilization-audit.md](./project-stabilization-audit.md)
 
 ## Implemented Now
 
@@ -48,6 +49,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `/adminui` me text, long text, number, boolean, date, JSON, media, aur relation fields ke liye React schema builder form hai.
 - Relation fields show a target schema picker and cannot save without a valid existing schema.
 - Relation fields target schema picker dikhate hain aur valid existing schema ke bina save nahi hote.
+- Project stabilization audit is documented in `docs/project-stabilization-audit.md`.
+- Project stabilization audit `docs/project-stabilization-audit.md` me documented hai.
 
 ## Owner Bootstrap And Login
 

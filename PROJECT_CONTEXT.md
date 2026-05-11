@@ -99,6 +99,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Admin UI visual QA checklist `docs/admin-ui-visual-qa.md` me documented hai.
 - Manual QA checklist is documented in `docs/qa-checklist.md`.
 - Manual QA checklist `docs/qa-checklist.md` me documented hai.
+- Project stabilization audit is documented in `docs/project-stabilization-audit.md` with practical flows, expected results, common errors, verified commands, and current gaps.
+- Project stabilization audit `docs/project-stabilization-audit.md` me documented hai jisme practical flows, expected results, common errors, verified commands, aur current gaps hain.
 - `npm run smoke` covers the full MVP owner/schema/entry/dynamic API/RBAC flow.
 - `npm run smoke` full MVP owner/schema/entry/dynamic API/RBAC flow cover karta hai.
 - Apiagex MVP release gate is ready at version `v1.0.0`.
@@ -304,6 +306,8 @@ One server must serve exactly these primary paths:
 - RBAC changes require a real role+user+API allow/block verification.
 - Relation changes require standard verification plus focused checks for payload shape, populate behavior, Admin UI relation pickers, and desktop/mobile entry editing.
 - Every completed task must update docs where relevant and be committed.
+- Task 10.0.14 adds `packages/server/tests/project-audit.test.ts` as a full feature audit covering routes, owner auth, schemas, entries, content filters, relations, RBAC, API tokens, users, webhooks, realtime session WebSocket flow, and docs/admin route availability.
+- Task 10.0.14 `packages/server/tests/project-audit.test.ts` add karta hai jo routes, owner auth, schemas, entries, content filters, relations, RBAC, API tokens, users, webhooks, realtime session WebSocket flow, aur docs/admin route availability cover karta hai.
 
 ## Next Step
 

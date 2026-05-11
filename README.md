@@ -87,6 +87,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - MVP manual QA checklist [docs/qa-checklist.md](./docs/qa-checklist.md) me available hai.
 - `npm run smoke` covers the full MVP owner/schema/entry/dynamic API/RBAC flow.
 - `npm run smoke` full MVP owner/schema/entry/dynamic API/RBAC flow cover karta hai.
+- Current stabilization audit is documented at [docs/project-stabilization-audit.md](./docs/project-stabilization-audit.md).
+- Current stabilization audit [docs/project-stabilization-audit.md](./docs/project-stabilization-audit.md) me documented hai.
 - Apiagex MVP release gate is ready at version `v1.0.0`.
 - Apiagex MVP release gate version `v1.0.0` par ready hai.
 - Apiagex task2 release gate is ready at version `v2.0.0`.
@@ -169,6 +171,8 @@ Hinglish: `npm run dev` local server data `.apiagex/apiagex.sqlite` me store kar
 Tests stay isolated by passing in-memory databases directly; they do not write to `.apiagex` by default.
 
 Task2 release verification covered routed Admin UI desktop/mobile browser checks, static `/doc` and `/readme`, local persistence, create-apiagex CLI, smoke tests, audit, and live API/RBAC allow/block flow.
+
+Task 10.0.14 stabilization audit adds a full feature audit test and practical user docs for owner auth, schemas, entries, content query filters, relations, RBAC, tokens, users, webhooks, realtime sessions, Admin UI, `/doc`, and `/readme`.
 
 ## Workspace
 

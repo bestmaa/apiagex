@@ -53,6 +53,8 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
     path: "/api/health",
   }));
 
+  server.get("/favicon.ico", async (_request, reply) => reply.code(204).send());
+
   server.post("/api/auth/bootstrap-owner", async (request, reply) => {
     try {
       return bootstrapOwner(
