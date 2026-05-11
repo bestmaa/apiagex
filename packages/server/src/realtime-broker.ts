@@ -7,6 +7,8 @@ import {
   getRealtimeConfig,
   getSchemaBySlug,
   isRealtimeEventEnabled,
+  listRealtimeEventsAfter,
+  recordRealtimeEvent,
   resolveApiToken,
   type SqliteDatabase,
 } from "@apiagex/database";
@@ -15,6 +17,7 @@ import type {
   RealtimeConnectionSnapshot,
   RealtimeEventMessage,
   RealtimePublishInput,
+  RealtimeStoredEvent,
 } from "./realtime-broker.type.js";
 
 const ackTimeoutMs = 15000;
@@ -65,22 +68,40 @@ export function createRealtimeBroker(database: SqliteDatabase): RealtimeBroker &
       heartbeatMs,
       ackTimeoutMs,
     });
+    setTimeout(() => replayMissed(ws, state, url.searchParams.get("lastEventId"), url.searchParams.get("replayLimit")), 0);
     ws.on("message", (data) => handleMessage(ws, state, data.toString()));
     ws.on("close", () => cleanup(ws));
   }
 
   function publish(input: RealtimePublishInput): void {
     if (!isRealtimeEventEnabled(database, input.schema.id, input.eventType)) return;
+    const stored = recordRealtimeEvent(database, {
+      entry: input.entry,
+      eventType: input.eventType,
+      schemaId: input.schema.id,
+      schemaSlug: input.schema.slug,
+    });
     for (const [ws, state] of clients) {
       if (state.schemaId !== input.schema.id || ws.readyState !== WebSocket.OPEN) continue;
-      const message = eventMessage(input);
-      const timer = setTimeout(() => {
-        state.pending.delete(message.messageId);
-        send(ws, { type: "ack.timeout", messageId: message.messageId, eventId: message.eventId });
-      }, ackTimeoutMs);
-      state.pending.set(message.messageId, timer);
-      send(ws, message);
+      sendEvent(ws, state, stored);
     }
+  }
+
+  function replayMissed(ws: WebSocket, state: ClientState, lastEventId: string | null, replayLimit: string | null): void {
+    if (!lastEventId) return;
+    const limit = parseReplayLimit(replayLimit);
+    const events = listRealtimeEventsAfter(database, state.schemaId, lastEventId, limit);
+    for (const event of events) sendEvent(ws, state, event, true);
+  }
+
+  function sendEvent(ws: WebSocket, state: ClientState, event: RealtimeStoredEvent, replayed = false): void {
+    const message = eventMessage(event, replayed);
+    const timer = setTimeout(() => {
+      state.pending.delete(message.messageId);
+      send(ws, { type: "ack.timeout", messageId: message.messageId, eventId: message.eventId });
+    }, ackTimeoutMs);
+    state.pending.set(message.messageId, timer);
+    send(ws, message);
   }
 
   function snapshot(): RealtimeConnectionSnapshot[] {
@@ -127,16 +148,17 @@ export function createRealtimeBroker(database: SqliteDatabase): RealtimeBroker &
     state.pending.delete(messageId);
   }
 
-  function eventMessage(input: RealtimePublishInput): RealtimeEventMessage {
+  function eventMessage(event: RealtimeStoredEvent, replayed: boolean): RealtimeEventMessage {
     return {
       type: "event",
-      event: input.eventType,
-      eventId: `rte_${randomUUID()}`,
-      messageId: `rtm_${randomUUID()}`,
-      schema: { id: input.schema.id, slug: input.schema.slug },
-      entry: input.entry,
-      occurredAt: new Date().toISOString(),
+      event: event.eventType,
+      eventId: event.id,
+      messageId: event.messageId,
+      schema: { id: event.schemaId, slug: event.schemaSlug },
+      entry: event.entry,
+      occurredAt: event.occurredAt,
       delivery: { ackRequired: true, ackTimeoutMs },
+      ...(replayed ? { replayed: true as const } : {}),
     };
   }
 
@@ -158,4 +180,9 @@ function parseClientMessage(text: string): { type?: string; messageId?: unknown 
   } catch {
     return undefined;
   }
+}
+
+function parseReplayLimit(value: string | null): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 50;
 }

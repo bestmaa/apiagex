@@ -1,11 +1,13 @@
 const realtimeClientExample = `const socket = new WebSocket(
-  "ws://localhost:4000/api/realtime?schema=orders&token=API_TOKEN"
+  "ws://localhost:4000/api/realtime?schema=orders&token=API_TOKEN&lastEventId=" + lastEventId
 );
 
 socket.addEventListener("message", (event) => {
   const message = JSON.parse(event.data);
   if (message.type === "event") {
     renderOrder(message.entry);
+    lastEventId = message.eventId;
+    saveLastEventId(lastEventId);
     socket.send(JSON.stringify({ type: "ack", messageId: message.messageId }));
   }
   if (message.type === "ack.timeout") {
@@ -27,24 +29,26 @@ export function RealtimeClientDocs({ focused }: { focused: boolean }) {
       <div>
         <span className="section-kicker">Realtime WebSocket API</span>
         <h3 id="realtime-client-title">Build live screens with ack and refetch</h3>
-        <p>English: Enable a collection in Settings, connect to the WebSocket with that schema slug, render each event, send an ack after your UI processes it, and refetch the list after reconnect or ack timeout.</p>
-        <p>Hinglish: Settings me collection enable karo, schema slug ke saath WebSocket connect karo, event milte hi UI update karo, process hone ke baad ack bhejo, aur reconnect ya ack timeout par list dobara fetch karo.</p>
+        <p>English: Enable a collection in Settings, connect with the schema slug, save the latest event id, send an ack after your UI processes each event, and reconnect with `lastEventId` to replay missed events.</p>
+        <p>Hinglish: Settings me collection enable karo, schema slug ke saath connect karo, latest event id save karo, har event process hone ke baad ack bhejo, aur missed events ke liye `lastEventId` ke saath reconnect karo.</p>
       </div>
       <div className="api-row">
         <strong>Connect</strong>
         <code>ws://HOST/api/realtime?schema=orders</code>
         <code>ws://HOST/api/realtime?schema=orders&amp;token=API_TOKEN</code>
         <code>ws://HOST/api/realtime?schema=orders&amp;roleId=ROLE_ID</code>
+        <code>ws://HOST/api/realtime?schema=orders&amp;lastEventId=rte_...</code>
       </div>
       <div className="api-row">
         <strong>Event message</strong>
         <code>type: event</code>
         <code>event: entry.created | entry.updated | entry.deleted</code>
-        <code>messageId + schema + entry + occurredAt</code>
+        <code>eventId + messageId + schema + entry + occurredAt</code>
+        <code>replayed: true when sent after reconnect</code>
       </div>
       <pre><code>{realtimeClientExample}</code></pre>
-      <p>English: WebSocket delivery only proves the browser connection received a message after it sends ack. Business status should still be saved through normal PATCH calls, like changing an order to preparing, so every screen can recover by refetching current data.</p>
-      <p>Hinglish: WebSocket delivery sirf ye prove karta hai ki browser connection ne ack bheja. Business status hamesha normal PATCH se save karo, jaise order ko preparing karna, taaki reconnect ke baad har screen current data refetch karke recover kar sake.</p>
+      <p>English: WebSocket ack only confirms the browser processed that realtime message. Business status must still be saved with normal PATCH calls, and clients should refetch the current list after reconnect, ack timeout, or a long offline period.</p>
+      <p>Hinglish: WebSocket ack sirf confirm karta hai ki browser ne realtime message process kiya. Business status hamesha normal PATCH se save karo, aur reconnect, ack timeout, ya lambi offline state ke baad current list refetch karo.</p>
     </section>
   );
 }

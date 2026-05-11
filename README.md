@@ -152,9 +152,9 @@ Hinglish: `/adminui#settings/webhooks` open karo, target URL ke saath hook banao
 
 ## Realtime API Quick Use
 
-English: Open `/adminui#settings/realtime`, enable one collection, then connect clients to `ws://HOST/api/realtime?schema=:schemaSlug`. Add `token=API_TOKEN` or `roleId=ROLE_ID` when the client should use API permissions. Events include `messageId`, `event`, `schema`, `entry`, and `occurredAt`; after rendering, clients should send `{ "type": "ack", "messageId": "..." }`. On reconnect or ack timeout, refetch the current list from `/api/content/:schemaSlug`.
+English: Open `/adminui#settings/realtime`, enable one collection, then connect clients to `ws://HOST/api/realtime?schema=:schemaSlug`. Add `token=API_TOKEN` or `roleId=ROLE_ID` when the client should use API permissions. Events include `eventId`, `messageId`, `event`, `schema`, `entry`, and `occurredAt`; after rendering, clients should store `eventId` and send `{ "type": "ack", "messageId": "..." }`. On reconnect, pass `lastEventId=EVENT_ID` to replay missed events, and still refetch `/api/content/:schemaSlug` after ack timeout or long offline periods.
 
-Hinglish: `/adminui#settings/realtime` open karo, collection enable karo, phir client ko `ws://HOST/api/realtime?schema=:schemaSlug` par connect karo. API permission chahiye ho to `token=API_TOKEN` ya `roleId=ROLE_ID` add karo. Event me `messageId`, `event`, `schema`, `entry`, aur `occurredAt` aata hai; render ke baad client `{ "type": "ack", "messageId": "..." }` bheje. Reconnect ya ack timeout par `/api/content/:schemaSlug` se current list refetch karo.
+Hinglish: `/adminui#settings/realtime` open karo, collection enable karo, phir client ko `ws://HOST/api/realtime?schema=:schemaSlug` par connect karo. API permission chahiye ho to `token=API_TOKEN` ya `roleId=ROLE_ID` add karo. Event me `eventId`, `messageId`, `event`, `schema`, `entry`, aur `occurredAt` aata hai; render ke baad client `eventId` store kare aur `{ "type": "ack", "messageId": "..." }` bheje. Reconnect par missed events replay ke liye `lastEventId=EVENT_ID` pass karo, aur ack timeout ya long offline period ke baad `/api/content/:schemaSlug` refetch karo.
 
 ## Local Persistence
 

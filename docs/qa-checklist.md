@@ -17,7 +17,7 @@
 - Open Settings > Content Roles, create an API role, and save at least one permission checkbox.
 - Create an API token for the selected Content Role and confirm the token appears only after creation.
 - Open Settings > Webhooks, open the verification docs link, create a webhook, trigger a matching entry write, and confirm a delivery log appears.
-- Open Settings > Realtime API, enable one collection, open the client docs link, connect a WebSocket client, trigger a matching entry write, and confirm a realtime event plus ack.
+- Open Settings > Realtime API, enable one collection, open the client docs link, connect a WebSocket client, trigger a matching entry write, confirm a realtime event plus ack, then reconnect with `lastEventId` and confirm missed event replay.
 - Open Users, confirm the list is visible first, then click Create user and create a user assigned to that API role.
 - Confirm Users and other non-doc Admin UI screens keep normal content height and do not show `English:` or `Hinglish:` helper labels.
 - Confirm there are no current-page console errors.
@@ -55,7 +55,8 @@
 - `POST /api/admin/webhooks` creates a webhook for `entry.created`, `entry.updated`, or `entry.deleted`.
 - `PUT /api/admin/realtime/:schemaId` enables realtime for selected `entry.created`, `entry.updated`, or `entry.deleted` events.
 - `GET /api/realtime?schema=:schemaSlug` accepts a WebSocket connection only when realtime is enabled for that schema.
-- A matching content write sends a WebSocket event with `messageId`, `event`, `schema`, `entry`, and `occurredAt`.
+- A matching content write sends a WebSocket event with `eventId`, `messageId`, `event`, `schema`, `entry`, and `occurredAt`.
+- A reconnect with `lastEventId=EVENT_ID` replays later events for the same schema with `replayed: true`.
 - The WebSocket client can send `{ "type": "ack", "messageId": "..." }` and receives `ack.ok`.
 - A matching content write sends signed headers `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, and `x-apiagex-signature`.
 - Receiver verification docs explain timestamp tolerance, delivery id replay checks, and HMAC validation.
@@ -87,7 +88,7 @@
 - Settings > Content Roles me API role create karo aur ek permission checkbox save karo.
 - Selected Content Role ke liye API token create karo aur confirm karo ki full token sirf create ke baad dikhta hai.
 - Settings > Webhooks open karo, verification docs link kholo, webhook create karo, matching entry write trigger karo, aur delivery log dikhna confirm karo.
-- Settings > Realtime API open karo, ek collection enable karo, client docs link kholo, WebSocket client connect karo, matching entry write trigger karo, aur realtime event plus ack confirm karo.
+- Settings > Realtime API open karo, ek collection enable karo, client docs link kholo, WebSocket client connect karo, matching entry write trigger karo, realtime event plus ack confirm karo, phir `lastEventId` ke saath reconnect karke missed event replay confirm karo.
 - Us API role ke saath user create karo.
 - Confirm karo ki Users aur baaki non-doc Admin UI screens normal content height me rahen aur `English:` ya `Hinglish:` helper labels na dikhayen.
 - Current page console errors nahi hone chahiye.
@@ -125,7 +126,8 @@
 - `POST /api/admin/webhooks` `entry.created`, `entry.updated`, ya `entry.deleted` ke liye webhook create kare.
 - `PUT /api/admin/realtime/:schemaId` selected `entry.created`, `entry.updated`, ya `entry.deleted` events ke liye realtime enable kare.
 - `GET /api/realtime?schema=:schemaSlug` WebSocket connection tabhi accept kare jab schema ke liye realtime enabled ho.
-- Matching content write `messageId`, `event`, `schema`, `entry`, aur `occurredAt` ke saath WebSocket event bheje.
+- Matching content write `eventId`, `messageId`, `event`, `schema`, `entry`, aur `occurredAt` ke saath WebSocket event bheje.
+- `lastEventId=EVENT_ID` ke saath reconnect same schema ke later events ko `replayed: true` ke saath replay kare.
 - WebSocket client `{ "type": "ack", "messageId": "..." }` bhej sake aur `ack.ok` receive kare.
 - Matching content write signed headers `x-apiagex-event`, `x-apiagex-webhook-id`, `x-apiagex-delivery-id`, `x-apiagex-timestamp`, aur `x-apiagex-signature` bheje.
 - Receiver verification docs timestamp tolerance, delivery id replay checks, aur HMAC validation explain kare.

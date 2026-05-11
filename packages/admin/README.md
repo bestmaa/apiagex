@@ -32,7 +32,7 @@ The UI also includes an admin-only backup panel that exports and restores the fu
 
 The UI also includes an admin-only migrations panel that reads schema history through `/api/migrations`.
 
-Settings includes a Realtime API screen that enables WebSocket create/update/delete events for selected generated content APIs and links to client ack/reconnect docs.
+Settings includes a Realtime API screen that enables WebSocket create/update/delete events for selected generated content APIs and links to practical client ack, `lastEventId`, reconnect, and refetch docs.
 
 The public read API can now resolve relations and media with `populate`, which makes the admin-managed schema more useful for consumers.
 
@@ -104,7 +104,7 @@ UI me admin-only backup panel bhi hai jo `/api/backups/export` aur `/api/backups
 
 UI me admin-only migrations panel bhi hai jo `/api/migrations` ke through schema history read karta hai.
 
-Settings me Realtime API screen hai jo selected generated content APIs ke liye WebSocket create/update/delete events enable karta hai aur client ack/reconnect docs link karta hai.
+Settings me Realtime API screen hai jo selected generated content APIs ke liye WebSocket create/update/delete events enable karta hai aur practical client ack, `lastEventId`, reconnect, plus refetch docs link karta hai.
 
 Public read API ab `populate` ke saath relations aur media resolve kar sakti hai, isliye admin-managed schema consumers ke liye zyada useful ho jata hai.
 

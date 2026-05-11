@@ -23,12 +23,13 @@ describe("realtime WebSocket APIs", () => {
     const ready = await nextJson(ws);
     expect(ready.type).toBe("ready");
 
+    const eventPromise = nextJson(ws);
     const create = await server.inject({
       method: "POST",
       url: "/api/content/article",
       payload: { data: { title: "Live order" } },
     });
-    const event = await nextJson(ws);
+    const event = await eventPromise;
     expect(create.statusCode).toBe(200);
     expect(event).toMatchObject({
       type: "event",
@@ -36,11 +37,57 @@ describe("realtime WebSocket APIs", () => {
       schema: { id: schemaId, slug: "article" },
     });
     expect(event.messageId).toMatch(/^rtm_/);
+    expect(event.eventId).toMatch(/^rte_/);
     expect(event.entry.data.title).toBe("Live order");
 
     ws.send(JSON.stringify({ type: "ack", messageId: event.messageId }));
     expect(await nextJson(ws)).toMatchObject({ type: "ack.ok", messageId: event.messageId });
     ws.close();
+    await server.close();
+  });
+
+  it("replays missed schema events after lastEventId on reconnect", async () => {
+    const server = createServer({ database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+    await server.inject({
+      method: "PUT",
+      url: `/api/admin/realtime/${schemaId}`,
+      payload: { enabled: true, events: ["entry.created"] },
+    });
+    await server.listen({ host: "127.0.0.1", port: 0 });
+    const port = portOf(server);
+    const firstSocket = new WebSocket(`ws://127.0.0.1:${port}/api/realtime?schema=article`);
+    await nextJson(firstSocket);
+
+    const firstEventPromise = nextJson(firstSocket);
+    await server.inject({
+      method: "POST",
+      url: "/api/content/article",
+      payload: { data: { title: "First" } },
+    });
+    const firstEvent = await firstEventPromise;
+    firstSocket.close();
+
+    await server.inject({
+      method: "POST",
+      url: "/api/content/article",
+      payload: { data: { title: "Missed" } },
+    });
+    const replaySocket = new WebSocket(`ws://127.0.0.1:${port}/api/realtime?schema=article&lastEventId=${firstEvent.eventId}`);
+    const replayMessages: Array<Record<string, any>> = [];
+    replaySocket.on("message", (data) => replayMessages.push(JSON.parse(data.toString()) as Record<string, any>));
+    await waitForMessage(replayMessages, (message) => message.type === "ready");
+    const replayed = await waitForMessage(replayMessages, (message) => message.type === "event");
+
+    expect(replayed).toMatchObject({
+      type: "event",
+      event: "entry.created",
+      replayed: true,
+      schema: { id: schemaId, slug: "article" },
+    });
+    expect(replayed.entry.data.title).toBe("Missed");
+    expect(replayed.eventId).not.toBe(firstEvent.eventId);
+    replaySocket.close();
     await server.close();
   });
 
@@ -93,5 +140,25 @@ function nextJson(ws: WebSocket): Promise<Record<string, any>> {
       resolve(JSON.parse(data.toString()) as Record<string, any>);
     });
     ws.once("error", reject);
+  });
+}
+
+function waitForMessage(
+  messages: Array<Record<string, any>>,
+  predicate: (message: Record<string, any>) => boolean,
+): Promise<Record<string, any>> {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+    const timer = setInterval(() => {
+      const found = messages.find(predicate);
+      if (found) {
+        clearInterval(timer);
+        resolve(found);
+      }
+      if (Date.now() - start > 3000) {
+        clearInterval(timer);
+        reject(new Error("WEBSOCKET_TIMEOUT"));
+      }
+    }, 10);
   });
 }

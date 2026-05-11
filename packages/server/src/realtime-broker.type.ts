@@ -1,4 +1,4 @@
-import type { EntryRecord, RealtimeEventType, SchemaRecord } from "@apiagex/database";
+import type { EntryRecord, RealtimeEventRecord, RealtimeEventType, SchemaRecord } from "@apiagex/database";
 
 export type RealtimePublishInput = {
   eventType: RealtimeEventType;
@@ -15,12 +15,15 @@ export type RealtimeEventMessage = {
   entry: EntryRecord;
   occurredAt: string;
   delivery: { ackRequired: true; ackTimeoutMs: number };
+  replayed?: true;
 };
 
 export type RealtimeBroker = {
   publish(input: RealtimePublishInput): void;
   snapshot(): RealtimeConnectionSnapshot[];
 };
+
+export type RealtimeStoredEvent = RealtimeEventRecord;
 
 export type RealtimeConnectionSnapshot = {
   id: string;

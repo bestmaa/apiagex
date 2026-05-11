@@ -46,8 +46,10 @@ export {
 export {
   getRealtimeConfig,
   isRealtimeEventEnabled,
+  listRealtimeEventsAfter,
   listRealtimeConfigs,
   listRealtimeSettings,
+  recordRealtimeEvent,
   setRealtimeConfig,
 } from "./realtime-repository.js";
 export {
@@ -125,7 +127,9 @@ export type {
 } from "./webhook-repository.type.js";
 export type {
   RealtimeConfigRecord,
+  RealtimeEventRecord,
   RealtimeEventType,
+  RecordRealtimeEventInput,
   SetRealtimeConfigInput,
 } from "./realtime-repository.type.js";
 export type {

@@ -1,8 +1,11 @@
+import { randomUUID } from "node:crypto";
 import type { SqliteDatabase } from "./sqlite.js";
 import { getSchemaById, listSchemas } from "./schema-repository.js";
 import type {
+  RealtimeEventRecord,
   RealtimeConfigRecord,
   RealtimeEventType,
+  RecordRealtimeEventInput,
   SetRealtimeConfigInput,
 } from "./realtime-repository.type.js";
 
@@ -11,6 +14,12 @@ const allowedEvents = new Set<RealtimeEventType>(["entry.created", "entry.update
 type RealtimeConfigRow = Omit<RealtimeConfigRecord, "enabled" | "events"> & {
   enabled: number;
   eventsJson: string;
+};
+
+type RealtimeEventRow = Omit<RealtimeEventRecord, "entry" | "eventType"> & {
+  eventType: RealtimeEventType;
+  entryJson: string;
+  sequence: number;
 };
 
 export function listRealtimeConfigs(db: SqliteDatabase): RealtimeConfigRecord[] {
@@ -56,6 +65,32 @@ export function isRealtimeEventEnabled(db: SqliteDatabase, schemaId: string, eve
   return Boolean(config?.enabled && config.events.includes(event));
 }
 
+export function recordRealtimeEvent(db: SqliteDatabase, input: RecordRealtimeEventInput): RealtimeEventRecord {
+  const now = new Date().toISOString();
+  const id = `rte_${randomUUID()}`;
+  const messageId = `rtm_${randomUUID()}`;
+  db.prepare(
+    `INSERT INTO realtime_events
+      (id, message_id, event_type, schema_id, schema_slug, entry_id, entry_json, occurred_at, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  ).run(id, messageId, input.eventType, input.schemaId, input.schemaSlug, input.entry.id, JSON.stringify(input.entry), now, now);
+  return rowToRealtimeEvent(db.prepare(realtimeEventSelectSql("WHERE id = ?")).get(id) as RealtimeEventRow);
+}
+
+export function listRealtimeEventsAfter(
+  db: SqliteDatabase,
+  schemaId: string,
+  lastEventId: string,
+  limit = 50,
+): RealtimeEventRecord[] {
+  const last = db.prepare("SELECT sequence FROM realtime_events WHERE id = ? AND schema_id = ?")
+    .get(lastEventId, schemaId) as { sequence: number } | undefined;
+  if (!last) return [];
+  const rows = db.prepare(realtimeEventSelectSql("WHERE schema_id = ? AND sequence > ? ORDER BY sequence ASC LIMIT ?"))
+    .all(schemaId, last.sequence, Math.max(1, Math.min(limit, 100))) as RealtimeEventRow[];
+  return rows.map(rowToRealtimeEvent);
+}
+
 function normalizeEvents(events: RealtimeEventType[]): RealtimeEventType[] {
   const unique = [...new Set(events)];
   if (unique.length === 0 || unique.some((event) => !allowedEvents.has(event))) {
@@ -75,4 +110,13 @@ function rowToRealtimeConfig(row: RealtimeConfigRow): RealtimeConfigRecord {
 
 function realtimeSelectSql(suffix: string): string {
   return `SELECT schema_id as schemaId, enabled, events_json as eventsJson, created_at as createdAt, updated_at as updatedAt FROM realtime_configs ${suffix}`;
+}
+
+function rowToRealtimeEvent(row: RealtimeEventRow): RealtimeEventRecord {
+  const { entryJson: _entryJson, sequence: _sequence, ...record } = row;
+  return { ...record, entry: JSON.parse(row.entryJson) as RealtimeEventRecord["entry"] };
+}
+
+function realtimeEventSelectSql(suffix: string): string {
+  return `SELECT sequence, id, message_id as messageId, event_type as eventType, schema_id as schemaId, schema_slug as schemaSlug, entry_id as entryId, entry_json as entryJson, occurred_at as occurredAt, created_at as createdAt FROM realtime_events ${suffix}`;
 }
