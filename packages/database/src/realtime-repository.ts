@@ -91,6 +91,27 @@ export function listRealtimeEventsAfter(
   return rows.map(rowToRealtimeEvent);
 }
 
+export function listRecentRealtimeEvents(db: SqliteDatabase, limit = 25): RealtimeEventRecord[] {
+  const rows = db.prepare(realtimeEventSelectSql("ORDER BY sequence DESC LIMIT ?"))
+    .all(Math.max(1, Math.min(limit, 100))) as RealtimeEventRow[];
+  return rows.map(rowToRealtimeEvent);
+}
+
+export function pruneRealtimeEvents(db: SqliteDatabase, schemaId: string, keepLatest = 1000): number {
+  const keep = Math.max(1, keepLatest);
+  const result = db.prepare(
+    `DELETE FROM realtime_events
+     WHERE schema_id = ?
+       AND sequence NOT IN (
+         SELECT sequence FROM realtime_events
+         WHERE schema_id = ?
+         ORDER BY sequence DESC
+         LIMIT ?
+       )`,
+  ).run(schemaId, schemaId, keep);
+  return result.changes;
+}
+
 function normalizeEvents(events: RealtimeEventType[]): RealtimeEventType[] {
   const unique = [...new Set(events)];
   if (unique.length === 0 || unique.some((event) => !allowedEvents.has(event))) {

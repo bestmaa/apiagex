@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyReply } from "fastify";
 import {
   listRealtimeSettings,
+  listRecentRealtimeEvents,
   listSchemas,
   setRealtimeConfig,
   type SqliteDatabase,
@@ -17,6 +18,8 @@ export function registerRealtimeRoutes(
     ok: true,
     configs: listRealtimeSettings(database),
     connections: broker.snapshot(),
+    events: listRecentRealtimeEvents(database),
+    retention: { eventsPerSchema: broker.retentionEventsPerSchema },
     schemas: listSchemas(database),
   }));
 

@@ -1,5 +1,5 @@
 import type { AddressInfo } from "node:net";
-import { openSqliteDatabase } from "@apiagex/database";
+import { createEntry, createSchema, openSqliteDatabase, pruneRealtimeEvents, recordRealtimeEvent } from "@apiagex/database";
 import { WebSocket } from "ws";
 import { describe, expect, it } from "vitest";
 import { createServer } from "../src/app.js";
@@ -30,7 +30,14 @@ describe("realtime WebSocket APIs", () => {
       payload: { data: { title: "Live order" } },
     });
     const event = await eventPromise;
+    const history = await server.inject({ method: "GET", url: "/api/admin/realtime" });
     expect(create.statusCode).toBe(200);
+    expect(history.json().retention).toEqual({ eventsPerSchema: 1000 });
+    expect(history.json().events[0]).toMatchObject({
+      eventType: "entry.created",
+      id: event.eventId,
+      schemaSlug: "article",
+    });
     expect(event).toMatchObject({
       type: "event",
       event: "entry.created",
@@ -44,6 +51,31 @@ describe("realtime WebSocket APIs", () => {
     expect(await nextJson(ws)).toMatchObject({ type: "ack.ok", messageId: event.messageId });
     ws.close();
     await server.close();
+  });
+
+  it("keeps only the latest realtime history rows per schema", async () => {
+    const database = openSqliteDatabase();
+    const server = createServer({ database });
+    const schema = createSchema(database, {
+      fields: [{ name: "Title", slug: "title", type: "text" }],
+      name: "Article",
+      slug: "article",
+    });
+    for (let index = 0; index < 1005; index += 1) {
+      const entry = createEntry(database, {
+        data: { title: `Event ${index}` },
+        schemaId: schema.id,
+      });
+      recordRealtimeEvent(database, { entry, eventType: "entry.created", schemaId: schema.id, schemaSlug: schema.slug });
+    }
+    pruneRealtimeEvents(database, schema.id, 1000);
+
+    const rows = database.prepare("SELECT COUNT(*) as count FROM realtime_events WHERE schema_id = ?")
+      .get(schema.id) as { count: number };
+    const history = await server.inject({ method: "GET", url: "/api/admin/realtime" });
+
+    expect(rows.count).toBe(1000);
+    expect(history.json().events[0].entry.data.title).toBe("Event 1004");
   });
 
   it("replays missed schema events after lastEventId on reconnect", async () => {

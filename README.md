@@ -156,6 +156,10 @@ English: Open `/adminui#settings/realtime`, enable one collection, then connect 
 
 Hinglish: `/adminui#settings/realtime` open karo, collection enable karo, phir client ko `ws://HOST/api/realtime?schema=:schemaSlug` par connect karo. API permission chahiye ho to `token=API_TOKEN` ya `roleId=ROLE_ID` add karo. Event me `eventId`, `messageId`, `event`, `schema`, `entry`, aur `occurredAt` aata hai; render ke baad client `eventId` store kare aur `{ "type": "ack", "messageId": "..." }` bheje. Reconnect par missed events replay ke liye `lastEventId=EVENT_ID` pass karo, aur ack timeout ya long offline period ke baad `/api/content/:schemaSlug` refetch karo.
 
+English: Settings > Realtime API also shows recent realtime event history. Apiagex keeps the latest 1000 events per collection for reconnect replay and prunes older events automatically after new events are recorded.
+
+Hinglish: Settings > Realtime API recent realtime event history bhi dikhata hai. Apiagex reconnect replay ke liye har collection ke latest 1000 events rakhta hai aur naye events record hone ke baad purane events automatically prune karta hai.
+
 ## Local Persistence
 
 English: `npm run dev` stores local server data in `.apiagex/apiagex.sqlite` and reserves `.apiagex/uploads` for local uploads. Override with `APIAGEX_DATABASE_PATH` and `APIAGEX_UPLOADS_PATH` when you need a different local path.

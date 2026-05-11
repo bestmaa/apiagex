@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { listRealtimeSettings, saveRealtimeConfig } from "./realtime-api";
-import type { RealtimeConfigRecord, RealtimeConnectionRecord, RealtimeEventType } from "./realtime.type";
+import type { RealtimeConfigRecord, RealtimeConnectionRecord, RealtimeEventRecord, RealtimeEventType } from "./realtime.type";
 import type { SchemaRecord } from "./schema.type";
 import { StateMessage } from "./components/StateMessage";
 
@@ -9,6 +9,8 @@ const eventOptions: RealtimeEventType[] = ["entry.created", "entry.updated", "en
 export function RealtimeManager() {
   const [configs, setConfigs] = useState<RealtimeConfigRecord[]>([]);
   const [connections, setConnections] = useState<RealtimeConnectionRecord[]>([]);
+  const [events, setEvents] = useState<RealtimeEventRecord[]>([]);
+  const [retention, setRetention] = useState(1000);
   const [schemas, setSchemas] = useState<SchemaRecord[]>([]);
   const [status, setStatus] = useState("Realtime settings ready");
 
@@ -21,6 +23,8 @@ export function RealtimeManager() {
     if (!result.ok) return setStatus(result.error ?? "Realtime settings failed");
     setConfigs(result.configs ?? []);
     setConnections(result.connections ?? []);
+    setEvents(result.events ?? []);
+    setRetention(result.retention?.eventsPerSchema ?? 1000);
     setSchemas(result.schemas ?? []);
   }
 
@@ -53,7 +57,37 @@ export function RealtimeManager() {
           ))}
         </div>
       )}
+      <RealtimeHistory events={events} retention={retention} />
       <StateMessage title="Realtime status">{status}</StateMessage>
+    </section>
+  );
+}
+
+function RealtimeHistory({ events, retention }: { events: RealtimeEventRecord[]; retention: number }) {
+  return (
+    <section className="settings-panel" aria-labelledby="realtime-history-title">
+      <h3 id="realtime-history-title">Recent realtime events</h3>
+      <p>History keeps the latest {retention} events per collection for reconnect replay.</p>
+      {events.length === 0 ? (
+        <StateMessage title="No realtime events yet" variant="empty">Enable a collection and write content to create realtime history.</StateMessage>
+      ) : (
+        <div className="api-table" role="table" aria-label="Recent realtime events">
+          <div className="api-table-row api-table-head" role="row">
+            <span>Event</span>
+            <span>Collection</span>
+            <span>Entry</span>
+            <span>Time</span>
+          </div>
+          {events.map((event) => (
+            <div className="api-table-row" role="row" key={event.id}>
+              <span><code>{event.eventType}</code><small>{event.id}</small></span>
+              <span>{event.schemaSlug}</span>
+              <span><code>{event.entryId}</code></span>
+              <span>{new Date(event.occurredAt).toLocaleString()}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

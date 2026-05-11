@@ -49,6 +49,8 @@ export {
   listRealtimeEventsAfter,
   listRealtimeConfigs,
   listRealtimeSettings,
+  listRecentRealtimeEvents,
+  pruneRealtimeEvents,
   recordRealtimeEvent,
   setRealtimeConfig,
 } from "./realtime-repository.js";

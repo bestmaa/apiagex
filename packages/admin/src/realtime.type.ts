@@ -19,10 +19,24 @@ export type RealtimeConnectionRecord = {
   pendingAcks: number;
 };
 
+export type RealtimeEventRecord = {
+  id: string;
+  messageId: string;
+  eventType: RealtimeEventType;
+  schemaId: string;
+  schemaSlug: string;
+  entryId: string;
+  entry: { data?: Record<string, unknown> };
+  occurredAt: string;
+  createdAt: string;
+};
+
 export type RealtimeListResponse = {
   ok: boolean;
   configs?: RealtimeConfigRecord[];
   connections?: RealtimeConnectionRecord[];
+  events?: RealtimeEventRecord[];
+  retention?: { eventsPerSchema: number };
   schemas?: SchemaRecord[];
   error?: string;
 };

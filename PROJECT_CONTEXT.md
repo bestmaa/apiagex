@@ -271,6 +271,8 @@ One server must serve exactly these primary paths:
 - Realtime events `entry.created`, `entry.updated`, aur `entry.deleted` hain, har event me `eventId`, `messageId`, schema, entry, aur `occurredAt` hota hai.
 - Clients should store the latest `eventId`, ack processed messages, reconnect with `lastEventId`, and refetch current content after ack timeout or long offline periods.
 - Clients latest `eventId` store karein, processed messages ko ack karein, `lastEventId` ke saath reconnect karein, aur ack timeout ya long offline period ke baad current content refetch karein.
+- Settings > Realtime API shows recent event history and retention keeps the latest 1000 events per collection.
+- Settings > Realtime API recent event history dikhata hai aur retention har collection ke latest 1000 events rakhta hai.
 - Realtime delivery failures do not roll back the content create, update, or delete operation.
 - Realtime delivery failure content create, update, ya delete operation ko rollback nahi karta.
 

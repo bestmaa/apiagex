@@ -38,6 +38,18 @@ describe("RealtimeManager", () => {
       ok: true,
       configs: [config],
       connections: [{ connectedAt: config.createdAt, id: "rtc_1", pendingAcks: 1, schemaId: schema.id, schemaSlug: schema.slug }],
+      events: [{
+        createdAt: config.createdAt,
+        entry: { data: { title: "Live order" } },
+        entryId: "entry_1",
+        eventType: "entry.created",
+        id: "rte_1",
+        messageId: "rtm_1",
+        occurredAt: config.createdAt,
+        schemaId: schema.id,
+        schemaSlug: schema.slug,
+      }],
+      retention: { eventsPerSchema: 1000 },
       schemas: [schema],
     });
     vi.mocked(saveRealtimeConfig).mockResolvedValue({ ok: true, config });
@@ -56,6 +68,8 @@ describe("RealtimeManager", () => {
 
     expect(container.textContent).toContain("Orders");
     expect(container.textContent).toContain("1 live connections");
+    expect(container.textContent).toContain("Recent realtime events");
+    expect(container.textContent).toContain("rte_1");
     expect(container.querySelector<HTMLAnchorElement>("a[href='#docs/realtime']")?.textContent).toContain("Realtime client docs");
 
     await act(async () => {

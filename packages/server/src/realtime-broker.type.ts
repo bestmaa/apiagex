@@ -20,6 +20,7 @@ export type RealtimeEventMessage = {
 
 export type RealtimeBroker = {
   publish(input: RealtimePublishInput): void;
+  retentionEventsPerSchema: number;
   snapshot(): RealtimeConnectionSnapshot[];
 };
 

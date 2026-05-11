@@ -8,6 +8,7 @@ import {
   getSchemaBySlug,
   isRealtimeEventEnabled,
   listRealtimeEventsAfter,
+  pruneRealtimeEvents,
   recordRealtimeEvent,
   resolveApiToken,
   type SqliteDatabase,
@@ -22,6 +23,7 @@ import type {
 
 const ackTimeoutMs = 15000;
 const heartbeatMs = 25000;
+const retentionEventsPerSchema = 1000;
 
 type ClientState = {
   id: string;
@@ -81,6 +83,7 @@ export function createRealtimeBroker(database: SqliteDatabase): RealtimeBroker &
       schemaId: input.schema.id,
       schemaSlug: input.schema.slug,
     });
+    pruneHistory(input.schema.id);
     for (const [ws, state] of clients) {
       if (state.schemaId !== input.schema.id || ws.readyState !== WebSocket.OPEN) continue;
       sendEvent(ws, state, stored);
@@ -162,7 +165,15 @@ export function createRealtimeBroker(database: SqliteDatabase): RealtimeBroker &
     };
   }
 
-  return { attach, publish, snapshot };
+  return { attach, publish, retentionEventsPerSchema, snapshot };
+
+  function pruneHistory(schemaId: string): void {
+    try {
+      pruneRealtimeEvents(database, schemaId, retentionEventsPerSchema);
+    } catch {
+      // Retention cleanup must not make content writes fail.
+    }
+  }
 }
 
 function closeWithError(ws: WebSocket, error: string): void {

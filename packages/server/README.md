@@ -55,6 +55,8 @@ Generated content APIs now support opt-in realtime settings per schema. When ena
 
 Realtime subscriptions can include `token=API_TOKEN` or `roleId=ROLE_ID`; when present, the same content API `getAll` permission is required before the WebSocket is accepted.
 
+Realtime history keeps the latest 1000 events per schema for replay and prunes older rows after new events are recorded.
+
 Public read routes are available at `/api/:slug` and `/api/:slug/:entryId`. Collection types return published items; single types return one published item.
 
 Public read routes support `populate=relations`, `populate=media`, or `populate=all` / `populate=*` for one-level field resolution. Relations return published public entries, and media return public file records with `/uploads/` URLs.
@@ -143,6 +145,8 @@ Admin backup export route `/admin/backups/export` par hai, restore `/admin/backu
 Generated content APIs me ab per schema opt-in realtime settings support hai. Enable hone par clients `/api/realtime?schema=:schemaSlug` par WebSocket se enabled create/update/delete actions receive kar sakte hain, aur missed schema events replay karne ke liye `lastEventId=EVENT_ID` ke saath reconnect kar sakte hain.
 
 Realtime subscriptions `token=API_TOKEN` ya `roleId=ROLE_ID` include kar sakti hain; present hone par WebSocket accept hone se pehle same content API `getAll` permission required hota hai.
+
+Realtime history replay ke liye har schema ke latest 1000 events rakhti hai aur naye events record hone ke baad purane rows prune karti hai.
 
 Public read routes `/api/:slug` aur `/api/:slug/:entryId` par available hain. Collection types published items return karti hain; single types ek published item return karti hain.
 
