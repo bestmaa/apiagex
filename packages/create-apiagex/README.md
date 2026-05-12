@@ -39,6 +39,8 @@ The generated-project test verifies this scaffold without network installs by cr
 Example:
 
 ```bash
+npm create apiagex@latest my-cms
+npx create-apiagex my-cms
 npm run build -w create-apiagex
 node packages/create-apiagex/dist/index.js my-cms --dry-run
 node packages/create-apiagex/dist/index.js my-cms --yes
@@ -92,6 +94,8 @@ Generated-project test network install ke bina scaffold verify karta hai: tempor
 Example:
 
 ```bash
+npm create apiagex@latest my-cms
+npx create-apiagex my-cms
 npm run build -w create-apiagex
 node packages/create-apiagex/dist/index.js my-cms --dry-run
 node packages/create-apiagex/dist/index.js my-cms --yes

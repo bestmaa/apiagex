@@ -89,6 +89,8 @@ Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha 
 - `npm run smoke` full MVP owner/schema/entry/dynamic API/RBAC flow cover karta hai.
 - Current stabilization audit is documented at [docs/project-stabilization-audit.md](./docs/project-stabilization-audit.md).
 - Current stabilization audit [docs/project-stabilization-audit.md](./docs/project-stabilization-audit.md) me documented hai.
+- Strapi-style install and publish flow is documented at [docs/install-and-publish-flow.md](./docs/install-and-publish-flow.md).
+- Strapi-style install aur publish flow [docs/install-and-publish-flow.md](./docs/install-and-publish-flow.md) me documented hai.
 - Apiagex MVP release gate is ready at version `v1.0.0`.
 - Apiagex MVP release gate version `v1.0.0` par ready hai.
 - Apiagex task2 release gate is ready at version `v2.0.0`.
@@ -173,6 +175,12 @@ Tests stay isolated by passing in-memory databases directly; they do not write t
 Task2 release verification covered routed Admin UI desktop/mobile browser checks, static `/doc` and `/readme`, local persistence, create-apiagex CLI, smoke tests, audit, and live API/RBAC allow/block flow.
 
 Task 10.0.14 stabilization audit adds a full feature audit test and practical user docs for owner auth, schemas, entries, content query filters, relations, RBAC, tokens, users, webhooks, realtime sessions, Admin UI, `/doc`, and `/readme`.
+
+## Create A New Apiagex Project
+
+English: Use `npm create apiagex@latest my-cms` or `npx create-apiagex my-cms`. The installer asks for setup mode, package manager, install preference, git preference, and owner setup preference. Generated projects depend on `@apiagex/server` and expose `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
+
+Hinglish: `npm create apiagex@latest my-cms` ya `npx create-apiagex my-cms` use karo. Installer setup mode, package manager, install preference, git preference, aur owner setup preference puchta hai. Generated projects `@apiagex/server` par depend karte hain aur `npm run dev`, `npm run start`, `npm run smoke`, plus `npm run build` expose karte hain.
 
 ## Workspace
 

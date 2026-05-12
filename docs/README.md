@@ -18,6 +18,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Role allow/block guide
 - Manual QA checklist
 - Project stabilization audit: [project-stabilization-audit.md](./project-stabilization-audit.md)
+- Install and publish flow: [install-and-publish-flow.md](./install-and-publish-flow.md)
 
 ## Implemented Now
 
@@ -51,6 +52,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Relation fields target schema picker dikhate hain aur valid existing schema ke bina save nahi hote.
 - Project stabilization audit is documented in `docs/project-stabilization-audit.md`.
 - Project stabilization audit `docs/project-stabilization-audit.md` me documented hai.
+- Install and publish flow is documented in `docs/install-and-publish-flow.md`.
+- Install aur publish flow `docs/install-and-publish-flow.md` me documented hai.
 
 ## Owner Bootstrap And Login
 

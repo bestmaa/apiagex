@@ -78,7 +78,7 @@ git diff --check
 #### T1023 - Document Install And Publish Flow
 
 - Version: `v10.0.15`
-- Status: `pending`
+- Status: `completed`
 - Goal: Explain how users install Apiagex and how maintainers verify package readiness.
 - Persona: New user and future package maintainer.
 - Success Criteria: Root README, create-apiagex README, server README, and project context explain `npm create apiagex@latest`, `npx create-apiagex`, generated scripts, environment variables, first owner flow, and release checks.
