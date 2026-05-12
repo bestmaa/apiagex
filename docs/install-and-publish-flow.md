@@ -147,6 +147,25 @@ npm run build -w @apiagex/server
 
 Also verify that `packages/create-apiagex/tests/generated-project.test.ts` passes. That test creates a temporary starter, runs runtime smoke, starts Apiagex on a temporary database/port, and checks `/api/health`, `/adminui`, `/doc`, and `/readme`.
 
+Publish order:
+
+```bash
+npm publish -w @apiagex/database --access public
+npm publish -w @apiagex/server --access public
+npm publish -w create-apiagex --access public
+```
+
+`@apiagex/server` copies the built Admin UI and static docs into its `dist` folder before packing, so generated projects can serve `/adminui`, `/doc`, and `/readme` from only the installed runtime package.
+
+Publishing requires an npm login:
+
+```bash
+npm login
+npm whoami
+```
+
+The publishing account must own or have access to the `@apiagex` npm scope. If the scope is not available for the account, create or join the npm organization first, or rename the scoped packages before publishing.
+
 ### Hinglish
 
 `@apiagex/server` aur `create-apiagex` publish karne se pehle ye run karo:
@@ -161,3 +180,22 @@ npm run build -w @apiagex/server
 ```
 
 Ye bhi verify karo ki `packages/create-apiagex/tests/generated-project.test.ts` pass ho. Ye test temporary starter create karta hai, runtime smoke chalata hai, temporary database/port par Apiagex start karta hai, aur `/api/health`, `/adminui`, `/doc`, plus `/readme` check karta hai.
+
+Publish order:
+
+```bash
+npm publish -w @apiagex/database --access public
+npm publish -w @apiagex/server --access public
+npm publish -w create-apiagex --access public
+```
+
+`@apiagex/server` packing se pehle built Admin UI aur static docs ko apne `dist` folder me copy karta hai, isliye generated projects sirf installed runtime package se `/adminui`, `/doc`, aur `/readme` serve kar sakte hain.
+
+Publish karne ke liye npm login required hai:
+
+```bash
+npm login
+npm whoami
+```
+
+Publishing account ke paas `@apiagex` npm scope ka access hona chahiye. Agar scope account ke liye available nahi hai, pehle npm organization create/join karo, ya publish se pehle scoped package names rename karo.

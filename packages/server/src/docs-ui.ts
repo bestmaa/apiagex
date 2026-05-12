@@ -11,7 +11,10 @@ const pageTitles: Record<DocsPageSlug, string> = {
 
 export function resolveDocsUiAsset(slug: DocsPageSlug): DocsUiAsset {
   const currentDir = dirname(fileURLToPath(import.meta.url));
-  const root = join(currentDir, "../../docs/dist");
+  const packagedRoot = join(currentDir, "docs-pages");
+  const root = existsSync(join(packagedRoot, slug, "index.html"))
+    ? packagedRoot
+    : join(currentDir, "../../docs/dist");
   return { root, pagePath: join(root, slug, "index.html") };
 }
 

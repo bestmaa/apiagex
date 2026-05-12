@@ -6,7 +6,10 @@ import type { AdminUiAsset } from "./admin-ui.type.js";
 
 export function resolveAdminUiAsset(): AdminUiAsset {
   const currentDir = dirname(fileURLToPath(import.meta.url));
-  const root = join(currentDir, "../../admin/dist/public");
+  const packagedRoot = join(currentDir, "admin-public");
+  const root = existsSync(join(packagedRoot, "index.html"))
+    ? packagedRoot
+    : join(currentDir, "../../admin/dist/public");
   return { root, indexPath: join(root, "index.html") };
 }
 

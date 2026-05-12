@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @apiagex/docs && npm run build -w @apiagex/admin && tsc -b packages/database packages/server packages/create-apiagex",
+    "build": "npm run build -w @apiagex/docs && npm run build -w @apiagex/admin && npm run build -w @apiagex/database && npm run build -w @apiagex/server && npm run build -w create-apiagex",
     "dev": "npm run dev -w @apiagex/server",
     "smoke": "vitest run packages/server/tests/release-smoke.test.ts",
     "release:check": "npm run check && npm run smoke && npm audit --audit-level=high",

@@ -4,6 +4,10 @@
   "description": "Kysely database adapter package for Apiagex CMS.",
   "type": "module",
   "license": "MIT",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "exports": {
     ".": "./dist/index.js"
   },

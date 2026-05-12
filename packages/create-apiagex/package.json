@@ -4,6 +4,10 @@
   "description": "Installer CLI for creating Apiagex CMS projects.",
   "type": "module",
   "license": "MIT",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "bin": {
     "create-apiagex": "./dist/index.js"
   },

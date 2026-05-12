@@ -75,6 +75,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Generated-project verification temp starter create karta hai, runtime smoke command chalata hai, temp port/database par Apiagex start karta hai, aur `/api/health`, `/adminui`, `/doc`, plus `/readme` check karta hai.
 - Install and publish flow is documented in `docs/install-and-publish-flow.md`, including `npm create apiagex@latest`, `npx create-apiagex`, generated scripts, environment variables, first owner flow, and maintainer checks.
 - Install aur publish flow `docs/install-and-publish-flow.md` me documented hai, including `npm create apiagex@latest`, `npx create-apiagex`, generated scripts, environment variables, first owner flow, aur maintainer checks.
+- Publish-ready package order is `@apiagex/database`, `@apiagex/server`, then `create-apiagex`; server packs built Admin UI and docs assets inside its `dist` folder.
+- Publish-ready package order `@apiagex/database`, `@apiagex/server`, phir `create-apiagex` hai; server built Admin UI aur docs assets apne `dist` folder me pack karta hai.
 - Admin UI Settings > Content Roles can create, list, and revoke one-time visible API tokens for selected API roles.
 - Admin UI Settings > Content Roles selected API roles ke liye one-time visible API tokens create, list, aur revoke kar sakta hai.
 - Admin/control-plane roles are not accepted by content API permission checks or API-user assignment.
