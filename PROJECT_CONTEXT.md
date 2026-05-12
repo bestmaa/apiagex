@@ -65,6 +65,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Dynamic APIs `x-apiagex-role-id` ya API token present hone par allow/block enforce karte hain.
 - API role tokens are stored hashed in `api_tokens`; content APIs accept `Authorization: Bearer TOKEN` or `x-apiagex-api-token`.
 - API role tokens `api_tokens` me hash hokar store hote hain; content APIs `Authorization: Bearer TOKEN` ya `x-apiagex-api-token` accept karte hain.
+- `@apiagex/server` exposes an installed runtime bin named `apiagex` with `dev`, `start`, `smoke`, `build`, `--help`, and `--version`.
+- `@apiagex/server` installed runtime bin `apiagex` expose karta hai jisme `dev`, `start`, `smoke`, `build`, `--help`, aur `--version` hain.
 - Admin UI Settings > Content Roles can create, list, and revoke one-time visible API tokens for selected API roles.
 - Admin UI Settings > Content Roles selected API roles ke liye one-time visible API tokens create, list, aur revoke kar sakta hai.
 - Admin/control-plane roles are not accepted by content API permission checks or API-user assignment.

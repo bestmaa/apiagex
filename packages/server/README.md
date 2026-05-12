@@ -91,6 +91,17 @@ Run it with:
 npm run dev -w @apiagex/server
 ```
 
+Installed projects can use the runtime CLI after depending on `@apiagex/server`:
+
+```bash
+apiagex dev
+apiagex start
+apiagex smoke
+apiagex --help
+```
+
+`apiagex dev` and `apiagex start` serve the same `/api`, `/adminui`, `/doc`, and `/readme` paths. `apiagex smoke` checks `/api/health` without starting a long-running server. Local persistence still uses `APIAGEX_DATABASE_PATH` and `APIAGEX_UPLOADS_PATH`, defaulting to `.apiagex/apiagex.sqlite` and `.apiagex/uploads`.
+
 ## Hindi
 
 Ye package Fastify API server ka owner hai. Ye `/docs` par docs page, `/health` par health status, aur `/admin/content-types` par starter admin content-type API serve karta hai.
@@ -163,6 +174,17 @@ Entries ke version snapshots bhi save hote hain. Server create, update, schedule
 Entries `pendingApproval` bhi ho sakti hain. Admin-only routes `/admin/content-types/:id/entries/:entryId/approve` aur `/admin/content-types/:id/entries/:entryId/reject` pending entry ko `published` ya `draft` me transition karti hain.
 
 Admin list route `?status=pendingApproval` bhi accept karti hai taaki sirf approval queue dikh sake.
+
+Installed projects `@apiagex/server` dependency ke baad runtime CLI use kar sakte hain:
+
+```bash
+apiagex dev
+apiagex start
+apiagex smoke
+apiagex --help
+```
+
+`apiagex dev` aur `apiagex start` same `/api`, `/adminui`, `/doc`, aur `/readme` paths serve karte hain. `apiagex smoke` long-running server start kiye bina `/api/health` check karta hai. Local persistence abhi bhi `APIAGEX_DATABASE_PATH` aur `APIAGEX_UPLOADS_PATH` use karti hai, default `.apiagex/apiagex.sqlite` aur `.apiagex/uploads`.
 
 Admin list route `q`, `page`, `pageSize`, aur `sort` query parameters bhi accept karti hai search, pagination, aur newest/oldest sorting ke liye.
 
