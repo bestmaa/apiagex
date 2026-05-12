@@ -79,8 +79,11 @@ describe("create-apiagex CLI", () => {
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"name": "my-cms"');
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"@apiagex/server"');
     await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.toContain("APIAGEX_DATABASE_PATH");
+    await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"setupMode"');
+    await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("Practical flow");
+    await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("REALTIME_SESSION_INVALID");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("many-to-many");
-    await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("/doc explains relation field types");
+    await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("Webhooks and Realtime");
   });
 
   it("uses defaults with --yes in non-interactive scripts", async () => {

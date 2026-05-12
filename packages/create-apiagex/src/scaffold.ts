@@ -38,7 +38,14 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
     },
     {
       path: "apiagex.config.json",
-      content: `${JSON.stringify({ database: { provider: "sqlite", url: "file:.apiagex/apiagex.sqlite" } }, null, 2)}\n`,
+      content: `${JSON.stringify(
+        {
+          database: { provider: "sqlite", url: "file:.apiagex/apiagex.sqlite" },
+          project: { packageManager: answers.packageManager, setupMode: answers.setupMode },
+        },
+        null,
+        2,
+      )}\n`,
     },
     {
       path: "docs/README.md",
@@ -77,6 +84,12 @@ function starterReadme(answers: ScaffoldAnswers): string {
 
 Generated Apiagex starter.
 
+## What this project gives you
+
+English: Apiagex runs one server with /api, /adminui, /doc, and /readme. Use the Admin UI to create schemas, entries, API roles, users, webhooks, and realtime settings.
+
+Hinglish: Apiagex ek server chalata hai jisme /api, /adminui, /doc, aur /readme hote hain. Schemas, entries, API roles, users, webhooks, aur realtime settings ke liye Admin UI use karo.
+
 ## Next commands
 
 \`\`\`bash
@@ -84,7 +97,48 @@ ${installCommand(answers.packageManager)}
 ${runCommand(answers.packageManager, "dev")}
 \`\`\`
 
-Open /adminui to create the first owner, /doc for API docs, and /readme for the readable project summary.
+Open http://127.0.0.1:4000/adminui to create the first owner. Open /doc for API docs and /readme for the readable project summary.
+
+## Scripts
+
+- \`${runCommand(answers.packageManager, "dev")}\`: start the local Apiagex server.
+- \`${runCommand(answers.packageManager, "start")}\`: start the server for regular runtime use.
+- \`${runCommand(answers.packageManager, "smoke")}\`: verify the runtime health route.
+- \`${runCommand(answers.packageManager, "build")}\`: print runtime build guidance.
+
+## Environment
+
+Copy .env.example to .env if you need custom paths.
+
+- APIAGEX_DATABASE_PATH: SQLite database path. Default .apiagex/apiagex.sqlite.
+- APIAGEX_UPLOADS_PATH: upload folder. Default .apiagex/uploads.
+- PORT: server port. Default 4000.
+- HOST: server host. Default 127.0.0.1.
+
+## Practical flow
+
+English:
+
+1. Create the first owner from /adminui.
+2. Create a schema, for example Article with a required title field.
+3. Create entries from Entries or call POST /api/content/article.
+4. Create Content Roles, save permissions, then create users or API tokens.
+5. Use Webhooks for external server notifications and Realtime API for live browser screens.
+
+Hinglish:
+
+1. /adminui se first owner create karo.
+2. Schema banao, jaise required title field ke saath Article.
+3. Entries screen se entry banao ya POST /api/content/article call karo.
+4. Content Roles banao, permissions save karo, phir users ya API tokens create karo.
+5. External server notifications ke liye Webhooks aur live browser screens ke liye Realtime API use karo.
+
+## Common errors
+
+- OWNER_ALREADY_BOOTSTRAPPED: owner already exists; use the same form to login.
+- API_PERMISSION_DENIED: content API role is missing the required permission.
+- API_TOKEN_INVALID: token is wrong or revoked.
+- REALTIME_SESSION_INVALID: realtime session token was reused or expired.
 
 ## Relation Modeling
 
@@ -95,7 +149,36 @@ Hinglish: Pehle target schema banao, phir /adminui me source schema par relation
 }
 
 function docsReadme(): string {
-  return "# Apiagex Project Docs\n\nUse /doc for generated API docs and /readme for the project summary.\n\nRelation docs: /doc explains relation field types, entry payloads, populate query options, Admin UI entry pickers, and common errors.\n";
+  return `# Apiagex Project Docs
+
+Use /doc for generated API docs and /readme for the project summary.
+
+## Owner and Admin UI
+
+English: Open /adminui, create the first owner, then use the same page for later logins.
+
+Hinglish: /adminui open karo, first owner create karo, phir later login ke liye same page use karo.
+
+## Generated APIs
+
+English: Every schema creates /api/content/:schemaSlug. Send entry data as { "data": { ... } }.
+
+Hinglish: Har schema /api/content/:schemaSlug create karta hai. Entry data { "data": { ... } } shape me bhejo.
+
+## Access control
+
+English: Content API roles are separate from Admin UI roles. Give getAll, get, create, update, delete, or manage per schema.
+
+Hinglish: Content API roles Admin UI roles se alag hain. Har schema ke liye getAll, get, create, update, delete, ya manage do.
+
+## Webhooks and Realtime
+
+English: Webhooks call external URLs after content changes. Realtime API sends WebSocket events only for enabled collections.
+
+Hinglish: Webhooks content change ke baad external URLs call karte hain. Realtime API sirf enabled collections ke liye WebSocket events bhejta hai.
+
+Relation docs: /doc explains relation field types, entry payloads, populate query options, Admin UI entry pickers, and common errors.
+`;
 }
 
 function installCommand(packageManager: string): string {

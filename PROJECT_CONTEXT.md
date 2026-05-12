@@ -69,6 +69,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - `@apiagex/server` installed runtime bin `apiagex` expose karta hai jisme `dev`, `start`, `smoke`, `build`, `--help`, aur `--version` hain.
 - `create-apiagex` supports interactive prompts plus non-interactive flags for setup mode, package manager, install preference, git preference, and owner bootstrap preference.
 - `create-apiagex` setup mode, package manager, install preference, git preference, aur owner bootstrap preference ke liye interactive prompts plus non-interactive flags support karta hai.
+- Generated Apiagex starters depend on `@apiagex/server`, expose `apiagex dev/start/smoke/build` scripts, and document owner setup, schema APIs, RBAC, webhooks, realtime, persistence, and common errors.
+- Generated Apiagex starters `@apiagex/server` par depend karte hain, `apiagex dev/start/smoke/build` scripts expose karte hain, aur owner setup, schema APIs, RBAC, webhooks, realtime, persistence, aur common errors document karte hain.
 - Admin UI Settings > Content Roles can create, list, and revoke one-time visible API tokens for selected API roles.
 - Admin UI Settings > Content Roles selected API roles ke liye one-time visible API tokens create, list, aur revoke kar sakta hai.
 - Admin/control-plane roles are not accepted by content API permission checks or API-user assignment.

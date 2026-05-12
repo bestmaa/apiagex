@@ -24,14 +24,15 @@ Generated starter files:
 - `.env.example`
 - `apiagex.config.json`
 - `README.md`
-- `src/main.ts`
 - `docs/README.md`
 
 The generated `.env.example` documents `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite` and `APIAGEX_UPLOADS_PATH=.apiagex/uploads` for local persistence.
 
-The generated starter README points users to `/doc`, `/readme`, and `/adminui`, and includes relation examples for one-to-one, one-to-many, many-to-one, and many-to-many modeling.
+The generated `package.json` depends on `@apiagex/server` and exposes `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
 
-The generated `docs/README.md` points relation docs to `/doc`, including payloads, populate options, Admin UI entry pickers, and common errors.
+The generated starter README points users to `/doc`, `/readme`, and `/adminui`, includes practical owner/schema/entry/role/webhook/realtime flow, and explains common errors.
+
+The generated `docs/README.md` explains generated API shape, access control, webhooks, realtime, relation docs, payloads, populate options, Admin UI entry pickers, and common errors.
 
 Example:
 
@@ -74,14 +75,15 @@ Generated starter files:
 - `.env.example`
 - `apiagex.config.json`
 - `README.md`
-- `src/main.ts`
 - `docs/README.md`
 
 Generated `.env.example` local persistence ke liye `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite` aur `APIAGEX_UPLOADS_PATH=.apiagex/uploads` document karta hai.
 
-Generated starter README users ko `/doc`, `/readme`, aur `/adminui` par point karta hai, aur one-to-one, one-to-many, many-to-one, aur many-to-many relation examples include karta hai.
+Generated `package.json` `@apiagex/server` par depend karta hai aur `npm run dev`, `npm run start`, `npm run smoke`, aur `npm run build` expose karta hai.
 
-Generated `docs/README.md` relation docs ke liye `/doc` batata hai, including payloads, populate options, Admin UI entry pickers, aur common errors.
+Generated starter README users ko `/doc`, `/readme`, aur `/adminui` par point karta hai, practical owner/schema/entry/role/webhook/realtime flow include karta hai, aur common errors explain karta hai.
+
+Generated `docs/README.md` generated API shape, access control, webhooks, realtime, relation docs, payloads, populate options, Admin UI entry pickers, aur common errors explain karta hai.
 
 Example:
 

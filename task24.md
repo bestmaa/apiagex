@@ -54,7 +54,7 @@ git diff --check
 #### T1021 - Improve Generated Starter Project
 
 - Version: `v10.0.15`
-- Status: `pending`
+- Status: `completed`
 - Goal: Generate a starter that users can understand and run immediately.
 - Persona: Developer opening the generated folder after install.
 - Success Criteria: Starter depends on `@apiagex/server`; scripts call `apiagex dev/start/smoke`; `.env.example`, `README.md`, `docs/README.md`, and config explain Admin UI, owner setup, schemas, roles, webhooks, realtime, persistence, and common errors in English plus Hinglish.
