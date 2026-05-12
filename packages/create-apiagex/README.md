@@ -47,6 +47,14 @@ node packages/create-apiagex/dist/index.js my-cms --yes
 node packages/create-apiagex/dist/index.js --dry-run
 ```
 
+Local workspace test before publishing:
+
+```bash
+npm run build -w create-apiagex
+cd newproject
+npx create-apiagex my-cms --yes
+```
+
 After scaffolding:
 
 ```bash
@@ -100,6 +108,14 @@ npm run build -w create-apiagex
 node packages/create-apiagex/dist/index.js my-cms --dry-run
 node packages/create-apiagex/dist/index.js my-cms --yes
 node packages/create-apiagex/dist/index.js --dry-run
+```
+
+Publish se pehle local workspace test:
+
+```bash
+npm run build -w create-apiagex
+cd newproject
+npx create-apiagex my-cms --yes
 ```
 
 Scaffold ke baad:

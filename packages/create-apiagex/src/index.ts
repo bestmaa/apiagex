@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { existsSync } from "node:fs";
+import { realpathSync } from "node:fs";
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -77,9 +78,14 @@ function fail(message: string): CliResult {
   return { code: 1, stdout: "", stderr: `${message}\n` };
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isDirectRun()) {
   const result = await runCli(process.argv.slice(2), process.cwd(), { interactive: process.stdin.isTTY });
   if (result.stdout) process.stdout.write(result.stdout);
   if (result.stderr) process.stderr.write(result.stderr);
   process.exitCode = result.code;
+}
+
+function isDirectRun(): boolean {
+  const entry = process.argv[1];
+  return Boolean(entry && realpathSync(entry) === fileURLToPath(import.meta.url));
 }
