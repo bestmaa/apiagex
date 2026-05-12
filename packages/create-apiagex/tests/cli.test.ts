@@ -10,7 +10,7 @@ describe("create-apiagex CLI", () => {
 
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("Usage:");
-    expect(result.stdout).toContain("create-apiagex <target-folder>");
+    expect(result.stdout).toContain("create-apiagex [target-folder]");
   });
 
   it("validates the target folder slug", async () => {
@@ -22,12 +22,40 @@ describe("create-apiagex CLI", () => {
 
   it("prints a dry-run scaffold plan without writing files", async () => {
     const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
-    const result = await runCli(["my-cms", "--dry-run"], root);
+    const result = await runCli([
+      "my-cms",
+      "--dry-run",
+      "--package-manager",
+      "pnpm",
+      "--setup",
+      "custom",
+      "--install",
+      "--git",
+    ], root);
 
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("Dry run only");
+    expect(result.stdout).toContain("Package manager: pnpm");
+    expect(result.stdout).toContain("Setup mode: custom");
     expect(result.stdout).toContain("package.json");
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).rejects.toThrow();
+  });
+
+  it("prompts for setup answers when interactive", async () => {
+    const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
+    const answers = ["prompt-cms", "custom", "yarn", "yes", "no", "yes"];
+    const result = await runCli(["--dry-run"], root, {
+      interactive: true,
+      prompt: async () => answers.shift() ?? "",
+    });
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("prompt-cms");
+    expect(result.stdout).toContain("Setup mode: custom");
+    expect(result.stdout).toContain("Package manager: yarn");
+    expect(result.stdout).toContain("Install dependencies: yes");
+    expect(result.stdout).toContain("Initialize git: no");
+    expect(result.stdout).toContain("Owner setup: create now");
   });
 
   it("refuses to overwrite a non-empty target folder", async () => {
@@ -47,10 +75,21 @@ describe("create-apiagex CLI", () => {
     const result = await runCli(["my-cms"], root);
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("Created 7 files");
+    expect(result.stdout).toContain("Created 6 files");
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"name": "my-cms"');
-    await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.toContain("ADMIN_EMAIL");
+    await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"@apiagex/server"');
+    await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.toContain("APIAGEX_DATABASE_PATH");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("many-to-many");
     await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("/doc explains relation field types");
+  });
+
+  it("uses defaults with --yes in non-interactive scripts", async () => {
+    const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
+    const result = await runCli(["yes-cms", "--yes", "--dry-run"], root);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Setup mode: quickstart");
+    expect(result.stdout).toContain("Package manager: npm");
+    expect(result.stdout).toContain("Install dependencies: no");
   });
 });

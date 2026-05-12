@@ -1,0 +1,51 @@
+import type { Readable, Writable } from "node:stream";
+
+export type PackageManager = "npm" | "pnpm" | "yarn";
+export type SetupMode = "custom" | "quickstart";
+
+export type CliOptions = {
+  bootstrapOwner?: boolean;
+  dryRun: boolean;
+  help: boolean;
+  initGit?: boolean;
+  installDependencies?: boolean;
+  packageManager?: PackageManager;
+  setupMode?: SetupMode;
+  target?: string;
+  version: boolean;
+  yes: boolean;
+};
+
+export type CliResult = {
+  code: number;
+  stderr: string;
+  stdout: string;
+};
+
+export type PromptQuestion = {
+  defaultValue: string;
+  message: string;
+};
+
+export type PromptFn = (question: PromptQuestion) => Promise<string>;
+
+export type RunCliOptions = {
+  interactive?: boolean;
+  prompt?: PromptFn;
+  stdin?: Readable;
+  stdout?: Writable;
+};
+
+export type ScaffoldAnswers = {
+  bootstrapOwner: boolean;
+  initGit: boolean;
+  installDependencies: boolean;
+  packageManager: PackageManager;
+  setupMode: SetupMode;
+  target: string;
+};
+
+export type ScaffoldFile = {
+  content: string;
+  path: string;
+};

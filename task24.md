@@ -42,7 +42,7 @@ git diff --check
 #### T1020 - Add Interactive Create Apiagex Prompts
 
 - Version: `v10.0.15`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make `create-apiagex` ask practical setup questions when flags are not provided.
 - Persona: User creating a CMS project for the first time.
 - Success Criteria: CLI can prompt for project name, setup mode, package manager, dependency install preference, git init preference, and owner bootstrap preference; non-interactive flags still work for CI; dry-run shows selected answers; tests cover prompt-driven and flag-driven creation.

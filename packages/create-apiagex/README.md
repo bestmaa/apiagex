@@ -8,10 +8,14 @@ Current CLI behavior:
 
 - Prints help with `create-apiagex --help`.
 - Prints version with `create-apiagex --version`.
+- Prompts for project name and setup choices in an interactive terminal.
+- Supports `--yes` and setup flags for CI/non-interactive scaffolding.
 - Validates that the target folder is a safe slug like `my-cms`.
 - Refuses to overwrite an existing non-empty folder.
 - Supports `--dry-run` to show the scaffold plan without writing files.
 - Creates a small starter scaffold when the target folder is missing or empty.
+
+Interactive setup asks for setup mode, package manager, dependency install preference, git init preference, and owner bootstrap preference.
 
 Generated starter files:
 
@@ -34,7 +38,8 @@ Example:
 ```bash
 npm run build -w create-apiagex
 node packages/create-apiagex/dist/index.js my-cms --dry-run
-node packages/create-apiagex/dist/index.js my-cms
+node packages/create-apiagex/dist/index.js my-cms --yes
+node packages/create-apiagex/dist/index.js --dry-run
 ```
 
 After scaffolding:
@@ -53,10 +58,14 @@ Current CLI behavior:
 
 - `create-apiagex --help` se help print hoti hai.
 - `create-apiagex --version` se version print hota hai.
+- Interactive terminal me project name aur setup choices puche jaate hain.
+- CI/non-interactive scaffold ke liye `--yes` aur setup flags support hain.
 - Target folder safe slug hona chahiye, jaise `my-cms`.
 - Existing non-empty folder overwrite nahi hota.
 - `--dry-run` scaffold plan dikhata hai bina files likhe.
 - Target folder missing ya empty ho to small starter scaffold create hota hai.
+
+Interactive setup setup mode, package manager, dependency install preference, git init preference, aur owner bootstrap preference puchta hai.
 
 Generated starter files:
 
@@ -79,7 +88,8 @@ Example:
 ```bash
 npm run build -w create-apiagex
 node packages/create-apiagex/dist/index.js my-cms --dry-run
-node packages/create-apiagex/dist/index.js my-cms
+node packages/create-apiagex/dist/index.js my-cms --yes
+node packages/create-apiagex/dist/index.js --dry-run
 ```
 
 Scaffold ke baad:

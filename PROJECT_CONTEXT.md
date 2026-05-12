@@ -67,6 +67,8 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - API role tokens `api_tokens` me hash hokar store hote hain; content APIs `Authorization: Bearer TOKEN` ya `x-apiagex-api-token` accept karte hain.
 - `@apiagex/server` exposes an installed runtime bin named `apiagex` with `dev`, `start`, `smoke`, `build`, `--help`, and `--version`.
 - `@apiagex/server` installed runtime bin `apiagex` expose karta hai jisme `dev`, `start`, `smoke`, `build`, `--help`, aur `--version` hain.
+- `create-apiagex` supports interactive prompts plus non-interactive flags for setup mode, package manager, install preference, git preference, and owner bootstrap preference.
+- `create-apiagex` setup mode, package manager, install preference, git preference, aur owner bootstrap preference ke liye interactive prompts plus non-interactive flags support karta hai.
 - Admin UI Settings > Content Roles can create, list, and revoke one-time visible API tokens for selected API roles.
 - Admin UI Settings > Content Roles selected API roles ke liye one-time visible API tokens create, list, aur revoke kar sakta hai.
 - Admin/control-plane roles are not accepted by content API permission checks or API-user assignment.
