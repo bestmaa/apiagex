@@ -34,6 +34,8 @@ The generated starter README points users to `/doc`, `/readme`, and `/adminui`, 
 
 The generated `docs/README.md` explains generated API shape, access control, webhooks, realtime, relation docs, payloads, populate options, Admin UI entry pickers, and common errors.
 
+The generated-project test verifies this scaffold without network installs by creating a temporary project, running the runtime smoke command, starting Apiagex on a temporary port/database, and checking `/api/health`, `/adminui`, `/doc`, and `/readme`.
+
 Example:
 
 ```bash
@@ -84,6 +86,8 @@ Generated `package.json` `@apiagex/server` par depend karta hai aur `npm run dev
 Generated starter README users ko `/doc`, `/readme`, aur `/adminui` par point karta hai, practical owner/schema/entry/role/webhook/realtime flow include karta hai, aur common errors explain karta hai.
 
 Generated `docs/README.md` generated API shape, access control, webhooks, realtime, relation docs, payloads, populate options, Admin UI entry pickers, aur common errors explain karta hai.
+
+Generated-project test network install ke bina scaffold verify karta hai: temporary project create karta hai, runtime smoke command chalata hai, temporary port/database par Apiagex start karta hai, aur `/api/health`, `/adminui`, `/doc`, plus `/readme` check karta hai.
 
 Example:
 

@@ -66,7 +66,7 @@ git diff --check
 #### T1022 - Verify Generated Project End To End
 
 - Version: `v10.0.15`
-- Status: `pending`
+- Status: `completed`
 - Goal: Prove the installer output can run like a real user project.
 - Persona: Maintainer checking release quality before publishing.
 - Success Criteria: Test creates a temp project, runs the generated `npm run smoke` equivalent through the runtime CLI, starts the runtime on a temp port/database, checks `/api/health`, `/adminui`, `/doc`, and `/readme`, then stops cleanly.

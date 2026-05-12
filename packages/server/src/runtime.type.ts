@@ -1,4 +1,5 @@
 import type { LocalServerConfig, ServerConfigEnv } from "./server-config.type.js";
+import type { ApiagexServer } from "./app.type.js";
 
 export type RuntimeCliResult = {
   code: number;
@@ -16,3 +17,5 @@ export type StartServerOptions = {
   cwd?: string;
   env?: ServerConfigEnv;
 };
+
+export type StartedApiagexServer = ApiagexServer;

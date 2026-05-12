@@ -1,10 +1,10 @@
 import { createServer } from "./app.js";
 import { ensureLocalServerPaths, resolveLocalServerConfig } from "./server-config.js";
-import type { RuntimeCliOptions, RuntimeCliResult, StartServerOptions } from "./runtime.type.js";
+import type { RuntimeCliOptions, RuntimeCliResult, StartedApiagexServer, StartServerOptions } from "./runtime.type.js";
 
 const runtimeVersion = "0.6.1";
 
-export async function startApiagexServer(options: StartServerOptions = {}): Promise<void> {
+export async function startApiagexServer(options: StartServerOptions = {}): Promise<StartedApiagexServer | undefined> {
   const env = options.env ?? process.env;
   const host = env.HOST ?? "127.0.0.1";
   const port = Number(env.PORT ?? 4000);
@@ -16,9 +16,11 @@ export async function startApiagexServer(options: StartServerOptions = {}): Prom
     console.log(`Apiagex listening on http://${host}:${port}`);
     console.log(`Apiagex database path: ${config.databasePath}`);
     console.log(`Apiagex uploads path: ${config.uploadsPath}`);
+    return server;
   } catch (error) {
     server.log.error(error);
     process.exitCode = 1;
+    return undefined;
   }
 }
 
