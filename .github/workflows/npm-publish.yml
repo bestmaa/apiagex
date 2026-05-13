@@ -1,6 +1,9 @@
 name: Publish npm packages
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       tag:
@@ -49,7 +52,7 @@ jobs:
         run: npm run release:check
 
       - name: Stop if versions already exist
-        if: ${{ !inputs.dry_run }}
+        if: ${{ github.event_name == 'workflow_dispatch' && !inputs.dry_run }}
         shell: bash
         run: |
           set -euo pipefail
@@ -71,8 +74,8 @@ jobs:
         shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_TAG: ${{ inputs.tag }}
-          DRY_RUN: ${{ inputs.dry_run }}
+          NPM_TAG: ${{ inputs.tag || 'latest' }}
+          DRY_RUN: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run }}
         run: |
           set -euo pipefail
           publish_flags=(--access public --tag "$NPM_TAG" --provenance)

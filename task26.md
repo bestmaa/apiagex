@@ -37,3 +37,15 @@ git diff --check
 - Output: `.github/workflows/npm-publish.yml`, package metadata, license, docs/context updates.
 - Verify: Standard verification plus `npm pack --dry-run --json` for publish packages.
 - Commit: `Add GitHub npm publish workflow`
+
+#### T1028 - Add Push Dry Run For Publish Workflow
+
+- Version: `0.6.2`
+- Status: `completed`
+- Goal: Let every push to `main` verify the publish flow without real npm publication.
+- Persona: Maintainer who wants confidence that GitHub publish will work before manual release.
+- Success Criteria: Push events run the same install and release checks, then run npm publish with `--dry-run`; real publish remains manual-only through `workflow_dispatch` with `dry_run=false`.
+- Constraints: Never perform a real npm publish from a push event.
+- Output: Safer workflow event handling.
+- Verify: Workflow dry-run on GitHub after push.
+- Commit: `Add push dry run for npm publish workflow`
