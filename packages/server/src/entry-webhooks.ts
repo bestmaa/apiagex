@@ -1,4 +1,4 @@
-import { type EntryRecord, type SchemaRecord, type SqliteDatabase, type WebhookEventType } from "@apiagex/database";
+import { type EntryRecord, type SchemaRecord, type SqliteDatabase, type WebhookEventType } from "apiagex-database";
 import { emitWebhookEvent } from "./webhook-dispatcher.js";
 import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
 

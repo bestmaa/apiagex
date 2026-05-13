@@ -1,4 +1,4 @@
-import type { CreateSchemaInput, FieldRecord, SchemaRecord, UpdateSchemaInput } from "@apiagex/database";
+import type { CreateSchemaInput, FieldRecord, SchemaRecord, UpdateSchemaInput } from "apiagex-database";
 
 export type SchemaParams = {
   id: string;

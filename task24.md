@@ -33,8 +33,8 @@ git diff --check
 - Status: `completed`
 - Goal: Make the installed runtime expose an `apiagex` command for generated projects.
 - Persona: Developer who created a new project and expects `npm run dev` to start Apiagex.
-- Success Criteria: `@apiagex/server` publishes a `bin` command named `apiagex`; CLI supports `dev`, `start`, `smoke`, `--help`, and `--version`; `dev/start` run the existing Fastify server; `smoke` validates runtime health without starting a long-running server; tests cover help/version/smoke/unknown command.
-- Constraints: Do not break existing `npm run dev -w @apiagex/server`; keep local persistence behavior unchanged.
+- Success Criteria: `apiagex-server` publishes a `bin` command named `apiagex`; CLI supports `dev`, `start`, `smoke`, `--help`, and `--version`; `dev/start` run the existing Fastify server; `smoke` validates runtime health without starting a long-running server; tests cover help/version/smoke/unknown command.
+- Constraints: Do not break existing `npm run dev -w apiagex-server`; keep local persistence behavior unchanged.
 - Output: Runtime CLI module, bin entry, tests, docs/context updates.
 - Verify: Server CLI tests, server build, standard verification.
 - Commit: `Add Apiagex runtime CLI`
@@ -57,7 +57,7 @@ git diff --check
 - Status: `completed`
 - Goal: Generate a starter that users can understand and run immediately.
 - Persona: Developer opening the generated folder after install.
-- Success Criteria: Starter depends on `@apiagex/server`; scripts call `apiagex dev/start/smoke`; `.env.example`, `README.md`, `docs/README.md`, and config explain Admin UI, owner setup, schemas, roles, webhooks, realtime, persistence, and common errors in English plus Hinglish.
+- Success Criteria: Starter depends on `apiagex-server`; scripts call `apiagex dev/start/smoke`; `.env.example`, `README.md`, `docs/README.md`, and config explain Admin UI, owner setup, schemas, roles, webhooks, realtime, persistence, and common errors in English plus Hinglish.
 - Constraints: Do not generate fake application code that conflicts with Apiagex runtime.
 - Output: Updated scaffold files and tests.
 - Verify: Scaffold snapshot/content tests and standard verification.

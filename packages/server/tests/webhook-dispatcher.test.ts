@@ -8,7 +8,7 @@ import {
   listWebhookDeliveries,
   migrateMvpDatabase,
   openSqliteDatabase,
-} from "@apiagex/database";
+} from "apiagex-database";
 import { describe, expect, it } from "vitest";
 import { dispatchPendingWebhooks, signWebhookRequest, verifyWebhookSignature } from "../src/webhook-dispatcher.js";
 import type { WebhookHttpRequest } from "../src/webhook-dispatcher.type.js";

@@ -1,5 +1,5 @@
 {
-  "name": "@apiagex/database",
+  "name": "apiagex-database",
   "version": "0.6.1",
   "description": "Kysely database adapter package for Apiagex CMS.",
   "type": "module",

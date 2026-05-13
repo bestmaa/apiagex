@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { SqliteDatabase } from "@apiagex/database";
+import type { SqliteDatabase } from "apiagex-database";
 import type {
   OwnerBootstrapInput,
   OwnerBootstrapResult,

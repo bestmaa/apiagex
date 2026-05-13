@@ -7,7 +7,7 @@ import {
   listRoles,
   setAdminPermission,
   type SqliteDatabase,
-} from "@apiagex/database";
+} from "apiagex-database";
 import type {
   AdminRoleBody,
   AdminRoleParams,

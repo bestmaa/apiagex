@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
-import { migrateMvpDatabase, openSqliteDatabase } from "@apiagex/database";
+import { migrateMvpDatabase, openSqliteDatabase } from "apiagex-database";
 import type {
   ApiagexServer,
   ApiRootResponse,

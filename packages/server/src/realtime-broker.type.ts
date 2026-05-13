@@ -1,4 +1,4 @@
-import type { EntryRecord, RealtimeEventRecord, RealtimeEventType, SchemaRecord } from "@apiagex/database";
+import type { EntryRecord, RealtimeEventRecord, RealtimeEventType, SchemaRecord } from "apiagex-database";
 
 export type RealtimePublishInput = {
   eventType: RealtimeEventType;

@@ -1,4 +1,4 @@
-import type { AdminPermissionAction } from "@apiagex/database";
+import type { AdminPermissionAction } from "apiagex-database";
 
 export type AdminRoleBody = {
   name: string;

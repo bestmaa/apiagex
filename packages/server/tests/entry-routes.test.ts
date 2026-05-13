@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { openSqliteDatabase } from "@apiagex/database";
+import { openSqliteDatabase } from "apiagex-database";
 import { describe, expect, it } from "vitest";
 import { createServer } from "../src/app.js";
 

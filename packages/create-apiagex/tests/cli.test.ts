@@ -77,7 +77,7 @@ describe("create-apiagex CLI", () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("Created 6 files");
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"name": "my-cms"');
-    await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"@apiagex/server"');
+    await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"apiagex-server"');
     await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.toContain("APIAGEX_DATABASE_PATH");
     await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"setupMode"');
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("Practical flow");

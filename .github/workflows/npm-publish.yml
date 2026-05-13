@@ -59,11 +59,11 @@ jobs:
         run: |
           set -euo pipefail
           declare -A package_paths=(
-            ["@apiagex/database"]="packages/database/package.json"
-            ["@apiagex/server"]="packages/server/package.json"
+            ["apiagex-database"]="packages/database/package.json"
+            ["apiagex-server"]="packages/server/package.json"
             ["create-apiagex"]="packages/create-apiagex/package.json"
           )
-          for package_name in "@apiagex/database" "@apiagex/server" "create-apiagex"; do
+          for package_name in "apiagex-database" "apiagex-server" "create-apiagex"; do
             package_path="${package_paths[$package_name]}"
             package_version="$(node -p "require('./${package_path}').version")"
             if npm view "${package_name}@${package_version}" version >/dev/null 2>&1; then
@@ -85,6 +85,6 @@ jobs:
             publish_flags+=(--dry-run)
           fi
 
-          npm publish -w @apiagex/database "${publish_flags[@]}"
-          npm publish -w @apiagex/server "${publish_flags[@]}"
+          npm publish -w apiagex-database "${publish_flags[@]}"
+          npm publish -w apiagex-server "${publish_flags[@]}"
           npm publish -w create-apiagex "${publish_flags[@]}"

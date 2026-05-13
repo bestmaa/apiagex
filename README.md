@@ -37,11 +37,11 @@ Required repository secret:
 NPM_TOKEN
 ```
 
-Run it from GitHub: Actions > Publish npm packages > Run workflow. Keep `dry_run=true` for checking; set `dry_run=false` to publish. Packages publish in this order: `@apiagex/database`, `@apiagex/server`, `create-apiagex`.
+Run it from GitHub: Actions > Publish npm packages > Run workflow. Keep `dry_run=true` for checking; set `dry_run=false` to publish. Packages publish in this order: `apiagex-database`, `apiagex-server`, `create-apiagex`.
 
 GitHub Actions me manual workflow hai: `Publish npm packages`.
 
-GitHub repo secret me `NPM_TOKEN` add karo. Pehle `dry_run=true` se check karo; publish karna ho to `dry_run=false` karo. Publish order same rahega: `@apiagex/database`, `@apiagex/server`, `create-apiagex`.
+GitHub repo secret me `NPM_TOKEN` add karo. Pehle `dry_run=true` se check karo; publish karna ho to `dry_run=false` karo. Publish order same rahega: `apiagex-database`, `apiagex-server`, `create-apiagex`.
 
 ## Current Status
 
@@ -217,9 +217,9 @@ Task 10.0.14 stabilization audit adds a full feature audit test and practical us
 
 ## Create A New Apiagex Project
 
-English: Use `npm create apiagex@latest my-cms` or `npx create-apiagex my-cms`. The installer asks for setup mode, package manager, install preference, git preference, and owner setup preference. Generated projects depend on `@apiagex/server` and expose `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
+English: Use `npm create apiagex@latest my-cms` or `npx create-apiagex my-cms`. The installer asks for setup mode, package manager, install preference, git preference, and owner setup preference. Generated projects depend on `apiagex-server` and expose `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
 
-Hinglish: `npm create apiagex@latest my-cms` ya `npx create-apiagex my-cms` use karo. Installer setup mode, package manager, install preference, git preference, aur owner setup preference puchta hai. Generated projects `@apiagex/server` par depend karte hain aur `npm run dev`, `npm run start`, `npm run smoke`, plus `npm run build` expose karte hain.
+Hinglish: `npm create apiagex@latest my-cms` ya `npx create-apiagex my-cms` use karo. Installer setup mode, package manager, install preference, git preference, aur owner setup preference puchta hai. Generated projects `apiagex-server` par depend karte hain aur `npm run dev`, `npm run start`, `npm run smoke`, plus `npm run build` expose karte hain.
 
 ## Workspace
 

@@ -9,7 +9,7 @@ import {
   queryEntries,
   updateEntry,
   type SqliteDatabase,
-} from "@apiagex/database";
+} from "apiagex-database";
 import type {
   EntryBody,
   EntryListParams,

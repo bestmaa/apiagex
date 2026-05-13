@@ -65,18 +65,18 @@ Apiagex fresh MVP baseline se dobara ban raha hai.
 - Dynamic APIs `x-apiagex-role-id` ya API token present hone par allow/block enforce karte hain.
 - API role tokens are stored hashed in `api_tokens`; content APIs accept `Authorization: Bearer TOKEN` or `x-apiagex-api-token`.
 - API role tokens `api_tokens` me hash hokar store hote hain; content APIs `Authorization: Bearer TOKEN` ya `x-apiagex-api-token` accept karte hain.
-- `@apiagex/server` exposes an installed runtime bin named `apiagex` with `dev`, `start`, `smoke`, `build`, `--help`, and `--version`.
-- `@apiagex/server` installed runtime bin `apiagex` expose karta hai jisme `dev`, `start`, `smoke`, `build`, `--help`, aur `--version` hain.
+- `apiagex-server` exposes an installed runtime bin named `apiagex` with `dev`, `start`, `smoke`, `build`, `--help`, and `--version`.
+- `apiagex-server` installed runtime bin `apiagex` expose karta hai jisme `dev`, `start`, `smoke`, `build`, `--help`, aur `--version` hain.
 - `create-apiagex` supports interactive prompts plus non-interactive flags for setup mode, package manager, install preference, git preference, and owner bootstrap preference.
 - `create-apiagex` setup mode, package manager, install preference, git preference, aur owner bootstrap preference ke liye interactive prompts plus non-interactive flags support karta hai.
-- Generated Apiagex starters depend on `@apiagex/server`, expose `apiagex dev/start/smoke/build` scripts, and document owner setup, schema APIs, RBAC, webhooks, realtime, persistence, and common errors.
-- Generated Apiagex starters `@apiagex/server` par depend karte hain, `apiagex dev/start/smoke/build` scripts expose karte hain, aur owner setup, schema APIs, RBAC, webhooks, realtime, persistence, aur common errors document karte hain.
+- Generated Apiagex starters depend on `apiagex-server`, expose `apiagex dev/start/smoke/build` scripts, and document owner setup, schema APIs, RBAC, webhooks, realtime, persistence, and common errors.
+- Generated Apiagex starters `apiagex-server` par depend karte hain, `apiagex dev/start/smoke/build` scripts expose karte hain, aur owner setup, schema APIs, RBAC, webhooks, realtime, persistence, aur common errors document karte hain.
 - Generated-project verification creates a temp starter, runs the runtime smoke command, starts Apiagex on a temp port/database, and checks `/api/health`, `/adminui`, `/doc`, and `/readme`.
 - Generated-project verification temp starter create karta hai, runtime smoke command chalata hai, temp port/database par Apiagex start karta hai, aur `/api/health`, `/adminui`, `/doc`, plus `/readme` check karta hai.
 - Install and publish flow is documented in `docs/install-and-publish-flow.md`, including `npm create apiagex@latest`, `npx create-apiagex`, generated scripts, environment variables, first owner flow, and maintainer checks.
 - Install aur publish flow `docs/install-and-publish-flow.md` me documented hai, including `npm create apiagex@latest`, `npx create-apiagex`, generated scripts, environment variables, first owner flow, aur maintainer checks.
-- Publish-ready package order is `@apiagex/database`, `@apiagex/server`, then `create-apiagex`; server packs built Admin UI and docs assets inside its `dist` folder.
-- Publish-ready package order `@apiagex/database`, `@apiagex/server`, phir `create-apiagex` hai; server built Admin UI aur docs assets apne `dist` folder me pack karta hai.
+- Publish-ready package order is `apiagex-database`, `apiagex-server`, then `create-apiagex`; server packs built Admin UI and docs assets inside its `dist` folder.
+- Publish-ready package order `apiagex-database`, `apiagex-server`, phir `create-apiagex` hai; server built Admin UI aur docs assets apne `dist` folder me pack karta hai.
 - GitHub Actions workflow `Publish npm packages` publishes packages manually with dry-run, duplicate version checks, and npm provenance after `NPM_TOKEN` is configured.
 - GitHub Actions workflow `Publish npm packages` `NPM_TOKEN` configure hone ke baad dry-run, duplicate version checks, aur npm provenance ke saath packages manually publish karta hai.
 - Admin UI Settings > Content Roles can create, list, and revoke one-time visible API tokens for selected API roles.

@@ -9,7 +9,7 @@ import {
   resolveApiToken,
   setRealtimeConfig,
   type SqliteDatabase,
-} from "@apiagex/database";
+} from "apiagex-database";
 import type { RealtimeBroker } from "./realtime-broker.type.js";
 import type { RealtimeConfigBody, RealtimeConfigParams, RealtimeSessionBody } from "./realtime-routes.type.js";
 

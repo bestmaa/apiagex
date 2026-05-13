@@ -32,10 +32,10 @@ git diff --check
 - Status: `completed`
 - Goal: Make published npm packages contain the runtime CLI, Admin UI assets, docs pages, and executable bins.
 - Persona: Maintainer publishing Apiagex as an open-source npm package.
-- Success Criteria: `@apiagex/server`, `@apiagex/database`, and `create-apiagex` use package `files`; server build copies built Admin UI and docs into `dist`; CLI bins stay executable; dry-run packs include the expected runtime files.
+- Success Criteria: `apiagex-server`, `apiagex-database`, and `create-apiagex` use package `files`; server build copies built Admin UI and docs into `dist`; CLI bins stay executable; dry-run packs include the expected runtime files.
 - Constraints: Do not publish without npm authentication; do not push without a configured git remote.
 - Output: Publish asset copy script, package file lists, docs/context updates.
-- Verify: `npm pack --dry-run --json -w @apiagex/server`, `npm pack --dry-run --json -w @apiagex/database`, `npm pack --dry-run --json -w create-apiagex`, standard verification.
+- Verify: `npm pack --dry-run --json -w apiagex-server`, `npm pack --dry-run --json -w apiagex-database`, `npm pack --dry-run --json -w create-apiagex`, standard verification.
 - Commit: `Prepare npm packages for publishing`
 
 #### T1025 - Publish npm Packages
@@ -45,7 +45,7 @@ git diff --check
 - Goal: Publish the packages to npm in dependency order.
 - Blocker: This machine is not logged in to npm. `npm whoami` returns `E401 Unauthorized`.
 - Required Maintainer Step: Run `npm login` or provide a valid npm automation token through local npm config, and make sure the npm account can publish the `@apiagex` scope.
-- Publish Order: `@apiagex/database`, `@apiagex/server`, then `create-apiagex`.
+- Publish Order: `apiagex-database`, `apiagex-server`, then `create-apiagex`.
 - Commit: `Publish Apiagex npm packages`
 
 #### T1026 - Push Open Source Repository

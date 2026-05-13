@@ -95,7 +95,7 @@ Open karo:
 - `npm run smoke`: checks runtime health through `apiagex smoke`
 - `npm run build`: prints runtime build guidance through `apiagex build`
 
-The generated project depends on `@apiagex/server`, which exposes the installed `apiagex` command.
+The generated project depends on `apiagex-server`, which exposes the installed `apiagex` command.
 
 ### Hinglish
 
@@ -104,7 +104,7 @@ The generated project depends on `@apiagex/server`, which exposes the installed 
 - `npm run smoke`: `apiagex smoke` se runtime health check karta hai
 - `npm run build`: `apiagex build` se runtime build guidance print karta hai
 
-Generated project `@apiagex/server` par depend karta hai, jo installed `apiagex` command expose karta hai.
+Generated project `apiagex-server` par depend karta hai, jo installed `apiagex` command expose karta hai.
 
 ## Environment
 
@@ -134,7 +134,7 @@ Custom local paths ya ports chahiye ho to `.env.example` ko `.env` me copy karo.
 
 ### English
 
-Before publishing `@apiagex/server` and `create-apiagex`, run:
+Before publishing `apiagex-server` and `create-apiagex`, run:
 
 ```bash
 npm run check
@@ -142,7 +142,7 @@ npm run smoke
 npm audit --audit-level=high
 git diff --check
 npm test -w create-apiagex
-npm run build -w @apiagex/server
+npm run build -w apiagex-server
 ```
 
 Also verify that `packages/create-apiagex/tests/generated-project.test.ts` passes. That test creates a temporary starter, runs runtime smoke, starts Apiagex on a temporary database/port, and checks `/api/health`, `/adminui`, `/doc`, and `/readme`.
@@ -150,12 +150,12 @@ Also verify that `packages/create-apiagex/tests/generated-project.test.ts` passe
 Publish order:
 
 ```bash
-npm publish -w @apiagex/database --access public
-npm publish -w @apiagex/server --access public
+npm publish -w apiagex-database --access public
+npm publish -w apiagex-server --access public
 npm publish -w create-apiagex --access public
 ```
 
-`@apiagex/server` copies the built Admin UI and static docs into its `dist` folder before packing, so generated projects can serve `/adminui`, `/doc`, and `/readme` from only the installed runtime package.
+`apiagex-server` copies the built Admin UI and static docs into its `dist` folder before packing, so generated projects can serve `/adminui`, `/doc`, and `/readme` from only the installed runtime package.
 
 Publishing requires an npm login:
 
@@ -164,7 +164,7 @@ npm login
 npm whoami
 ```
 
-The publishing account must own or have access to the `@apiagex` npm scope. If the scope is not available for the account, create or join the npm organization first, or rename the scoped packages before publishing.
+The published runtime packages use unscoped names because the `apiagex` npm organization name is not available. The public package order is `apiagex-database`, `apiagex-server`, then `create-apiagex`.
 
 GitHub publish flow:
 
@@ -178,7 +178,7 @@ The workflow checks duplicate package versions before real publish. If a package
 
 ### Hinglish
 
-`@apiagex/server` aur `create-apiagex` publish karne se pehle ye run karo:
+`apiagex-server` aur `create-apiagex` publish karne se pehle ye run karo:
 
 ```bash
 npm run check
@@ -186,7 +186,7 @@ npm run smoke
 npm audit --audit-level=high
 git diff --check
 npm test -w create-apiagex
-npm run build -w @apiagex/server
+npm run build -w apiagex-server
 ```
 
 Ye bhi verify karo ki `packages/create-apiagex/tests/generated-project.test.ts` pass ho. Ye test temporary starter create karta hai, runtime smoke chalata hai, temporary database/port par Apiagex start karta hai, aur `/api/health`, `/adminui`, `/doc`, plus `/readme` check karta hai.
@@ -194,12 +194,12 @@ Ye bhi verify karo ki `packages/create-apiagex/tests/generated-project.test.ts` 
 Publish order:
 
 ```bash
-npm publish -w @apiagex/database --access public
-npm publish -w @apiagex/server --access public
+npm publish -w apiagex-database --access public
+npm publish -w apiagex-server --access public
 npm publish -w create-apiagex --access public
 ```
 
-`@apiagex/server` packing se pehle built Admin UI aur static docs ko apne `dist` folder me copy karta hai, isliye generated projects sirf installed runtime package se `/adminui`, `/doc`, aur `/readme` serve kar sakte hain.
+`apiagex-server` packing se pehle built Admin UI aur static docs ko apne `dist` folder me copy karta hai, isliye generated projects sirf installed runtime package se `/adminui`, `/doc`, aur `/readme` serve kar sakte hain.
 
 Publish karne ke liye npm login required hai:
 
@@ -208,7 +208,7 @@ npm login
 npm whoami
 ```
 
-Publishing account ke paas `@apiagex` npm scope ka access hona chahiye. Agar scope account ke liye available nahi hai, pehle npm organization create/join karo, ya publish se pehle scoped package names rename karo.
+Published runtime packages unscoped names use karte hain kyunki `apiagex` npm organization name available nahi hai. Public package order `apiagex-database`, `apiagex-server`, phir `create-apiagex` hai.
 
 GitHub publish flow:
 
