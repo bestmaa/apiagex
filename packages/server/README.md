@@ -1,4 +1,4 @@
-# apiagex-server
+# @apiagex/server
 
 ## English
 
@@ -88,10 +88,10 @@ Local development persistence defaults to `.apiagex/apiagex.sqlite`, and local u
 Run it with:
 
 ```bash
-npm run dev -w apiagex-server
+npm run dev -w @apiagex/server
 ```
 
-Installed projects can use the runtime CLI after depending on `apiagex-server`:
+Installed projects can use the runtime CLI after depending on `@apiagex/server`:
 
 ```bash
 apiagex dev
@@ -102,7 +102,7 @@ apiagex --help
 
 `apiagex dev` and `apiagex start` serve the same `/api`, `/adminui`, `/doc`, and `/readme` paths. `apiagex smoke` checks `/api/health` without starting a long-running server. Local persistence still uses `APIAGEX_DATABASE_PATH` and `APIAGEX_UPLOADS_PATH`, defaulting to `.apiagex/apiagex.sqlite` and `.apiagex/uploads`.
 
-New users normally get this runtime through `npm create apiagex@latest my-cms` or `npx create-apiagex my-cms`, which scaffolds a project that depends on `apiagex-server`.
+New users normally get this runtime through `npm create apiagex@latest my-cms` or `npx create-apiagex my-cms`, which scaffolds a project that depends on `@apiagex/server`.
 
 ## Hindi
 
@@ -177,7 +177,7 @@ Entries `pendingApproval` bhi ho sakti hain. Admin-only routes `/admin/content-t
 
 Admin list route `?status=pendingApproval` bhi accept karti hai taaki sirf approval queue dikh sake.
 
-Installed projects `apiagex-server` dependency ke baad runtime CLI use kar sakte hain:
+Installed projects `@apiagex/server` dependency ke baad runtime CLI use kar sakte hain:
 
 ```bash
 apiagex dev
@@ -188,7 +188,7 @@ apiagex --help
 
 `apiagex dev` aur `apiagex start` same `/api`, `/adminui`, `/doc`, aur `/readme` paths serve karte hain. `apiagex smoke` long-running server start kiye bina `/api/health` check karta hai. Local persistence abhi bhi `APIAGEX_DATABASE_PATH` aur `APIAGEX_UPLOADS_PATH` use karti hai, default `.apiagex/apiagex.sqlite` aur `.apiagex/uploads`.
 
-New users usually ye runtime `npm create apiagex@latest my-cms` ya `npx create-apiagex my-cms` ke through lete hain, jo `apiagex-server` dependency wala project scaffold karta hai.
+New users usually ye runtime `npm create apiagex@latest my-cms` ya `npx create-apiagex my-cms` ke through lete hain, jo `@apiagex/server` dependency wala project scaffold karta hai.
 
 Admin list route `q`, `page`, `pageSize`, aur `sort` query parameters bhi accept karti hai search, pagination, aur newest/oldest sorting ke liye.
 

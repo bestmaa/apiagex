@@ -1,4 +1,4 @@
-import { type EntryRecord, type RealtimeEventType, type SchemaRecord } from "apiagex-database";
+import { type EntryRecord, type RealtimeEventType, type SchemaRecord } from "@apiagex/database";
 import type { RealtimeBroker } from "./realtime-broker.type.js";
 
 export function emitEntryRealtime(

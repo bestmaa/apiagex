@@ -8,7 +8,7 @@ import {
   type SqliteDatabase,
   type FieldRecord,
   type SchemaRecord,
-} from "apiagex-database";
+} from "@apiagex/database";
 import type {
   SchemaFieldResponse,
   SchemaCreateBody,

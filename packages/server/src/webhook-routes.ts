@@ -6,7 +6,7 @@ import {
   listWebhooks,
   updateWebhook,
   type SqliteDatabase,
-} from "apiagex-database";
+} from "@apiagex/database";
 import { dispatchPendingWebhooks } from "./webhook-dispatcher.js";
 import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
 import type { WebhookBody, WebhookParams } from "./webhook-routes.type.js";

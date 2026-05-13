@@ -1,6 +1,6 @@
 {
   "name": "create-apiagex",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Installer CLI for creating Apiagex CMS projects.",
   "type": "module",
   "license": "MIT",
@@ -29,7 +29,7 @@
     "LICENSE"
   ],
   "bin": {
-    "create-apiagex": "./dist/index.js"
+    "create-apiagex": "dist/index.js"
   },
   "exports": {
     ".": "./dist/index.js"

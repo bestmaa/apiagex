@@ -9,7 +9,7 @@ import {
   revokeApiToken,
   setPermission,
   type SqliteDatabase,
-} from "apiagex-database";
+} from "@apiagex/database";
 import type {
   RoleBody,
   RoleParams,

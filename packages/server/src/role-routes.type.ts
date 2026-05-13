@@ -1,5 +1,5 @@
-import type { CreateRoleInput } from "apiagex-database";
-import type { SetPermissionInput } from "apiagex-database";
+import type { CreateRoleInput } from "@apiagex/database";
+import type { SetPermissionInput } from "@apiagex/database";
 
 export type RoleBody = CreateRoleInput;
 

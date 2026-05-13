@@ -5,7 +5,7 @@ import {
   getUserById,
   listUsers,
   type SqliteDatabase,
-} from "apiagex-database";
+} from "@apiagex/database";
 import type { UserBody, UserParams } from "./user-routes.type.js";
 
 export function registerUserRoutes(server: FastifyInstance, database: SqliteDatabase): void {

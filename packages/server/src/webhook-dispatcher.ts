@@ -11,7 +11,7 @@ import {
   type SqliteDatabase,
   type WebhookEventRecord,
   type WebhookSecretRecord,
-} from "apiagex-database";
+} from "@apiagex/database";
 import type {
   WebhookDispatchResult,
   WebhookDispatcherOptions,

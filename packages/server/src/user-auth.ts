@@ -4,7 +4,7 @@ import {
   getUserById,
   getUserPasswordHashByEmail,
   type SqliteDatabase,
-} from "apiagex-database";
+} from "@apiagex/database";
 import type { UserLoginInput, UserLoginResult } from "./user-auth.type.js";
 
 export function loginUser(

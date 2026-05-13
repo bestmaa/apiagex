@@ -1,4 +1,4 @@
-import type { EntryData } from "apiagex-database";
+import type { EntryData } from "@apiagex/database";
 
 export type EntryListParams = {
   schemaId: string;

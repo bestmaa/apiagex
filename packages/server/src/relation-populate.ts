@@ -5,7 +5,7 @@ import {
   type EntryRecord,
   type SchemaRecord,
   type SqliteDatabase,
-} from "apiagex-database";
+} from "@apiagex/database";
 
 export type PopulatedEntryRecord = Omit<EntryRecord, "data"> & {
   data: Record<string, unknown>;

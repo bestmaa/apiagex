@@ -1,4 +1,4 @@
-import type { WebhookEventRecord, WebhookSecretRecord } from "apiagex-database";
+import type { WebhookEventRecord, WebhookSecretRecord } from "@apiagex/database";
 
 export type WebhookHttpRequest = {
   url: string;

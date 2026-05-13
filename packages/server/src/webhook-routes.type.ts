@@ -1,4 +1,4 @@
-import type { WebhookDraft } from "apiagex-database";
+import type { WebhookDraft } from "@apiagex/database";
 
 export type WebhookBody = WebhookDraft;
 

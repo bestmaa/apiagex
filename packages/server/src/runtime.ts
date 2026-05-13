@@ -2,7 +2,7 @@ import { createServer } from "./app.js";
 import { ensureLocalServerPaths, resolveLocalServerConfig } from "./server-config.js";
 import type { RuntimeCliOptions, RuntimeCliResult, StartedApiagexServer, StartServerOptions } from "./runtime.type.js";
 
-const runtimeVersion = "0.6.1";
+const runtimeVersion = "0.6.2";
 
 export async function startApiagexServer(options: StartServerOptions = {}): Promise<StartedApiagexServer | undefined> {
   const env = options.env ?? process.env;

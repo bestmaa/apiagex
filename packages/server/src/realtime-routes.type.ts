@@ -1,4 +1,4 @@
-import type { RealtimeEventType } from "apiagex-database";
+import type { RealtimeEventType } from "@apiagex/database";
 
 export type RealtimeConfigParams = {
   schemaId: string;

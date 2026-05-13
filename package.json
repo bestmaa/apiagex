@@ -1,6 +1,6 @@
 {
   "name": "apiagex",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Installable headless CMS platform workspace.",
   "type": "module",
   "license": "MIT",
@@ -26,13 +26,13 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @apiagex/docs && npm run build -w @apiagex/admin && npm run build -w apiagex-database && npm run build -w apiagex-server && npm run build -w create-apiagex",
-    "dev": "npm run dev -w apiagex-server",
+    "build": "npm run build -w @apiagex/docs && npm run build -w @apiagex/admin && npm run build -w @apiagex/database && npm run build -w @apiagex/server && npm run build -w create-apiagex",
+    "dev": "npm run dev -w @apiagex/server",
     "smoke": "vitest run packages/server/tests/release-smoke.test.ts",
     "release:check": "npm run check && npm run smoke && npm audit --audit-level=high",
     "reset:local": "node scripts/reset-local-dev.mjs",
     "reset:local:smoke": "vitest run scripts/reset-local-smoke.test.ts",
-    "start": "npm run start -w apiagex-server",
+    "start": "npm run start -w @apiagex/server",
     "test": "vitest run",
     "check": "npm run build && npm run test"
   },

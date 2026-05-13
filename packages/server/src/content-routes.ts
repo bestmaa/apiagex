@@ -13,7 +13,7 @@ import {
   updateEntry,
   type SchemaRecord,
   type SqliteDatabase,
-} from "apiagex-database";
+} from "@apiagex/database";
 import type { FastifyRequest } from "fastify";
 import type {
   ContentBody,

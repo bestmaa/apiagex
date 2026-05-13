@@ -13,7 +13,7 @@ import {
   recordRealtimeEvent,
   resolveApiToken,
   type SqliteDatabase,
-} from "apiagex-database";
+} from "@apiagex/database";
 import type {
   RealtimeBroker,
   RealtimeConnectionSnapshot,
