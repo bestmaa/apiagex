@@ -166,6 +166,16 @@ npm whoami
 
 The publishing account must own or have access to the `@apiagex` npm scope. If the scope is not available for the account, create or join the npm organization first, or rename the scoped packages before publishing.
 
+GitHub publish flow:
+
+1. Add a GitHub repository secret named `NPM_TOKEN`.
+2. Push the release commit to GitHub.
+3. Open Actions > Publish npm packages.
+4. Run the workflow with `dry_run=true` first.
+5. Run the workflow with `dry_run=false` to publish.
+
+The workflow checks duplicate package versions before real publish. If a package version already exists on npm, bump all package versions first.
+
 ### Hinglish
 
 `@apiagex/server` aur `create-apiagex` publish karne se pehle ye run karo:
@@ -199,3 +209,13 @@ npm whoami
 ```
 
 Publishing account ke paas `@apiagex` npm scope ka access hona chahiye. Agar scope account ke liye available nahi hai, pehle npm organization create/join karo, ya publish se pehle scoped package names rename karo.
+
+GitHub publish flow:
+
+1. GitHub repository secret me `NPM_TOKEN` add karo.
+2. Release commit ko GitHub par push karo.
+3. Actions > Publish npm packages open karo.
+4. Pehle `dry_run=true` ke saath workflow run karo.
+5. Publish ke liye `dry_run=false` ke saath workflow run karo.
+
+Workflow real publish se pehle duplicate package versions check karta hai. Agar package version npm par already hai, pehle sab package versions bump karo.

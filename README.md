@@ -4,6 +4,45 @@ Apiagex is being rebuilt as a fresh MVP headless CMS/API platform.
 
 Apiagex ko fresh MVP headless CMS/API platform ke roop me dobara banaya ja raha hai.
 
+## Install
+
+```bash
+npm create apiagex@latest my-cms
+# or
+npx create-apiagex my-cms
+```
+
+Then:
+
+```bash
+cd my-cms
+npm run dev
+```
+
+Open `http://127.0.0.1:4000/adminui`.
+
+## Open Source License
+
+Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.
+
+Apiagex MIT License ke under release hai. Aap use, modify, distribute kar sakte ho, lekin copyright aur license notice copies ya substantial portions ke saath rehna chahiye.
+
+## Maintainer npm Publish
+
+GitHub Actions has a manual workflow: `Publish npm packages`.
+
+Required repository secret:
+
+```txt
+NPM_TOKEN
+```
+
+Run it from GitHub: Actions > Publish npm packages > Run workflow. Keep `dry_run=true` for checking; set `dry_run=false` to publish. Packages publish in this order: `@apiagex/database`, `@apiagex/server`, `create-apiagex`.
+
+GitHub Actions me manual workflow hai: `Publish npm packages`.
+
+GitHub repo secret me `NPM_TOKEN` add karo. Pehle `dry_run=true` se check karo; publish karna ho to `dry_run=false` karo. Publish order same rahega: `@apiagex/database`, `@apiagex/server`, `create-apiagex`.
+
 ## Current Status
 
 - Old implementation code is backed up in Git:

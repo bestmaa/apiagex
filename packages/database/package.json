@@ -4,9 +4,28 @@
   "description": "Kysely database adapter package for Apiagex CMS.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bestmaa/apiagex.git",
+    "directory": "packages/database"
+  },
+  "bugs": {
+    "url": "https://github.com/bestmaa/apiagex/issues"
+  },
+  "homepage": "https://github.com/bestmaa/apiagex#readme",
+  "keywords": [
+    "apiagex",
+    "headless-cms",
+    "cms",
+    "sqlite"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "exports": {
     ".": "./dist/index.js"

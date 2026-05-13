@@ -4,9 +4,29 @@
   "description": "Installer CLI for creating Apiagex CMS projects.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bestmaa/apiagex.git",
+    "directory": "packages/create-apiagex"
+  },
+  "bugs": {
+    "url": "https://github.com/bestmaa/apiagex/issues"
+  },
+  "homepage": "https://github.com/bestmaa/apiagex#readme",
+  "keywords": [
+    "apiagex",
+    "create-apiagex",
+    "headless-cms",
+    "cms",
+    "scaffold"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "bin": {
     "create-apiagex": "./dist/index.js"
