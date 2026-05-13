@@ -49,3 +49,15 @@ git diff --check
 - Output: Safer workflow event handling.
 - Verify: Workflow dry-run on GitHub after push.
 - Commit: `Add push dry run for npm publish workflow`
+
+#### T1029 - Add Tag Based npm Publish
+
+- Version: `0.6.2`
+- Status: `completed`
+- Goal: Let maintainers publish from git by pushing an explicit npm release tag.
+- Persona: Maintainer who wants Codex or git automation to publish without using the GitHub UI form.
+- Success Criteria: Pushing a tag named `npm-v*` runs the publish workflow as a real npm publish; normal `main` pushes stay dry-run only; duplicate package version checks run before real publish.
+- Constraints: Only explicit `npm-v*` tags can publish automatically.
+- Output: Tag trigger and event-aware dry-run logic.
+- Verify: Push `npm-v0.6.1` and inspect GitHub Actions.
+- Commit: `Add tag based npm publish trigger`
