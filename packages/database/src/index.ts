@@ -9,6 +9,10 @@ export {
   openSqliteDatabase,
 } from "./sqlite.js";
 export {
+  openSqliteAdapter,
+  SqliteApiagexDatabase,
+} from "./sqlite-adapter.js";
+export {
   createEntry,
   deleteEntry,
   getEntryById,
@@ -100,6 +104,13 @@ export {
   schemaEntriesUseField,
 } from "./relation-helpers.js";
 export type { MvpTableName, MigrationRecord, TableInfoRow } from "./schema.type.js";
+export type {
+  ApiagexDatabase,
+  DatabaseProvider,
+  DatabaseQueryParam,
+  DatabaseRunResult,
+  DatabaseStatement,
+} from "./database-adapter.type.js";
 export type {
   CreateEntryInput,
   EntryData,

@@ -78,7 +78,7 @@ Each task uses this structure:
 #### T2802 - Add Database Adapter Boundary
 
 - Version: `v0.7.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a provider-neutral database adapter contract and a SQLite adapter backed by `better-sqlite3`, without migrating existing repository behavior yet.
 - Persona: Backend infrastructure engineer; introduce the boundary with very low blast radius.
 - Success Criteria: Adapter types cover `get`, `all`, `run`, `exec`, `transaction`, and `close`; SQLite adapter works through the new contract; current database exports remain compatible.
