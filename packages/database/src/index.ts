@@ -4,6 +4,12 @@ export {
   MVP_TABLES,
 } from "./migrations.js";
 export {
+  getProviderFoundationMigration,
+  MYSQL_FOUNDATION_SQL,
+  POSTGRES_FOUNDATION_SQL,
+  providerFoundationSql,
+} from "./provider-migrations.js";
+export {
   listMvpTables,
   migrateMvpDatabase,
   openSqliteDatabase,
@@ -106,6 +112,7 @@ export {
   schemaEntriesUseField,
 } from "./relation-helpers.js";
 export type { MvpTableName, MigrationRecord, TableInfoRow } from "./schema.type.js";
+export type { ProviderFoundationMigration } from "./provider-migrations.js";
 export type {
   ApiagexDatabase,
   DatabaseProvider,

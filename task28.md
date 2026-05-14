@@ -106,7 +106,7 @@ Each task uses this structure:
 #### T2804 - Split Provider Migration SQL
 
 - Version: `v0.7.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Split migration SQL by provider so SQLite, PostgreSQL, and MySQL each have valid DDL.
 - Persona: Database engineer; make migrations explicit and testable for each engine.
 - Success Criteria: SQLite keeps current SQL; PostgreSQL uses compatible serial/boolean/text/FK syntax; MySQL uses compatible auto-increment/boolean/text/FK syntax; migration record behavior stays consistent.
