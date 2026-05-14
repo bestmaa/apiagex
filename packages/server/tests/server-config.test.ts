@@ -33,9 +33,22 @@ describe("local server configuration", () => {
     expect(config.uploadsPath).toBe("/workspace/app/storage/uploads");
   });
 
-  it("rejects planned database providers until adapters are implemented", () => {
+  it("supports PostgreSQL provider when a database URL is present", () => {
+    const config = resolveLocalServerConfig(
+      {
+        APIAGEX_DATABASE_PROVIDER: "postgres",
+        APIAGEX_DATABASE_URL: "postgres://apiagex:secret@localhost:5432/apiagex",
+      },
+      "/workspace/app",
+    );
+
+    expect(config.databaseProvider).toBe("postgres");
+    expect(config.databaseUrl).toBe("postgres://apiagex:secret@localhost:5432/apiagex");
+  });
+
+  it("requires a PostgreSQL database URL when provider is postgres", () => {
     expect(() => resolveLocalServerConfig({ APIAGEX_DATABASE_PROVIDER: "postgres" }, "/workspace/app")).toThrow(
-      "DATABASE_PROVIDER_NOT_SUPPORTED",
+      "DATABASE_URL_REQUIRED: postgres",
     );
   });
 

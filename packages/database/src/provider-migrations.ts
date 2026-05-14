@@ -1,5 +1,7 @@
 import type { DatabaseProvider } from "./database-adapter.type.js";
+import type { ApiagexDatabase } from "./database-adapter.type.js";
 import { MVP_FOUNDATION_SQL, MVP_TABLES } from "./migrations.js";
+import { MVP_MIGRATION_ID } from "./migrations.js";
 import type { MvpTableName } from "./schema.type.js";
 
 export type ProviderFoundationMigration = {
@@ -20,6 +22,19 @@ export function providerFoundationSql(provider: DatabaseProvider): string {
   if (provider === "sqlite") return MVP_FOUNDATION_SQL;
   if (provider === "postgres") return POSTGRES_FOUNDATION_SQL;
   return MYSQL_FOUNDATION_SQL;
+}
+
+export async function migrateProviderFoundation(
+  db: ApiagexDatabase,
+  provider: DatabaseProvider,
+): Promise<void> {
+  await db.exec(providerFoundationSql(provider));
+  const existing = await db.prepare("SELECT id, applied_at FROM migrations WHERE id = ?")
+    .get<{ id: string; applied_at: string }>(MVP_MIGRATION_ID);
+  if (!existing) {
+    await db.prepare("INSERT INTO migrations (id, applied_at) VALUES (?, ?)")
+      .run(MVP_MIGRATION_ID, new Date().toISOString());
+  }
 }
 
 export const POSTGRES_FOUNDATION_SQL = `

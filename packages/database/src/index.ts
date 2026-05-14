@@ -5,10 +5,17 @@ export {
 } from "./migrations.js";
 export {
   getProviderFoundationMigration,
+  migrateProviderFoundation,
   MYSQL_FOUNDATION_SQL,
   POSTGRES_FOUNDATION_SQL,
   providerFoundationSql,
 } from "./provider-migrations.js";
+export {
+  convertPostgresPlaceholders,
+  openPostgresAdapter,
+  PostgresApiagexDatabase,
+} from "./postgres-adapter.js";
+export type { PostgresAdapterOptions } from "./postgres-adapter.js";
 export {
   listMvpTables,
   migrateMvpDatabase,

@@ -3,7 +3,7 @@ import { dirname, resolve } from "node:path";
 import type { DatabaseProvider, LocalServerConfig, ServerConfigEnv } from "./server-config.type.js";
 
 const defaultDataDir = ".apiagex";
-const supportedDatabaseProviders: DatabaseProvider[] = ["sqlite"];
+const supportedDatabaseProviders: DatabaseProvider[] = ["sqlite", "postgres"];
 
 export function resolveLocalServerConfig(
   env: ServerConfigEnv = process.env,
@@ -11,10 +11,12 @@ export function resolveLocalServerConfig(
 ): LocalServerConfig {
   const baseCwd = env.INIT_CWD ?? cwd;
   const databaseProvider = resolveDatabaseProvider(env.APIAGEX_DATABASE_PROVIDER);
+  const databaseUrl = resolveDatabaseUrl(databaseProvider, env.APIAGEX_DATABASE_URL);
   const databasePath = resolve(baseCwd, env.APIAGEX_DATABASE_PATH ?? `${defaultDataDir}/apiagex.sqlite`);
   const uploadsPath = resolve(baseCwd, env.APIAGEX_UPLOADS_PATH ?? `${defaultDataDir}/uploads`);
   return {
     ...(env.APIAGEX_SECRET === undefined ? {} : { appSecret: env.APIAGEX_SECRET }),
+    ...(databaseUrl === undefined ? {} : { databaseUrl }),
     databasePath,
     databaseProvider,
     uploadsPath,
@@ -22,12 +24,18 @@ export function resolveLocalServerConfig(
 }
 
 export async function ensureLocalServerPaths(config: LocalServerConfig): Promise<void> {
-  await mkdir(dirname(config.databasePath), { recursive: true });
+  if (config.databaseProvider === "sqlite") await mkdir(dirname(config.databasePath), { recursive: true });
   await mkdir(config.uploadsPath, { recursive: true });
 }
 
 function resolveDatabaseProvider(value: string | undefined): DatabaseProvider {
   const provider = value ?? "sqlite";
   if (supportedDatabaseProviders.includes(provider as DatabaseProvider)) return provider as DatabaseProvider;
-  throw new Error(`DATABASE_PROVIDER_NOT_SUPPORTED: ${provider}. Supported today: sqlite. Planned: postgres, mysql.`);
+  throw new Error(`DATABASE_PROVIDER_NOT_SUPPORTED: ${provider}. Supported today: sqlite, postgres. Planned: mysql.`);
+}
+
+function resolveDatabaseUrl(provider: DatabaseProvider, value: string | undefined): string | undefined {
+  if (provider === "sqlite") return undefined;
+  if (!value?.trim()) throw new Error(`DATABASE_URL_REQUIRED: ${provider}`);
+  return value.trim();
 }

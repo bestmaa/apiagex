@@ -119,7 +119,7 @@ Each task uses this structure:
 #### T2805 - Add PostgreSQL Adapter
 
 - Version: `v0.7.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add real PostgreSQL runtime support through `pg`.
 - Persona: Backend database engineer; make Postgres a real adapter, not a setup label.
 - Success Criteria: `APIAGEX_DATABASE_PROVIDER=postgres` and `APIAGEX_DATABASE_URL=postgres://...` work; `?` parameters convert to `$1`, `$2`; update/delete returns consistent `{ changes }`.
