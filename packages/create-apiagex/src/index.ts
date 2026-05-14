@@ -55,8 +55,10 @@ Usage:
 
 Options:
   --setup quickstart|custom      Choose starter setup mode.
-  --database sqlite              Choose database provider. Postgres and MySQL are planned.
+  --database sqlite|postgres|mysql
+                                Choose database provider.
   --database-path <path>         Set the SQLite database path.
+  --database-url <url>           Set the PostgreSQL/MySQL connection URL.
   --host <host>                  Set the server host.
   --port <port>                  Set the server port.
   --app-secret <secret>          Set APIAGEX_SECRET instead of generating one.

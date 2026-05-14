@@ -16,13 +16,18 @@ export function parseArgs(args: string[]): CliOptions | string {
     else if (arg === "--no-owner") options.bootstrapOwner = false;
     else if (arg === "--database") {
       const value = args[index + 1];
-      if (!isDatabaseProvider(value)) return "Use --database sqlite. Postgres and MySQL are planned but not available yet.";
+      if (!isDatabaseProvider(value)) return "Use --database sqlite, postgres, or mysql.";
       options.databaseProvider = value;
       index += 1;
     } else if (arg === "--database-path") {
       const value = args[index + 1];
       if (!value) return "Use --database-path with a SQLite database path.";
       options.databasePath = value;
+      index += 1;
+    } else if (arg === "--database-url") {
+      const value = args[index + 1];
+      if (!value) return "Use --database-url with a PostgreSQL or MySQL connection URL.";
+      options.databaseUrl = value;
       index += 1;
     } else if (arg === "--host") {
       const value = args[index + 1];
@@ -79,7 +84,7 @@ function isPackageManager(value: string | undefined): value is PackageManager {
 }
 
 function isDatabaseProvider(value: string | undefined): value is DatabaseProvider {
-  return value === "sqlite";
+  return value === "sqlite" || value === "postgres" || value === "mysql";
 }
 
 function isSetupMode(value: string | undefined): value is SetupMode {

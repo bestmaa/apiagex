@@ -44,7 +44,7 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
       path: "apiagex.config.json",
       content: `${JSON.stringify(
         {
-          database: { provider: answers.databaseProvider, path: answers.databasePath },
+          database: databaseConfig(answers),
           project: {
             appSecretEnv: "APIAGEX_SECRET",
             packageManager: answers.packageManager,
@@ -77,7 +77,7 @@ export function renderPlan(projectName: string, targetDir: string, files: Scaffo
     "Selected setup:",
     `- Setup mode: ${answers.setupMode}`,
     `- Database: ${answers.databaseProvider}`,
-    `- SQLite path: ${answers.databasePath}`,
+    databasePlanLine(answers),
     `- Server: http://${answers.host}:${answers.port}`,
     `- Package manager: ${answers.packageManager}`,
     `- Install dependencies: ${answers.installDependencies ? "yes" : "no"}`,
@@ -127,8 +127,10 @@ If .env contains APIAGEX_OWNER_EMAIL and APIAGEX_OWNER_PASSWORD, the first owner
 
 The installer creates .env for local use. Copy .env.example to .env again if you need to reset local settings.
 
-- APIAGEX_DATABASE_PROVIDER: sqlite today. Postgres and MySQL are planned.
-- APIAGEX_DATABASE_PATH: SQLite database path. Default .apiagex/apiagex.sqlite.
+- APIAGEX_DATABASE_PROVIDER: sqlite, postgres, or mysql.
+${answers.databaseProvider === "sqlite"
+    ? "- APIAGEX_DATABASE_PATH: SQLite database path. Default .apiagex/apiagex.sqlite."
+    : "- APIAGEX_DATABASE_URL: database connection URL for PostgreSQL or MySQL."}
 - APIAGEX_UPLOADS_PATH: upload folder. Default .apiagex/uploads.
 - APIAGEX_SECRET: app secret generated during setup.
 - PORT: server port. Default 4000.
@@ -204,7 +206,7 @@ Relation docs: /doc explains relation field types, entry payloads, populate quer
 function envFile(answers: ScaffoldAnswers, includeSecrets: boolean): string {
   const lines = [
     `APIAGEX_DATABASE_PROVIDER=${answers.databaseProvider}`,
-    `APIAGEX_DATABASE_PATH=${answers.databasePath}`,
+    ...databaseEnvLines(answers),
     "APIAGEX_UPLOADS_PATH=.apiagex/uploads",
     `APIAGEX_SECRET=${includeSecrets ? answers.appSecret : "change-me"}`,
     `HOST=${answers.host}`,
@@ -222,6 +224,26 @@ function envFile(answers: ScaffoldAnswers, includeSecrets: boolean): string {
     );
   }
   return `${lines.join("\n")}\n`;
+}
+
+function databaseConfig(answers: ScaffoldAnswers): Record<string, string> {
+  if (answers.databaseProvider === "sqlite") return { provider: "sqlite", path: answers.databasePath };
+  return { provider: answers.databaseProvider, urlEnv: "APIAGEX_DATABASE_URL" };
+}
+
+function databasePlanLine(answers: ScaffoldAnswers): string {
+  if (answers.databaseProvider === "sqlite") return `- SQLite path: ${answers.databasePath}`;
+  return `- Database URL: ${answers.databaseUrl ?? defaultDatabaseUrl(answers.databaseProvider)}`;
+}
+
+function databaseEnvLines(answers: ScaffoldAnswers): string[] {
+  if (answers.databaseProvider === "sqlite") return [`APIAGEX_DATABASE_PATH=${answers.databasePath}`];
+  return [`APIAGEX_DATABASE_URL=${answers.databaseUrl ?? defaultDatabaseUrl(answers.databaseProvider)}`];
+}
+
+function defaultDatabaseUrl(provider: Exclude<ScaffoldAnswers["databaseProvider"], "sqlite">): string {
+  if (provider === "postgres") return "postgres://apiagex:change-me@localhost:5432/apiagex";
+  return "mysql://apiagex:change-me@localhost:3306/apiagex";
 }
 
 function serverEntryFile(): string {

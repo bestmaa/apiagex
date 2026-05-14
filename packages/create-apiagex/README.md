@@ -15,7 +15,7 @@ Current CLI behavior:
 - Supports `--dry-run` to show the scaffold plan without writing files.
 - Creates a small starter scaffold when the target folder is missing or empty.
 
-Interactive setup asks for setup mode, SQLite database path, host, port, package manager, dependency install preference, git init preference, and optional first owner bootstrap credentials. Postgres and MySQL are planned providers, but SQLite is the supported provider today.
+Interactive setup asks for setup mode, database provider, SQLite database path or PostgreSQL/MySQL database URL, host, port, package manager, dependency install preference, git init preference, and optional first owner bootstrap credentials.
 
 Generated starter files:
 
@@ -28,7 +28,7 @@ Generated starter files:
 - `README.md`
 - `docs/README.md`
 
-The generated `.env` stores local setup values such as `APIAGEX_DATABASE_PROVIDER`, `APIAGEX_DATABASE_PATH`, `APIAGEX_UPLOADS_PATH`, `APIAGEX_SECRET`, `HOST`, and `PORT`. If owner bootstrap is enabled, `.env` also contains `APIAGEX_OWNER_EMAIL` and `APIAGEX_OWNER_PASSWORD`; remove the password after the first successful start.
+The generated `.env` stores local setup values such as `APIAGEX_DATABASE_PROVIDER`, `APIAGEX_DATABASE_PATH` for SQLite or `APIAGEX_DATABASE_URL` for PostgreSQL/MySQL, `APIAGEX_UPLOADS_PATH`, `APIAGEX_SECRET`, `HOST`, and `PORT`. If owner bootstrap is enabled, `.env` also contains `APIAGEX_OWNER_EMAIL` and `APIAGEX_OWNER_PASSWORD`; remove the password after the first successful start.
 
 The generated `package.json` depends on `@apiagex/server` and exposes `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
 
@@ -80,7 +80,7 @@ Current CLI behavior:
 - `--dry-run` scaffold plan dikhata hai bina files likhe.
 - Target folder missing ya empty ho to small starter scaffold create hota hai.
 
-Interactive setup setup mode, SQLite database path, host, port, package manager, dependency install preference, git init preference, aur optional first owner bootstrap credentials puchta hai. Postgres aur MySQL planned providers hain, lekin aaj SQLite supported provider hai.
+Interactive setup setup mode, database provider, SQLite database path ya PostgreSQL/MySQL database URL, host, port, package manager, dependency install preference, git init preference, aur optional first owner bootstrap credentials puchta hai.
 
 Generated starter files:
 
@@ -93,7 +93,7 @@ Generated starter files:
 - `README.md`
 - `docs/README.md`
 
-Generated `.env` local setup values store karta hai, jaise `APIAGEX_DATABASE_PROVIDER`, `APIAGEX_DATABASE_PATH`, `APIAGEX_UPLOADS_PATH`, `APIAGEX_SECRET`, `HOST`, aur `PORT`. Owner bootstrap enable ho to `.env` me `APIAGEX_OWNER_EMAIL` aur `APIAGEX_OWNER_PASSWORD` bhi hota hai; first successful start ke baad password hata do.
+Generated `.env` local setup values store karta hai, jaise `APIAGEX_DATABASE_PROVIDER`, SQLite ke liye `APIAGEX_DATABASE_PATH` ya PostgreSQL/MySQL ke liye `APIAGEX_DATABASE_URL`, `APIAGEX_UPLOADS_PATH`, `APIAGEX_SECRET`, `HOST`, aur `PORT`. Owner bootstrap enable ho to `.env` me `APIAGEX_OWNER_EMAIL` aur `APIAGEX_OWNER_PASSWORD` bhi hota hai; first successful start ke baad password hata do.
 
 Generated `package.json` `@apiagex/server` par depend karta hai aur `npm run dev`, `npm run start`, `npm run smoke`, aur `npm run build` expose karta hai.
 

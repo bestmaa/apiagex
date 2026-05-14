@@ -147,7 +147,7 @@ Each task uses this structure:
 #### T2807 - Add Provider Setup Wizard
 
 - Version: `v0.7.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Update `create-apiagex` so first setup asks for the database provider and writes correct project files for the selected provider.
 - Persona: CLI product engineer; make setup practical for new users.
 - Success Criteria: Setup prompts for sqlite/postgres/mysql; SQLite asks for path; PostgreSQL/MySQL ask for database URL; generated `.env`, `.env.example`, `apiagex.config.json`, `src/index.js`, and README match the provider.

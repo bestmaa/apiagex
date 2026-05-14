@@ -2,13 +2,14 @@ import type { Readable, Writable } from "node:stream";
 
 export type PackageManager = "npm" | "pnpm" | "yarn";
 export type SetupMode = "custom" | "quickstart";
-export type DatabaseProvider = "sqlite";
+export type DatabaseProvider = "sqlite" | "postgres" | "mysql";
 
 export type CliOptions = {
   appSecret?: string;
   bootstrapOwner?: boolean;
   databasePath?: string;
   databaseProvider?: DatabaseProvider;
+  databaseUrl?: string;
   dryRun: boolean;
   help: boolean;
   host?: string;
@@ -49,6 +50,7 @@ export type ScaffoldAnswers = {
   bootstrapOwner: boolean;
   databasePath: string;
   databaseProvider: DatabaseProvider;
+  databaseUrl?: string;
   host: string;
   initGit: boolean;
   installDependencies: boolean;

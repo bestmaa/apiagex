@@ -2,6 +2,7 @@ import { createInterface } from "node:readline/promises";
 import { randomBytes } from "node:crypto";
 import type {
   CliOptions,
+  DatabaseProvider,
   PromptFn,
   RunCliOptions,
   ScaffoldAnswers,
@@ -13,8 +14,17 @@ export async function resolveAnswers(options: CliOptions, io: RunCliOptions = {}
   const target = options.target ?? (canAsk ? await ask(prompt, "Project name", "my-apiagex") : undefined);
   if (!target) return "Target folder is required. Run create-apiagex --help for usage.";
   const setupMode = options.setupMode ?? await choiceAnswer(prompt, canAsk, "Setup mode", "quickstart", ["quickstart", "custom"]);
-  const databaseProvider = options.databaseProvider ?? "sqlite";
-  const databasePath = options.databasePath ?? await setupAnswer(prompt, canAsk, setupMode, "SQLite database path", ".apiagex/apiagex.sqlite");
+  const databaseProvider = options.databaseProvider ?? await choiceAnswer(
+    prompt,
+    canAsk,
+    "Database provider",
+    "sqlite",
+    ["sqlite", "postgres", "mysql"],
+  );
+  const databasePath = databaseProvider === "sqlite"
+    ? options.databasePath ?? await setupAnswer(prompt, canAsk, setupMode, "SQLite database path", ".apiagex/apiagex.sqlite")
+    : ".apiagex/apiagex.sqlite";
+  const databaseUrl = await resolveDatabaseUrl(databaseProvider, options, prompt, canAsk);
   const host = options.host ?? await setupAnswer(prompt, canAsk, setupMode, "Server host", "127.0.0.1");
   const port = options.port ?? await setupAnswer(prompt, canAsk, setupMode, "Server port", "4000");
   const appSecret = options.appSecret ?? generateSecret();
@@ -31,6 +41,7 @@ export async function resolveAnswers(options: CliOptions, io: RunCliOptions = {}
     bootstrapOwner,
     databasePath,
     databaseProvider,
+    ...(databaseUrl === undefined ? {} : { databaseUrl }),
     host,
     initGit: await boolAnswer(prompt, canAsk, "Initialize git repository?", options.initGit, true),
     installDependencies: await boolAnswer(prompt, canAsk, "Install dependencies after scaffold?", options.installDependencies, false),
@@ -41,6 +52,29 @@ export async function resolveAnswers(options: CliOptions, io: RunCliOptions = {}
     setupMode,
     target,
   };
+}
+
+async function resolveDatabaseUrl(
+  provider: DatabaseProvider,
+  options: CliOptions,
+  prompt: PromptFn,
+  canAsk: boolean,
+): Promise<string | undefined> {
+  if (provider === "sqlite") return undefined;
+  if (options.databaseUrl) return options.databaseUrl;
+  if (!canAsk) return providerDefaultUrl(provider);
+  return ask(prompt, `${providerLabel(provider)} database URL`, providerDefaultUrl(provider));
+}
+
+function providerDefaultUrl(provider: Exclude<DatabaseProvider, "sqlite">): string {
+  if (provider === "postgres") return "postgres://apiagex:change-me@localhost:5432/apiagex";
+  return "mysql://apiagex:change-me@localhost:3306/apiagex";
+}
+
+function providerLabel(provider: DatabaseProvider): string {
+  if (provider === "postgres") return "PostgreSQL";
+  if (provider === "mysql") return "MySQL";
+  return "SQLite";
 }
 
 async function boolAnswer(

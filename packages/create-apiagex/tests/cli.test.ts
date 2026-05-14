@@ -51,7 +51,7 @@ describe("create-apiagex CLI", () => {
 
   it("prompts for setup answers when interactive", async () => {
     const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
-    const answers = ["prompt-cms", "custom", "data/prompt.sqlite", "0.0.0.0", "5050", "yarn", "yes", "owner@example.com", "OwnerPass123!", "no", "yes"];
+    const answers = ["prompt-cms", "custom", "sqlite", "data/prompt.sqlite", "0.0.0.0", "5050", "yarn", "yes", "owner@example.com", "OwnerPass123!", "no", "yes"];
     const result = await runCli(["--dry-run"], root, {
       interactive: true,
       prompt: async () => answers.shift() ?? "",
@@ -97,6 +97,47 @@ describe("create-apiagex CLI", () => {
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("REALTIME_SESSION_INVALID");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("many-to-many");
     await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("Webhooks and Realtime");
+  });
+
+  it("creates PostgreSQL scaffold files with database URL env", async () => {
+    const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
+    const result = await runCli([
+      "pg-cms",
+      "--database",
+      "postgres",
+      "--database-url",
+      "postgres://apiagex:secret@localhost:5432/apiagex",
+    ], root);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Database: postgres");
+    expect(result.stdout).toContain("Database URL: postgres://apiagex:secret@localhost:5432/apiagex");
+    await expect(readFile(join(root, "pg-cms", ".env"), "utf8")).resolves.toContain(
+      "APIAGEX_DATABASE_PROVIDER=postgres",
+    );
+    await expect(readFile(join(root, "pg-cms", ".env"), "utf8")).resolves.toContain(
+      "APIAGEX_DATABASE_URL=postgres://apiagex:secret@localhost:5432/apiagex",
+    );
+    await expect(readFile(join(root, "pg-cms", ".env"), "utf8")).resolves.not.toContain("APIAGEX_DATABASE_PATH");
+    await expect(readFile(join(root, "pg-cms", "apiagex.config.json"), "utf8")).resolves.toContain(
+      '"urlEnv": "APIAGEX_DATABASE_URL"',
+    );
+  });
+
+  it("supports MySQL in dry-run setup", async () => {
+    const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
+    const result = await runCli([
+      "mysql-cms",
+      "--dry-run",
+      "--database",
+      "mysql",
+      "--database-url",
+      "mysql://apiagex:secret@localhost:3306/apiagex",
+    ], root);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Database: mysql");
+    expect(result.stdout).toContain("Database URL: mysql://apiagex:secret@localhost:3306/apiagex");
   });
 
   it("uses defaults with --yes in non-interactive scripts", async () => {
