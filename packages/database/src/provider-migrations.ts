@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS roles (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL DEFAULT '',
-  is_owner BOOLEAN NOT NULL DEFAULT FALSE,
+  is_owner INTEGER NOT NULL DEFAULT 0,
   role_kind TEXT NOT NULL DEFAULT 'api',
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS fields (
   type TEXT NOT NULL,
   relation_schema_id TEXT REFERENCES schemas(id),
   relation_type TEXT,
-  required BOOLEAN NOT NULL DEFAULT FALSE,
+  required INTEGER NOT NULL DEFAULT 0,
   position INTEGER NOT NULL,
   UNIQUE(schema_id, slug)
 );
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS permissions (
   role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
   schema_id TEXT NOT NULL REFERENCES schemas(id) ON DELETE CASCADE,
   action TEXT NOT NULL,
-  allowed BOOLEAN NOT NULL DEFAULT FALSE,
+  allowed INTEGER NOT NULL DEFAULT 0,
   UNIQUE(role_id, schema_id, action)
 );
 
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS admin_permissions (
   id TEXT PRIMARY KEY,
   role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
   action TEXT NOT NULL,
-  allowed BOOLEAN NOT NULL DEFAULT FALSE,
+  allowed INTEGER NOT NULL DEFAULT 0,
   UNIQUE(role_id, action)
 );
 
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS webhooks (
   secret TEXT NOT NULL,
   events_json TEXT NOT NULL,
   schema_id TEXT REFERENCES schemas(id) ON DELETE SET NULL,
-  active BOOLEAN NOT NULL DEFAULT TRUE,
+  active INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS webhook_deliveries (
 
 CREATE TABLE IF NOT EXISTS realtime_configs (
   schema_id TEXT PRIMARY KEY REFERENCES schemas(id) ON DELETE CASCADE,
-  enabled BOOLEAN NOT NULL DEFAULT FALSE,
+  enabled INTEGER NOT NULL DEFAULT 0,
   events_json TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL

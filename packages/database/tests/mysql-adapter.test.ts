@@ -4,6 +4,7 @@ import {
   createRole,
   listRoles,
   openMySqlAdapter,
+  quoteMySqlSchemaTable,
   splitMySqlStatements,
 } from "../src/index.js";
 
@@ -17,6 +18,12 @@ describe("MySQL adapter", () => {
 
   it("requires a connection URL", async () => {
     await expect(openMySqlAdapter(undefined, { migrate: false })).rejects.toThrow("DATABASE_URL_REQUIRED: mysql");
+  });
+
+  it("quotes the schemas table because it conflicts with MySQL parser rules", () => {
+    expect(quoteMySqlSchemaTable("SELECT id FROM schemas WHERE slug = ?")).toBe(
+      "SELECT id FROM `schemas` WHERE slug = ?",
+    );
   });
 
   it.runIf(process.env.APIAGEX_TEST_MYSQL_URL)("runs repositories against MySQL", async () => {

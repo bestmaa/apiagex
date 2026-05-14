@@ -4,12 +4,19 @@ import {
   createRole,
   listRoles,
   openPostgresAdapter,
+  quotePostgresCamelCaseAliases,
 } from "../src/index.js";
 
 describe("PostgreSQL adapter", () => {
   it("converts sqlite-style placeholders to PostgreSQL positional parameters", () => {
     expect(convertPostgresPlaceholders("SELECT * FROM entries WHERE id = ? AND schema_id = ?")).toBe(
       "SELECT * FROM entries WHERE id = $1 AND schema_id = $2",
+    );
+  });
+
+  it("quotes camelCase aliases so PostgreSQL returns repository field names", () => {
+    expect(quotePostgresCamelCaseAliases("SELECT role_kind as roleKind, created_at as createdAt FROM roles")).toBe(
+      'SELECT role_kind as "roleKind", created_at as "createdAt" FROM roles',
     );
   });
 

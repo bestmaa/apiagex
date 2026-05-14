@@ -12,12 +12,12 @@ describe("provider migration SQL", () => {
     expect(getProviderFoundationMigration("sqlite").tables).toEqual(MVP_TABLES);
   });
 
-  it("generates PostgreSQL foundation SQL with Postgres-native sequence and booleans", () => {
+  it("generates PostgreSQL foundation SQL with Postgres-native sequence and repository-compatible flags", () => {
     const sql = providerFoundationSql("postgres");
 
     expect(sql).toContain("CREATE TABLE IF NOT EXISTS migrations");
     expect(sql).toContain("sequence BIGSERIAL PRIMARY KEY");
-    expect(sql).toContain("is_owner BOOLEAN NOT NULL DEFAULT FALSE");
+    expect(sql).toContain("is_owner INTEGER NOT NULL DEFAULT 0");
     expect(sql).toContain("REFERENCES schemas(id) ON DELETE CASCADE");
     expect(sql).not.toContain("AUTOINCREMENT");
   });

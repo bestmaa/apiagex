@@ -16,7 +16,7 @@ export class PostgresApiagexDatabase implements ApiagexDatabase {
   }
 
   prepare(sql: string): DatabaseStatement {
-    const queryText = convertPostgresPlaceholders(sql);
+    const queryText = convertPostgresSql(sql);
     return {
       get: async <TRecord = unknown>(...params: DatabaseQueryParam[]) => {
         const result = await this.client.query(queryText, params);
@@ -65,6 +65,14 @@ export async function openPostgresAdapter(
 export function convertPostgresPlaceholders(sql: string): string {
   let index = 0;
   return sql.replaceAll("?", () => `$${++index}`);
+}
+
+export function quotePostgresCamelCaseAliases(sql: string): string {
+  return sql.replace(/\bas\s+([a-z][A-Za-z0-9]*[A-Z][A-Za-z0-9]*)\b/g, 'as "$1"');
+}
+
+function convertPostgresSql(sql: string): string {
+  return convertPostgresPlaceholders(quotePostgresCamelCaseAliases(sql));
 }
 
 function toRunResult(rowCount: number | null): DatabaseRunResult {

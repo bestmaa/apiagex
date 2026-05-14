@@ -13,22 +13,23 @@ export class MySqlApiagexDatabase implements ApiagexDatabase {
 
   async exec(sql: string): Promise<void> {
     for (const statement of splitMySqlStatements(sql)) {
-      await this.connection.query(statement);
+      await this.connection.query(convertMySqlSql(statement));
     }
   }
 
   prepare(sql: string): DatabaseStatement {
+    const queryText = convertMySqlSql(sql);
     return {
       get: async <TRecord = unknown>(...params: DatabaseQueryParam[]) => {
-        const [rows] = await this.connection.query(sql, params);
+        const [rows] = await this.connection.query(queryText, params);
         return (Array.isArray(rows) ? rows[0] : undefined) as TRecord | undefined;
       },
       all: async <TRecord = unknown>(...params: DatabaseQueryParam[]) => {
-        const [rows] = await this.connection.query(sql, params);
+        const [rows] = await this.connection.query(queryText, params);
         return (Array.isArray(rows) ? rows : []) as TRecord[];
       },
       run: async (...params: DatabaseQueryParam[]) => {
-        const [result] = await this.connection.query<mysql.ResultSetHeader>(sql, params);
+        const [result] = await this.connection.query<mysql.ResultSetHeader>(queryText, params);
         return toRunResult(result);
       },
     };
@@ -67,6 +68,14 @@ export function splitMySqlStatements(sql: string): string[] {
     .split(";")
     .map((statement) => statement.trim())
     .filter(Boolean);
+}
+
+export function quoteMySqlSchemaTable(sql: string): string {
+  return sql.replace(/\bschemas\b/g, "`schemas`");
+}
+
+function convertMySqlSql(sql: string): string {
+  return quoteMySqlSchemaTable(sql);
 }
 
 function toRunResult(result: mysql.ResultSetHeader): DatabaseRunResult {

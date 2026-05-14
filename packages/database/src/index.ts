@@ -14,11 +14,13 @@ export {
   convertPostgresPlaceholders,
   openPostgresAdapter,
   PostgresApiagexDatabase,
+  quotePostgresCamelCaseAliases,
 } from "./postgres-adapter.js";
 export type { PostgresAdapterOptions } from "./postgres-adapter.js";
 export {
   openMySqlAdapter,
   MySqlApiagexDatabase,
+  quoteMySqlSchemaTable,
   splitMySqlStatements,
 } from "./mysql-adapter.js";
 export type { MySqlAdapterOptions } from "./mysql-adapter.js";
