@@ -160,7 +160,7 @@ Each task uses this structure:
 #### T2808 - Verify Provider E2E And Docs
 
 - Version: `v0.7.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Run end-to-end verification and write practical provider documentation.
 - Persona: Release QA engineer; prove the full flow works before publishing.
 - Success Criteria: Fresh generated project starts; health check passes; owner bootstrap/login works; docs explain SQLite, PostgreSQL, MySQL setup, env vars, errors, and troubleshooting in English + Hinglish.

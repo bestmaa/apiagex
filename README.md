@@ -130,6 +130,8 @@ GitHub repo secret me `NPM_TOKEN` add karo. Pehle `dry_run=true` se check karo; 
 - Current stabilization audit [docs/project-stabilization-audit.md](./docs/project-stabilization-audit.md) me documented hai.
 - Strapi-style install and publish flow is documented at [docs/install-and-publish-flow.md](./docs/install-and-publish-flow.md).
 - Strapi-style install aur publish flow [docs/install-and-publish-flow.md](./docs/install-and-publish-flow.md) me documented hai.
+- Database provider setup for SQLite, PostgreSQL, and MySQL is documented at [docs/database-provider-setup.md](./docs/database-provider-setup.md).
+- SQLite, PostgreSQL, aur MySQL database provider setup [docs/database-provider-setup.md](./docs/database-provider-setup.md) me documented hai.
 - Apiagex MVP release gate is ready at version `v1.0.0`.
 - Apiagex MVP release gate version `v1.0.0` par ready hai.
 - Apiagex task2 release gate is ready at version `v2.0.0`.
@@ -205,9 +207,9 @@ Hinglish: Settings > Realtime API recent realtime event history bhi dikhata hai.
 
 ## Local Persistence
 
-English: `npm run dev` stores local server data in `.apiagex/apiagex.sqlite` and reserves `.apiagex/uploads` for local uploads. Override with `APIAGEX_DATABASE_PATH` and `APIAGEX_UPLOADS_PATH` when you need a different local path.
+English: `npm run dev` stores local server data in `.apiagex/apiagex.sqlite` and reserves `.apiagex/uploads` for local uploads. Override SQLite with `APIAGEX_DATABASE_PATH`, or set `APIAGEX_DATABASE_PROVIDER=postgres|mysql` plus `APIAGEX_DATABASE_URL` to use PostgreSQL or MySQL.
 
-Hinglish: `npm run dev` local server data `.apiagex/apiagex.sqlite` me store karta hai aur local uploads ke liye `.apiagex/uploads` use karta hai. Alag local path chahiye ho to `APIAGEX_DATABASE_PATH` aur `APIAGEX_UPLOADS_PATH` set karo.
+Hinglish: `npm run dev` local server data `.apiagex/apiagex.sqlite` me store karta hai aur local uploads ke liye `.apiagex/uploads` use karta hai. SQLite path ke liye `APIAGEX_DATABASE_PATH`, ya PostgreSQL/MySQL ke liye `APIAGEX_DATABASE_PROVIDER=postgres|mysql` plus `APIAGEX_DATABASE_URL` set karo.
 
 Tests stay isolated by passing in-memory databases directly; they do not write to `.apiagex` by default.
 
@@ -217,9 +219,9 @@ Task 10.0.14 stabilization audit adds a full feature audit test and practical us
 
 ## Create A New Apiagex Project
 
-English: Use `npm create apiagex@latest my-cms` or `npx create-apiagex my-cms`. The installer asks for setup mode, SQLite path, host/port, package manager, install preference, git preference, and optional first owner bootstrap credentials. Generated projects depend on `@apiagex/server`, start through `src/index.js`, and expose `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
+English: Use `npm create apiagex@latest my-cms` or `npx create-apiagex my-cms`. The installer asks for setup mode, database provider, SQLite path or PostgreSQL/MySQL URL, host/port, package manager, install preference, git preference, and optional first owner bootstrap credentials. Generated projects depend on `@apiagex/server`, start through `src/index.js`, and expose `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
 
-Hinglish: `npm create apiagex@latest my-cms` ya `npx create-apiagex my-cms` use karo. Installer setup mode, SQLite path, host/port, package manager, install preference, git preference, aur optional first owner bootstrap credentials puchta hai. Generated projects `@apiagex/server` par depend karte hain, `src/index.js` se start hote hain, aur `npm run dev`, `npm run start`, `npm run smoke`, plus `npm run build` expose karte hain.
+Hinglish: `npm create apiagex@latest my-cms` ya `npx create-apiagex my-cms` use karo. Installer setup mode, database provider, SQLite path ya PostgreSQL/MySQL URL, host/port, package manager, install preference, git preference, aur optional first owner bootstrap credentials puchta hai. Generated projects `@apiagex/server` par depend karte hain, `src/index.js` se start hote hain, aur `npm run dev`, `npm run start`, `npm run smoke`, plus `npm run build` expose karte hain.
 
 ## Workspace
 

@@ -19,6 +19,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Manual QA checklist
 - Project stabilization audit: [project-stabilization-audit.md](./project-stabilization-audit.md)
 - Install and publish flow: [install-and-publish-flow.md](./install-and-publish-flow.md)
+- Database provider setup: [database-provider-setup.md](./database-provider-setup.md)
 
 ## Implemented Now
 
@@ -54,6 +55,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Project stabilization audit `docs/project-stabilization-audit.md` me documented hai.
 - Install and publish flow is documented in `docs/install-and-publish-flow.md`.
 - Install aur publish flow `docs/install-and-publish-flow.md` me documented hai.
+- Database provider setup is documented in `docs/database-provider-setup.md`.
+- Database provider setup `docs/database-provider-setup.md` me documented hai.
 
 ## Owner Bootstrap And Login
 

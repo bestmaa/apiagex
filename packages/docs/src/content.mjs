@@ -11,6 +11,19 @@ export const docPage = {
       ],
     },
     {
+      heading: "Database Providers",
+      lines: [
+        "Runtime database providers: SQLite is the default, PostgreSQL uses APIAGEX_DATABASE_PROVIDER=postgres plus APIAGEX_DATABASE_URL, and MySQL uses APIAGEX_DATABASE_PROVIDER=mysql plus APIAGEX_DATABASE_URL.",
+        "Runtime database providers: SQLite default hai, PostgreSQL ke liye APIAGEX_DATABASE_PROVIDER=postgres plus APIAGEX_DATABASE_URL use hota hai, aur MySQL ke liye APIAGEX_DATABASE_PROVIDER=mysql plus APIAGEX_DATABASE_URL use hota hai.",
+        "Create setup: npm create apiagex@latest asks for sqlite/postgres/mysql and writes .env, .env.example, apiagex.config.json, and src/index.js for the selected provider.",
+        "Create setup: npm create apiagex@latest sqlite/postgres/mysql puchta hai aur selected provider ke hisab se .env, .env.example, apiagex.config.json, aur src/index.js likhta hai.",
+        "Troubleshooting: DATABASE_URL_REQUIRED means a server database was selected without APIAGEX_DATABASE_URL; ECONNREFUSED means the database host is not reachable.",
+        "Troubleshooting: DATABASE_URL_REQUIRED ka matlab server database choose hua lekin APIAGEX_DATABASE_URL missing hai; ECONNREFUSED ka matlab database host reachable nahi hai.",
+        "Detailed provider docs: docs/database-provider-setup.md covers env examples, owner bootstrap, common errors, and optional PostgreSQL/MySQL integration test commands.",
+        "Detailed provider docs: docs/database-provider-setup.md env examples, owner bootstrap, common errors, aur optional PostgreSQL/MySQL integration test commands cover karta hai.",
+      ],
+    },
+    {
       heading: "Schemas And Relations",
       lines: [
         "Schemas: /api/admin/schemas supports create, list, read, update, and delete with field validation.",
