@@ -8,23 +8,23 @@ import {
   listSchemas,
   resolveApiToken,
   setRealtimeConfig,
-  type SqliteDatabase,
+  type ApiagexDatabase,
 } from "@apiagex/database";
 import type { RealtimeBroker } from "./realtime-broker.type.js";
 import type { RealtimeConfigBody, RealtimeConfigParams, RealtimeSessionBody } from "./realtime-routes.type.js";
 
 export function registerRealtimeRoutes(
   server: FastifyInstance,
-  database: SqliteDatabase,
+  database: ApiagexDatabase,
   broker: RealtimeBroker,
 ): void {
   server.get("/api/admin/realtime", async () => ({
     ok: true,
-    configs: listRealtimeSettings(database),
+    configs: await listRealtimeSettings(database),
     connections: broker.snapshot(),
-    events: listRecentRealtimeEvents(database),
+    events: await listRecentRealtimeEvents(database),
     retention: { eventsPerSchema: broker.retentionEventsPerSchema },
-    schemas: listSchemas(database),
+    schemas: await listSchemas(database),
   }));
 
   server.put<{ Body: RealtimeConfigBody; Params: RealtimeConfigParams }>(
@@ -33,7 +33,7 @@ export function registerRealtimeRoutes(
       try {
         return {
           ok: true,
-          config: setRealtimeConfig(database, {
+          config: await setRealtimeConfig(database, {
             schemaId: request.params.schemaId,
             enabled: request.body.enabled,
             events: request.body.events,
@@ -52,11 +52,11 @@ export function registerRealtimeRoutes(
     if (body.ttlSeconds !== undefined && !Number.isFinite(body.ttlSeconds)) {
       return reply.code(400).send({ ok: false, error: "REALTIME_TTL_INVALID" });
     }
-    const schema = getSchemaBySlug(database, schemaSlug);
+    const schema = await getSchemaBySlug(database, schemaSlug);
     if (!schema) return reply.code(404).send({ ok: false, error: "SCHEMA_NOT_FOUND" });
-    const apiToken = resolveApiToken(database, bearerToken(request.headers.authorization));
+    const apiToken = await resolveApiToken(database, bearerToken(request.headers.authorization));
     if (!apiToken) return reply.code(401).send({ ok: false, error: "API_TOKEN_INVALID" });
-    if (!canRoleAccess(database, apiToken.roleId, schema.id, "getAll")) {
+    if (!(await canRoleAccess(database, apiToken.roleId, schema.id, "getAll"))) {
       return reply.code(403).send({ ok: false, error: "API_PERMISSION_DENIED" });
     }
     const input = {
@@ -65,7 +65,7 @@ export function registerRealtimeRoutes(
       schemaSlug: schema.slug,
       ...(body.ttlSeconds === undefined ? {} : { ttlSeconds: body.ttlSeconds }),
     };
-    const created = createRealtimeSession(database, input);
+    const created = await createRealtimeSession(database, input);
     return { ok: true, token: created.token, expiresAt: created.session.expiresAt, tokenPrefix: created.session.tokenPrefix };
   });
 }

@@ -6,9 +6,9 @@ import {
 } from "./relation-fixtures.js";
 
 describe("relation test fixtures", () => {
-  it("creates reusable relation schemas", () => {
+  it("creates reusable relation schemas", async () => {
     const db = openRelationFixtureDb();
-    const schemas = createRelationFixtureSchemas(db);
+    const schemas = await createRelationFixtureSchemas(db);
 
     expect(schemas.article.fields.map((field) => field.slug)).toEqual([
       "title",
@@ -22,10 +22,10 @@ describe("relation test fixtures", () => {
     });
   });
 
-  it("creates reusable single-relation entries", () => {
+  it("creates reusable single-relation entries", async () => {
     const db = openRelationFixtureDb();
-    const schemas = createRelationFixtureSchemas(db);
-    const entries = createSingleRelationFixtureEntries(db, schemas);
+    const schemas = await createRelationFixtureSchemas(db);
+    const entries = await createSingleRelationFixtureEntries(db, schemas);
 
     expect(entries.article.data).toMatchObject({
       author: entries.author.id,

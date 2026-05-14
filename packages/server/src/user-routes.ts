@@ -4,14 +4,14 @@ import {
   createUser,
   getUserById,
   listUsers,
-  type SqliteDatabase,
+  type ApiagexDatabase,
 } from "@apiagex/database";
 import type { UserBody, UserParams } from "./user-routes.type.js";
 
-export function registerUserRoutes(server: FastifyInstance, database: SqliteDatabase): void {
+export function registerUserRoutes(server: FastifyInstance, database: ApiagexDatabase): void {
   server.get("/api/admin/users", async () => ({
     ok: true,
-    users: listUsers(database),
+    users: await listUsers(database),
   }));
 
   server.post<{ Body: UserBody }>("/api/admin/users", async (request, reply) => {
@@ -19,7 +19,7 @@ export function registerUserRoutes(server: FastifyInstance, database: SqliteData
       validatePassword(request.body.password);
       return {
         ok: true,
-        user: createUser(database, {
+        user: await createUser(database, {
           email: request.body.email,
           passwordHash: hashPassword(request.body.password),
           roleId: request.body.roleId,
@@ -31,18 +31,14 @@ export function registerUserRoutes(server: FastifyInstance, database: SqliteData
   });
 
   server.get<{ Params: UserParams }>("/api/admin/users/:userId", async (request, reply) => {
-    const user = getUserById(database, request.params.userId);
-    if (!user) {
-      return reply.code(404).send({ ok: false, error: "USER_NOT_FOUND" });
-    }
+    const user = await getUserById(database, request.params.userId);
+    if (!user) return reply.code(404).send({ ok: false, error: "USER_NOT_FOUND" });
     return { ok: true, user };
   });
 }
 
 function validatePassword(password: string): void {
-  if (password.length < 8) {
-    throw new Error("USER_PASSWORD_TOO_SHORT");
-  }
+  if (password.length < 8) throw new Error("USER_PASSWORD_TOO_SHORT");
 }
 
 function hashPassword(password: string): string {

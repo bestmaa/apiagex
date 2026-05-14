@@ -3,31 +3,29 @@ import {
   createEntry,
   createSchema,
   getEntryById,
-  migrateMvpDatabase,
-  openSqliteDatabase,
+  openMigratedSqliteAdapter,
   updateEntry,
 } from "../src/index.js";
 
 describe("relation readback", () => {
-  it("reads relation values after create and update", () => {
-    const db = openSqliteDatabase();
-    migrateMvpDatabase(db);
-    const authorSchema = createSchema(db, {
+  it("reads relation values after create and update", async () => {
+    const db = openMigratedSqliteAdapter();
+    const authorSchema = await createSchema(db, {
       name: "Author",
       slug: "author",
       fields: [{ name: "Name", slug: "name", type: "text", required: true }],
     });
-    const categorySchema = createSchema(db, {
+    const categorySchema = await createSchema(db, {
       name: "Category",
       slug: "category",
       fields: [{ name: "Name", slug: "name", type: "text", required: true }],
     });
-    const tagSchema = createSchema(db, {
+    const tagSchema = await createSchema(db, {
       name: "Tag",
       slug: "tag",
       fields: [{ name: "Name", slug: "name", type: "text", required: true }],
     });
-    const articleSchema = createSchema(db, {
+    const articleSchema = await createSchema(db, {
       name: "Article",
       slug: "article",
       fields: [
@@ -48,7 +46,7 @@ describe("relation readback", () => {
         },
       ],
     });
-    const profileSchema = createSchema(db, {
+    const profileSchema = await createSchema(db, {
       name: "Profile",
       slug: "profile",
       fields: [
@@ -61,7 +59,7 @@ describe("relation readback", () => {
         },
       ],
     });
-    const authorArticlesSchema = createSchema(db, {
+    const authorArticlesSchema = await createSchema(db, {
       name: "Author Articles",
       slug: "author-articles",
       fields: [
@@ -74,49 +72,49 @@ describe("relation readback", () => {
         },
       ],
     });
-    const firstAuthor = createEntry(db, { schemaId: authorSchema.id, data: { name: "Asha" } });
-    const secondAuthor = createEntry(db, { schemaId: authorSchema.id, data: { name: "Ravi" } });
-    const firstCategory = createEntry(db, {
+    const firstAuthor = await createEntry(db, { schemaId: authorSchema.id, data: { name: "Asha" } });
+    const secondAuthor = await createEntry(db, { schemaId: authorSchema.id, data: { name: "Ravi" } });
+    const firstCategory = await createEntry(db, {
       schemaId: categorySchema.id,
       data: { name: "Guides" },
     });
-    const secondCategory = createEntry(db, {
+    const secondCategory = await createEntry(db, {
       schemaId: categorySchema.id,
       data: { name: "News" },
     });
-    const firstTag = createEntry(db, { schemaId: tagSchema.id, data: { name: "CMS" } });
-    const secondTag = createEntry(db, { schemaId: tagSchema.id, data: { name: "API" } });
-    const article = createEntry(db, {
+    const firstTag = await createEntry(db, { schemaId: tagSchema.id, data: { name: "CMS" } });
+    const secondTag = await createEntry(db, { schemaId: tagSchema.id, data: { name: "API" } });
+    const article = await createEntry(db, {
       schemaId: articleSchema.id,
       data: { category: firstCategory.id, tags: [firstTag.id], title: "Relations" },
     });
-    const profile = createEntry(db, {
+    const profile = await createEntry(db, {
       schemaId: profileSchema.id,
       data: { author: firstAuthor.id },
     });
-    const authorArticles = createEntry(db, {
+    const authorArticles = await createEntry(db, {
       schemaId: authorArticlesSchema.id,
       data: { articles: [article.id] },
     });
 
-    expect(getEntryById(db, article.id)?.data).toMatchObject({
+    expect((await getEntryById(db, article.id))?.data).toMatchObject({
       category: firstCategory.id,
       tags: [firstTag.id],
     });
-    expect(getEntryById(db, profile.id)?.data.author).toBe(firstAuthor.id);
-    expect(getEntryById(db, authorArticles.id)?.data.articles).toEqual([article.id]);
+    expect((await getEntryById(db, profile.id))?.data.author).toBe(firstAuthor.id);
+    expect((await getEntryById(db, authorArticles.id))?.data.articles).toEqual([article.id]);
 
-    const updatedArticle = updateEntry(db, article.id, {
+    const updatedArticle = await updateEntry(db, article.id, {
       data: {
         category: secondCategory.id,
         tags: [firstTag.id, secondTag.id, firstTag.id],
         title: "Relations Updated",
       },
     });
-    const updatedProfile = updateEntry(db, profile.id, {
+    const updatedProfile = await updateEntry(db, profile.id, {
       data: { author: secondAuthor.id },
     });
-    const updatedAuthorArticles = updateEntry(db, authorArticles.id, {
+    const updatedAuthorArticles = await updateEntry(db, authorArticles.id, {
       data: { articles: [article.id, article.id] },
     });
 

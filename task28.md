@@ -91,7 +91,7 @@ Each task uses this structure:
 #### T2803 - Migrate Repositories To Adapter
 
 - Version: `v0.7.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Move database repository code from direct `better-sqlite3` calls onto the adapter contract.
 - Persona: Refactor engineer; make the mechanical migration carefully and keep behavior identical.
 - Success Criteria: Schema, entry, content, role, user, webhook, realtime, token, and owner flows use the adapter boundary; SQLite tests and smoke still pass.

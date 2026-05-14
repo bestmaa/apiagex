@@ -1,68 +1,54 @@
 import { randomUUID } from "node:crypto";
-import type { SqliteDatabase } from "./sqlite.js";
+import type { ApiagexDatabase } from "./database-adapter.type.js";
 import { getRoleById } from "./role-repository.js";
 import type { CreateUserInput, UserRecord } from "./user-repository.type.js";
 
+type UserPasswordRecord = { id: string; passwordHash: string; roleId: string };
 type UserRow = UserRecord;
 
-export function createUser(db: SqliteDatabase, input: CreateUserInput): UserRecord {
+export async function createUser(db: ApiagexDatabase, input: CreateUserInput): Promise<UserRecord> {
   const email = normalizeEmail(input.email);
-  validateUser(db, { ...input, email });
+  await validateUser(db, { ...input, email });
   const id = randomUUID();
   const now = new Date().toISOString();
-  db.prepare(
+  await db.prepare(
     "INSERT INTO users (id, email, password_hash, role_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
   ).run(id, email, input.passwordHash, input.roleId, now, now);
   return requireUser(db, id);
 }
 
-export function listUsers(db: SqliteDatabase): UserRecord[] {
-  const rows = db
-    .prepare(userSelectSql("WHERE roles.role_kind = 'api' ORDER BY users.created_at ASC"))
-    .all() as UserRow[];
-  return rows;
+export async function listUsers(db: ApiagexDatabase): Promise<UserRecord[]> {
+  return db.prepare(userSelectSql("WHERE roles.role_kind = 'api' ORDER BY users.created_at ASC")).all<UserRow>();
 }
 
-export function getUserById(db: SqliteDatabase, id: string): UserRecord | undefined {
-  return db
-    .prepare(userSelectSql("WHERE users.id = ? AND roles.role_kind = 'api'"))
-    .get(id) as UserRow | undefined;
+export async function getUserById(db: ApiagexDatabase, id: string): Promise<UserRecord | undefined> {
+  return db.prepare(userSelectSql("WHERE users.id = ? AND roles.role_kind = 'api'")).get<UserRow>(id);
 }
 
-export function getUserPasswordHashByEmail(
-  db: SqliteDatabase,
+export async function getUserPasswordHashByEmail(
+  db: ApiagexDatabase,
   email: string,
-): { id: string; passwordHash: string; roleId: string } | undefined {
+): Promise<UserPasswordRecord | undefined> {
   return db
     .prepare(
       `SELECT users.id, users.password_hash as passwordHash, users.role_id as roleId
        FROM users JOIN roles ON roles.id = users.role_id
        WHERE users.email = ? AND roles.role_kind = 'api'`,
     )
-    .get(normalizeEmail(email)) as { id: string; passwordHash: string; roleId: string } | undefined;
+    .get<UserPasswordRecord>(normalizeEmail(email));
 }
 
-function validateUser(db: SqliteDatabase, input: CreateUserInput): void {
-  if (!input.email.includes("@")) {
-    throw new Error("USER_EMAIL_INVALID");
-  }
-  if (!input.passwordHash) {
-    throw new Error("USER_PASSWORD_HASH_REQUIRED");
-  }
-  const role = getRoleById(db, input.roleId);
-  if (!role) {
-    throw new Error("ROLE_NOT_FOUND");
-  }
-  if (role.roleKind !== "api") {
-    throw new Error("ROLE_API_REQUIRED");
-  }
+async function validateUser(db: ApiagexDatabase, input: CreateUserInput): Promise<void> {
+  if (!input.email.includes("@")) throw new Error("USER_EMAIL_INVALID");
+  if (!input.passwordHash) throw new Error("USER_PASSWORD_HASH_REQUIRED");
+  const role = await getRoleById(db, input.roleId);
+  if (!role) throw new Error("ROLE_NOT_FOUND");
+  if (role.roleKind !== "api") throw new Error("ROLE_API_REQUIRED");
 }
 
-function requireUser(db: SqliteDatabase, id: string): UserRecord {
-  const user = getUserById(db, id);
-  if (!user) {
-    throw new Error("USER_NOT_FOUND");
-  }
+async function requireUser(db: ApiagexDatabase, id: string): Promise<UserRecord> {
+  const user = await getUserById(db, id);
+  if (!user) throw new Error("USER_NOT_FOUND");
   return user;
 }
 

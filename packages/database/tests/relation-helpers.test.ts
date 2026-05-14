@@ -4,8 +4,7 @@ import {
   createSchema,
   entryDataReferences,
   listEntryDataRows,
-  migrateMvpDatabase,
-  openSqliteDatabase,
+  openMigratedSqliteAdapter,
   parseEntryData,
   relationTypeOf,
   schemaEntriesUseField,
@@ -18,21 +17,20 @@ describe("relation repository helpers", () => {
     expect(entryDataReferences({ title: "entry-1" }, "missing")).toBe(false);
   });
 
-  it("reads entry rows and checks used fields", () => {
-    const db = openSqliteDatabase();
-    migrateMvpDatabase(db);
-    const schema = createSchema(db, {
+  it("reads entry rows and checks used fields", async () => {
+    const db = openMigratedSqliteAdapter();
+    const schema = await createSchema(db, {
       name: "Article",
       slug: "article",
       fields: [{ name: "Title", slug: "title", type: "text" }],
     });
-    createEntry(db, { schemaId: schema.id, data: { title: "Hello" } });
+    await createEntry(db, { schemaId: schema.id, data: { title: "Hello" } });
 
-    const rows = listEntryDataRows(db, "WHERE schema_id = ?", [schema.id]);
+    const rows = await listEntryDataRows(db, "WHERE schema_id = ?", [schema.id]);
 
     expect(parseEntryData(rows[0]?.dataJson ?? "{}")).toEqual({ title: "Hello" });
-    expect(schemaEntriesUseField(db, schema.id, "title")).toBe(true);
-    expect(schemaEntriesUseField(db, schema.id, "missing")).toBe(false);
+    expect(await schemaEntriesUseField(db, schema.id, "title")).toBe(true);
+    expect(await schemaEntriesUseField(db, schema.id, "missing")).toBe(false);
   });
 
   it("defaults legacy relation fields to many-to-one", () => {

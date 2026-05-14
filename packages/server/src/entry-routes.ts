@@ -2,13 +2,13 @@ import type { FastifyInstance, FastifyReply } from "fastify";
 import {
   createEntry,
   deleteEntry,
-  type EntryListOptions,
   getEntryById,
   getSchemaById,
   listEntries,
   queryEntries,
   updateEntry,
-  type SqliteDatabase,
+  type ApiagexDatabase,
+  type EntryListOptions,
 } from "@apiagex/database";
 import type {
   EntryBody,
@@ -17,13 +17,13 @@ import type {
   EntryParams,
 } from "./entry-routes.type.js";
 import { emitEntryMutationWebhook } from "./entry-webhooks.js";
-import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
 import { emitEntryRealtime } from "./entry-realtime.js";
 import type { RealtimeBroker } from "./realtime-broker.type.js";
+import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
 
 export function registerEntryRoutes(
   server: FastifyInstance,
-  database: SqliteDatabase,
+  database: ApiagexDatabase,
   webhookOptions: WebhookDispatcherOptions = {},
   realtimeBroker?: RealtimeBroker,
 ): void {
@@ -32,11 +32,11 @@ export function registerEntryRoutes(
     async (request, reply) => {
       try {
         if (!hasEntryListQuery(request.query)) {
-          return { ok: true, entries: listEntries(database, request.params.schemaId) };
+          return { ok: true, entries: await listEntries(database, request.params.schemaId) };
         }
         return {
           ok: true,
-          ...queryEntries(database, request.params.schemaId, entryListOptions(request.query)),
+          ...(await queryEntries(database, request.params.schemaId, entryListOptions(request.query))),
         };
       } catch (error) {
         return sendEntryError(reply, error, statusFor(error));
@@ -48,9 +48,8 @@ export function registerEntryRoutes(
     "/api/admin/schemas/:schemaId/entries",
     async (request, reply) => {
       try {
-        const data = request.body.data;
-        const entry = createEntry(database, { schemaId: request.params.schemaId, data });
-        const schema = getSchemaById(database, request.params.schemaId);
+        const entry = await createEntry(database, { schemaId: request.params.schemaId, data: request.body.data });
+        const schema = await getSchemaById(database, request.params.schemaId);
         if (schema) await emitEntryMutationWebhook(database, schema, "entry.created", entry, webhookOptions);
         if (schema) emitEntryRealtime(realtimeBroker, schema, "entry.created", entry);
         return { ok: true, entry };
@@ -63,7 +62,7 @@ export function registerEntryRoutes(
   server.get<{ Params: EntryParams }>(
     "/api/admin/schemas/:schemaId/entries/:entryId",
     async (request, reply) => {
-      const entry = getEntryById(database, request.params.entryId);
+      const entry = await getEntryById(database, request.params.entryId);
       if (!entry || entry.schemaId !== request.params.schemaId) {
         return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
       }
@@ -75,11 +74,11 @@ export function registerEntryRoutes(
     "/api/admin/schemas/:schemaId/entries/:entryId",
     async (request, reply) => {
       try {
-        if (!entryBelongsToSchema(database, request.params.entryId, request.params.schemaId)) {
+        if (!(await entryBelongsToSchema(database, request.params.entryId, request.params.schemaId))) {
           return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
         }
-        const entry = updateEntry(database, request.params.entryId, request.body);
-        const schema = getSchemaById(database, request.params.schemaId);
+        const entry = await updateEntry(database, request.params.entryId, request.body);
+        const schema = await getSchemaById(database, request.params.schemaId);
         if (schema) await emitEntryMutationWebhook(database, schema, "entry.updated", entry, webhookOptions);
         if (schema) emitEntryRealtime(realtimeBroker, schema, "entry.updated", entry);
         return { ok: true, entry };
@@ -93,12 +92,12 @@ export function registerEntryRoutes(
     "/api/admin/schemas/:schemaId/entries/:entryId",
     async (request, reply) => {
       try {
-        if (!entryBelongsToSchema(database, request.params.entryId, request.params.schemaId)) {
+        if (!(await entryBelongsToSchema(database, request.params.entryId, request.params.schemaId))) {
           return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
         }
-        const entry = getEntryById(database, request.params.entryId);
-        const schema = getSchemaById(database, request.params.schemaId);
-        deleteEntry(database, request.params.entryId);
+        const entry = await getEntryById(database, request.params.entryId);
+        const schema = await getSchemaById(database, request.params.schemaId);
+        await deleteEntry(database, request.params.entryId);
         if (entry && schema) await emitEntryMutationWebhook(database, schema, "entry.deleted", entry, webhookOptions);
         if (entry && schema) emitEntryRealtime(realtimeBroker, schema, "entry.deleted", entry);
         return { ok: true, deleted: true };
@@ -143,12 +142,12 @@ function statusFor(error: unknown): number {
   return errorCode(error).endsWith("_NOT_FOUND") ? 404 : 400;
 }
 
-function entryBelongsToSchema(
-  database: SqliteDatabase,
+async function entryBelongsToSchema(
+  database: ApiagexDatabase,
   entryId: string,
   schemaId: string,
-): boolean {
-  const entry = getEntryById(database, entryId);
+): Promise<boolean> {
+  const entry = await getEntryById(database, entryId);
   return Boolean(entry && entry.schemaId === schemaId);
 }
 

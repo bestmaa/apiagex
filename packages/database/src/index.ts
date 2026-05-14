@@ -9,8 +9,10 @@ export {
   openSqliteDatabase,
 } from "./sqlite.js";
 export {
+  openMigratedSqliteAdapter,
   openSqliteAdapter,
   SqliteApiagexDatabase,
+  wrapSqliteDatabase,
 } from "./sqlite-adapter.js";
 export {
   createEntry,

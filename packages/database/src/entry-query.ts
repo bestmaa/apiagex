@@ -1,11 +1,11 @@
-import type { SqliteDatabase } from "./sqlite.js";
-import { getSchemaById } from "./schema-repository.js";
+import type { ApiagexDatabase, DatabaseQueryParam } from "./database-adapter.type.js";
 import type {
   EntryData,
   EntryListOptions,
   EntryListResult,
   EntryRecord,
 } from "./entry-repository.type.js";
+import { getSchemaById } from "./schema-repository.js";
 import type { SchemaRecord } from "./schema-repository.type.js";
 
 type EntryRow = {
@@ -16,29 +16,26 @@ type EntryRow = {
   updatedAt: string;
 };
 
-export function queryEntries(
-  db: SqliteDatabase,
+export async function queryEntries(
+  db: ApiagexDatabase,
   schemaId: string,
   options: EntryListOptions = {},
-): EntryListResult {
-  const schema = requireSchema(db, schemaId);
+): Promise<EntryListResult> {
+  const schema = await requireSchema(db, schemaId);
   const limit = clampListLimit(options.limit);
   const offset = Math.max(0, Math.floor(options.offset ?? 0));
   const search = options.search?.trim() ?? "";
   const selectedFields = validateSelectedFields(schema, options.fields);
   const where = search ? "WHERE schema_id = ? AND (data_json LIKE ? OR id LIKE ?)" : "WHERE schema_id = ?";
-  const params = search ? [schemaId, `%${search}%`, `%${search}%`] : [schemaId];
-  const totalRow = db.prepare(`SELECT COUNT(*) as total FROM entries ${where}`).get(...params) as { total: number };
-  const rows = db.prepare(`${entrySelectSql(where)} ORDER BY created_at DESC LIMIT ? OFFSET ?`).all(
-    ...params,
-    limit,
-    offset,
-  ) as EntryRow[];
+  const params: DatabaseQueryParam[] = search ? [schemaId, `%${search}%`, `%${search}%`] : [schemaId];
+  const totalRow = await db.prepare(`SELECT COUNT(*) as total FROM entries ${where}`).get<{ total: number }>(...params);
+  const rows = await db.prepare(`${entrySelectSql(where)} ORDER BY created_at DESC LIMIT ? OFFSET ?`)
+    .all<EntryRow>(...params, limit, offset);
   return {
     entries: rows.map((row) => projectEntry(rowToEntry(row), selectedFields)),
     limit,
     offset,
-    total: totalRow.total,
+    total: totalRow?.total ?? 0,
   };
 }
 
@@ -47,10 +44,7 @@ function clampListLimit(value: number | undefined): number {
   return Math.min(100, Math.max(1, Math.floor(value)));
 }
 
-function validateSelectedFields(
-  schema: SchemaRecord,
-  fields: string[] | undefined,
-): string[] | undefined {
+function validateSelectedFields(schema: SchemaRecord, fields: string[] | undefined): string[] | undefined {
   const selected = fields?.map((field) => field.trim()).filter(Boolean);
   if (!selected || selected.length === 0) return undefined;
   const allowed = new Set(schema.fields.map((field) => field.slug));
@@ -69,8 +63,8 @@ function projectEntry(entry: EntryRecord, fields: string[] | undefined): EntryRe
   return { ...entry, data };
 }
 
-function requireSchema(db: SqliteDatabase, schemaId: string): SchemaRecord {
-  const schema = getSchemaById(db, schemaId);
+async function requireSchema(db: ApiagexDatabase, schemaId: string): Promise<SchemaRecord> {
+  const schema = await getSchemaById(db, schemaId);
   if (!schema) throw new Error("SCHEMA_NOT_FOUND");
   return schema;
 }

@@ -1,6 +1,12 @@
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
-import { migrateMvpDatabase, openSqliteDatabase } from "@apiagex/database";
+import {
+  migrateMvpDatabase,
+  openMigratedSqliteAdapter,
+  wrapSqliteDatabase,
+  type ApiagexDatabase,
+  type SqliteDatabase,
+} from "@apiagex/database";
 import type {
   ApiagexServer,
   ApiRootResponse,
@@ -23,8 +29,7 @@ import { registerRealtimeRoutes } from "./realtime-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
-  const database = options.database ?? openSqliteDatabase(options.databasePath);
-  migrateMvpDatabase(database);
+  const database = resolveDatabase(options);
   const realtimeBroker = createRealtimeBroker(database);
   realtimeBroker.attach(server);
   server.register(fastifyStatic, {
@@ -57,7 +62,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
 
   server.post("/api/auth/bootstrap-owner", async (request, reply) => {
     try {
-      return bootstrapOwner(
+      return await bootstrapOwner(
         database,
         request.body as { email: string; password: string },
       );
@@ -70,7 +75,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
 
   server.post("/api/auth/login", async (request, reply) => {
     try {
-      return loginOwner(
+      return await loginOwner(
         database,
         request.body as { email: string; password: string },
       );
@@ -82,7 +87,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
 
   server.post("/api/auth/login-user", async (request, reply) => {
     try {
-      return loginUser(
+      return await loginUser(
         database,
         request.body as { email: string; password: string },
       );
@@ -105,4 +110,15 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   });
 
   return server;
+}
+
+function resolveDatabase(options: CreateServerOptions): ApiagexDatabase {
+  if (!options.database) return openMigratedSqliteAdapter(options.databasePath);
+  if (isApiagexDatabase(options.database)) return options.database;
+  migrateMvpDatabase(options.database);
+  return wrapSqliteDatabase(options.database);
+}
+
+function isApiagexDatabase(database: ApiagexDatabase | SqliteDatabase): database is ApiagexDatabase {
+  return "provider" in database;
 }

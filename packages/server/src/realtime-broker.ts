@@ -12,7 +12,7 @@ import {
   pruneRealtimeEvents,
   recordRealtimeEvent,
   resolveApiToken,
-  type SqliteDatabase,
+  type ApiagexDatabase,
 } from "@apiagex/database";
 import type {
   RealtimeBroker,
@@ -35,7 +35,7 @@ type ClientState = {
   heartbeat: NodeJS.Timeout;
 };
 
-export function createRealtimeBroker(database: SqliteDatabase): RealtimeBroker & {
+export function createRealtimeBroker(database: ApiagexDatabase): RealtimeBroker & {
   attach(server: FastifyInstance): void;
 } {
   const wss = new WebSocketServer({ noServer: true });
@@ -45,15 +45,17 @@ export function createRealtimeBroker(database: SqliteDatabase): RealtimeBroker &
     server.server.on("upgrade", (request, socket, head) => {
       const url = new URL(request.url ?? "", "http://apiagex.local");
       if (url.pathname !== "/api/realtime") return;
-      wss.handleUpgrade(request, socket, head, (ws) => accept(ws, request, url));
+      wss.handleUpgrade(request, socket, head, (ws) => {
+        void accept(ws, request, url);
+      });
     });
   }
 
-  function accept(ws: WebSocket, _request: IncomingMessage, url: URL): void {
-    const schema = getSchemaBySlug(database, url.searchParams.get("schema") ?? "");
+  async function accept(ws: WebSocket, _request: IncomingMessage, url: URL): Promise<void> {
+    const schema = await getSchemaBySlug(database, url.searchParams.get("schema") ?? "");
     if (!schema) return closeWithError(ws, "SCHEMA_NOT_FOUND");
-    if (!getRealtimeConfig(database, schema.id)?.enabled) return closeWithError(ws, "REALTIME_DISABLED");
-    const access = canSubscribe(url, schema.id);
+    if (!(await getRealtimeConfig(database, schema.id))?.enabled) return closeWithError(ws, "REALTIME_DISABLED");
+    const access = await canSubscribe(url, schema.id);
     if (!access.allowed) return closeWithError(ws, access.error ?? "API_PERMISSION_DENIED");
     const state: ClientState = {
       id: `rtc_${randomUUID()}`,
@@ -71,30 +73,41 @@ export function createRealtimeBroker(database: SqliteDatabase): RealtimeBroker &
       heartbeatMs,
       ackTimeoutMs,
     });
-    setTimeout(() => replayMissed(ws, state, url.searchParams.get("lastEventId"), url.searchParams.get("replayLimit")), 0);
+    setTimeout(() => {
+      void replayMissed(ws, state, url.searchParams.get("lastEventId"), url.searchParams.get("replayLimit"));
+    }, 0);
     ws.on("message", (data) => handleMessage(ws, state, data.toString()));
     ws.on("close", () => cleanup(ws));
   }
 
   function publish(input: RealtimePublishInput): void {
-    if (!isRealtimeEventEnabled(database, input.schema.id, input.eventType)) return;
-    const stored = recordRealtimeEvent(database, {
+    void publishAsync(input);
+  }
+
+  async function publishAsync(input: RealtimePublishInput): Promise<void> {
+    if (!(await isRealtimeEventEnabled(database, input.schema.id, input.eventType))) return;
+    const stored = await recordRealtimeEvent(database, {
       entry: input.entry,
       eventType: input.eventType,
       schemaId: input.schema.id,
       schemaSlug: input.schema.slug,
     });
-    pruneHistory(input.schema.id);
+    void pruneHistory(input.schema.id);
     for (const [ws, state] of clients) {
       if (state.schemaId !== input.schema.id || ws.readyState !== WebSocket.OPEN) continue;
       sendEvent(ws, state, stored);
     }
   }
 
-  function replayMissed(ws: WebSocket, state: ClientState, lastEventId: string | null, replayLimit: string | null): void {
+  async function replayMissed(
+    ws: WebSocket,
+    state: ClientState,
+    lastEventId: string | null,
+    replayLimit: string | null,
+  ): Promise<void> {
     if (!lastEventId) return;
     const limit = parseReplayLimit(replayLimit);
-    const events = listRealtimeEventsAfter(database, state.schemaId, lastEventId, limit);
+    const events = await listRealtimeEventsAfter(database, state.schemaId, lastEventId, limit);
     for (const event of events) sendEvent(ws, state, event, true);
   }
 
@@ -118,22 +131,22 @@ export function createRealtimeBroker(database: SqliteDatabase): RealtimeBroker &
     }));
   }
 
-  function canSubscribe(url: URL, schemaId: string): { allowed: boolean; error?: string } {
+  async function canSubscribe(url: URL, schemaId: string): Promise<{ allowed: boolean; error?: string }> {
     const session = url.searchParams.get("session")?.trim();
     const schemaSlug = url.searchParams.get("schema")?.trim() ?? "";
     if (session) {
-      return consumeRealtimeSession(database, session, schemaSlug)
+      return (await consumeRealtimeSession(database, session, schemaSlug))
         ? { allowed: true }
         : { allowed: false, error: "REALTIME_SESSION_INVALID" };
     }
     const token = url.searchParams.get("token")?.trim();
     if (token) {
-      const apiToken = resolveApiToken(database, token);
+      const apiToken = await resolveApiToken(database, token);
       if (!apiToken) return { allowed: false, error: "API_TOKEN_INVALID" };
-      return { allowed: canRoleAccess(database, apiToken.roleId, schemaId, "getAll") };
+      return { allowed: await canRoleAccess(database, apiToken.roleId, schemaId, "getAll") };
     }
     const roleId = url.searchParams.get("roleId")?.trim();
-    return roleId ? { allowed: canRoleAccess(database, roleId, schemaId, "getAll") } : { allowed: true };
+    return roleId ? { allowed: await canRoleAccess(database, roleId, schemaId, "getAll") } : { allowed: true };
   }
 
   function handleMessage(ws: WebSocket, state: ClientState, text: string): void {
@@ -175,9 +188,9 @@ export function createRealtimeBroker(database: SqliteDatabase): RealtimeBroker &
 
   return { attach, publish, retentionEventsPerSchema, snapshot };
 
-  function pruneHistory(schemaId: string): void {
+  async function pruneHistory(schemaId: string): Promise<void> {
     try {
-      pruneRealtimeEvents(database, schemaId, retentionEventsPerSchema);
+      await pruneRealtimeEvents(database, schemaId, retentionEventsPerSchema);
     } catch {
       // Retention cleanup must not make content writes fail.
     }

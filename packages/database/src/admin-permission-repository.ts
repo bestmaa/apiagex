@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
-import type { SqliteDatabase } from "./sqlite.js";
-import { getRoleById } from "./role-repository.js";
+import type { ApiagexDatabase } from "./database-adapter.type.js";
 import type {
   AdminPermissionAction,
   AdminPermissionRecord,
   SetAdminPermissionInput,
 } from "./admin-permission-repository.type.js";
+import { getRoleById } from "./role-repository.js";
 
 type AdminPermissionRow = Omit<AdminPermissionRecord, "allowed"> & { allowed: number };
 
@@ -17,72 +17,67 @@ export const adminPermissionActions: AdminPermissionAction[] = [
   "settings",
 ];
 
-export function setAdminPermission(
-  db: SqliteDatabase,
+export async function setAdminPermission(
+  db: ApiagexDatabase,
   input: SetAdminPermissionInput,
-): AdminPermissionRecord {
-  validateAdminPermissionInput(db, input);
-  const existing = findAdminPermission(db, input.roleId, input.action);
+): Promise<AdminPermissionRecord> {
+  await validateAdminPermissionInput(db, input);
+  const existing = await findAdminPermission(db, input.roleId, input.action);
   if (existing) {
-    db.prepare("UPDATE admin_permissions SET allowed = ? WHERE id = ?").run(
-      input.allowed ? 1 : 0,
-      existing.id,
-    );
+    await db.prepare("UPDATE admin_permissions SET allowed = ? WHERE id = ?")
+      .run(input.allowed ? 1 : 0, existing.id);
     return requireAdminPermission(db, existing.id);
   }
   const id = randomUUID();
-  db.prepare(
-    "INSERT INTO admin_permissions (id, role_id, action, allowed) VALUES (?, ?, ?, ?)",
-  ).run(id, input.roleId, input.action, input.allowed ? 1 : 0);
+  await db.prepare("INSERT INTO admin_permissions (id, role_id, action, allowed) VALUES (?, ?, ?, ?)")
+    .run(id, input.roleId, input.action, input.allowed ? 1 : 0);
   return requireAdminPermission(db, id);
 }
 
-export function listAdminRolePermissions(
-  db: SqliteDatabase,
+export async function listAdminRolePermissions(
+  db: ApiagexDatabase,
   roleId: string,
-): AdminPermissionRecord[] {
-  const role = getRoleById(db, roleId);
+): Promise<AdminPermissionRecord[]> {
+  const role = await getRoleById(db, roleId);
   if (role?.isOwner) return ownerPermissions(roleId);
-  const rows = db
+  const rows = await db
     .prepare(adminPermissionSelectSql("WHERE role_id = ? ORDER BY action ASC"))
-    .all(roleId) as AdminPermissionRow[];
+    .all<AdminPermissionRow>(roleId);
   return rows.map(rowToAdminPermission);
 }
 
-export function canAdminRoleAccess(
-  db: SqliteDatabase,
+export async function canAdminRoleAccess(
+  db: ApiagexDatabase,
   roleId: string,
   action: AdminPermissionAction,
-): boolean {
-  const role = getRoleById(db, roleId);
+): Promise<boolean> {
+  const role = await getRoleById(db, roleId);
   if (!role || role.roleKind !== "admin") return false;
   if (role.isOwner) return true;
-  return Boolean(findAdminPermission(db, roleId, action)?.allowed);
+  return Boolean((await findAdminPermission(db, roleId, action))?.allowed);
 }
 
-function validateAdminPermissionInput(db: SqliteDatabase, input: SetAdminPermissionInput): void {
+async function validateAdminPermissionInput(db: ApiagexDatabase, input: SetAdminPermissionInput): Promise<void> {
   if (!adminPermissionActions.includes(input.action)) throw new Error("ADMIN_PERMISSION_ACTION_INVALID");
-  const role = getRoleById(db, input.roleId);
+  const role = await getRoleById(db, input.roleId);
   if (!role) throw new Error("ROLE_NOT_FOUND");
   if (role.roleKind !== "admin") throw new Error("ROLE_ADMIN_REQUIRED");
   if (role.isOwner) throw new Error("ROLE_OWNER_LOCKED");
 }
 
-function findAdminPermission(
-  db: SqliteDatabase,
+async function findAdminPermission(
+  db: ApiagexDatabase,
   roleId: string,
   action: AdminPermissionAction,
-): AdminPermissionRecord | undefined {
-  const row = db
+): Promise<AdminPermissionRecord | undefined> {
+  const row = await db
     .prepare(adminPermissionSelectSql("WHERE role_id = ? AND action = ?"))
-    .get(roleId, action) as AdminPermissionRow | undefined;
+    .get<AdminPermissionRow>(roleId, action);
   return row ? rowToAdminPermission(row) : undefined;
 }
 
-function requireAdminPermission(db: SqliteDatabase, id: string): AdminPermissionRecord {
-  const row = db.prepare(adminPermissionSelectSql("WHERE id = ?")).get(id) as
-    | AdminPermissionRow
-    | undefined;
+async function requireAdminPermission(db: ApiagexDatabase, id: string): Promise<AdminPermissionRecord> {
+  const row = await db.prepare(adminPermissionSelectSql("WHERE id = ?")).get<AdminPermissionRow>(id);
   if (!row) throw new Error("ADMIN_PERMISSION_NOT_FOUND");
   return rowToAdminPermission(row);
 }

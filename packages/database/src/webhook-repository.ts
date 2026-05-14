@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { SqliteDatabase } from "./sqlite.js";
+import type { ApiagexDatabase } from "./database-adapter.type.js";
 import { getSchemaById } from "./schema-repository.js";
 import type {
   EnqueueWebhookEventInput,
@@ -9,9 +9,9 @@ import type {
   WebhookEventRecord,
   WebhookEventStatus,
   WebhookEventType,
+  WebhookPayload,
   WebhookRecord,
   WebhookSecretRecord,
-  WebhookPayload,
 } from "./webhook-repository.type.js";
 
 const allowedEvents = new Set<WebhookEventType>(["entry.created", "entry.updated", "entry.deleted"]);
@@ -20,47 +20,60 @@ type WebhookRow = Omit<WebhookSecretRecord, "active" | "events"> & {
   active: number;
   eventsJson: string;
 };
-
 type EventRow = Omit<WebhookEventRecord, "eventType" | "payload"> & {
   eventType: WebhookEventType;
   payloadJson: string;
 };
-
 type DeliveryRow = WebhookDeliveryRecord;
 
-export function createWebhook(db: SqliteDatabase, input: WebhookDraft): WebhookRecord {
-  const draft = normalizeWebhookDraft(db, input);
+export async function createWebhook(db: ApiagexDatabase, input: WebhookDraft): Promise<WebhookRecord> {
+  const draft = await normalizeWebhookDraft(db, input);
   const id = randomUUID();
   const now = new Date().toISOString();
-  db.prepare(
+  await db.prepare(
     `INSERT INTO webhooks (id, name, url, secret, events_json, schema_id, active, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(id, draft.name, draft.url, draft.secret, JSON.stringify(draft.events), draft.schemaId, draft.active ? 1 : 0, now, now);
-  return publicWebhook(requireWebhook(db, id));
+  return publicWebhook(await requireWebhook(db, id));
 }
 
-export function updateWebhook(db: SqliteDatabase, webhookId: string, input: WebhookDraft): WebhookRecord {
-  const current = requireWebhook(db, webhookId);
-  const draft = normalizeWebhookDraft(db, { ...input, secret: input.secret ?? current.secret });
-  const now = new Date().toISOString();
-  db.prepare(
+export async function updateWebhook(
+  db: ApiagexDatabase,
+  webhookId: string,
+  input: WebhookDraft,
+): Promise<WebhookRecord> {
+  const current = await requireWebhook(db, webhookId);
+  const draft = await normalizeWebhookDraft(db, { ...input, secret: input.secret ?? current.secret });
+  await db.prepare(
     `UPDATE webhooks SET name = ?, url = ?, secret = ?, events_json = ?, schema_id = ?, active = ?, updated_at = ?
      WHERE id = ?`,
-  ).run(draft.name, draft.url, draft.secret, JSON.stringify(draft.events), draft.schemaId, draft.active ? 1 : 0, now, webhookId);
-  return publicWebhook(requireWebhook(db, webhookId));
+  ).run(
+    draft.name,
+    draft.url,
+    draft.secret,
+    JSON.stringify(draft.events),
+    draft.schemaId,
+    draft.active ? 1 : 0,
+    new Date().toISOString(),
+    webhookId,
+  );
+  return publicWebhook(await requireWebhook(db, webhookId));
 }
 
-export function listWebhooks(db: SqliteDatabase): WebhookRecord[] {
-  const rows = db.prepare(webhookSelectSql("ORDER BY created_at DESC")).all() as WebhookRow[];
+export async function listWebhooks(db: ApiagexDatabase): Promise<WebhookRecord[]> {
+  const rows = await db.prepare(webhookSelectSql("ORDER BY created_at DESC")).all<WebhookRow>();
   return rows.map(rowToWebhook).map(publicWebhook);
 }
 
-export function deleteWebhook(db: SqliteDatabase, webhookId: string): boolean {
-  const result = db.prepare("DELETE FROM webhooks WHERE id = ?").run(webhookId);
+export async function deleteWebhook(db: ApiagexDatabase, webhookId: string): Promise<boolean> {
+  const result = await db.prepare("DELETE FROM webhooks WHERE id = ?").run(webhookId);
   return result.changes > 0;
 }
 
-export function enqueueWebhookEvent(db: SqliteDatabase, input: EnqueueWebhookEventInput): WebhookEventRecord {
+export async function enqueueWebhookEvent(
+  db: ApiagexDatabase,
+  input: EnqueueWebhookEventInput,
+): Promise<WebhookEventRecord> {
   const id = randomUUID();
   const now = new Date().toISOString();
   const payload: WebhookPayload = {
@@ -69,7 +82,7 @@ export function enqueueWebhookEvent(db: SqliteDatabase, input: EnqueueWebhookEve
     entry: input.entry,
     occurredAt: now,
   };
-  db.prepare(
+  await db.prepare(
     `INSERT INTO webhook_events
       (id, event_type, schema_id, schema_slug, entry_id, payload_json, status, attempts, next_retry_at, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, 'pending', 0, NULL, ?, ?)`,
@@ -77,78 +90,115 @@ export function enqueueWebhookEvent(db: SqliteDatabase, input: EnqueueWebhookEve
   return requireWebhookEvent(db, id);
 }
 
-export function listPendingWebhookEvents(db: SqliteDatabase, now = new Date().toISOString(), limit = 20): WebhookEventRecord[] {
-  const rows = db.prepare(eventSelectSql("WHERE status = 'pending' AND (next_retry_at IS NULL OR next_retry_at <= ?) ORDER BY created_at ASC LIMIT ?"))
-    .all(now, limit) as EventRow[];
+export async function listPendingWebhookEvents(
+  db: ApiagexDatabase,
+  now = new Date().toISOString(),
+  limit = 20,
+): Promise<WebhookEventRecord[]> {
+  const rows = await db
+    .prepare(eventSelectSql("WHERE status = 'pending' AND (next_retry_at IS NULL OR next_retry_at <= ?) ORDER BY created_at ASC LIMIT ?"))
+    .all<EventRow>(now, limit);
   return rows.map(rowToEvent);
 }
 
-export function listMatchingWebhooks(db: SqliteDatabase, event: WebhookEventRecord): WebhookSecretRecord[] {
-  const rows = db.prepare(webhookSelectSql("WHERE active = 1 AND (schema_id IS NULL OR schema_id = ?) ORDER BY created_at ASC"))
-    .all(event.schemaId) as WebhookRow[];
+export async function listMatchingWebhooks(
+  db: ApiagexDatabase,
+  event: WebhookEventRecord,
+): Promise<WebhookSecretRecord[]> {
+  const rows = await db
+    .prepare(webhookSelectSql("WHERE active = 1 AND (schema_id IS NULL OR schema_id = ?) ORDER BY created_at ASC"))
+    .all<WebhookRow>(event.schemaId);
   return rows.map(rowToWebhook).filter((webhook) => webhook.events.includes(event.eventType));
 }
 
-export function listWebhookDeliveries(db: SqliteDatabase, webhookId?: string): WebhookDeliveryRecord[] {
+export async function listWebhookDeliveries(
+  db: ApiagexDatabase,
+  webhookId?: string,
+): Promise<WebhookDeliveryRecord[]> {
   const suffix = webhookId ? "WHERE webhook_id = ? ORDER BY created_at DESC" : "ORDER BY created_at DESC";
-  const rows = webhookId
-    ? db.prepare(deliverySelectSql(suffix)).all(webhookId) as DeliveryRow[]
-    : db.prepare(deliverySelectSql(suffix)).all() as DeliveryRow[];
-  return rows;
+  return webhookId
+    ? db.prepare(deliverySelectSql(suffix)).all<DeliveryRow>(webhookId)
+    : db.prepare(deliverySelectSql(suffix)).all<DeliveryRow>();
 }
 
-export function countWebhookDeliveryAttempts(db: SqliteDatabase, eventId: string, webhookId: string): number {
-  const row = db.prepare("SELECT COUNT(*) as count FROM webhook_deliveries WHERE event_id = ? AND webhook_id = ?")
-    .get(eventId, webhookId) as { count: number };
-  return row.count;
+export async function countWebhookDeliveryAttempts(
+  db: ApiagexDatabase,
+  eventId: string,
+  webhookId: string,
+): Promise<number> {
+  const row = await db
+    .prepare("SELECT COUNT(*) as count FROM webhook_deliveries WHERE event_id = ? AND webhook_id = ?")
+    .get<{ count: number }>(eventId, webhookId);
+  return row?.count ?? 0;
 }
 
-export function hasSuccessfulWebhookDelivery(db: SqliteDatabase, eventId: string, webhookId: string): boolean {
-  const row = db.prepare("SELECT id FROM webhook_deliveries WHERE event_id = ? AND webhook_id = ? AND status = 'success' LIMIT 1")
-    .get(eventId, webhookId);
+export async function hasSuccessfulWebhookDelivery(
+  db: ApiagexDatabase,
+  eventId: string,
+  webhookId: string,
+): Promise<boolean> {
+  const row = await db
+    .prepare("SELECT id FROM webhook_deliveries WHERE event_id = ? AND webhook_id = ? AND status = 'success' LIMIT 1")
+    .get<{ id: string }>(eventId, webhookId);
   return Boolean(row);
 }
 
-export function recordWebhookDelivery(db: SqliteDatabase, input: RecordWebhookDeliveryInput): WebhookDeliveryRecord {
+export async function recordWebhookDelivery(
+  db: ApiagexDatabase,
+  input: RecordWebhookDeliveryInput,
+): Promise<WebhookDeliveryRecord> {
   const id = input.id ?? randomUUID();
-  const now = new Date().toISOString();
-  db.prepare(
+  await db.prepare(
     `INSERT INTO webhook_deliveries
       (id, event_id, webhook_id, url, status, status_code, response_body, error, attempt, created_at, next_retry_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-  ).run(id, input.eventId, input.webhookId, input.url, input.status, input.statusCode ?? null, trim(input.responseBody), trim(input.error), input.attempt, now, input.nextRetryAt ?? null);
-  return db.prepare(deliverySelectSql("WHERE id = ?")).get(id) as WebhookDeliveryRecord;
+  ).run(
+    id,
+    input.eventId,
+    input.webhookId,
+    input.url,
+    input.status,
+    input.statusCode ?? null,
+    trim(input.responseBody),
+    trim(input.error),
+    input.attempt,
+    new Date().toISOString(),
+    input.nextRetryAt ?? null,
+  );
+  const delivery = await db.prepare(deliverySelectSql("WHERE id = ?")).get<WebhookDeliveryRecord>(id);
+  if (!delivery) throw new Error("WEBHOOK_DELIVERY_NOT_FOUND");
+  return delivery;
 }
 
-export function updateWebhookEventStatus(
-  db: SqliteDatabase,
+export async function updateWebhookEventStatus(
+  db: ApiagexDatabase,
   eventId: string,
   status: WebhookEventStatus,
   attempts: number,
   nextRetryAt: string | null,
-): void {
-  db.prepare("UPDATE webhook_events SET status = ?, attempts = ?, next_retry_at = ?, updated_at = ? WHERE id = ?")
+): Promise<void> {
+  await db.prepare("UPDATE webhook_events SET status = ?, attempts = ?, next_retry_at = ?, updated_at = ? WHERE id = ?")
     .run(status, attempts, nextRetryAt, new Date().toISOString(), eventId);
 }
 
-function normalizeWebhookDraft(db: SqliteDatabase, input: WebhookDraft): Required<WebhookDraft> {
+async function normalizeWebhookDraft(db: ApiagexDatabase, input: WebhookDraft): Promise<Required<WebhookDraft>> {
   const events = [...new Set(input.events)];
   if (!input.name.trim()) throw new Error("WEBHOOK_NAME_REQUIRED");
   if (!isHttpUrl(input.url)) throw new Error("WEBHOOK_URL_INVALID");
   if (events.length === 0 || events.some((event) => !allowedEvents.has(event))) throw new Error("WEBHOOK_EVENTS_INVALID");
-  if (input.schemaId && !getSchemaById(db, input.schemaId)) throw new Error("SCHEMA_NOT_FOUND");
+  if (input.schemaId && !(await getSchemaById(db, input.schemaId))) throw new Error("SCHEMA_NOT_FOUND");
   const secret = input.secret?.trim() || randomUUID();
   return { name: input.name.trim(), url: input.url.trim(), secret, events, schemaId: input.schemaId ?? null, active: input.active ?? true };
 }
 
-function requireWebhook(db: SqliteDatabase, webhookId: string): WebhookSecretRecord {
-  const row = db.prepare(webhookSelectSql("WHERE id = ?")).get(webhookId) as WebhookRow | undefined;
+async function requireWebhook(db: ApiagexDatabase, webhookId: string): Promise<WebhookSecretRecord> {
+  const row = await db.prepare(webhookSelectSql("WHERE id = ?")).get<WebhookRow>(webhookId);
   if (!row) throw new Error("WEBHOOK_NOT_FOUND");
   return rowToWebhook(row);
 }
 
-function requireWebhookEvent(db: SqliteDatabase, eventId: string): WebhookEventRecord {
-  const row = db.prepare(eventSelectSql("WHERE id = ?")).get(eventId) as EventRow | undefined;
+async function requireWebhookEvent(db: ApiagexDatabase, eventId: string): Promise<WebhookEventRecord> {
+  const row = await db.prepare(eventSelectSql("WHERE id = ?")).get<EventRow>(eventId);
   if (!row) throw new Error("WEBHOOK_EVENT_NOT_FOUND");
   return rowToEvent(row);
 }

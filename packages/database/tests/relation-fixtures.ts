@@ -1,11 +1,10 @@
 import {
   createEntry,
   createSchema,
-  migrateMvpDatabase,
-  openSqliteDatabase,
+  openMigratedSqliteAdapter,
+  type ApiagexDatabase,
   type EntryRecord,
   type SchemaRecord,
-  type SqliteDatabase,
 } from "../src/index.js";
 
 export type RelationFixtureSchemas = {
@@ -23,29 +22,27 @@ export type RelationFixtureEntries = {
   tag: EntryRecord;
 };
 
-export function openRelationFixtureDb(): SqliteDatabase {
-  const db = openSqliteDatabase();
-  migrateMvpDatabase(db);
-  return db;
+export function openRelationFixtureDb(): ApiagexDatabase {
+  return openMigratedSqliteAdapter();
 }
 
-export function createRelationFixtureSchemas(db: SqliteDatabase): RelationFixtureSchemas {
-  const author = createSchema(db, {
+export async function createRelationFixtureSchemas(db: ApiagexDatabase): Promise<RelationFixtureSchemas> {
+  const author = await createSchema(db, {
     name: "Author",
     slug: "author",
     fields: [{ name: "Name", slug: "name", type: "text", required: true }],
   });
-  const category = createSchema(db, {
+  const category = await createSchema(db, {
     name: "Category",
     slug: "category",
     fields: [{ name: "Name", slug: "name", type: "text", required: true }],
   });
-  const tag = createSchema(db, {
+  const tag = await createSchema(db, {
     name: "Tag",
     slug: "tag",
     fields: [{ name: "Name", slug: "name", type: "text", required: true }],
   });
-  const profile = createSchema(db, {
+  const profile = await createSchema(db, {
     name: "Profile",
     slug: "profile",
     fields: [
@@ -58,7 +55,7 @@ export function createRelationFixtureSchemas(db: SqliteDatabase): RelationFixtur
       },
     ],
   });
-  const article = createSchema(db, {
+  const article = await createSchema(db, {
     name: "Article",
     slug: "article",
     fields: [
@@ -90,16 +87,23 @@ export function createRelationFixtureSchemas(db: SqliteDatabase): RelationFixtur
 }
 
 export function createSingleRelationFixtureEntries(
-  db: SqliteDatabase,
+  db: ApiagexDatabase,
   schemas: RelationFixtureSchemas,
-): RelationFixtureEntries {
-  const author = createEntry(db, { schemaId: schemas.author.id, data: { name: "Asha" } });
-  const category = createEntry(db, {
+): Promise<RelationFixtureEntries> {
+  return createEntries(db, schemas);
+}
+
+async function createEntries(
+  db: ApiagexDatabase,
+  schemas: RelationFixtureSchemas,
+): Promise<RelationFixtureEntries> {
+  const author = await createEntry(db, { schemaId: schemas.author.id, data: { name: "Asha" } });
+  const category = await createEntry(db, {
     schemaId: schemas.category.id,
     data: { name: "Guides" },
   });
-  const tag = createEntry(db, { schemaId: schemas.tag.id, data: { name: "CMS" } });
-  const article = createEntry(db, {
+  const tag = await createEntry(db, { schemaId: schemas.tag.id, data: { name: "CMS" } });
+  const article = await createEntry(db, {
     schemaId: schemas.article.id,
     data: { author: author.id, category: category.id, title: "Relations" },
   });

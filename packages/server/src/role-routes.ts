@@ -8,7 +8,7 @@ import {
   listRoles,
   revokeApiToken,
   setPermission,
-  type SqliteDatabase,
+  type ApiagexDatabase,
 } from "@apiagex/database";
 import type {
   RoleBody,
@@ -18,47 +18,40 @@ import type {
   RoleTokenParams,
 } from "./role-routes.type.js";
 
-export function registerRoleRoutes(server: FastifyInstance, database: SqliteDatabase): void {
+export function registerRoleRoutes(server: FastifyInstance, database: ApiagexDatabase): void {
   server.get("/api/admin/roles", async () => ({
     ok: true,
-    roles: listRoles(database),
+    roles: await listRoles(database),
   }));
 
   server.post<{ Body: RoleBody }>("/api/admin/roles", async (request, reply) => {
     try {
-      return { ok: true, role: createRole(database, request.body) };
+      return { ok: true, role: await createRole(database, request.body) };
     } catch (error) {
       return sendRoleError(reply, error, 400);
     }
   });
 
   server.get<{ Params: RoleParams }>("/api/admin/roles/:roleId", async (request, reply) => {
-    const role = getRoleById(database, request.params.roleId);
-    if (!role || role.roleKind !== "api") {
-      return reply.code(404).send({ ok: false, error: "ROLE_NOT_FOUND" });
-    }
+    const role = await getRoleById(database, request.params.roleId);
+    if (!role || role.roleKind !== "api") return reply.code(404).send({ ok: false, error: "ROLE_NOT_FOUND" });
     return { ok: true, role };
   });
 
-  server.get<{ Params: RoleParams }>(
-    "/api/admin/roles/:roleId/permissions",
-    async (request, reply) => {
-      const role = getRoleById(database, request.params.roleId);
-      if (!role || role.roleKind !== "api") {
-        return reply.code(404).send({ ok: false, error: "ROLE_NOT_FOUND" });
-      }
-      return { ok: true, permissions: listRolePermissions(database, request.params.roleId) };
-    },
-  );
+  server.get<{ Params: RoleParams }>("/api/admin/roles/:roleId/permissions", async (request, reply) => {
+    const role = await getRoleById(database, request.params.roleId);
+    if (!role || role.roleKind !== "api") return reply.code(404).send({ ok: false, error: "ROLE_NOT_FOUND" });
+    return { ok: true, permissions: await listRolePermissions(database, request.params.roleId) };
+  });
 
   server.put<{ Body: RolePermissionsBody; Params: RoleParams }>(
     "/api/admin/roles/:roleId/permissions",
     async (request, reply) => {
       try {
         for (const permission of request.body.permissions) {
-          setPermission(database, { ...permission, roleId: request.params.roleId });
+          await setPermission(database, { ...permission, roleId: request.params.roleId });
         }
-        return { ok: true, permissions: listRolePermissions(database, request.params.roleId) };
+        return { ok: true, permissions: await listRolePermissions(database, request.params.roleId) };
       } catch (error) {
         return sendRoleError(reply, error, 400);
       }
@@ -66,18 +59,16 @@ export function registerRoleRoutes(server: FastifyInstance, database: SqliteData
   );
 
   server.get<{ Params: RoleParams }>("/api/admin/roles/:roleId/tokens", async (request, reply) => {
-    const role = getRoleById(database, request.params.roleId);
-    if (!role || role.roleKind !== "api") {
-      return reply.code(404).send({ ok: false, error: "ROLE_NOT_FOUND" });
-    }
-    return { ok: true, tokens: listApiTokens(database, request.params.roleId) };
+    const role = await getRoleById(database, request.params.roleId);
+    if (!role || role.roleKind !== "api") return reply.code(404).send({ ok: false, error: "ROLE_NOT_FOUND" });
+    return { ok: true, tokens: await listApiTokens(database, request.params.roleId) };
   });
 
   server.post<{ Body: RoleTokenBody; Params: RoleParams }>(
     "/api/admin/roles/:roleId/tokens",
     async (request, reply) => {
       try {
-        const created = createApiToken(database, {
+        const created = await createApiToken(database, {
           roleId: request.params.roleId,
           name: request.body.name,
         });
@@ -88,18 +79,15 @@ export function registerRoleRoutes(server: FastifyInstance, database: SqliteData
     },
   );
 
-  server.delete<{ Params: RoleTokenParams }>(
-    "/api/admin/roles/:roleId/tokens/:tokenId",
-    async (request, reply) => {
-      try {
-        const token = revokeApiToken(database, request.params.roleId, request.params.tokenId);
-        if (!token) return reply.code(404).send({ ok: false, error: "API_TOKEN_NOT_FOUND" });
-        return { ok: true, token };
-      } catch (error) {
-        return sendRoleError(reply, error, 400);
-      }
-    },
-  );
+  server.delete<{ Params: RoleTokenParams }>("/api/admin/roles/:roleId/tokens/:tokenId", async (request, reply) => {
+    try {
+      const token = await revokeApiToken(database, request.params.roleId, request.params.tokenId);
+      if (!token) return reply.code(404).send({ ok: false, error: "API_TOKEN_NOT_FOUND" });
+      return { ok: true, token };
+    } catch (error) {
+      return sendRoleError(reply, error, 400);
+    }
+  });
 }
 
 function sendRoleError(reply: FastifyReply, error: unknown, statusCode: number): FastifyReply {

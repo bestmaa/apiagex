@@ -1,5 +1,12 @@
 import type { AddressInfo } from "node:net";
-import { createEntry, createSchema, openSqliteDatabase, pruneRealtimeEvents, recordRealtimeEvent } from "@apiagex/database";
+import {
+  createEntry,
+  createSchema,
+  openMigratedSqliteAdapter,
+  openSqliteDatabase,
+  pruneRealtimeEvents,
+  recordRealtimeEvent,
+} from "@apiagex/database";
 import { WebSocket } from "ws";
 import { describe, expect, it } from "vitest";
 import { createServer } from "../src/app.js";
@@ -54,28 +61,28 @@ describe("realtime WebSocket APIs", () => {
   });
 
   it("keeps only the latest realtime history rows per schema", async () => {
-    const database = openSqliteDatabase();
+    const database = openMigratedSqliteAdapter();
     const server = createServer({ database });
-    const schema = createSchema(database, { fields: [{ name: "Title", slug: "title", type: "text" }], name: "Article", slug: "article" });
+    const schema = await createSchema(database, { fields: [{ name: "Title", slug: "title", type: "text" }], name: "Article", slug: "article" });
     for (let index = 0; index < 1005; index += 1) {
-      const entry = createEntry(database, {
+      const entry = await createEntry(database, {
         data: { title: `Event ${index}` },
         schemaId: schema.id,
       });
-      recordRealtimeEvent(database, { entry, eventType: "entry.created", schemaId: schema.id, schemaSlug: schema.slug });
+      await recordRealtimeEvent(database, { entry, eventType: "entry.created", schemaId: schema.id, schemaSlug: schema.slug });
     }
-    pruneRealtimeEvents(database, schema.id, 1000);
+    await pruneRealtimeEvents(database, schema.id, 1000);
 
-    const rows = database.prepare("SELECT COUNT(*) as count FROM realtime_events WHERE schema_id = ?")
-      .get(schema.id) as { count: number };
+    const rows = await database.prepare("SELECT COUNT(*) as count FROM realtime_events WHERE schema_id = ?")
+      .get<{ count: number }>(schema.id);
     const history = await server.inject({ method: "GET", url: "/api/admin/realtime" });
 
-    expect(rows.count).toBe(1000);
+    expect(rows?.count).toBe(1000);
     expect(history.json().events[0].entry.data.title).toBe("Event 1004");
   });
 
   it("replays missed schema events after lastEventId on reconnect", async () => {
-    const database = openSqliteDatabase();
+    const database = openMigratedSqliteAdapter();
     const server = createServer({ database });
     const schemaId = await createArticleSchema(server);
     await server.inject({
@@ -173,7 +180,7 @@ describe("realtime WebSocket APIs", () => {
     expect(await nextJson(reused)).toMatchObject({ type: "error", error: "REALTIME_SESSION_INVALID" });
 
     const expiredSession = await server.inject({ method: "POST", url: "/api/realtime/session", headers: { authorization: `Bearer ${token.json().token}` }, payload: { schema: "article", ttlSeconds: 60 } });
-    database.prepare("UPDATE realtime_sessions SET expires_at = ? WHERE token_prefix = ?")
+    await database.prepare("UPDATE realtime_sessions SET expires_at = ? WHERE token_prefix = ?")
       .run("2026-01-01T00:00:00.000Z", expiredSession.json().tokenPrefix);
     const expired = new WebSocket(`ws://127.0.0.1:${port}/api/realtime?schema=article&session=${expiredSession.json().token}`);
     expect(await nextJson(expired)).toMatchObject({ type: "error", error: "REALTIME_SESSION_INVALID" });

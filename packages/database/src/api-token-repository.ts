@@ -1,11 +1,11 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import type { SqliteDatabase } from "./sqlite.js";
-import { getRoleById } from "./role-repository.js";
+import type { ApiagexDatabase, DatabaseQueryParam } from "./database-adapter.type.js";
 import type {
   ApiTokenRecord,
   CreatedApiToken,
   CreateApiTokenInput,
 } from "./api-token-repository.type.js";
+import { getRoleById } from "./role-repository.js";
 
 type ApiTokenRow = {
   id: string;
@@ -18,68 +18,67 @@ type ApiTokenRow = {
   revokedAt: string | null;
 };
 
-export function createApiToken(db: SqliteDatabase, input: CreateApiTokenInput): CreatedApiToken {
-  requireApiRole(db, input.roleId);
+export async function createApiToken(db: ApiagexDatabase, input: CreateApiTokenInput): Promise<CreatedApiToken> {
+  await requireApiRole(db, input.roleId);
   const token = `agx_${randomBytes(32).toString("base64url")}`;
   const id = randomUUID();
   const now = new Date().toISOString();
-  db.prepare(
+  await db.prepare(
     `INSERT INTO api_tokens
       (id, role_id, name, token_hash, token_prefix, created_at, last_used_at, revoked_at)
      VALUES (?, ?, ?, ?, ?, ?, NULL, NULL)`,
   ).run(id, input.roleId, normalizeTokenName(input.name), hashToken(token), token.slice(0, 12), now);
-  return { token, tokenRecord: requireApiToken(db, id) };
+  return { token, tokenRecord: await requireApiToken(db, id) };
 }
 
-export function listApiTokens(db: SqliteDatabase, roleId: string): ApiTokenRecord[] {
-  requireApiRole(db, roleId);
-  const rows = db
+export async function listApiTokens(db: ApiagexDatabase, roleId: string): Promise<ApiTokenRecord[]> {
+  await requireApiRole(db, roleId);
+  const rows = await db
     .prepare(tokenSelectSql("WHERE api_tokens.role_id = ? ORDER BY api_tokens.created_at DESC"))
-    .all(roleId) as ApiTokenRow[];
+    .all<ApiTokenRow>(roleId);
   return rows.map(rowToApiToken);
 }
 
-export function revokeApiToken(
-  db: SqliteDatabase,
+export async function revokeApiToken(
+  db: ApiagexDatabase,
   roleId: string,
   tokenId: string,
-): ApiTokenRecord | undefined {
-  requireApiRole(db, roleId);
+): Promise<ApiTokenRecord | undefined> {
+  await requireApiRole(db, roleId);
   const now = new Date().toISOString();
-  db.prepare("UPDATE api_tokens SET revoked_at = COALESCE(revoked_at, ?) WHERE id = ? AND role_id = ?")
+  await db.prepare("UPDATE api_tokens SET revoked_at = COALESCE(revoked_at, ?) WHERE id = ? AND role_id = ?")
     .run(now, tokenId, roleId);
   return getApiTokenById(db, tokenId, roleId);
 }
 
-export function resolveApiToken(db: SqliteDatabase, token: string): ApiTokenRecord | undefined {
-  const row = db
+export async function resolveApiToken(db: ApiagexDatabase, token: string): Promise<ApiTokenRecord | undefined> {
+  const row = await db
     .prepare(tokenSelectSql("WHERE api_tokens.token_hash = ? AND api_tokens.revoked_at IS NULL AND roles.role_kind = 'api'"))
-    .get(hashToken(token)) as ApiTokenRow | undefined;
+    .get<ApiTokenRow>(hashToken(token));
   if (!row) return undefined;
-  db.prepare("UPDATE api_tokens SET last_used_at = ? WHERE id = ?")
-    .run(new Date().toISOString(), row.id);
+  await db.prepare("UPDATE api_tokens SET last_used_at = ? WHERE id = ?").run(new Date().toISOString(), row.id);
   return getApiTokenById(db, row.id);
 }
 
-function getApiTokenById(
-  db: SqliteDatabase,
+async function getApiTokenById(
+  db: ApiagexDatabase,
   tokenId: string,
   roleId?: string,
-): ApiTokenRecord | undefined {
+): Promise<ApiTokenRecord | undefined> {
   const suffix = roleId ? "WHERE api_tokens.id = ? AND api_tokens.role_id = ?" : "WHERE api_tokens.id = ?";
-  const params = roleId ? [tokenId, roleId] : [tokenId];
-  const row = db.prepare(tokenSelectSql(suffix)).get(...params) as ApiTokenRow | undefined;
+  const params: DatabaseQueryParam[] = roleId ? [tokenId, roleId] : [tokenId];
+  const row = await db.prepare(tokenSelectSql(suffix)).get<ApiTokenRow>(...params);
   return row ? rowToApiToken(row) : undefined;
 }
 
-function requireApiToken(db: SqliteDatabase, tokenId: string): ApiTokenRecord {
-  const token = getApiTokenById(db, tokenId);
+async function requireApiToken(db: ApiagexDatabase, tokenId: string): Promise<ApiTokenRecord> {
+  const token = await getApiTokenById(db, tokenId);
   if (!token) throw new Error("API_TOKEN_NOT_FOUND");
   return token;
 }
 
-function requireApiRole(db: SqliteDatabase, roleId: string): void {
-  const role = getRoleById(db, roleId);
+async function requireApiRole(db: ApiagexDatabase, roleId: string): Promise<void> {
+  const role = await getRoleById(db, roleId);
   if (!role) throw new Error("ROLE_NOT_FOUND");
   if (role.roleKind !== "api") throw new Error("ROLE_API_REQUIRED");
 }

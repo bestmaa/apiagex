@@ -1,104 +1,78 @@
 import { randomUUID } from "node:crypto";
-import type { SqliteDatabase } from "./sqlite.js";
-import { getRoleById } from "./role-repository.js";
-import { getSchemaById } from "./schema-repository.js";
+import type { ApiagexDatabase } from "./database-adapter.type.js";
 import type {
   PermissionAction,
   PermissionRecord,
   SetPermissionInput,
 } from "./permission-repository.type.js";
+import { getRoleById } from "./role-repository.js";
+import { getSchemaById } from "./schema-repository.js";
 
 type PermissionRow = Omit<PermissionRecord, "allowed"> & { allowed: number };
 
-const permissionActions: PermissionAction[] = [
-  "getAll",
-  "get",
-  "create",
-  "update",
-  "delete",
-  "manage",
-];
+const permissionActions: PermissionAction[] = ["getAll", "get", "create", "update", "delete", "manage"];
 
-export function setPermission(
-  db: SqliteDatabase,
+export async function setPermission(
+  db: ApiagexDatabase,
   input: SetPermissionInput,
-): PermissionRecord {
-  validatePermissionInput(db, input);
-  const existing = findPermission(db, input.roleId, input.schemaId, input.action);
+): Promise<PermissionRecord> {
+  await validatePermissionInput(db, input);
+  const existing = await findPermission(db, input.roleId, input.schemaId, input.action);
   if (existing) {
-    db.prepare("UPDATE permissions SET allowed = ? WHERE id = ?").run(
-      input.allowed ? 1 : 0,
-      existing.id,
-    );
+    await db.prepare("UPDATE permissions SET allowed = ? WHERE id = ?").run(input.allowed ? 1 : 0, existing.id);
     return requirePermission(db, existing.id);
   }
   const id = randomUUID();
-  db.prepare(
+  await db.prepare(
     "INSERT INTO permissions (id, role_id, schema_id, action, allowed) VALUES (?, ?, ?, ?, ?)",
   ).run(id, input.roleId, input.schemaId, input.action, input.allowed ? 1 : 0);
   return requirePermission(db, id);
 }
 
-export function listRolePermissions(
-  db: SqliteDatabase,
-  roleId: string,
-): PermissionRecord[] {
-  const rows = db
+export async function listRolePermissions(db: ApiagexDatabase, roleId: string): Promise<PermissionRecord[]> {
+  const rows = await db
     .prepare(permissionSelectSql("WHERE role_id = ? ORDER BY schema_id ASC, action ASC"))
-    .all(roleId) as PermissionRow[];
+    .all<PermissionRow>(roleId);
   return rows.map(rowToPermission);
 }
 
-export function canRoleAccess(
-  db: SqliteDatabase,
+export async function canRoleAccess(
+  db: ApiagexDatabase,
   roleId: string,
   schemaId: string,
   action: PermissionAction,
-): boolean {
-  const role = getRoleById(db, roleId);
-  if (!role) return false;
-  if (role.roleKind !== "api") return false;
-  const manage = findPermission(db, roleId, schemaId, "manage");
+): Promise<boolean> {
+  const role = await getRoleById(db, roleId);
+  if (!role || role.roleKind !== "api") return false;
+  const manage = await findPermission(db, roleId, schemaId, "manage");
   if (manage?.allowed) return true;
-  const permission = findPermission(db, roleId, schemaId, action);
+  const permission = await findPermission(db, roleId, schemaId, action);
   return Boolean(permission?.allowed);
 }
 
-function validatePermissionInput(db: SqliteDatabase, input: SetPermissionInput): void {
-  if (!permissionActions.includes(input.action)) {
-    throw new Error("PERMISSION_ACTION_INVALID");
-  }
-  const role = getRoleById(db, input.roleId);
-  if (!role) {
-    throw new Error("ROLE_NOT_FOUND");
-  }
-  if (role.roleKind !== "api") {
-    throw new Error("ROLE_API_REQUIRED");
-  }
-  if (!getSchemaById(db, input.schemaId)) {
-    throw new Error("SCHEMA_NOT_FOUND");
-  }
+async function validatePermissionInput(db: ApiagexDatabase, input: SetPermissionInput): Promise<void> {
+  if (!permissionActions.includes(input.action)) throw new Error("PERMISSION_ACTION_INVALID");
+  const role = await getRoleById(db, input.roleId);
+  if (!role) throw new Error("ROLE_NOT_FOUND");
+  if (role.roleKind !== "api") throw new Error("ROLE_API_REQUIRED");
+  if (!(await getSchemaById(db, input.schemaId))) throw new Error("SCHEMA_NOT_FOUND");
 }
 
-function findPermission(
-  db: SqliteDatabase,
+async function findPermission(
+  db: ApiagexDatabase,
   roleId: string,
   schemaId: string,
   action: PermissionAction,
-): PermissionRecord | undefined {
-  const row = db
+): Promise<PermissionRecord | undefined> {
+  const row = await db
     .prepare(permissionSelectSql("WHERE role_id = ? AND schema_id = ? AND action = ?"))
-    .get(roleId, schemaId, action) as PermissionRow | undefined;
+    .get<PermissionRow>(roleId, schemaId, action);
   return row ? rowToPermission(row) : undefined;
 }
 
-function requirePermission(db: SqliteDatabase, id: string): PermissionRecord {
-  const row = db.prepare(permissionSelectSql("WHERE id = ?")).get(id) as
-    | PermissionRow
-    | undefined;
-  if (!row) {
-    throw new Error("PERMISSION_NOT_FOUND");
-  }
+async function requirePermission(db: ApiagexDatabase, id: string): Promise<PermissionRecord> {
+  const row = await db.prepare(permissionSelectSql("WHERE id = ?")).get<PermissionRow>(id);
+  if (!row) throw new Error("PERMISSION_NOT_FOUND");
   return rowToPermission(row);
 }
 

@@ -1,7 +1,7 @@
 import { createServer } from "./app.js";
 import { ensureLocalServerPaths, resolveLocalServerConfig } from "./server-config.js";
 import { bootstrapOwner } from "./owner-bootstrap.js";
-import { migrateMvpDatabase, openSqliteDatabase } from "@apiagex/database";
+import { openMigratedSqliteAdapter } from "@apiagex/database";
 import type { RuntimeCliOptions, RuntimeCliResult, StartedApiagexServer, StartServerOptions } from "./runtime.type.js";
 
 const runtimeVersion = "0.6.4";
@@ -16,7 +16,7 @@ export async function startApiagexServer(options: StartServerOptions = {}): Prom
   const port = options.port ?? Number(env.PORT ?? 4000);
   const config = options.config ?? resolveLocalServerConfig(env, options.cwd ?? process.cwd());
   await ensureLocalServerPaths(config);
-  if (options.initialOwner) bootstrapInitialOwner(config.databasePath, options.initialOwner);
+  if (options.initialOwner) await bootstrapInitialOwner(config.databasePath, options.initialOwner);
   const server = createServer(config);
   try {
     await server.listen({ host, port });
@@ -72,18 +72,17 @@ Environment:
 `;
 }
 
-function bootstrapInitialOwner(databasePath: string, owner: { email: string; password: string }): void {
-  const database = openSqliteDatabase(databasePath);
+async function bootstrapInitialOwner(databasePath: string, owner: { email: string; password: string }): Promise<void> {
+  const database = openMigratedSqliteAdapter(databasePath);
   try {
-    migrateMvpDatabase(database);
-    bootstrapOwner(database, owner);
+    await bootstrapOwner(database, owner);
     console.log(`Apiagex owner created: ${owner.email}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : "OWNER_BOOTSTRAP_FAILED";
     if (message !== "OWNER_ALREADY_BOOTSTRAPPED") throw error;
     console.log("Apiagex owner already exists; skipping owner bootstrap.");
   } finally {
-    database.close();
+    await database.close();
   }
 }
 

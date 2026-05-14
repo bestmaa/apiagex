@@ -9,18 +9,18 @@ import {
   listPendingWebhookEvents,
   listWebhookDeliveries,
   listWebhooks,
-  migrateMvpDatabase,
-  openSqliteDatabase,
+  openMigratedSqliteAdapter,
   recordWebhookDelivery,
   updateWebhook,
+  type ApiagexDatabase,
 } from "../src/index.js";
 
 describe("webhook repository", () => {
-  it("creates, lists, updates, and deletes webhook registrations", () => {
-    const db = openMigratedDb();
-    const schema = createArticleSchema(db);
+  it("creates, lists, updates, and deletes webhook registrations", async () => {
+    const db = openMigratedSqliteAdapter();
+    const schema = await createArticleSchema(db);
 
-    const webhook = createWebhook(db, {
+    const webhook = await createWebhook(db, {
       events: ["entry.created", "entry.updated"],
       name: "CRM sync",
       schemaId: schema.id,
@@ -29,9 +29,9 @@ describe("webhook repository", () => {
     });
     expect(webhook.active).toBe(true);
     expect(webhook.events).toEqual(["entry.created", "entry.updated"]);
-    expect(listWebhooks(db)).toHaveLength(1);
+    expect(await listWebhooks(db)).toHaveLength(1);
 
-    const updated = updateWebhook(db, webhook.id, {
+    const updated = await updateWebhook(db, webhook.id, {
       active: false,
       events: ["entry.deleted"],
       name: "CRM delete sync",
@@ -40,26 +40,26 @@ describe("webhook repository", () => {
     });
     expect(updated.active).toBe(false);
     expect(updated.events).toEqual(["entry.deleted"]);
-    expect(deleteWebhook(db, webhook.id)).toBe(true);
-    expect(listWebhooks(db)).toHaveLength(0);
+    expect(await deleteWebhook(db, webhook.id)).toBe(true);
+    expect(await listWebhooks(db)).toHaveLength(0);
   });
 
-  it("enqueues events and matches active webhook filters", () => {
-    const db = openMigratedDb();
-    const schema = createArticleSchema(db);
-    const entry = createEntry(db, { schemaId: schema.id, data: { title: "Hooked" } });
-    createWebhook(db, {
+  it("enqueues events and matches active webhook filters", async () => {
+    const db = openMigratedSqliteAdapter();
+    const schema = await createArticleSchema(db);
+    const entry = await createEntry(db, { schemaId: schema.id, data: { title: "Hooked" } });
+    await createWebhook(db, {
       events: ["entry.created"],
       name: "All create",
       url: "https://example.com/all",
     });
-    createWebhook(db, {
+    await createWebhook(db, {
       events: ["entry.updated"],
       name: "Update only",
       url: "https://example.com/update",
     });
 
-    const event = enqueueWebhookEvent(db, {
+    const event = await enqueueWebhookEvent(db, {
       entry,
       eventType: "entry.created",
       schemaId: schema.id,
@@ -67,28 +67,28 @@ describe("webhook repository", () => {
     });
 
     expect(event.payload.entry.data.title).toBe("Hooked");
-    expect(listPendingWebhookEvents(db)).toHaveLength(1);
-    expect(listMatchingWebhooks(db, event).map((webhook) => webhook.name)).toEqual(["All create"]);
+    expect(await listPendingWebhookEvents(db)).toHaveLength(1);
+    expect((await listMatchingWebhooks(db, event)).map((webhook) => webhook.name)).toEqual(["All create"]);
   });
 
-  it("records delivery attempts without exposing webhook secrets", () => {
-    const db = openMigratedDb();
-    const schema = createArticleSchema(db);
-    const entry = createEntry(db, { schemaId: schema.id, data: { title: "Delivery" } });
-    const webhook = createWebhook(db, {
+  it("records delivery attempts without exposing webhook secrets", async () => {
+    const db = openMigratedSqliteAdapter();
+    const schema = await createArticleSchema(db);
+    const entry = await createEntry(db, { schemaId: schema.id, data: { title: "Delivery" } });
+    const webhook = await createWebhook(db, {
       events: ["entry.created"],
       name: "Receiver",
       secret: "hidden",
       url: "https://example.com/hook",
     });
-    const event = enqueueWebhookEvent(db, {
+    const event = await enqueueWebhookEvent(db, {
       entry,
       eventType: "entry.created",
       schemaId: schema.id,
       schemaSlug: schema.slug,
     });
 
-    recordWebhookDelivery(db, {
+    await recordWebhookDelivery(db, {
       attempt: 1,
       eventId: event.id,
       responseBody: "ok",
@@ -98,18 +98,12 @@ describe("webhook repository", () => {
       webhookId: webhook.id,
     });
 
-    expect(listWebhookDeliveries(db, webhook.id)).toHaveLength(1);
-    expect(JSON.stringify(listWebhooks(db))).not.toContain("hidden");
+    expect(await listWebhookDeliveries(db, webhook.id)).toHaveLength(1);
+    expect(JSON.stringify(await listWebhooks(db))).not.toContain("hidden");
   });
 });
 
-function openMigratedDb() {
-  const db = openSqliteDatabase();
-  migrateMvpDatabase(db);
-  return db;
-}
-
-function createArticleSchema(db: ReturnType<typeof openSqliteDatabase>) {
+function createArticleSchema(db: ApiagexDatabase) {
   return createSchema(db, {
     fields: [{ name: "Title", slug: "title", type: "text", required: true }],
     name: "Article",

@@ -5,7 +5,7 @@ import {
   getSchemaById,
   listSchemas,
   updateSchema,
-  type SqliteDatabase,
+  type ApiagexDatabase,
   type FieldRecord,
   type SchemaRecord,
 } from "@apiagex/database";
@@ -19,18 +19,18 @@ import type {
 
 export function registerSchemaRoutes(
   server: FastifyInstance,
-  database: SqliteDatabase,
+  database: ApiagexDatabase,
 ): void {
   server.get("/api/admin/schemas", async () => ({
     ok: true,
-    schemas: listSchemas(database).map((schema) => toSchemaResponse(database, schema)),
+    schemas: await Promise.all((await listSchemas(database)).map((schema) => toSchemaResponse(database, schema))),
   }));
 
   server.post<{ Body: SchemaCreateBody }>("/api/admin/schemas", async (request, reply) => {
     try {
       return {
         ok: true,
-        schema: toSchemaResponse(database, createSchema(database, request.body)),
+        schema: await toSchemaResponse(database, await createSchema(database, request.body)),
       };
     } catch (error) {
       return sendSchemaError(reply, error, 400);
@@ -38,11 +38,11 @@ export function registerSchemaRoutes(
   });
 
   server.get<{ Params: SchemaParams }>("/api/admin/schemas/:id", async (request, reply) => {
-    const schema = getSchemaById(database, request.params.id);
+    const schema = await getSchemaById(database, request.params.id);
     if (!schema) {
       return reply.code(404).send({ ok: false, error: "SCHEMA_NOT_FOUND" });
     }
-    return { ok: true, schema: toSchemaResponse(database, schema) };
+    return { ok: true, schema: await toSchemaResponse(database, schema) };
   });
 
   server.put<{ Body: SchemaUpdateBody; Params: SchemaParams }>(
@@ -51,7 +51,7 @@ export function registerSchemaRoutes(
       try {
         return {
           ok: true,
-          schema: toSchemaResponse(database, updateSchema(database, request.params.id, request.body)),
+          schema: await toSchemaResponse(database, await updateSchema(database, request.params.id, request.body)),
         };
       } catch (error) {
         const statusCode = errorCode(error) === "SCHEMA_NOT_FOUND" ? 404 : 400;
@@ -62,7 +62,7 @@ export function registerSchemaRoutes(
 
   server.delete<{ Params: SchemaParams }>("/api/admin/schemas/:id", async (request, reply) => {
     try {
-      deleteSchema(database, request.params.id);
+      await deleteSchema(database, request.params.id);
       return { ok: true, deleted: true };
     } catch (error) {
       const statusCode = errorCode(error) === "SCHEMA_NOT_FOUND" ? 404 : 400;
@@ -71,16 +71,16 @@ export function registerSchemaRoutes(
   });
 }
 
-function toSchemaResponse(database: SqliteDatabase, schema: SchemaRecord): SchemaResponseRecord {
+async function toSchemaResponse(database: ApiagexDatabase, schema: SchemaRecord): Promise<SchemaResponseRecord> {
   return {
     ...schema,
-    fields: schema.fields.map((field) => toFieldResponse(database, field)),
+    fields: await Promise.all(schema.fields.map((field) => toFieldResponse(database, field))),
   };
 }
 
-function toFieldResponse(database: SqliteDatabase, field: FieldRecord): SchemaFieldResponse {
+async function toFieldResponse(database: ApiagexDatabase, field: FieldRecord): Promise<SchemaFieldResponse> {
   if (field.type !== "relation" || !field.relationSchemaId) return field;
-  const target = getSchemaById(database, field.relationSchemaId);
+  const target = await getSchemaById(database, field.relationSchemaId);
   if (!target) return field;
   return {
     ...field,

@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
-import type { SqliteDatabase } from "./sqlite.js";
-import { getSchemaById, listSchemas } from "./schema-repository.js";
+import type { ApiagexDatabase } from "./database-adapter.type.js";
 import type {
-  RealtimeEventRecord,
   RealtimeConfigRecord,
+  RealtimeEventRecord,
   RealtimeEventType,
   RecordRealtimeEventInput,
   SetRealtimeConfigInput,
 } from "./realtime-repository.type.js";
+import { getSchemaById, listSchemas } from "./schema-repository.js";
 
 const allowedEvents = new Set<RealtimeEventType>(["entry.created", "entry.updated", "entry.deleted"]);
 
@@ -22,15 +22,15 @@ type RealtimeEventRow = Omit<RealtimeEventRecord, "entry" | "eventType"> & {
   sequence: number;
 };
 
-export function listRealtimeConfigs(db: SqliteDatabase): RealtimeConfigRecord[] {
-  const rows = db.prepare(realtimeSelectSql("ORDER BY updated_at DESC")).all() as RealtimeConfigRow[];
+export async function listRealtimeConfigs(db: ApiagexDatabase): Promise<RealtimeConfigRecord[]> {
+  const rows = await db.prepare(realtimeSelectSql("ORDER BY updated_at DESC")).all<RealtimeConfigRow>();
   return rows.map(rowToRealtimeConfig);
 }
 
-export function listRealtimeSettings(db: SqliteDatabase): RealtimeConfigRecord[] {
-  const configs = new Map(listRealtimeConfigs(db).map((config) => [config.schemaId, config]));
+export async function listRealtimeSettings(db: ApiagexDatabase): Promise<RealtimeConfigRecord[]> {
+  const configs = new Map((await listRealtimeConfigs(db)).map((config) => [config.schemaId, config]));
   const now = new Date().toISOString();
-  return listSchemas(db).map((schema) =>
+  return (await listSchemas(db)).map((schema) =>
     configs.get(schema.id) ?? {
       schemaId: schema.id,
       enabled: false,
@@ -41,65 +41,83 @@ export function listRealtimeSettings(db: SqliteDatabase): RealtimeConfigRecord[]
   );
 }
 
-export function getRealtimeConfig(db: SqliteDatabase, schemaId: string): RealtimeConfigRecord | undefined {
-  const row = db.prepare(realtimeSelectSql("WHERE schema_id = ?")).get(schemaId) as RealtimeConfigRow | undefined;
+export async function getRealtimeConfig(
+  db: ApiagexDatabase,
+  schemaId: string,
+): Promise<RealtimeConfigRecord | undefined> {
+  const row = await db.prepare(realtimeSelectSql("WHERE schema_id = ?")).get<RealtimeConfigRow>(schemaId);
   return row ? rowToRealtimeConfig(row) : undefined;
 }
 
-export function setRealtimeConfig(db: SqliteDatabase, input: SetRealtimeConfigInput): RealtimeConfigRecord {
+export async function setRealtimeConfig(
+  db: ApiagexDatabase,
+  input: SetRealtimeConfigInput,
+): Promise<RealtimeConfigRecord> {
   const events = normalizeEvents(input.events);
-  if (!getSchemaById(db, input.schemaId)) throw new Error("SCHEMA_NOT_FOUND");
+  if (!(await getSchemaById(db, input.schemaId))) throw new Error("SCHEMA_NOT_FOUND");
   const now = new Date().toISOString();
-  db.prepare(
+  await db.prepare(
     `INSERT INTO realtime_configs (schema_id, enabled, events_json, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?)
      ON CONFLICT(schema_id) DO UPDATE SET enabled = excluded.enabled,
        events_json = excluded.events_json,
        updated_at = excluded.updated_at`,
   ).run(input.schemaId, input.enabled ? 1 : 0, JSON.stringify(events), now, now);
-  return getRealtimeConfig(db, input.schemaId) as RealtimeConfigRecord;
+  const config = await getRealtimeConfig(db, input.schemaId);
+  if (!config) throw new Error("REALTIME_CONFIG_NOT_FOUND");
+  return config;
 }
 
-export function isRealtimeEventEnabled(db: SqliteDatabase, schemaId: string, event: RealtimeEventType): boolean {
-  const config = getRealtimeConfig(db, schemaId);
+export async function isRealtimeEventEnabled(
+  db: ApiagexDatabase,
+  schemaId: string,
+  event: RealtimeEventType,
+): Promise<boolean> {
+  const config = await getRealtimeConfig(db, schemaId);
   return Boolean(config?.enabled && config.events.includes(event));
 }
 
-export function recordRealtimeEvent(db: SqliteDatabase, input: RecordRealtimeEventInput): RealtimeEventRecord {
+export async function recordRealtimeEvent(
+  db: ApiagexDatabase,
+  input: RecordRealtimeEventInput,
+): Promise<RealtimeEventRecord> {
   const now = new Date().toISOString();
   const id = `rte_${randomUUID()}`;
   const messageId = `rtm_${randomUUID()}`;
-  db.prepare(
+  await db.prepare(
     `INSERT INTO realtime_events
       (id, message_id, event_type, schema_id, schema_slug, entry_id, entry_json, occurred_at, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(id, messageId, input.eventType, input.schemaId, input.schemaSlug, input.entry.id, JSON.stringify(input.entry), now, now);
-  return rowToRealtimeEvent(db.prepare(realtimeEventSelectSql("WHERE id = ?")).get(id) as RealtimeEventRow);
+  const row = await db.prepare(realtimeEventSelectSql("WHERE id = ?")).get<RealtimeEventRow>(id);
+  if (!row) throw new Error("REALTIME_EVENT_NOT_FOUND");
+  return rowToRealtimeEvent(row);
 }
 
-export function listRealtimeEventsAfter(
-  db: SqliteDatabase,
+export async function listRealtimeEventsAfter(
+  db: ApiagexDatabase,
   schemaId: string,
   lastEventId: string,
   limit = 50,
-): RealtimeEventRecord[] {
-  const last = db.prepare("SELECT sequence FROM realtime_events WHERE id = ? AND schema_id = ?")
-    .get(lastEventId, schemaId) as { sequence: number } | undefined;
+): Promise<RealtimeEventRecord[]> {
+  const last = await db.prepare("SELECT sequence FROM realtime_events WHERE id = ? AND schema_id = ?")
+    .get<{ sequence: number }>(lastEventId, schemaId);
   if (!last) return [];
-  const rows = db.prepare(realtimeEventSelectSql("WHERE schema_id = ? AND sequence > ? ORDER BY sequence ASC LIMIT ?"))
-    .all(schemaId, last.sequence, Math.max(1, Math.min(limit, 100))) as RealtimeEventRow[];
+  const rows = await db
+    .prepare(realtimeEventSelectSql("WHERE schema_id = ? AND sequence > ? ORDER BY sequence ASC LIMIT ?"))
+    .all<RealtimeEventRow>(schemaId, last.sequence, Math.max(1, Math.min(limit, 100)));
   return rows.map(rowToRealtimeEvent);
 }
 
-export function listRecentRealtimeEvents(db: SqliteDatabase, limit = 25): RealtimeEventRecord[] {
-  const rows = db.prepare(realtimeEventSelectSql("ORDER BY sequence DESC LIMIT ?"))
-    .all(Math.max(1, Math.min(limit, 100))) as RealtimeEventRow[];
+export async function listRecentRealtimeEvents(db: ApiagexDatabase, limit = 25): Promise<RealtimeEventRecord[]> {
+  const rows = await db.prepare(realtimeEventSelectSql("ORDER BY sequence DESC LIMIT ?"))
+    .all<RealtimeEventRow>(Math.max(1, Math.min(limit, 100)));
   return rows.map(rowToRealtimeEvent);
 }
 
-export function pruneRealtimeEvents(db: SqliteDatabase, schemaId: string, keepLatest = 1000): number {
+export async function pruneRealtimeEvents(db: ApiagexDatabase, schemaId: string, keepLatest = 1000): Promise<number> {
   const keep = Math.max(1, keepLatest);
-  const result = db.prepare(
+  const result = await db.prepare(
     `DELETE FROM realtime_events
      WHERE schema_id = ?
        AND sequence NOT IN (

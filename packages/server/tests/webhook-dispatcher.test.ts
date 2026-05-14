@@ -6,8 +6,8 @@ import {
   enqueueWebhookEvent,
   listPendingWebhookEvents,
   listWebhookDeliveries,
-  migrateMvpDatabase,
-  openSqliteDatabase,
+  openMigratedSqliteAdapter,
+  type ApiagexDatabase,
 } from "@apiagex/database";
 import { describe, expect, it } from "vitest";
 import { dispatchPendingWebhooks, signWebhookRequest, verifyWebhookSignature } from "../src/webhook-dispatcher.js";
@@ -16,15 +16,15 @@ import type { WebhookHttpRequest } from "../src/webhook-dispatcher.type.js";
 describe("webhook dispatcher", () => {
   it("signs and delivers pending webhook events", async () => {
     const db = openMigratedDb();
-    const schema = createArticleSchema(db);
-    const entry = createEntry(db, { schemaId: schema.id, data: { title: "Delivered" } });
-    const webhook = createWebhook(db, {
+    const schema = await createArticleSchema(db);
+    const entry = await createEntry(db, { schemaId: schema.id, data: { title: "Delivered" } });
+    const webhook = await createWebhook(db, {
       events: ["entry.created"],
       name: "Receiver",
       secret: "hook-secret",
       url: "https://example.com/hook",
     });
-    enqueueWebhookEvent(db, { entry, eventType: "entry.created", schemaId: schema.id, schemaSlug: schema.slug });
+    await enqueueWebhookEvent(db, { entry, eventType: "entry.created", schemaId: schema.id, schemaSlug: schema.slug });
     const calls: WebhookHttpRequest[] = [];
 
     const results = await dispatchPendingWebhooks(db, {
@@ -45,21 +45,26 @@ describe("webhook dispatcher", () => {
     expect(calls[0]?.headers["x-apiagex-delivery-id"]).toMatch(/^whd_/);
     expect(calls[0]?.headers["x-apiagex-timestamp"]).toBeTruthy();
     expect(calls[0]?.headers["x-apiagex-signature"]).toBe(`sha256=${expectedSignature}`);
-    expect(listWebhookDeliveries(db, webhook.id)[0]?.id).toBe(deliveryId);
-    expect(listWebhookDeliveries(db, webhook.id)[0]?.status).toBe("success");
-    expect(listPendingWebhookEvents(db)).toHaveLength(0);
+    expect((await listWebhookDeliveries(db, webhook.id))[0]?.id).toBe(deliveryId);
+    expect((await listWebhookDeliveries(db, webhook.id))[0]?.status).toBe("success");
+    expect(await listPendingWebhookEvents(db)).toHaveLength(0);
   });
 
   it("logs failed deliveries and leaves events pending for retry", async () => {
     const db = openMigratedDb();
-    const schema = createArticleSchema(db);
-    const entry = createEntry(db, { schemaId: schema.id, data: { title: "Retry" } });
-    const webhook = createWebhook(db, {
+    const schema = await createArticleSchema(db);
+    const entry = await createEntry(db, { schemaId: schema.id, data: { title: "Retry" } });
+    const webhook = await createWebhook(db, {
       events: ["entry.updated"],
       name: "Receiver",
       url: "https://example.com/hook",
     });
-    const event = enqueueWebhookEvent(db, { entry, eventType: "entry.updated", schemaId: schema.id, schemaSlug: schema.slug });
+    const event = await enqueueWebhookEvent(db, {
+      entry,
+      eventType: "entry.updated",
+      schemaId: schema.id,
+      schemaSlug: schema.slug,
+    });
     const now = new Date("2026-05-11T00:00:00.000Z");
 
     await dispatchPendingWebhooks(db, {
@@ -67,26 +72,31 @@ describe("webhook dispatcher", () => {
       now,
     });
 
-    const delivery = listWebhookDeliveries(db, webhook.id)[0];
-    const pending = listPendingWebhookEvents(db, "2026-05-11T00:00:59.000Z");
-    const retryReady = listPendingWebhookEvents(db, "2026-05-11T00:01:01.000Z");
+    const delivery = (await listWebhookDeliveries(db, webhook.id))[0];
+    const pending = await listPendingWebhookEvents(db, "2026-05-11T00:00:59.000Z");
+    const retryReady = await listPendingWebhookEvents(db, "2026-05-11T00:01:01.000Z");
     expect(delivery?.status).toBe("failed");
     expect(delivery?.nextRetryAt).toBe("2026-05-11T00:01:00.000Z");
     expect(pending).toHaveLength(0);
     expect(retryReady.map((item) => item.id)).toEqual([event.id]);
   });
 
-  it("can sign a request without dispatching it", () => {
+  it("can sign a request without dispatching it", async () => {
     const db = openMigratedDb();
-    const schema = createArticleSchema(db);
-    const entry = createEntry(db, { schemaId: schema.id, data: { title: "Signed" } });
-    const webhook = createWebhook(db, {
+    const schema = await createArticleSchema(db);
+    const entry = await createEntry(db, { schemaId: schema.id, data: { title: "Signed" } });
+    const webhook = await createWebhook(db, {
       events: ["entry.created"],
       name: "Receiver",
       secret: "manual-secret",
       url: "https://example.com/hook",
     });
-    const event = enqueueWebhookEvent(db, { entry, eventType: "entry.created", schemaId: schema.id, schemaSlug: schema.slug });
+    const event = await enqueueWebhookEvent(db, {
+      entry,
+      eventType: "entry.created",
+      schemaId: schema.id,
+      schemaSlug: schema.slug,
+    });
 
     const signed = signWebhookRequest(
       event,
@@ -101,17 +111,22 @@ describe("webhook dispatcher", () => {
     expect(JSON.parse(signed.body).entry.data.title).toBe("Signed");
   });
 
-  it("verifies timestamped webhook signatures and rejects replays outside tolerance", () => {
+  it("verifies timestamped webhook signatures and rejects replays outside tolerance", async () => {
     const db = openMigratedDb();
-    const schema = createArticleSchema(db);
-    const entry = createEntry(db, { schemaId: schema.id, data: { title: "Verify" } });
-    const webhook = createWebhook(db, {
+    const schema = await createArticleSchema(db);
+    const entry = await createEntry(db, { schemaId: schema.id, data: { title: "Verify" } });
+    const webhook = await createWebhook(db, {
       events: ["entry.created"],
       name: "Receiver",
       secret: "verify-secret",
       url: "https://example.com/hook",
     });
-    const event = enqueueWebhookEvent(db, { entry, eventType: "entry.created", schemaId: schema.id, schemaSlug: schema.slug });
+    const event = await enqueueWebhookEvent(db, {
+      entry,
+      eventType: "entry.created",
+      schemaId: schema.id,
+      schemaSlug: schema.slug,
+    });
     const signed = signWebhookRequest(event, { ...webhook, secret: "verify-secret" }, "whd_verify", "2026-05-11T00:00:00.000Z");
 
     expect(verifyWebhookSignature({
@@ -142,12 +157,10 @@ describe("webhook dispatcher", () => {
 });
 
 function openMigratedDb() {
-  const db = openSqliteDatabase();
-  migrateMvpDatabase(db);
-  return db;
+  return openMigratedSqliteAdapter();
 }
 
-function createArticleSchema(db: ReturnType<typeof openSqliteDatabase>) {
+function createArticleSchema(db: ApiagexDatabase) {
   return createSchema(db, {
     fields: [{ name: "Title", slug: "title", type: "text", required: true }],
     name: "Article",

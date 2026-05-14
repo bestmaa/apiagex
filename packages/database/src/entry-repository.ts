@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import type { ApiagexDatabase } from "./database-adapter.type.js";
+import type { CreateEntryInput, EntryData, EntryRecord, UpdateEntryInput } from "./entry-repository.type.js";
 import {
   relationEntryReferenced,
   relationOneToOneConflict,
@@ -11,71 +13,72 @@ import {
   parseEntryData,
   relationTypeOf,
 } from "./relation-helpers.js";
-import type { SqliteDatabase } from "./sqlite.js";
 import { getSchemaById } from "./schema-repository.js";
-import type { CreateEntryInput, EntryData, EntryRecord, UpdateEntryInput } from "./entry-repository.type.js";
 import type { FieldRecord, SchemaRecord } from "./schema-repository.type.js";
 
 type EntryRow = { id: string; schemaId: string; dataJson: string; createdAt: string; updatedAt: string };
 
-export function createEntry(db: SqliteDatabase, input: CreateEntryInput): EntryRecord {
-  const schema = requireSchema(db, input.schemaId);
-  validateEntryData(db, schema, input.data);
+export async function createEntry(db: ApiagexDatabase, input: CreateEntryInput): Promise<EntryRecord> {
+  const schema = await requireSchema(db, input.schemaId);
+  await validateEntryData(db, schema, input.data);
   const normalizedData = normalizeEntryData(schema, input.data);
   const id = randomUUID();
   const now = new Date().toISOString();
-  db.prepare(
+  await db.prepare(
     "INSERT INTO entries (id, schema_id, data_json, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
   ).run(id, input.schemaId, JSON.stringify(normalizedData), now, now);
   return requireEntry(db, id);
 }
 
-export function listEntries(db: SqliteDatabase, schemaId: string): EntryRecord[] {
-  requireSchema(db, schemaId);
-  const rows = db
+export async function listEntries(db: ApiagexDatabase, schemaId: string): Promise<EntryRecord[]> {
+  await requireSchema(db, schemaId);
+  const rows = await db
     .prepare(
       "SELECT id, schema_id as schemaId, data_json as dataJson, created_at as createdAt, updated_at as updatedAt FROM entries WHERE schema_id = ? ORDER BY created_at ASC",
     )
-    .all(schemaId) as EntryRow[];
+    .all<EntryRow>(schemaId);
   return rows.map(rowToEntry);
 }
 
-export function getEntryById(db: SqliteDatabase, id: string): EntryRecord | undefined {
-  const row = db.prepare(entrySelectSql("WHERE id = ?")).get(id) as EntryRow | undefined;
+export async function getEntryById(db: ApiagexDatabase, id: string): Promise<EntryRecord | undefined> {
+  const row = await db.prepare(entrySelectSql("WHERE id = ?")).get<EntryRow>(id);
   return row ? rowToEntry(row) : undefined;
 }
 
-export function updateEntry(db: SqliteDatabase, id: string, input: UpdateEntryInput): EntryRecord {
-  const current = requireEntry(db, id);
-  const schema = requireSchema(db, current.schemaId);
-  validateEntryData(db, schema, input.data, id);
+export async function updateEntry(
+  db: ApiagexDatabase,
+  id: string,
+  input: UpdateEntryInput,
+): Promise<EntryRecord> {
+  const current = await requireEntry(db, id);
+  const schema = await requireSchema(db, current.schemaId);
+  await validateEntryData(db, schema, input.data, id);
   const normalizedData = normalizeEntryData(schema, input.data);
-  const now = new Date().toISOString();
-  db.prepare("UPDATE entries SET data_json = ?, updated_at = ? WHERE id = ?").run(
-    JSON.stringify(normalizedData),
-    now,
-    id,
-  );
+  await db.prepare("UPDATE entries SET data_json = ?, updated_at = ? WHERE id = ?")
+    .run(JSON.stringify(normalizedData), new Date().toISOString(), id);
   return requireEntry(db, id);
 }
 
-export function deleteEntry(db: SqliteDatabase, id: string): void {
-  assertEntryNotReferenced(db, id);
-  const result = db.prepare("DELETE FROM entries WHERE id = ?").run(id);
+export async function deleteEntry(db: ApiagexDatabase, id: string): Promise<void> {
+  await assertEntryNotReferenced(db, id);
+  const result = await db.prepare("DELETE FROM entries WHERE id = ?").run(id);
   if (result.changes === 0) throw new Error("ENTRY_NOT_FOUND");
 }
 
-function assertEntryNotReferenced(db: SqliteDatabase, entryId: string): void {
-  const rows = listEntryDataRows(db);
+async function assertEntryNotReferenced(db: ApiagexDatabase, entryId: string): Promise<void> {
+  const rows = await listEntryDataRows(db);
   for (const row of rows) {
     if (row.id === entryId) continue;
-    if (entryDataReferences(parseEntryData(row.dataJson), entryId)) {
-      throw new Error(relationEntryReferenced(entryId));
-    }
+    if (entryDataReferences(parseEntryData(row.dataJson), entryId)) throw new Error(relationEntryReferenced(entryId));
   }
 }
 
-function validateEntryData(db: SqliteDatabase, schema: SchemaRecord, data: EntryData, currentEntryId?: string): void {
+async function validateEntryData(
+  db: ApiagexDatabase,
+  schema: SchemaRecord,
+  data: EntryData,
+  currentEntryId?: string,
+): Promise<void> {
   if (!isRecord(data)) throw new Error("ENTRY_DATA_INVALID");
   const fieldSlugs = new Set(schema.fields.map((field) => field.slug));
   for (const key of Object.keys(data)) {
@@ -83,22 +86,18 @@ function validateEntryData(db: SqliteDatabase, schema: SchemaRecord, data: Entry
   }
   for (const field of schema.fields) {
     const value = data[field.slug];
-    if (field.required && isMissing(value)) {
-      throw new Error(`ENTRY_FIELD_REQUIRED:${field.slug}`);
-    }
-    if (!isMissing(value)) {
-      validateFieldValue(db, schema, field, value, currentEntryId);
-    }
+    if (field.required && isMissing(value)) throw new Error(`ENTRY_FIELD_REQUIRED:${field.slug}`);
+    if (!isMissing(value)) await validateFieldValue(db, schema, field, value, currentEntryId);
   }
 }
 
-function validateFieldValue(
-  db: SqliteDatabase,
+async function validateFieldValue(
+  db: ApiagexDatabase,
   schema: SchemaRecord,
   field: FieldRecord,
   value: unknown,
   currentEntryId?: string,
-): void {
+): Promise<void> {
   if (field.type === "text" || field.type === "longText" || field.type === "media") {
     assertType(field, typeof value === "string");
   } else if (field.type === "number") {
@@ -108,52 +107,38 @@ function validateFieldValue(
   } else if (field.type === "date") {
     assertType(field, typeof value === "string" && !Number.isNaN(Date.parse(value)));
   } else if (field.type === "relation") {
-    assertRelation(db, schema, field, value, currentEntryId);
+    await assertRelation(db, schema, field, value, currentEntryId);
   }
 }
 
-function assertRelation(
-  db: SqliteDatabase,
+async function assertRelation(
+  db: ApiagexDatabase,
   schema: SchemaRecord,
   field: FieldRecord,
   value: unknown,
   currentEntryId?: string,
-): void {
+): Promise<void> {
   const relationType = relationTypeOf(field);
   if (relationType === "oneToMany" || relationType === "manyToMany") {
-    assertMultiRelation(db, field, value);
+    await assertMultiRelation(db, field, value);
     return;
   }
-  if (typeof value !== "string") {
-    throw new Error(relationValueShapeInvalid(field.slug));
-  }
-  const target = getEntryById(db, String(value));
-  if (!target || target.schemaId !== field.relationSchemaId) {
-    throw new Error(relationTargetEntryInvalid(field.slug));
-  }
-  if (relationType === "oneToOne") {
-    assertOneToOneAvailable(db, schema, field, value, currentEntryId);
-  }
+  if (typeof value !== "string") throw new Error(relationValueShapeInvalid(field.slug));
+  const target = await getEntryById(db, String(value));
+  if (!target || target.schemaId !== field.relationSchemaId) throw new Error(relationTargetEntryInvalid(field.slug));
+  if (relationType === "oneToOne") await assertOneToOneAvailable(db, schema, field, value, currentEntryId);
 }
 
-function assertMultiRelation(db: SqliteDatabase, field: FieldRecord, value: unknown): void {
-  if (!Array.isArray(value)) {
-    throw new Error(relationValueShapeInvalid(field.slug));
-  }
-  if (field.required && value.length === 0) {
-    throw new Error(`ENTRY_FIELD_REQUIRED:${field.slug}`);
-  }
+async function assertMultiRelation(db: ApiagexDatabase, field: FieldRecord, value: unknown): Promise<void> {
+  if (!Array.isArray(value)) throw new Error(relationValueShapeInvalid(field.slug));
+  if (field.required && value.length === 0) throw new Error(`ENTRY_FIELD_REQUIRED:${field.slug}`);
   const seen = new Set<string>();
   for (const targetEntryId of value) {
-    if (typeof targetEntryId !== "string") {
-      throw new Error(relationValueShapeInvalid(field.slug));
-    }
+    if (typeof targetEntryId !== "string") throw new Error(relationValueShapeInvalid(field.slug));
     if (seen.has(targetEntryId)) continue;
     seen.add(targetEntryId);
-    const target = getEntryById(db, targetEntryId);
-    if (!target || target.schemaId !== field.relationSchemaId) {
-      throw new Error(relationTargetEntryInvalid(field.slug));
-    }
+    const target = await getEntryById(db, targetEntryId);
+    if (!target || target.schemaId !== field.relationSchemaId) throw new Error(relationTargetEntryInvalid(field.slug));
   }
 }
 
@@ -171,10 +156,14 @@ function normalizeEntryData(schema: SchemaRecord, data: EntryData): EntryData {
   return normalized;
 }
 
-function assertOneToOneAvailable(
-  db: SqliteDatabase, schema: SchemaRecord, field: FieldRecord, targetEntryId: string, currentEntryId?: string,
-): void {
-  const rows = listEntryDataRows(db, "WHERE schema_id = ?", [schema.id]);
+async function assertOneToOneAvailable(
+  db: ApiagexDatabase,
+  schema: SchemaRecord,
+  field: FieldRecord,
+  targetEntryId: string,
+  currentEntryId?: string,
+): Promise<void> {
+  const rows = await listEntryDataRows(db, "WHERE schema_id = ?", [schema.id]);
   for (const row of rows) {
     if (row.id === currentEntryId) continue;
     const data = parseEntryData(row.dataJson);
@@ -194,14 +183,14 @@ function isRecord(value: unknown): value is EntryData {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function requireSchema(db: SqliteDatabase, schemaId: string): SchemaRecord {
-  const schema = getSchemaById(db, schemaId);
+async function requireSchema(db: ApiagexDatabase, schemaId: string): Promise<SchemaRecord> {
+  const schema = await getSchemaById(db, schemaId);
   if (!schema) throw new Error("SCHEMA_NOT_FOUND");
   return schema;
 }
 
-function requireEntry(db: SqliteDatabase, id: string): EntryRecord {
-  const entry = getEntryById(db, id);
+async function requireEntry(db: ApiagexDatabase, id: string): Promise<EntryRecord> {
+  const entry = await getEntryById(db, id);
   if (!entry) throw new Error("ENTRY_NOT_FOUND");
   return entry;
 }

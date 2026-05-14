@@ -1,9 +1,9 @@
-import { type EntryRecord, type SchemaRecord, type SqliteDatabase, type WebhookEventType } from "@apiagex/database";
+import { type ApiagexDatabase, type EntryRecord, type SchemaRecord, type WebhookEventType } from "@apiagex/database";
 import { emitWebhookEvent } from "./webhook-dispatcher.js";
 import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
 
 export async function emitEntryMutationWebhook(
-  database: SqliteDatabase,
+  database: ApiagexDatabase,
   schema: SchemaRecord,
   eventType: WebhookEventType,
   entry: EntryRecord,

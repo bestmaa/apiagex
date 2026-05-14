@@ -1,5 +1,5 @@
 import type { ApiagexDatabase, DatabaseQueryParam, DatabaseRunResult, DatabaseStatement } from "./database-adapter.type.js";
-import { openSqliteDatabase, type SqliteDatabase } from "./sqlite.js";
+import { migrateMvpDatabase, openSqliteDatabase, type SqliteDatabase } from "./sqlite.js";
 
 export class SqliteApiagexDatabase implements ApiagexDatabase {
   readonly provider = "sqlite";
@@ -38,6 +38,16 @@ export class SqliteApiagexDatabase implements ApiagexDatabase {
 
 export function openSqliteAdapter(path = ":memory:"): ApiagexDatabase {
   return new SqliteApiagexDatabase(openSqliteDatabase(path));
+}
+
+export function openMigratedSqliteAdapter(path = ":memory:"): ApiagexDatabase {
+  const db = openSqliteDatabase(path);
+  migrateMvpDatabase(db);
+  return new SqliteApiagexDatabase(db);
+}
+
+export function wrapSqliteDatabase(db: SqliteDatabase): ApiagexDatabase {
+  return new SqliteApiagexDatabase(db);
 }
 
 function toRunResult(result: { changes: number }): DatabaseRunResult {

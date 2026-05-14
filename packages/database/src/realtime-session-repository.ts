@@ -1,5 +1,5 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import type { SqliteDatabase } from "./sqlite.js";
+import type { ApiagexDatabase } from "./database-adapter.type.js";
 import type {
   CreatedRealtimeSession,
   CreateRealtimeSessionInput,
@@ -8,12 +8,15 @@ import type {
 
 type RealtimeSessionRow = RealtimeSessionRecord;
 
-export function createRealtimeSession(db: SqliteDatabase, input: CreateRealtimeSessionInput): CreatedRealtimeSession {
+export async function createRealtimeSession(
+  db: ApiagexDatabase,
+  input: CreateRealtimeSessionInput,
+): Promise<CreatedRealtimeSession> {
   const now = new Date();
   const ttlSeconds = Math.max(30, Math.min(input.ttlSeconds ?? 300, 900));
   const token = `rt_${randomBytes(32).toString("base64url")}`;
   const id = randomUUID();
-  db.prepare(
+  await db.prepare(
     `INSERT INTO realtime_sessions
       (id, token_hash, token_prefix, role_id, schema_id, schema_slug, created_at, expires_at, used_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)`,
@@ -27,31 +30,34 @@ export function createRealtimeSession(db: SqliteDatabase, input: CreateRealtimeS
     now.toISOString(),
     new Date(now.getTime() + ttlSeconds * 1000).toISOString(),
   );
-  return { token, session: requireRealtimeSession(db, id) };
+  return { token, session: await requireRealtimeSession(db, id) };
 }
 
-export function consumeRealtimeSession(
-  db: SqliteDatabase,
+export async function consumeRealtimeSession(
+  db: ApiagexDatabase,
   token: string,
   schemaSlug: string,
   now = new Date(),
-): RealtimeSessionRecord | undefined {
-  const row = db.prepare(sessionSelectSql("WHERE token_hash = ? AND schema_slug = ?"))
-    .get(hashToken(token), schemaSlug) as RealtimeSessionRow | undefined;
+): Promise<RealtimeSessionRecord | undefined> {
+  const row = await db
+    .prepare(sessionSelectSql("WHERE token_hash = ? AND schema_slug = ?"))
+    .get<RealtimeSessionRow>(hashToken(token), schemaSlug);
   if (!row || row.usedAt || Date.parse(row.expiresAt) <= now.getTime()) return undefined;
-  const result = db.prepare("UPDATE realtime_sessions SET used_at = ? WHERE id = ? AND used_at IS NULL")
+  const result = await db.prepare("UPDATE realtime_sessions SET used_at = ? WHERE id = ? AND used_at IS NULL")
     .run(now.toISOString(), row.id);
   if (result.changes !== 1) return undefined;
   return getRealtimeSessionById(db, row.id);
 }
 
-function getRealtimeSessionById(db: SqliteDatabase, id: string): RealtimeSessionRecord | undefined {
-  const row = db.prepare(sessionSelectSql("WHERE id = ?")).get(id) as RealtimeSessionRow | undefined;
-  return row;
+async function getRealtimeSessionById(
+  db: ApiagexDatabase,
+  id: string,
+): Promise<RealtimeSessionRecord | undefined> {
+  return db.prepare(sessionSelectSql("WHERE id = ?")).get<RealtimeSessionRow>(id);
 }
 
-function requireRealtimeSession(db: SqliteDatabase, id: string): RealtimeSessionRecord {
-  const session = getRealtimeSessionById(db, id);
+async function requireRealtimeSession(db: ApiagexDatabase, id: string): Promise<RealtimeSessionRecord> {
+  const session = await getRealtimeSessionById(db, id);
   if (!session) throw new Error("REALTIME_SESSION_NOT_FOUND");
   return session;
 }

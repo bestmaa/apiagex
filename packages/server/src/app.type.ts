@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import type { SqliteDatabase } from "@apiagex/database";
+import type { ApiagexDatabase, SqliteDatabase } from "@apiagex/database";
 import type { WebhookHttpClient } from "./webhook-dispatcher.type.js";
 
 export type ApiagexServer = FastifyInstance;
@@ -17,7 +17,7 @@ export type ApiRootResponse = {
 };
 
 export type CreateServerOptions = {
-  database?: SqliteDatabase;
+  database?: ApiagexDatabase | SqliteDatabase;
   databasePath?: string;
   uploadsPath?: string;
   webhookHttpClient?: WebhookHttpClient;

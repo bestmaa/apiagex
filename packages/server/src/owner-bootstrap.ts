@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { SqliteDatabase } from "@apiagex/database";
+import type { ApiagexDatabase } from "@apiagex/database";
 import type {
   OwnerBootstrapInput,
   OwnerBootstrapResult,
@@ -26,36 +26,25 @@ const defaultAdminPermissions = {
   "user-manager": ["apiRoles", "apiUsers"],
 } as const;
 
-export function bootstrapOwner(
-  db: SqliteDatabase,
+export async function bootstrapOwner(
+  db: ApiagexDatabase,
   input: OwnerBootstrapInput,
-): OwnerBootstrapResult {
+): Promise<OwnerBootstrapResult> {
   const email = input.email.trim().toLowerCase();
-  if (!email.includes("@")) {
-    throw new Error("OWNER_EMAIL_INVALID");
-  }
-  if (input.password.length < 8) {
-    throw new Error("OWNER_PASSWORD_TOO_SHORT");
-  }
+  if (!email.includes("@")) throw new Error("OWNER_EMAIL_INVALID");
+  if (input.password.length < 8) throw new Error("OWNER_PASSWORD_TOO_SHORT");
 
-  const ownerCount = db
-    .prepare(
-      "SELECT COUNT(*) as count FROM users JOIN roles ON roles.id = users.role_id WHERE roles.is_owner = 1",
-    )
-    .get() as {
-    count: number;
-  };
-  if (ownerCount.count > 0) {
-    throw new Error("OWNER_ALREADY_BOOTSTRAPPED");
-  }
+  const ownerCount = await db
+    .prepare("SELECT COUNT(*) as count FROM users JOIN roles ON roles.id = users.role_id WHERE roles.is_owner = 1")
+    .get<{ count: number }>();
+  if ((ownerCount?.count ?? 0) > 0) throw new Error("OWNER_ALREADY_BOOTSTRAPPED");
 
   const now = new Date().toISOString();
   const userId = randomUUID();
-  seedDefaultRoles(db, now);
-  seedDefaultAdminPermissions(db);
-  db.prepare(
-    "INSERT INTO users (id, email, password_hash, role_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
-  ).run(userId, email, hashPassword(input.password), OWNER_ROLE_ID, now, now);
+  await seedDefaultRoles(db, now);
+  await seedDefaultAdminPermissions(db);
+  await db.prepare("INSERT INTO users (id, email, password_hash, role_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)")
+    .run(userId, email, hashPassword(input.password), OWNER_ROLE_ID, now, now);
 
   return {
     ok: true,
@@ -64,20 +53,15 @@ export function bootstrapOwner(
   };
 }
 
-export function loginOwner(
-  db: SqliteDatabase,
-  input: OwnerBootstrapInput,
-): OwnerLoginResult {
+export async function loginOwner(db: ApiagexDatabase, input: OwnerBootstrapInput): Promise<OwnerLoginResult> {
   const email = input.email.trim().toLowerCase();
-  const row = db
+  const row = await db
     .prepare(
       "SELECT users.id, users.email, users.password_hash FROM users JOIN roles ON roles.id = users.role_id WHERE users.email = ? AND roles.is_owner = 1",
     )
-    .get(email) as { id: string; email: string; password_hash: string } | undefined;
+    .get<{ id: string; email: string; password_hash: string }>(email);
 
-  if (!row || row.password_hash !== hashPassword(input.password)) {
-    throw new Error("OWNER_LOGIN_INVALID");
-  }
+  if (!row || row.password_hash !== hashPassword(input.password)) throw new Error("OWNER_LOGIN_INVALID");
 
   return {
     ok: true,
@@ -90,25 +74,25 @@ function hashPassword(password: string): string {
   return createHash("sha256").update(password).digest("hex");
 }
 
-function seedDefaultRoles(db: SqliteDatabase, now: string): void {
+async function seedDefaultRoles(db: ApiagexDatabase, now: string): Promise<void> {
   for (const [id, name, description, isOwner] of adminRoleCatalog) {
-    seedRole(db, id, name, description, isOwner, "admin", now);
+    await seedRole(db, id, name, description, isOwner, "admin", now);
   }
   for (const [id, name, description] of apiRoleCatalog) {
-    seedRole(db, id, name, description, false, "api", now);
+    await seedRole(db, id, name, description, false, "api", now);
   }
 }
 
-function seedRole(
-  db: SqliteDatabase,
+async function seedRole(
+  db: ApiagexDatabase,
   id: string,
   name: string,
   description: string,
   isOwner: boolean,
   roleKind: "admin" | "api",
   now: string,
-): void {
-  db.prepare(
+): Promise<void> {
+  await db.prepare(
     `INSERT INTO roles (id, name, description, is_owner, role_kind, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(name) DO UPDATE SET
@@ -119,14 +103,12 @@ function seedRole(
   ).run(id, name, description, isOwner ? 1 : 0, roleKind, now, now);
 }
 
-function seedDefaultAdminPermissions(db: SqliteDatabase): void {
+async function seedDefaultAdminPermissions(db: ApiagexDatabase): Promise<void> {
   for (const [roleName, actions] of Object.entries(defaultAdminPermissions)) {
-    const role = db.prepare("SELECT id FROM roles WHERE name = ? AND role_kind = 'admin'").get(roleName) as
-      | { id: string }
-      | undefined;
+    const role = await db.prepare("SELECT id FROM roles WHERE name = ? AND role_kind = 'admin'").get<{ id: string }>(roleName);
     if (!role) continue;
     for (const action of actions) {
-      db.prepare(
+      await db.prepare(
         `INSERT INTO admin_permissions (id, role_id, action, allowed)
          VALUES (?, ?, ?, 1)
          ON CONFLICT(role_id, action) DO UPDATE SET allowed = excluded.allowed`,

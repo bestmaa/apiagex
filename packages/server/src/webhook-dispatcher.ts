@@ -7,8 +7,8 @@ import {
   listPendingWebhookEvents,
   recordWebhookDelivery,
   updateWebhookEventStatus,
+  type ApiagexDatabase,
   type EnqueueWebhookEventInput,
-  type SqliteDatabase,
   type WebhookEventRecord,
   type WebhookSecretRecord,
 } from "@apiagex/database";
@@ -24,20 +24,20 @@ const maxAttempts = 5;
 const retrySeconds = [60, 300, 900, 3600, 10800];
 
 export async function emitWebhookEvent(
-  database: SqliteDatabase,
+  database: ApiagexDatabase,
   input: EnqueueWebhookEventInput,
   options: WebhookDispatcherOptions = {},
 ): Promise<WebhookDispatchResult[]> {
-  enqueueWebhookEvent(database, input);
+  await enqueueWebhookEvent(database, input);
   return dispatchPendingWebhooks(database, options);
 }
 
 export async function dispatchPendingWebhooks(
-  database: SqliteDatabase,
+  database: ApiagexDatabase,
   options: WebhookDispatcherOptions = {},
 ): Promise<WebhookDispatchResult[]> {
   const now = options.now ?? new Date();
-  const events = listPendingWebhookEvents(database, now.toISOString(), options.limit);
+  const events = await listPendingWebhookEvents(database, now.toISOString(), options.limit);
   const results: WebhookDispatchResult[] = [];
   for (const event of events) {
     results.push(await dispatchEvent(database, event, options.httpClient ?? fetchWebhook, now));
@@ -81,14 +81,14 @@ export function verifyWebhookSignature(input: WebhookVerificationInput): boolean
 }
 
 async function dispatchEvent(
-  database: SqliteDatabase,
+  database: ApiagexDatabase,
   event: WebhookEventRecord,
   httpClient: WebhookHttpClient,
   now: Date,
 ): Promise<WebhookDispatchResult> {
-  const webhooks = listMatchingWebhooks(database, event);
+  const webhooks = await listMatchingWebhooks(database, event);
   if (webhooks.length === 0) {
-    updateWebhookEventStatus(database, event.id, "delivered", event.attempts, null);
+    await updateWebhookEventStatus(database, event.id, "delivered", event.attempts, null);
     return { event, delivered: 0, failed: 0, skipped: 0 };
   }
   let delivered = 0;
@@ -96,11 +96,11 @@ async function dispatchEvent(
   let skipped = 0;
   let nextRetryAt: string | null = null;
   for (const webhook of webhooks) {
-    if (hasSuccessfulWebhookDelivery(database, event.id, webhook.id)) {
+    if (await hasSuccessfulWebhookDelivery(database, event.id, webhook.id)) {
       skipped += 1;
       continue;
     }
-    const attempts = countWebhookDeliveryAttempts(database, event.id, webhook.id);
+    const attempts = await countWebhookDeliveryAttempts(database, event.id, webhook.id);
     if (attempts >= maxAttempts) {
       failed += 1;
       continue;
@@ -112,14 +112,14 @@ async function dispatchEvent(
       nextRetryAt = earliestRetry(nextRetryAt, retryAt(now, attempts + 1));
     }
   }
-  const attemptCount = maxAttemptsForEvent(database, event.id, webhooks);
+  const attemptCount = await maxAttemptsForEvent(database, event.id, webhooks);
   const eventStatus = failed > 0 ? (nextRetryAt ? "pending" : "failed") : "delivered";
-  updateWebhookEventStatus(database, event.id, eventStatus, attemptCount, nextRetryAt);
+  await updateWebhookEventStatus(database, event.id, eventStatus, attemptCount, nextRetryAt);
   return { event, delivered, failed, skipped };
 }
 
 async function deliverOne(
-  database: SqliteDatabase,
+  database: ApiagexDatabase,
   event: WebhookEventRecord,
   webhook: WebhookSecretRecord,
   httpClient: WebhookHttpClient,
@@ -131,7 +131,7 @@ async function deliverOne(
   try {
     const response = await httpClient({ url: webhook.url, body: signed.body, headers: signed.headers });
     const ok = response.statusCode >= 200 && response.statusCode < 300;
-    recordWebhookDelivery(database, {
+    await recordWebhookDelivery(database, {
       id: deliveryId,
       eventId: event.id,
       webhookId: webhook.id,
@@ -144,7 +144,7 @@ async function deliverOne(
     });
     return ok ? "success" : "failed";
   } catch (error) {
-    recordWebhookDelivery(database, {
+    await recordWebhookDelivery(database, {
       id: deliveryId,
       eventId: event.id,
       webhookId: webhook.id,
@@ -172,8 +172,13 @@ function earliestRetry(current: string | null, next: string): string {
   return !current || next < current ? next : current;
 }
 
-function maxAttemptsForEvent(database: SqliteDatabase, eventId: string, webhooks: WebhookSecretRecord[]): number {
-  return Math.max(0, ...webhooks.map((webhook) => countWebhookDeliveryAttempts(database, eventId, webhook.id)));
+async function maxAttemptsForEvent(
+  database: ApiagexDatabase,
+  eventId: string,
+  webhooks: WebhookSecretRecord[],
+): Promise<number> {
+  const attempts = await Promise.all(webhooks.map((webhook) => countWebhookDeliveryAttempts(database, eventId, webhook.id)));
+  return Math.max(0, ...attempts);
 }
 
 function webhookSignature(secret: string, timestamp: string, deliveryId: string, body: string): string {
