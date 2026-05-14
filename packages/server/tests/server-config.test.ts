@@ -13,20 +13,30 @@ describe("local server configuration", () => {
     const config = resolveLocalServerConfig({}, "/workspace/app");
 
     expect(config.databasePath).toBe("/workspace/app/.apiagex/apiagex.sqlite");
+    expect(config.databaseProvider).toBe("sqlite");
     expect(config.uploadsPath).toBe("/workspace/app/.apiagex/uploads");
   });
 
-  it("allows env overrides for database and uploads paths", () => {
+  it("allows env overrides for database, uploads, and app secret", () => {
     const config = resolveLocalServerConfig(
       {
+        APIAGEX_DATABASE_PROVIDER: "sqlite",
         APIAGEX_DATABASE_PATH: "data/local.sqlite",
+        APIAGEX_SECRET: "local-secret",
         APIAGEX_UPLOADS_PATH: "storage/uploads",
       },
       "/workspace/app",
     );
 
     expect(config.databasePath).toBe("/workspace/app/data/local.sqlite");
+    expect(config.appSecret).toBe("local-secret");
     expect(config.uploadsPath).toBe("/workspace/app/storage/uploads");
+  });
+
+  it("rejects planned database providers until adapters are implemented", () => {
+    expect(() => resolveLocalServerConfig({ APIAGEX_DATABASE_PROVIDER: "postgres" }, "/workspace/app")).toThrow(
+      "DATABASE_PROVIDER_NOT_SUPPORTED",
+    );
   });
 
   it("uses npm INIT_CWD for workspace dev persistence defaults", () => {

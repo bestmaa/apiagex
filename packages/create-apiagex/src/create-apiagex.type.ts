@@ -2,14 +2,22 @@ import type { Readable, Writable } from "node:stream";
 
 export type PackageManager = "npm" | "pnpm" | "yarn";
 export type SetupMode = "custom" | "quickstart";
+export type DatabaseProvider = "sqlite";
 
 export type CliOptions = {
+  appSecret?: string;
   bootstrapOwner?: boolean;
+  databasePath?: string;
+  databaseProvider?: DatabaseProvider;
   dryRun: boolean;
   help: boolean;
+  host?: string;
   initGit?: boolean;
   installDependencies?: boolean;
+  ownerEmail?: string;
+  ownerPassword?: string;
   packageManager?: PackageManager;
+  port?: string;
   setupMode?: SetupMode;
   target?: string;
   version: boolean;
@@ -37,10 +45,17 @@ export type RunCliOptions = {
 };
 
 export type ScaffoldAnswers = {
+  appSecret: string;
   bootstrapOwner: boolean;
+  databasePath: string;
+  databaseProvider: DatabaseProvider;
+  host: string;
   initGit: boolean;
   installDependencies: boolean;
+  ownerEmail?: string;
+  ownerPassword?: string;
   packageManager: PackageManager;
+  port: string;
   setupMode: SetupMode;
   target: string;
 };

@@ -12,10 +12,18 @@ export type RuntimeCliOptions = {
   env?: ServerConfigEnv;
 };
 
+export type InitialOwnerOptions = {
+  email: string;
+  password: string;
+};
+
 export type StartServerOptions = {
   config?: LocalServerConfig;
   cwd?: string;
   env?: ServerConfigEnv;
+  host?: string;
+  initialOwner?: InitialOwnerOptions;
+  port?: number;
 };
 
 export type StartedApiagexServer = ApiagexServer;

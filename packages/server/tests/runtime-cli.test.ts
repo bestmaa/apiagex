@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { runRuntimeCli } from "../src/runtime.js";
+import type { AddressInfo } from "node:net";
+import { mkdtemp } from "node:fs/promises";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { runRuntimeCli, startApiagex } from "../src/runtime.js";
 
 describe("apiagex runtime CLI", () => {
   it("prints help", async () => {
@@ -8,13 +12,14 @@ describe("apiagex runtime CLI", () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("apiagex dev");
     expect(result.stdout).toContain("APIAGEX_DATABASE_PATH");
+    expect(result.stdout).toContain("APIAGEX_OWNER_PASSWORD");
   });
 
   it("prints version", async () => {
     const result = await runRuntimeCli(["--version"]);
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("apiagex 0.6.2");
+    expect(result.stdout).toContain("apiagex 0.6.3");
   });
 
   it("runs a health smoke check without a long-running server", async () => {
@@ -37,5 +42,29 @@ describe("apiagex runtime CLI", () => {
 
     expect(result.code).toBe(1);
     expect(result.stderr).toContain("Unknown apiagex command: publish");
+  });
+
+  it("can bootstrap the first owner during server start", async () => {
+    const root = await mkdtemp(join(tmpdir(), "apiagex-runtime-"));
+    const server = await startApiagex({
+      cwd: root,
+      env: {
+        APIAGEX_DATABASE_PATH: "data/runtime.sqlite",
+        APIAGEX_UPLOADS_PATH: "uploads",
+      },
+      host: "127.0.0.1",
+      port: 0,
+      initialOwner: { email: "owner@example.com", password: "OwnerPass123!" },
+    });
+
+    expect(server).toBeTruthy();
+    const port = (server?.server.address() as AddressInfo).port;
+    const login = await fetch(`http://127.0.0.1:${port}/api/auth/login`, {
+      body: JSON.stringify({ email: "owner@example.com", password: "OwnerPass123!" }),
+      headers: { "content-type": "application/json" },
+      method: "POST",
+    });
+    expect(login.status).toBe(200);
+    await server?.close();
   });
 });

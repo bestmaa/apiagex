@@ -14,8 +14,10 @@ describe("generated Apiagex project", () => {
 
     const projectDir = join(root, "generated-cms");
     const packageJson = await readFile(join(projectDir, "package.json"), "utf8");
-    expect(packageJson).toContain('"dev": "apiagex dev"');
+    expect(packageJson).toContain('"dev": "node --env-file=.env src/index.js"');
     expect(packageJson).toContain('"@apiagex/server"');
+    const entry = await readFile(join(projectDir, "src/index.js"), "utf8");
+    expect(entry).toContain("startApiagex");
 
     const smoke = await runRuntimeCli(["smoke"], { cwd: projectDir });
     expect(smoke.code).toBe(0);

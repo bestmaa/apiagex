@@ -19,16 +19,19 @@ The installer asks for:
 
 - project name
 - setup mode: `quickstart` or `custom`
+- SQLite database path
+- server host and port
 - package manager: `npm`, `pnpm`, or `yarn`
 - whether dependencies should be installed after scaffold
 - whether git should be initialized
-- whether owner bootstrap should happen during setup or later from Admin UI
+- whether the first owner should be bootstrapped from `.env` on first server start
 
 For CI or scripted setup:
 
 ```bash
 npx create-apiagex my-cms --yes
 npx create-apiagex my-cms --setup quickstart --package-manager npm --no-install --no-git --no-owner
+npx create-apiagex my-cms --setup custom --database sqlite --database-path data/apiagex.sqlite --host 0.0.0.0 --port 4000
 ```
 
 After scaffold:
@@ -59,16 +62,19 @@ Installer ye puchega:
 
 - project name
 - setup mode: `quickstart` ya `custom`
+- SQLite database path
+- server host aur port
 - package manager: `npm`, `pnpm`, ya `yarn`
 - scaffold ke baad dependencies install karni hain ya nahi
 - git initialize karna hai ya nahi
-- owner bootstrap setup me karna hai ya later Admin UI se
+- first owner `.env` se first server start par bootstrap karna hai ya Admin UI se
 
 CI ya scripted setup ke liye:
 
 ```bash
 npx create-apiagex my-cms --yes
 npx create-apiagex my-cms --setup quickstart --package-manager npm --no-install --no-git --no-owner
+npx create-apiagex my-cms --setup custom --database sqlite --database-path data/apiagex.sqlite --host 0.0.0.0 --port 4000
 ```
 
 Scaffold ke baad:
@@ -90,45 +96,51 @@ Open karo:
 
 ### English
 
-- `npm run dev`: starts Apiagex locally through `apiagex dev`
-- `npm run start`: starts Apiagex through `apiagex start`
+- `npm run dev`: starts `src/index.js` with `.env`
+- `npm run start`: starts `src/index.js` with `.env`
 - `npm run smoke`: checks runtime health through `apiagex smoke`
 - `npm run build`: prints runtime build guidance through `apiagex build`
 
-The generated project depends on `@apiagex/server`, which exposes the installed `apiagex` command.
+The generated project depends on `@apiagex/server`, which exposes both the `apiagex` command and the `startApiagex()` API for the generated `src/index.js` entry file.
 
 ### Hinglish
 
-- `npm run dev`: `apiagex dev` ke through local Apiagex start karta hai
-- `npm run start`: `apiagex start` ke through Apiagex start karta hai
+- `npm run dev`: `.env` ke saath `src/index.js` start karta hai
+- `npm run start`: `.env` ke saath `src/index.js` start karta hai
 - `npm run smoke`: `apiagex smoke` se runtime health check karta hai
 - `npm run build`: `apiagex build` se runtime build guidance print karta hai
 
-Generated project `@apiagex/server` par depend karta hai, jo installed `apiagex` command expose karta hai.
+Generated project `@apiagex/server` par depend karta hai, jo installed `apiagex` command aur generated `src/index.js` ke liye `startApiagex()` API expose karta hai.
 
 ## Environment
 
 ### English
 
-Generated projects include `.env.example`.
+Generated projects include `.env`, `.env.example`, and `src/index.js`.
 
+- `APIAGEX_DATABASE_PROVIDER=sqlite`
 - `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite`
 - `APIAGEX_UPLOADS_PATH=.apiagex/uploads`
+- `APIAGEX_SECRET=<generated>`
 - `PORT=4000`
 - `HOST=127.0.0.1`
+- `APIAGEX_OWNER_EMAIL` and `APIAGEX_OWNER_PASSWORD` are optional first-owner bootstrap values.
 
-Copy `.env.example` to `.env` when you need custom local paths or ports.
+SQLite is supported today. Postgres and MySQL are planned provider choices for a later adapter release. Remove `APIAGEX_OWNER_PASSWORD` from `.env` after the first owner is created.
 
 ### Hinglish
 
-Generated projects me `.env.example` hota hai.
+Generated projects me `.env`, `.env.example`, aur `src/index.js` hota hai.
 
+- `APIAGEX_DATABASE_PROVIDER=sqlite`
 - `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite`
 - `APIAGEX_UPLOADS_PATH=.apiagex/uploads`
+- `APIAGEX_SECRET=<generated>`
 - `PORT=4000`
 - `HOST=127.0.0.1`
+- `APIAGEX_OWNER_EMAIL` aur `APIAGEX_OWNER_PASSWORD` optional first-owner bootstrap values hain.
 
-Custom local paths ya ports chahiye ho to `.env.example` ko `.env` me copy karo.
+SQLite aaj supported hai. Postgres aur MySQL later adapter release ke liye planned provider choices hain. First owner create hone ke baad `.env` se `APIAGEX_OWNER_PASSWORD` hata do.
 
 ## Maintainer Publish Checks
 

@@ -31,19 +31,27 @@ describe("create-apiagex CLI", () => {
       "custom",
       "--install",
       "--git",
+      "--database-path",
+      "data/custom.sqlite",
+      "--host",
+      "0.0.0.0",
+      "--port",
+      "5050",
     ], root);
 
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("Dry run only");
     expect(result.stdout).toContain("Package manager: pnpm");
     expect(result.stdout).toContain("Setup mode: custom");
+    expect(result.stdout).toContain("SQLite path: data/custom.sqlite");
+    expect(result.stdout).toContain("Server: http://0.0.0.0:5050");
     expect(result.stdout).toContain("package.json");
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).rejects.toThrow();
   });
 
   it("prompts for setup answers when interactive", async () => {
     const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
-    const answers = ["prompt-cms", "custom", "yarn", "yes", "no", "yes"];
+    const answers = ["prompt-cms", "custom", "data/prompt.sqlite", "0.0.0.0", "5050", "yarn", "yes", "owner@example.com", "OwnerPass123!", "no", "yes"];
     const result = await runCli(["--dry-run"], root, {
       interactive: true,
       prompt: async () => answers.shift() ?? "",
@@ -52,10 +60,12 @@ describe("create-apiagex CLI", () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("prompt-cms");
     expect(result.stdout).toContain("Setup mode: custom");
+    expect(result.stdout).toContain("SQLite path: data/prompt.sqlite");
+    expect(result.stdout).toContain("Server: http://0.0.0.0:5050");
     expect(result.stdout).toContain("Package manager: yarn");
     expect(result.stdout).toContain("Install dependencies: yes");
     expect(result.stdout).toContain("Initialize git: no");
-    expect(result.stdout).toContain("Owner setup: create now");
+    expect(result.stdout).toContain("Owner setup: create from .env on first start");
   });
 
   it("refuses to overwrite a non-empty target folder", async () => {
@@ -75,11 +85,14 @@ describe("create-apiagex CLI", () => {
     const result = await runCli(["my-cms"], root);
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("Created 6 files");
+    expect(result.stdout).toContain("Created 8 files");
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"name": "my-cms"');
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"@apiagex/server"');
+    await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"dev": "node --env-file=.env src/index.js"');
+    await expect(readFile(join(root, "my-cms", ".env"), "utf8")).resolves.toContain("APIAGEX_SECRET=");
     await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.toContain("APIAGEX_DATABASE_PATH");
     await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"setupMode"');
+    await expect(readFile(join(root, "my-cms", "src/index.js"), "utf8")).resolves.toContain("startApiagex");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("Practical flow");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("REALTIME_SESSION_INVALID");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("many-to-many");
@@ -92,7 +105,24 @@ describe("create-apiagex CLI", () => {
 
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("Setup mode: quickstart");
+    expect(result.stdout).toContain("Database: sqlite");
     expect(result.stdout).toContain("Package manager: npm");
     expect(result.stdout).toContain("Install dependencies: no");
+  });
+
+  it("writes first owner bootstrap env when requested", async () => {
+    const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
+    const result = await runCli([
+      "owner-cms",
+      "--owner",
+      "--owner-email",
+      "owner@example.com",
+      "--owner-password",
+      "OwnerPass123!",
+    ], root);
+
+    expect(result.code).toBe(0);
+    await expect(readFile(join(root, "owner-cms", ".env"), "utf8")).resolves.toContain("APIAGEX_OWNER_EMAIL=owner@example.com");
+    await expect(readFile(join(root, "owner-cms", ".env"), "utf8")).resolves.toContain("APIAGEX_OWNER_PASSWORD=OwnerPass123!");
   });
 });

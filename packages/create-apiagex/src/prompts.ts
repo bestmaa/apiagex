@@ -1,4 +1,5 @@
 import { createInterface } from "node:readline/promises";
+import { randomBytes } from "node:crypto";
 import type {
   CliOptions,
   PromptFn,
@@ -12,12 +13,31 @@ export async function resolveAnswers(options: CliOptions, io: RunCliOptions = {}
   const target = options.target ?? (canAsk ? await ask(prompt, "Project name", "my-apiagex") : undefined);
   if (!target) return "Target folder is required. Run create-apiagex --help for usage.";
   const setupMode = options.setupMode ?? await choiceAnswer(prompt, canAsk, "Setup mode", "quickstart", ["quickstart", "custom"]);
+  const databaseProvider = options.databaseProvider ?? "sqlite";
+  const databasePath = options.databasePath ?? await setupAnswer(prompt, canAsk, setupMode, "SQLite database path", ".apiagex/apiagex.sqlite");
+  const host = options.host ?? await setupAnswer(prompt, canAsk, setupMode, "Server host", "127.0.0.1");
+  const port = options.port ?? await setupAnswer(prompt, canAsk, setupMode, "Server port", "4000");
+  const appSecret = options.appSecret ?? generateSecret();
   const packageManager = options.packageManager ?? await choiceAnswer(prompt, canAsk, "Package manager", "npm", ["npm", "pnpm", "yarn"]);
+  const bootstrapOwner = await boolAnswer(prompt, canAsk, "Create first owner during first server start?", options.bootstrapOwner, false);
+  const ownerEmail = bootstrapOwner
+    ? options.ownerEmail ?? await setupAnswer(prompt, canAsk, setupMode, "Owner email", "owner@apiagex.local")
+    : undefined;
+  const ownerPassword = bootstrapOwner
+    ? options.ownerPassword ?? await setupAnswer(prompt, canAsk, setupMode, "Owner password", generatePassword())
+    : undefined;
   return {
-    bootstrapOwner: await boolAnswer(prompt, canAsk, "Bootstrap owner during scaffold?", options.bootstrapOwner, false),
+    appSecret,
+    bootstrapOwner,
+    databasePath,
+    databaseProvider,
+    host,
     initGit: await boolAnswer(prompt, canAsk, "Initialize git repository?", options.initGit, true),
     installDependencies: await boolAnswer(prompt, canAsk, "Install dependencies after scaffold?", options.installDependencies, false),
+    ...(ownerEmail === undefined ? {} : { ownerEmail }),
+    ...(ownerPassword === undefined ? {} : { ownerPassword }),
     packageManager,
+    port,
     setupMode,
     target,
   };
@@ -47,9 +67,28 @@ async function choiceAnswer<const T extends string>(
   return allowed.includes(answer as T) ? answer as T : defaultValue;
 }
 
+async function setupAnswer(
+  prompt: PromptFn,
+  canAsk: boolean,
+  setupMode: string,
+  message: string,
+  defaultValue: string,
+): Promise<string> {
+  if (!canAsk || setupMode !== "custom") return defaultValue;
+  return ask(prompt, message, defaultValue);
+}
+
 async function ask(prompt: PromptFn, message: string, defaultValue: string): Promise<string> {
   const answer = (await prompt({ defaultValue, message })).trim();
   return answer || defaultValue;
+}
+
+function generateSecret(): string {
+  return randomBytes(32).toString("base64url");
+}
+
+function generatePassword(): string {
+  return `Apiagex-${randomBytes(9).toString("base64url")}1!`;
 }
 
 function nodePrompt(io: RunCliOptions): PromptFn {

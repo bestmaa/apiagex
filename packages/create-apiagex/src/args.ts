@@ -1,4 +1,4 @@
-import type { CliOptions, PackageManager, SetupMode } from "./create-apiagex.type.js";
+import type { CliOptions, DatabaseProvider, PackageManager, SetupMode } from "./create-apiagex.type.js";
 
 export function parseArgs(args: string[]): CliOptions | string {
   const options: CliOptions = { dryRun: false, help: false, version: false, yes: false };
@@ -14,7 +14,43 @@ export function parseArgs(args: string[]): CliOptions | string {
     else if (arg === "--no-git") options.initGit = false;
     else if (arg === "--owner") options.bootstrapOwner = true;
     else if (arg === "--no-owner") options.bootstrapOwner = false;
-    else if (arg === "--package-manager") {
+    else if (arg === "--database") {
+      const value = args[index + 1];
+      if (!isDatabaseProvider(value)) return "Use --database sqlite. Postgres and MySQL are planned but not available yet.";
+      options.databaseProvider = value;
+      index += 1;
+    } else if (arg === "--database-path") {
+      const value = args[index + 1];
+      if (!value) return "Use --database-path with a SQLite database path.";
+      options.databasePath = value;
+      index += 1;
+    } else if (arg === "--host") {
+      const value = args[index + 1];
+      if (!value) return "Use --host with a host value.";
+      options.host = value;
+      index += 1;
+    } else if (arg === "--port") {
+      const value = args[index + 1];
+      if (!value || !/^\d+$/.test(value)) return "Use --port with a numeric port.";
+      options.port = value;
+      index += 1;
+    } else if (arg === "--app-secret") {
+      const value = args[index + 1];
+      if (!value) return "Use --app-secret with a non-empty secret.";
+      options.appSecret = value;
+      index += 1;
+    } else if (arg === "--owner-email") {
+      const value = args[index + 1];
+      if (!value) return "Use --owner-email with an email address.";
+      options.ownerEmail = value;
+      index += 1;
+    } else if (arg === "--owner-password") {
+      const value = args[index + 1];
+      if (!value) return "Use --owner-password with a password.";
+      options.ownerPassword = value;
+      index += 1;
+      options.bootstrapOwner = true;
+    } else if (arg === "--package-manager") {
       const value = args[index + 1];
       if (!isPackageManager(value)) return "Use --package-manager npm, pnpm, or yarn.";
       options.packageManager = value;
@@ -40,6 +76,10 @@ export function validateProjectSlug(target: string): string | undefined {
 
 function isPackageManager(value: string | undefined): value is PackageManager {
   return value === "npm" || value === "pnpm" || value === "yarn";
+}
+
+function isDatabaseProvider(value: string | undefined): value is DatabaseProvider {
+  return value === "sqlite";
 }
 
 function isSetupMode(value: string | undefined): value is SetupMode {

@@ -9,7 +9,7 @@ import { resolveAnswers } from "./prompts.js";
 import { createScaffoldFiles, renderPlan } from "./scaffold.js";
 import type { CliResult, RunCliOptions } from "./create-apiagex.type.js";
 
-const packageVersion = "0.6.2";
+const packageVersion = "0.6.3";
 
 export async function runCli(args: string[], cwd = process.cwd(), io: RunCliOptions = {}): Promise<CliResult> {
   const parsed = parseArgs(args);
@@ -55,10 +55,17 @@ Usage:
 
 Options:
   --setup quickstart|custom      Choose starter setup mode.
+  --database sqlite              Choose database provider. Postgres and MySQL are planned.
+  --database-path <path>         Set the SQLite database path.
+  --host <host>                  Set the server host.
+  --port <port>                  Set the server port.
+  --app-secret <secret>          Set APIAGEX_SECRET instead of generating one.
+  --owner-email <email>          Set first owner email when owner bootstrap is enabled.
+  --owner-password <password>    Set first owner password and enable owner bootstrap.
   --package-manager npm|pnpm|yarn
   --install, --no-install        Record whether dependencies should be installed after scaffold.
   --git, --no-git                Record whether git should be initialized after scaffold.
-  --owner, --no-owner            Record whether owner setup should happen now or in Admin UI.
+  --owner, --no-owner            Configure first owner bootstrap on first server start.
   --dry-run                      Print the scaffold plan without writing files.
   -y, --yes                      Use defaults for missing options.
   -h, --help                     Show help.

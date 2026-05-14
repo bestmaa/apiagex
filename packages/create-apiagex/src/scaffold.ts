@@ -11,13 +11,13 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
           private: true,
           type: "module",
           scripts: {
-            dev: "apiagex dev",
-            start: "apiagex start",
+            dev: "node --env-file=.env src/index.js",
+            start: "node --env-file=.env src/index.js",
             build: "apiagex build",
             smoke: "apiagex smoke",
           },
           dependencies: {
-            "@apiagex/server": "^0.6.2",
+            "@apiagex/server": "^0.6.3",
           },
         },
         null,
@@ -33,19 +33,32 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
       content: "node_modules\n.env\ndist\n.apiagex\n",
     },
     {
+      path: ".env",
+      content: envFile(answers, true),
+    },
+    {
       path: ".env.example",
-      content: "APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite\nAPIAGEX_UPLOADS_PATH=.apiagex/uploads\nPORT=4000\nHOST=127.0.0.1\n",
+      content: envFile(answers, false),
     },
     {
       path: "apiagex.config.json",
       content: `${JSON.stringify(
         {
-          database: { provider: "sqlite", url: "file:.apiagex/apiagex.sqlite" },
-          project: { packageManager: answers.packageManager, setupMode: answers.setupMode },
+          database: { provider: answers.databaseProvider, path: answers.databasePath },
+          project: {
+            appSecretEnv: "APIAGEX_SECRET",
+            packageManager: answers.packageManager,
+            setupMode: answers.setupMode,
+          },
+          server: { host: answers.host, port: Number(answers.port) },
         },
         null,
         2,
       )}\n`,
+    },
+    {
+      path: "src/index.js",
+      content: serverEntryFile(),
     },
     {
       path: "docs/README.md",
@@ -63,10 +76,13 @@ export function renderPlan(projectName: string, targetDir: string, files: Scaffo
     "",
     "Selected setup:",
     `- Setup mode: ${answers.setupMode}`,
+    `- Database: ${answers.databaseProvider}`,
+    `- SQLite path: ${answers.databasePath}`,
+    `- Server: http://${answers.host}:${answers.port}`,
     `- Package manager: ${answers.packageManager}`,
     `- Install dependencies: ${answers.installDependencies ? "yes" : "no"}`,
     `- Initialize git: ${answers.initGit ? "yes" : "no"}`,
-    `- Owner setup: ${answers.bootstrapOwner ? "create now" : "create from Admin UI"}`,
+    `- Owner setup: ${answers.bootstrapOwner ? "create from .env on first start" : "create from Admin UI"}`,
     "",
     "Files:",
     fileList,
@@ -98,28 +114,32 @@ ${runCommand(answers.packageManager, "dev")}
 \`\`\`
 
 Open http://127.0.0.1:4000/adminui to create the first owner. Open /doc for API docs and /readme for the readable project summary.
+If .env contains APIAGEX_OWNER_EMAIL and APIAGEX_OWNER_PASSWORD, the first owner is created automatically on first server start. Remove APIAGEX_OWNER_PASSWORD from .env after the first successful start.
 
 ## Scripts
 
-- \`${runCommand(answers.packageManager, "dev")}\`: start the local Apiagex server.
-- \`${runCommand(answers.packageManager, "start")}\`: start the server for regular runtime use.
+- \`${runCommand(answers.packageManager, "dev")}\`: start src/index.js with .env.
+- \`${runCommand(answers.packageManager, "start")}\`: start src/index.js with .env.
 - \`${runCommand(answers.packageManager, "smoke")}\`: verify the runtime health route.
 - \`${runCommand(answers.packageManager, "build")}\`: print runtime build guidance.
 
 ## Environment
 
-Copy .env.example to .env if you need custom paths.
+The installer creates .env for local use. Copy .env.example to .env again if you need to reset local settings.
 
+- APIAGEX_DATABASE_PROVIDER: sqlite today. Postgres and MySQL are planned.
 - APIAGEX_DATABASE_PATH: SQLite database path. Default .apiagex/apiagex.sqlite.
 - APIAGEX_UPLOADS_PATH: upload folder. Default .apiagex/uploads.
+- APIAGEX_SECRET: app secret generated during setup.
 - PORT: server port. Default 4000.
 - HOST: server host. Default 127.0.0.1.
+- APIAGEX_OWNER_EMAIL and APIAGEX_OWNER_PASSWORD: optional first owner bootstrap values. Remove the password after first start.
 
 ## Practical flow
 
 English:
 
-1. Create the first owner from /adminui.
+1. Start the server. If owner env values exist, Apiagex creates the first owner automatically; otherwise create it from /adminui.
 2. Create a schema, for example Article with a required title field.
 3. Create entries from Entries or call POST /api/content/article.
 4. Create Content Roles, save permissions, then create users or API tokens.
@@ -127,7 +147,7 @@ English:
 
 Hinglish:
 
-1. /adminui se first owner create karo.
+1. Server start karo. Owner env values hain to Apiagex first owner automatic create karega; nahi hain to /adminui se create karo.
 2. Schema banao, jaise required title field ke saath Article.
 3. Entries screen se entry banao ya POST /api/content/article call karo.
 4. Content Roles banao, permissions save karo, phir users ya API tokens create karo.
@@ -157,7 +177,7 @@ Use /doc for generated API docs and /readme for the project summary.
 
 English: Open /adminui, create the first owner, then use the same page for later logins.
 
-Hinglish: /adminui open karo, first owner create karo, phir later login ke liye same page use karo.
+Hinglish: /adminui open karo, first owner create karo ya .env owner bootstrap use karo, phir later login ke liye same page use karo.
 
 ## Generated APIs
 
@@ -178,6 +198,45 @@ English: Webhooks call external URLs after content changes. Realtime API sends W
 Hinglish: Webhooks content change ke baad external URLs call karte hain. Realtime API sirf enabled collections ke liye WebSocket events bhejta hai.
 
 Relation docs: /doc explains relation field types, entry payloads, populate query options, Admin UI entry pickers, and common errors.
+`;
+}
+
+function envFile(answers: ScaffoldAnswers, includeSecrets: boolean): string {
+  const lines = [
+    `APIAGEX_DATABASE_PROVIDER=${answers.databaseProvider}`,
+    `APIAGEX_DATABASE_PATH=${answers.databasePath}`,
+    "APIAGEX_UPLOADS_PATH=.apiagex/uploads",
+    `APIAGEX_SECRET=${includeSecrets ? answers.appSecret : "change-me"}`,
+    `HOST=${answers.host}`,
+    `PORT=${answers.port}`,
+  ];
+  if (answers.bootstrapOwner) {
+    lines.push(
+      `APIAGEX_OWNER_EMAIL=${answers.ownerEmail ?? "owner@apiagex.local"}`,
+      `APIAGEX_OWNER_PASSWORD=${includeSecrets ? answers.ownerPassword ?? "" : "change-me-after-first-start"}`,
+    );
+  } else {
+    lines.push(
+      "# APIAGEX_OWNER_EMAIL=owner@apiagex.local",
+      "# APIAGEX_OWNER_PASSWORD=change-me-after-first-start",
+    );
+  }
+  return `${lines.join("\n")}\n`;
+}
+
+function serverEntryFile(): string {
+  return `import { startApiagex } from "@apiagex/server";
+
+const ownerEmail = process.env.APIAGEX_OWNER_EMAIL;
+const ownerPassword = process.env.APIAGEX_OWNER_PASSWORD;
+
+await startApiagex({
+  host: process.env.HOST ?? "127.0.0.1",
+  port: Number(process.env.PORT ?? 4000),
+  initialOwner: ownerEmail && ownerPassword
+    ? { email: ownerEmail, password: ownerPassword }
+    : undefined,
+});
 `;
 }
 

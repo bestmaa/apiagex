@@ -217,9 +217,9 @@ Task 10.0.14 stabilization audit adds a full feature audit test and practical us
 
 ## Create A New Apiagex Project
 
-English: Use `npm create apiagex@latest my-cms` or `npx create-apiagex my-cms`. The installer asks for setup mode, package manager, install preference, git preference, and owner setup preference. Generated projects depend on `@apiagex/server` and expose `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
+English: Use `npm create apiagex@latest my-cms` or `npx create-apiagex my-cms`. The installer asks for setup mode, SQLite path, host/port, package manager, install preference, git preference, and optional first owner bootstrap credentials. Generated projects depend on `@apiagex/server`, start through `src/index.js`, and expose `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
 
-Hinglish: `npm create apiagex@latest my-cms` ya `npx create-apiagex my-cms` use karo. Installer setup mode, package manager, install preference, git preference, aur owner setup preference puchta hai. Generated projects `@apiagex/server` par depend karte hain aur `npm run dev`, `npm run start`, `npm run smoke`, plus `npm run build` expose karte hain.
+Hinglish: `npm create apiagex@latest my-cms` ya `npx create-apiagex my-cms` use karo. Installer setup mode, SQLite path, host/port, package manager, install preference, git preference, aur optional first owner bootstrap credentials puchta hai. Generated projects `@apiagex/server` par depend karte hain, `src/index.js` se start hote hain, aur `npm run dev`, `npm run start`, `npm run smoke`, plus `npm run build` expose karte hain.
 
 ## Workspace
 
