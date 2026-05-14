@@ -173,7 +173,7 @@ Each task uses this structure:
 #### T2809 - Publish Provider Adapter Release
 
 - Version: `v0.8.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Publish the provider adapter release and verify install commands from npm.
 - Persona: Release engineer; ship only after checks are green.
 - Success Criteria: Package versions are bumped consistently; GitHub Actions publish succeeds; npm registry shows new versions; `npm create apiagex@latest` creates a working project.
