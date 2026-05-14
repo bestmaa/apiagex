@@ -56,13 +56,15 @@ export async function setRealtimeConfig(
   const events = normalizeEvents(input.events);
   if (!(await getSchemaById(db, input.schemaId))) throw new Error("SCHEMA_NOT_FOUND");
   const now = new Date().toISOString();
-  await db.prepare(
-    `INSERT INTO realtime_configs (schema_id, enabled, events_json, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?)
-     ON CONFLICT(schema_id) DO UPDATE SET enabled = excluded.enabled,
-       events_json = excluded.events_json,
-       updated_at = excluded.updated_at`,
-  ).run(input.schemaId, input.enabled ? 1 : 0, JSON.stringify(events), now, now);
+  const existing = await getRealtimeConfig(db, input.schemaId);
+  if (existing) {
+    await db.prepare("UPDATE realtime_configs SET enabled = ?, events_json = ?, updated_at = ? WHERE schema_id = ?")
+      .run(input.enabled ? 1 : 0, JSON.stringify(events), now, input.schemaId);
+  } else {
+    await db.prepare(
+      "INSERT INTO realtime_configs (schema_id, enabled, events_json, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+    ).run(input.schemaId, input.enabled ? 1 : 0, JSON.stringify(events), now, now);
+  }
   const config = await getRealtimeConfig(db, input.schemaId);
   if (!config) throw new Error("REALTIME_CONFIG_NOT_FOUND");
   return config;

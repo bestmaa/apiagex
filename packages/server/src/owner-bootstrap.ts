@@ -92,15 +92,14 @@ async function seedRole(
   roleKind: "admin" | "api",
   now: string,
 ): Promise<void> {
-  await db.prepare(
-    `INSERT INTO roles (id, name, description, is_owner, role_kind, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)
-     ON CONFLICT(name) DO UPDATE SET
-       description = excluded.description,
-       is_owner = excluded.is_owner,
-       role_kind = excluded.role_kind,
-       updated_at = excluded.updated_at`,
-  ).run(id, name, description, isOwner ? 1 : 0, roleKind, now, now);
+  const existing = await db.prepare("SELECT id FROM roles WHERE name = ?").get<{ id: string }>(name);
+  if (existing) {
+    await db.prepare("UPDATE roles SET description = ?, is_owner = ?, role_kind = ?, updated_at = ? WHERE id = ?")
+      .run(description, isOwner ? 1 : 0, roleKind, now, existing.id);
+    return;
+  }
+  await db.prepare("INSERT INTO roles (id, name, description, is_owner, role_kind, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
+    .run(id, name, description, isOwner ? 1 : 0, roleKind, now, now);
 }
 
 async function seedDefaultAdminPermissions(db: ApiagexDatabase): Promise<void> {
@@ -108,11 +107,14 @@ async function seedDefaultAdminPermissions(db: ApiagexDatabase): Promise<void> {
     const role = await db.prepare("SELECT id FROM roles WHERE name = ? AND role_kind = 'admin'").get<{ id: string }>(roleName);
     if (!role) continue;
     for (const action of actions) {
-      await db.prepare(
-        `INSERT INTO admin_permissions (id, role_id, action, allowed)
-         VALUES (?, ?, ?, 1)
-         ON CONFLICT(role_id, action) DO UPDATE SET allowed = excluded.allowed`,
-      ).run(`admin_permission_${roleName}_${action}`, role.id, action);
+      const existing = await db.prepare("SELECT id FROM admin_permissions WHERE role_id = ? AND action = ?")
+        .get<{ id: string }>(role.id, action);
+      if (existing) {
+        await db.prepare("UPDATE admin_permissions SET allowed = 1 WHERE id = ?").run(existing.id);
+      } else {
+        await db.prepare("INSERT INTO admin_permissions (id, role_id, action, allowed) VALUES (?, ?, ?, 1)")
+          .run(`admin_permission_${roleName}_${action}`, role.id, action);
+      }
     }
   }
 }

@@ -17,6 +17,12 @@ export {
 } from "./postgres-adapter.js";
 export type { PostgresAdapterOptions } from "./postgres-adapter.js";
 export {
+  openMySqlAdapter,
+  MySqlApiagexDatabase,
+  splitMySqlStatements,
+} from "./mysql-adapter.js";
+export type { MySqlAdapterOptions } from "./mysql-adapter.js";
+export {
   listMvpTables,
   migrateMvpDatabase,
   openSqliteDatabase,

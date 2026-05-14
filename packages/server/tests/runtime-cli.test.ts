@@ -12,6 +12,7 @@ describe("apiagex runtime CLI", () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("apiagex dev");
     expect(result.stdout).toContain("APIAGEX_DATABASE_PROVIDER");
+    expect(result.stdout).toContain("sqlite, postgres, or mysql");
     expect(result.stdout).toContain("APIAGEX_DATABASE_PATH");
     expect(result.stdout).toContain("APIAGEX_DATABASE_URL");
     expect(result.stdout).toContain("APIAGEX_OWNER_PASSWORD");

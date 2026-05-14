@@ -132,7 +132,7 @@ Each task uses this structure:
 #### T2806 - Add MySQL Adapter
 
 - Version: `v0.7.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add real MySQL runtime support through `mysql2`.
 - Persona: Backend database engineer; make MySQL a real adapter, not a setup label.
 - Success Criteria: `APIAGEX_DATABASE_PROVIDER=mysql` and `APIAGEX_DATABASE_URL=mysql://...` work; positional `?` parameters work; update/delete returns consistent `{ changes }`.

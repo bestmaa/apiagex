@@ -3,7 +3,7 @@ import { dirname, resolve } from "node:path";
 import type { DatabaseProvider, LocalServerConfig, ServerConfigEnv } from "./server-config.type.js";
 
 const defaultDataDir = ".apiagex";
-const supportedDatabaseProviders: DatabaseProvider[] = ["sqlite", "postgres"];
+const supportedDatabaseProviders: DatabaseProvider[] = ["sqlite", "postgres", "mysql"];
 
 export function resolveLocalServerConfig(
   env: ServerConfigEnv = process.env,
@@ -31,7 +31,7 @@ export async function ensureLocalServerPaths(config: LocalServerConfig): Promise
 function resolveDatabaseProvider(value: string | undefined): DatabaseProvider {
   const provider = value ?? "sqlite";
   if (supportedDatabaseProviders.includes(provider as DatabaseProvider)) return provider as DatabaseProvider;
-  throw new Error(`DATABASE_PROVIDER_NOT_SUPPORTED: ${provider}. Supported today: sqlite, postgres. Planned: mysql.`);
+  throw new Error(`DATABASE_PROVIDER_NOT_SUPPORTED: ${provider}. Supported today: sqlite, postgres, mysql.`);
 }
 
 function resolveDatabaseUrl(provider: DatabaseProvider, value: string | undefined): string | undefined {

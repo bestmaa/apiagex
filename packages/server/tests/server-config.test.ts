@@ -46,9 +46,28 @@ describe("local server configuration", () => {
     expect(config.databaseUrl).toBe("postgres://apiagex:secret@localhost:5432/apiagex");
   });
 
+  it("supports MySQL provider when a database URL is present", () => {
+    const config = resolveLocalServerConfig(
+      {
+        APIAGEX_DATABASE_PROVIDER: "mysql",
+        APIAGEX_DATABASE_URL: "mysql://apiagex:secret@localhost:3306/apiagex",
+      },
+      "/workspace/app",
+    );
+
+    expect(config.databaseProvider).toBe("mysql");
+    expect(config.databaseUrl).toBe("mysql://apiagex:secret@localhost:3306/apiagex");
+  });
+
   it("requires a PostgreSQL database URL when provider is postgres", () => {
     expect(() => resolveLocalServerConfig({ APIAGEX_DATABASE_PROVIDER: "postgres" }, "/workspace/app")).toThrow(
       "DATABASE_URL_REQUIRED: postgres",
+    );
+  });
+
+  it("requires a MySQL database URL when provider is mysql", () => {
+    expect(() => resolveLocalServerConfig({ APIAGEX_DATABASE_PROVIDER: "mysql" }, "/workspace/app")).toThrow(
+      "DATABASE_URL_REQUIRED: mysql",
     );
   });
 
