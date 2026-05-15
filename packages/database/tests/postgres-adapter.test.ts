@@ -4,6 +4,7 @@ import {
   createRole,
   listRoles,
   openPostgresAdapter,
+  PostgresApiagexDatabase,
   quotePostgresCamelCaseAliases,
 } from "../src/index.js";
 
@@ -24,6 +25,64 @@ describe("PostgreSQL adapter", () => {
     await expect(openPostgresAdapter(undefined)).rejects.toThrow("DATABASE_URL_REQUIRED: postgres");
   });
 
+  it("serializes concurrent queries on the single pg client", async () => {
+    let activeQueries = 0;
+    let maxActiveQueries = 0;
+    const client = {
+      end: async () => undefined,
+      query: async () => {
+        activeQueries += 1;
+        maxActiveQueries = Math.max(maxActiveQueries, activeQueries);
+        await delay(5);
+        activeQueries -= 1;
+        return { rows: [], rowCount: 0 };
+      },
+    };
+    const db = new PostgresApiagexDatabase(client as never);
+    const statement = db.prepare("SELECT * FROM roles WHERE id = ?");
+
+    await Promise.all([
+      statement.all("role-1"),
+      statement.get("role-2"),
+      statement.run("role-3"),
+      db.exec("SELECT 1"),
+    ]);
+
+    expect(maxActiveQueries).toBe(1);
+  });
+
+  it("keeps outside queries behind an active transaction", async () => {
+    const queries: string[] = [];
+    const client = {
+      end: async () => undefined,
+      query: async (sql: string) => {
+        queries.push(sql);
+        await delay(5);
+        return { rows: [], rowCount: 0 };
+      },
+    };
+    const db = new PostgresApiagexDatabase(client as never);
+    const statement = db.prepare("SELECT * FROM roles WHERE id = ?");
+
+    await Promise.all([
+      db.transaction(async () => {
+        await Promise.all([
+          statement.run("inside-1"),
+          statement.run("inside-2"),
+        ]);
+      }),
+      statement.run("outside"),
+    ]);
+
+    expect(queries).toEqual([
+      "BEGIN",
+      "SELECT * FROM roles WHERE id = $1",
+      "SELECT * FROM roles WHERE id = $1",
+      "COMMIT",
+      "SELECT * FROM roles WHERE id = $1",
+    ]);
+  });
+
   it.runIf(process.env.APIAGEX_TEST_POSTGRES_URL)("runs repository calls against real PostgreSQL", async () => {
     const db = await openPostgresAdapter(process.env.APIAGEX_TEST_POSTGRES_URL);
     try {
@@ -35,3 +94,7 @@ describe("PostgreSQL adapter", () => {
     }
   });
 });
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

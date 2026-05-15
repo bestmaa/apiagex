@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import { Client } from "pg";
 import type { ApiagexDatabase, DatabaseQueryParam, DatabaseRunResult, DatabaseStatement } from "./database-adapter.type.js";
 import { migrateProviderFoundation } from "./provider-migrations.js";
@@ -6,47 +7,65 @@ export type PostgresAdapterOptions = {
   migrate?: boolean;
 };
 
+type QueryQueue = {
+  current: Promise<unknown>;
+};
+
 export class PostgresApiagexDatabase implements ApiagexDatabase {
   readonly provider = "postgres";
+  private readonly transactionContext = new AsyncLocalStorage<QueryQueue>();
+  private readonly queryQueue: QueryQueue = { current: Promise.resolve() };
 
   constructor(private readonly client: Client) {}
 
   async exec(sql: string): Promise<void> {
-    await this.client.query(sql);
+    await this.runSerialized(() => this.client.query(sql));
   }
 
   prepare(sql: string): DatabaseStatement {
     const queryText = convertPostgresSql(sql);
     return {
       get: async <TRecord = unknown>(...params: DatabaseQueryParam[]) => {
-        const result = await this.client.query(queryText, params);
+        const result = await this.runSerialized(() => this.client.query(queryText, params));
         return result.rows[0] as TRecord | undefined;
       },
       all: async <TRecord = unknown>(...params: DatabaseQueryParam[]) => {
-        const result = await this.client.query(queryText, params);
+        const result = await this.runSerialized(() => this.client.query(queryText, params));
         return result.rows as TRecord[];
       },
       run: async (...params: DatabaseQueryParam[]) => {
-        const result = await this.client.query(queryText, params);
+        const result = await this.runSerialized(() => this.client.query(queryText, params));
         return toRunResult(result.rowCount);
       },
     };
   }
 
   async transaction<TResult>(callback: () => Promise<TResult>): Promise<TResult> {
-    await this.client.query("BEGIN");
-    try {
-      const result = await callback();
-      await this.client.query("COMMIT");
-      return result;
-    } catch (error) {
-      await this.client.query("ROLLBACK");
-      throw error;
-    }
+    return this.runSerialized(() => this.transactionContext.run({ current: Promise.resolve() }, async () => {
+      await this.client.query("BEGIN");
+      try {
+        const result = await callback();
+        await this.client.query("COMMIT");
+        return result;
+      } catch (error) {
+        await this.client.query("ROLLBACK");
+        throw error;
+      }
+    }));
   }
 
   async close(): Promise<void> {
-    await this.client.end();
+    await this.runSerialized(() => this.client.end());
+  }
+
+  private async runSerialized<TResult>(operation: () => Promise<TResult>): Promise<TResult> {
+    const queue = this.transactionContext.getStore() ?? this.queryQueue;
+    const next = queue.current.then(operation, operation);
+    queue.current = next.then(
+      () => undefined,
+      () => undefined,
+    );
+    return next;
   }
 }
 

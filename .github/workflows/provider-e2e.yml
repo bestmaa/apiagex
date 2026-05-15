@@ -1,0 +1,79 @@
+name: Provider E2E
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: provider-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  provider-e2e:
+    name: SQLite, PostgreSQL, and MySQL provider checks
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: apiagex_provider_e2e
+          POSTGRES_PASSWORD: apiagex_provider_password
+          POSTGRES_USER: apiagex
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U apiagex -d apiagex_provider_e2e"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: apiagex_provider_e2e
+          MYSQL_PASSWORD: apiagex_provider_password
+          MYSQL_ROOT_PASSWORD: apiagex_root_password
+          MYSQL_USER: apiagex
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uapiagex -papiagex_provider_password"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build workspaces
+        run: npm run build
+
+      - name: SQLite release smoke
+        run: npm run smoke
+
+      - name: Real provider adapter tests
+        env:
+          APIAGEX_TEST_MYSQL_URL: mysql://apiagex:apiagex_provider_password@127.0.0.1:3306/apiagex_provider_e2e
+          APIAGEX_TEST_POSTGRES_URL: postgres://apiagex:apiagex_provider_password@127.0.0.1:5432/apiagex_provider_e2e
+        run: npm test -w @apiagex/database
+
+      - name: Generated project runtime check
+        run: npm test -w create-apiagex -- tests/generated-project.test.ts
