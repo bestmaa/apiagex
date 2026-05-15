@@ -9,7 +9,7 @@ import {
 } from "@apiagex/database";
 import type { RuntimeCliOptions, RuntimeCliResult, StartedApiagexServer, StartServerOptions } from "./runtime.type.js";
 
-const runtimeVersion = "0.8.1";
+const runtimeVersion = "0.8.2";
 
 export async function startApiagex(options: StartServerOptions = {}): Promise<StartedApiagexServer | undefined> {
   return startApiagexServer(options);
