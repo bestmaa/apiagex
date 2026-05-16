@@ -4,7 +4,7 @@ import { createServer } from "../src/app.js";
 
 describe("MVP RBAC flow", () => {
   it("creates API, roles, users, then allows and blocks dynamic API access", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createSchema(server);
     const readerRoleId = await createRole(server, "reader");
     const blockedRoleId = await createRole(server, "blocked");
@@ -38,7 +38,7 @@ describe("MVP RBAC flow", () => {
   });
 
   it("keeps relation populate behind source and target get permissions", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const authorSchemaId = await createAuthorSchema(server);
     const bookSchemaId = await createBookSchema(server, authorSchemaId);
     const allowedRoleId = await createRole(server, "relation-reader");

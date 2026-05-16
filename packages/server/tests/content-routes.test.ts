@@ -4,7 +4,7 @@ import { createServer } from "../src/app.js";
 
 describe("dynamic content APIs", () => {
   it("creates, lists, reads, updates, and deletes content by schema slug", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await createArticleSchema(server);
 
     const create = await server.inject({
@@ -36,7 +36,7 @@ describe("dynamic content APIs", () => {
   });
 
   it("returns schema and validation errors", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await createArticleSchema(server);
 
     const missingSchema = await server.inject({ method: "GET", url: "/api/content/missing" });
@@ -53,7 +53,7 @@ describe("dynamic content APIs", () => {
   });
 
   it("supports dynamic content search, field projection, and pagination", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await createArticleSchema(server);
     for (const [title, views] of [
       ["Alpha", 1],
@@ -88,7 +88,7 @@ describe("dynamic content APIs", () => {
   });
 
   it("rejects unknown dynamic content projection fields", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await createArticleSchema(server);
 
     const response = await server.inject({
@@ -101,7 +101,7 @@ describe("dynamic content APIs", () => {
   });
 
   it("allows and blocks dynamic APIs by role permission header", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
     const allowedRole = await createRole(server, "reader");
     const blockedRole = await createRole(server, "blocked");
@@ -128,7 +128,7 @@ describe("dynamic content APIs", () => {
   });
 
   it("separates getAll list access from get single-entry access", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
     const entry = await server.inject({
       method: "POST",
@@ -170,7 +170,7 @@ describe("dynamic content APIs", () => {
   });
 
   it("uses API tokens to enforce content role permissions", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
     const roleId = await createRole(server, "token-reader");
     await savePermission(server, roleId, schemaId, "getAll");
@@ -214,7 +214,7 @@ describe("dynamic content APIs", () => {
   });
 
   it("validates relation payloads after dynamic write permissions pass", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const authorSchemaId = await createAuthorSchema(server);
     await createBookSchema(server, authorSchemaId);
     const blockedRole = await createRole(server, "blocked-writer");
@@ -275,7 +275,7 @@ describe("dynamic content APIs", () => {
   });
 
   it("populates one-level relation entries for dynamic read and list", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const authorSchemaId = await createAuthorSchema(server);
     const bookSchemaId = await createBookSchema(server, authorSchemaId);
     const author = await server.inject({

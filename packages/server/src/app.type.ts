@@ -17,6 +17,7 @@ export type ApiRootResponse = {
 };
 
 export type CreateServerOptions = {
+  adminAuth?: "disabled" | "required";
   database?: ApiagexDatabase | SqliteDatabase;
   databasePath?: string;
   uploadsPath?: string;

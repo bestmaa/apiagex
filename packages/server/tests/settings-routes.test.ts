@@ -4,7 +4,7 @@ import { createServer } from "../src/app.js";
 
 describe("settings access control APIs", () => {
   it("lists separated admin panel roles and content API roles", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await bootstrap(server);
 
     const response = await server.inject({ method: "GET", url: "/api/admin/settings/access" });
@@ -32,7 +32,7 @@ describe("settings access control APIs", () => {
   });
 
   it("creates admin roles and saves admin permissions", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await bootstrap(server);
     const create = await server.inject({
       method: "POST",
@@ -56,7 +56,7 @@ describe("settings access control APIs", () => {
   });
 
   it("rejects owner permission edits and API roles in admin permissions", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await bootstrap(server);
 
     const ownerSave = await server.inject({

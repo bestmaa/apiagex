@@ -28,6 +28,38 @@ import type {
   SchemaMutationResponse,
 } from "./schema.type";
 
+export const ownerSessionStorageKey = "apiagexOwner";
+
+type StoredOwnerSession = {
+  email: string;
+  token: string;
+};
+
+let adminAuthToken = readStoredOwnerSession()?.token;
+
+export function setAdminAuthToken(token: string | undefined): void {
+  adminAuthToken = token;
+}
+
+export function readStoredOwnerSession(): StoredOwnerSession | null {
+  const saved = localStorage.getItem(ownerSessionStorageKey);
+  if (!saved) return null;
+  try {
+    const session = JSON.parse(saved) as StoredOwnerSession;
+    if (!session.email || !session.token) return null;
+    return session;
+  } catch {
+    return null;
+  }
+}
+
+export async function validateOwnerSession(token: string): Promise<AuthResponse> {
+  const response = await fetch("/api/auth/session", {
+    headers: { authorization: `Bearer ${token}` },
+  });
+  return (await response.json()) as AuthResponse;
+}
+
 export async function authenticateOwner(
   email: string,
   password: string,
@@ -53,36 +85,32 @@ async function requestAuth(
 }
 
 export async function listSchemas(): Promise<SchemaListResponse> {
-  const response = await fetch("/api/admin/schemas");
-  return (await response.json()) as SchemaListResponse;
+  return adminJson<SchemaListResponse>("/api/admin/schemas");
 }
 
 export async function createSchema(input: SchemaDraft): Promise<SchemaMutationResponse> {
-  const response = await fetch("/api/admin/schemas", {
+  return adminJson<SchemaMutationResponse>("/api/admin/schemas", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
   });
-  return (await response.json()) as SchemaMutationResponse;
 }
 
 export async function updateSchema(
   schemaId: string,
   input: SchemaDraft,
 ): Promise<SchemaMutationResponse> {
-  const response = await fetch(`/api/admin/schemas/${schemaId}`, {
+  return adminJson<SchemaMutationResponse>(`/api/admin/schemas/${schemaId}`, {
     method: "PUT",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
   });
-  return (await response.json()) as SchemaMutationResponse;
 }
 
 export async function deleteSchema(schemaId: string): Promise<SchemaDeleteResponse> {
-  const response = await fetch(`/api/admin/schemas/${schemaId}`, {
+  return adminJson<SchemaDeleteResponse>(`/api/admin/schemas/${schemaId}`, {
     method: "DELETE",
   });
-  return (await response.json()) as SchemaDeleteResponse;
 }
 
 export async function listEntries(
@@ -95,20 +123,18 @@ export async function listEntries(
   if (query.offset !== undefined) params.set("offset", String(query.offset));
   if (query.search) params.set("search", query.search);
   const suffix = params.size ? `?${params.toString()}` : "";
-  const response = await fetch(`/api/admin/schemas/${schemaId}/entries${suffix}`);
-  return (await response.json()) as EntryListResponse;
+  return adminJson<EntryListResponse>(`/api/admin/schemas/${schemaId}/entries${suffix}`);
 }
 
 export async function createEntry(
   schemaId: string,
   data: EntryData,
 ): Promise<EntryMutationResponse> {
-  const response = await fetch(`/api/admin/schemas/${schemaId}/entries`, {
+  return adminJson<EntryMutationResponse>(`/api/admin/schemas/${schemaId}/entries`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ data }),
   });
-  return (await response.json()) as EntryMutationResponse;
 }
 
 export async function updateEntry(
@@ -116,85 +142,75 @@ export async function updateEntry(
   entryId: string,
   data: EntryData,
 ): Promise<EntryMutationResponse> {
-  const response = await fetch(`/api/admin/schemas/${schemaId}/entries/${entryId}`, {
+  return adminJson<EntryMutationResponse>(`/api/admin/schemas/${schemaId}/entries/${entryId}`, {
     method: "PUT",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ data }),
   });
-  return (await response.json()) as EntryMutationResponse;
 }
 
 export async function deleteEntry(
   schemaId: string,
   entryId: string,
 ): Promise<EntryDeleteResponse> {
-  const response = await fetch(`/api/admin/schemas/${schemaId}/entries/${entryId}`, {
+  return adminJson<EntryDeleteResponse>(`/api/admin/schemas/${schemaId}/entries/${entryId}`, {
     method: "DELETE",
   });
-  return (await response.json()) as EntryDeleteResponse;
 }
 
 export async function listRoles(): Promise<RoleListResponse> {
-  const response = await fetch("/api/admin/roles");
-  return (await response.json()) as RoleListResponse;
+  return adminJson<RoleListResponse>("/api/admin/roles");
 }
 
 export async function createRole(
   name: string,
   description: string,
 ): Promise<RoleMutationResponse> {
-  const response = await fetch("/api/admin/roles", {
+  return adminJson<RoleMutationResponse>("/api/admin/roles", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ name, description }),
   });
-  return (await response.json()) as RoleMutationResponse;
 }
 
 export async function listRolePermissions(roleId: string): Promise<PermissionListResponse> {
-  const response = await fetch(`/api/admin/roles/${roleId}/permissions`);
-  return (await response.json()) as PermissionListResponse;
+  return adminJson<PermissionListResponse>(`/api/admin/roles/${roleId}/permissions`);
 }
 
 export async function saveRolePermissions(
   roleId: string,
   permissions: PermissionDraft[],
 ): Promise<PermissionListResponse> {
-  const response = await fetch(`/api/admin/roles/${roleId}/permissions`, {
+  return adminJson<PermissionListResponse>(`/api/admin/roles/${roleId}/permissions`, {
     method: "PUT",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ permissions }),
   });
-  return (await response.json()) as PermissionListResponse;
 }
 
 export async function listApiTokens(roleId: string): Promise<ApiTokenListResponse> {
-  const response = await fetch(`/api/admin/roles/${roleId}/tokens`);
-  return (await response.json()) as ApiTokenListResponse;
+  return adminJson<ApiTokenListResponse>(`/api/admin/roles/${roleId}/tokens`);
 }
 
 export async function createApiToken(
   roleId: string,
   name: string,
 ): Promise<ApiTokenCreateResponse> {
-  const response = await fetch(`/api/admin/roles/${roleId}/tokens`, {
+  return adminJson<ApiTokenCreateResponse>(`/api/admin/roles/${roleId}/tokens`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ name }),
   });
-  return (await response.json()) as ApiTokenCreateResponse;
 }
 
 export async function revokeApiToken(roleId: string, tokenId: string): Promise<ApiTokenRevokeResponse> {
-  const response = await fetch(`/api/admin/roles/${roleId}/tokens/${tokenId}`, {
+  return adminJson<ApiTokenRevokeResponse>(`/api/admin/roles/${roleId}/tokens/${tokenId}`, {
     method: "DELETE",
   });
-  return (await response.json()) as ApiTokenRevokeResponse;
 }
 
 export async function listUsers(): Promise<UserListResponse> {
-  const response = await fetch("/api/admin/users");
-  return (await response.json()) as UserListResponse;
+  return adminJson<UserListResponse>("/api/admin/users");
 }
 
 export async function createUser(input: {
@@ -202,46 +218,54 @@ export async function createUser(input: {
   password: string;
   roleId: string;
 }): Promise<UserMutationResponse> {
-  const response = await fetch("/api/admin/users", {
+  return adminJson<UserMutationResponse>("/api/admin/users", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
   });
-  return (await response.json()) as UserMutationResponse;
 }
 
 export async function listAccessSettings(): Promise<AccessSettingsResponse> {
-  const response = await fetch("/api/admin/settings/access");
-  return (await response.json()) as AccessSettingsResponse;
+  return adminJson<AccessSettingsResponse>("/api/admin/settings/access");
 }
 
 export async function createAdminRole(
   name: string,
   description: string,
 ): Promise<RoleMutationResponse> {
-  const response = await fetch("/api/admin/settings/access/admin-roles", {
+  return adminJson<RoleMutationResponse>("/api/admin/settings/access/admin-roles", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ name, description }),
   });
-  return (await response.json()) as RoleMutationResponse;
 }
 
 export async function listAdminRolePermissions(
   roleId: string,
 ): Promise<AdminPermissionListResponse> {
-  const response = await fetch(`/api/admin/settings/access/admin-roles/${roleId}/permissions`);
-  return (await response.json()) as AdminPermissionListResponse;
+  return adminJson<AdminPermissionListResponse>(`/api/admin/settings/access/admin-roles/${roleId}/permissions`);
 }
 
 export async function saveAdminRolePermissions(
   roleId: string,
   permissions: AdminPermissionDraft[],
 ): Promise<AdminPermissionListResponse> {
-  const response = await fetch(`/api/admin/settings/access/admin-roles/${roleId}/permissions`, {
+  return adminJson<AdminPermissionListResponse>(`/api/admin/settings/access/admin-roles/${roleId}/permissions`, {
     method: "PUT",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ permissions }),
   });
-  return (await response.json()) as AdminPermissionListResponse;
+}
+
+export async function adminJson<TResult>(path: string, init: RequestInit = {}): Promise<TResult> {
+  const headers = new Headers(init.headers);
+  if (adminAuthToken) headers.set("authorization", `Bearer ${adminAuthToken}`);
+  const response = await fetch(path, { ...init, headers });
+  const result = (await response.json()) as TResult;
+  if (response.status === 401) {
+    localStorage.removeItem(ownerSessionStorageKey);
+    setAdminAuthToken(undefined);
+    window.dispatchEvent(new CustomEvent("apiagex-owner-session-invalid"));
+  }
+  return result;
 }

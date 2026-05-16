@@ -3,20 +3,19 @@ import type {
   RealtimeListResponse,
   RealtimeMutationResponse,
 } from "./realtime.type";
+import { adminJson } from "./api";
 
 export async function listRealtimeSettings(): Promise<RealtimeListResponse> {
-  const response = await fetch("/api/admin/realtime");
-  return (await response.json()) as RealtimeListResponse;
+  return adminJson<RealtimeListResponse>("/api/admin/realtime");
 }
 
 export async function saveRealtimeConfig(
   schemaId: string,
   input: { enabled: boolean; events: RealtimeEventType[] },
 ): Promise<RealtimeMutationResponse> {
-  const response = await fetch(`/api/admin/realtime/${schemaId}`, {
+  return adminJson<RealtimeMutationResponse>(`/api/admin/realtime/${schemaId}`, {
     method: "PUT",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
   });
-  return (await response.json()) as RealtimeMutationResponse;
 }

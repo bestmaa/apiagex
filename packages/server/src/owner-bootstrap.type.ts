@@ -6,6 +6,7 @@ export type OwnerBootstrapInput = {
 export type OwnerBootstrapResult = {
   ok: true;
   created: true;
+  token: string;
   user: {
     id: string;
     email: string;

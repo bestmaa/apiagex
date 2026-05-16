@@ -4,7 +4,7 @@ import { createServer } from "../src/app.js";
 
 describe("role admin APIs", () => {
   it("creates, lists, and reads roles", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
 
     const create = await server.inject({
       method: "POST",
@@ -23,7 +23,7 @@ describe("role admin APIs", () => {
   });
 
   it("rejects invalid role names", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
 
     const response = await server.inject({
       method: "POST",
@@ -37,7 +37,7 @@ describe("role admin APIs", () => {
 
   it("hides admin roles from API role routes", async () => {
     const database = openSqliteDatabase();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
     await server.inject({
       method: "POST",
       url: "/api/auth/bootstrap-owner",
@@ -63,7 +63,7 @@ describe("role admin APIs", () => {
   });
 
   it("saves role permissions for schema actions", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const role = await server.inject({
       method: "POST",
       url: "/api/admin/roles",
@@ -95,7 +95,7 @@ describe("role admin APIs", () => {
   });
 
   it("creates, lists, and revokes API role tokens", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const role = await server.inject({
       method: "POST",
       url: "/api/admin/roles",
@@ -127,7 +127,7 @@ describe("role admin APIs", () => {
 
   it("rejects token creation for admin roles", async () => {
     const database = openSqliteDatabase();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
     await server.inject({
       method: "POST",
       url: "/api/auth/bootstrap-owner",

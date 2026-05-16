@@ -4,7 +4,7 @@ import { createServer } from "../src/app.js";
 
 describe("MVP release smoke", () => {
   it("covers owner, schema, entry, dynamic API, role, user, and permission flow", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const owner = await server.inject({
       method: "POST",
       url: "/api/auth/bootstrap-owner",
@@ -40,7 +40,7 @@ describe("MVP release smoke", () => {
   });
 
   it("covers relation schema, entries, populate, and RBAC allow/block", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const authorSchema = await createRelationAuthorSchema(server);
     const bookSchema = await createRelationBookSchema(server, authorSchema.id);
     const author = await server.inject({

@@ -14,7 +14,7 @@ const articlePayload = {
 
 describe("schema admin APIs", () => {
   it("creates, lists, reads, updates, and deletes schemas", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
 
     const create = await server.inject({
       method: "POST",
@@ -51,7 +51,7 @@ describe("schema admin APIs", () => {
   });
 
   it("rejects invalid schema fields", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
 
     const response = await server.inject({
       method: "POST",
@@ -68,7 +68,7 @@ describe("schema admin APIs", () => {
   });
 
   it("creates relation fields only when target schema exists", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const author = await server.inject({
       method: "POST",
       url: "/api/admin/schemas",
@@ -143,7 +143,7 @@ describe("schema admin APIs", () => {
   });
 
   it("blocks deleting relation target schemas", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const author = await server.inject({
       method: "POST",
       url: "/api/admin/schemas",

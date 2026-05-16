@@ -5,6 +5,7 @@ import type {
   OwnerBootstrapResult,
   OwnerLoginResult,
 } from "./owner-bootstrap.type.js";
+import { issueOwnerToken } from "./admin-auth.js";
 
 const OWNER_ROLE_ID = "role_owner";
 const adminRoleCatalog = [
@@ -49,6 +50,7 @@ export async function bootstrapOwner(
   return {
     ok: true,
     created: true,
+    token: issueOwnerToken(userId, hashPassword(input.password)),
     user: { id: userId, email, role: "owner" },
   };
 }
@@ -65,7 +67,7 @@ export async function loginOwner(db: ApiagexDatabase, input: OwnerBootstrapInput
 
   return {
     ok: true,
-    token: `owner:${row.id}`,
+    token: issueOwnerToken(row.id, row.password_hash),
     user: { id: row.id, email: row.email, role: "owner" },
   };
 }

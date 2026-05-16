@@ -1,4 +1,11 @@
 export { readAdminIndex, resolveAdminUiAsset } from "./admin-ui.js";
+export {
+  issueOwnerToken,
+  ownerTokenFromRequest,
+  registerAdminAuthGuard,
+  sendAdminSession,
+  verifyOwnerToken,
+} from "./admin-auth.js";
 export { readDocsPage, resolveDocsUiAsset } from "./docs-ui.js";
 export { createServer } from "./app.js";
 export { bootstrapOwner, loginOwner } from "./owner-bootstrap.js";

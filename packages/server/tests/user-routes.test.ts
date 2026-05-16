@@ -4,7 +4,7 @@ import { createServer } from "../src/app.js";
 
 describe("user admin APIs", () => {
   it("creates, lists, and reads users with one role", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const role = await server.inject({
       method: "POST",
       url: "/api/admin/roles",
@@ -31,7 +31,7 @@ describe("user admin APIs", () => {
   });
 
   it("rejects users without valid role", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
 
     const response = await server.inject({
       method: "POST",
@@ -48,7 +48,7 @@ describe("user admin APIs", () => {
   });
 
   it("rejects users assigned to admin roles", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await server.inject({
       method: "POST",
       url: "/api/auth/bootstrap-owner",
@@ -70,7 +70,7 @@ describe("user admin APIs", () => {
   });
 
   it("hides owner users from content API user list", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await server.inject({
       method: "POST",
       url: "/api/auth/bootstrap-owner",

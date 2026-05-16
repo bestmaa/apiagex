@@ -1,5 +1,11 @@
 import { FormEvent, useEffect, useState } from "react";
-import { authenticateOwner } from "./api";
+import {
+  authenticateOwner,
+  ownerSessionStorageKey,
+  readStoredOwnerSession,
+  setAdminAuthToken,
+  validateOwnerSession,
+} from "./api";
 import { ApiList } from "./ApiList";
 import { DashboardPage } from "./DashboardPage";
 import { EntryManager } from "./EntryManager";
@@ -26,8 +32,6 @@ const navItems: AdminNavItem[] = [
   { label: "Settings", route: "settings" },
   { label: "Docs", route: "docs" },
 ];
-const sessionKey = "apiagexOwner";
-
 export function App() {
   const [session, setSession] = useState<OwnerSession | null>(null);
   const [route, setRoute] = useState<AdminRoute>(readRoute());
@@ -35,12 +39,42 @@ export function App() {
   const { theme, toggleTheme } = useAdminTheme();
 
   useEffect(() => {
-    const saved = localStorage.getItem(sessionKey);
-    if (saved) {
-      const nextSession = JSON.parse(saved) as OwnerSession;
+    let cancelled = false;
+    const saved = readStoredOwnerSession();
+    if (!saved) return undefined;
+    setStatus("Checking saved owner session");
+    setAdminAuthToken(saved.token);
+    validateOwnerSession(saved.token).then((result) => {
+      if (cancelled) return;
+      if (!result.ok || !result.user) {
+        localStorage.removeItem(ownerSessionStorageKey);
+        setAdminAuthToken(undefined);
+        setSession(null);
+        setStatus("Owner session expired. Login again.");
+        return;
+      }
+      const nextSession = { email: result.user.email, token: saved.token };
       setSession(nextSession);
       setStatus(`Logged in owner: ${nextSession.email}`);
+    }).catch(() => {
+      if (cancelled) return;
+      localStorage.removeItem(ownerSessionStorageKey);
+      setAdminAuthToken(undefined);
+      setSession(null);
+      setStatus("Owner session could not be verified. Login again.");
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    function clearInvalidSession() {
+      setSession(null);
+      setStatus("Owner session expired. Login again.");
     }
+    window.addEventListener("apiagex-owner-session-invalid", clearInvalidSession);
+    return () => window.removeEventListener("apiagex-owner-session-invalid", clearInvalidSession);
   }, []);
 
   useEffect(() => {
@@ -62,14 +96,20 @@ export function App() {
       setStatus(result.error ?? "Login failed");
       return;
     }
-    const nextSession = { email: result.user.email, token: result.token ?? "bootstrap-owner" };
-    localStorage.setItem(sessionKey, JSON.stringify(nextSession));
+    if (!result.token) {
+      setStatus("Owner token missing. Login failed.");
+      return;
+    }
+    const nextSession = { email: result.user.email, token: result.token };
+    setAdminAuthToken(nextSession.token);
+    localStorage.setItem(ownerSessionStorageKey, JSON.stringify(nextSession));
     setSession(nextSession);
     setStatus(`Logged in owner: ${nextSession.email}`);
   }
 
   function logout() {
-    localStorage.removeItem(sessionKey);
+    localStorage.removeItem(ownerSessionStorageKey);
+    setAdminAuthToken(undefined);
     setSession(null);
     setStatus("No owner session");
   }
@@ -110,6 +150,7 @@ function renderRoute(
             status={status}
           />
         }
+        session={session}
       />
     );
   }

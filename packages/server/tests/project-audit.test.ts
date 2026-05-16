@@ -9,6 +9,7 @@ describe("project feature audit", () => {
   it("verifies the current owner, API, RBAC, webhook, realtime, and docs flows", async () => {
     const webhookCalls: WebhookHttpRequest[] = [];
     const server = createServer({
+      adminAuth: "disabled",
       database: openSqliteDatabase(),
       webhookHttpClient: async (request) => {
         webhookCalls.push(request);

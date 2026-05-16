@@ -5,6 +5,7 @@ import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
 import type { RoleRecord } from "./role.type";
 import type { SchemaRecord } from "./schema.type";
+import type { OwnerSession } from "./session.type";
 import type { UserRecord } from "./user.type";
 
 type SchemaEntrySummary = {
@@ -18,11 +19,16 @@ type DashboardState = {
   users: UserRecord[];
 };
 
-export function DashboardPage({ sessionPanel }: { sessionPanel: ReactNode }) {
+export function DashboardPage({ session, sessionPanel }: { session: OwnerSession | null; sessionPanel: ReactNode }) {
   const [state, setState] = useState<DashboardState | null>(null);
-  const [status, setStatus] = useState("Loading dashboard");
+  const [status, setStatus] = useState(session ? "Loading dashboard" : "Login to load dashboard");
 
   useEffect(() => {
+    if (!session) {
+      setState(null);
+      setStatus("Login to load dashboard");
+      return undefined;
+    }
     let active = true;
     async function loadDashboard() {
       const [schemaResult, roleResult, userResult] = await Promise.all([
@@ -57,7 +63,7 @@ export function DashboardPage({ sessionPanel }: { sessionPanel: ReactNode }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [session]);
 
   return (
     <>

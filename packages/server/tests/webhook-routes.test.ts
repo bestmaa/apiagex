@@ -5,7 +5,7 @@ import type { WebhookHttpRequest } from "../src/webhook-dispatcher.type.js";
 
 describe("webhook admin APIs", () => {
   it("creates, lists, updates, deletes, and lists deliveries", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
 
     const create = await server.inject({
@@ -52,6 +52,7 @@ describe("webhook admin APIs", () => {
   it("delivers dynamic content mutation hooks without failing writes", async () => {
     const calls: WebhookHttpRequest[] = [];
     const server = createServer({
+      adminAuth: "disabled",
       database: openSqliteDatabase(),
       webhookHttpClient: async (request) => {
         calls.push(request);
@@ -91,6 +92,7 @@ describe("webhook admin APIs", () => {
 
   it("logs failed admin entry update hooks while the update succeeds", async () => {
     const server = createServer({
+      adminAuth: "disabled",
       database: openSqliteDatabase(),
       webhookHttpClient: async () => ({ body: "down", statusCode: 503 }),
     });
@@ -127,7 +129,7 @@ describe("webhook admin APIs", () => {
   });
 
   it("rejects invalid webhook URLs", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
 
     const response = await server.inject({
       method: "POST",

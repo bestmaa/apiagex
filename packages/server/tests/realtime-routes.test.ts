@@ -13,7 +13,7 @@ import { createServer } from "../src/app.js";
 
 describe("realtime WebSocket APIs", () => {
   it("enables realtime per schema and publishes entry events with ack", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
     const list = await server.inject({ method: "GET", url: "/api/admin/realtime" });
     expect(list.json().configs[0]).toMatchObject({ enabled: false, schemaId });
@@ -62,7 +62,7 @@ describe("realtime WebSocket APIs", () => {
 
   it("keeps only the latest realtime history rows per schema", async () => {
     const database = openMigratedSqliteAdapter();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
     const schema = await createSchema(database, { fields: [{ name: "Title", slug: "title", type: "text" }], name: "Article", slug: "article" });
     for (let index = 0; index < 1005; index += 1) {
       const entry = await createEntry(database, {
@@ -83,7 +83,7 @@ describe("realtime WebSocket APIs", () => {
 
   it("replays missed schema events after lastEventId on reconnect", async () => {
     const database = openMigratedSqliteAdapter();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
     const schemaId = await createArticleSchema(server);
     await server.inject({
       method: "PUT",
@@ -128,7 +128,7 @@ describe("realtime WebSocket APIs", () => {
   });
 
   it("rejects disabled schemas and roles without getAll permission", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
     await server.listen({ host: "127.0.0.1", port: 0 });
 
@@ -148,7 +148,7 @@ describe("realtime WebSocket APIs", () => {
 
   it("creates one-time realtime sessions for websocket connections", async () => {
     const database = openSqliteDatabase();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
     const schemaId = await createArticleSchema(server);
     await server.inject({
       method: "PUT",
@@ -189,7 +189,7 @@ describe("realtime WebSocket APIs", () => {
   });
 
   it("rejects realtime session creation without getAll permission", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await createArticleSchema(server);
     const role = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "no-session" } });
     const token = await server.inject({ method: "POST", url: `/api/admin/roles/${role.json().role.id}/tokens`, payload: { name: "Blocked realtime client" } });

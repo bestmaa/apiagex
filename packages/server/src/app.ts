@@ -14,6 +14,7 @@ import type {
   HealthResponse,
 } from "./app.type.js";
 import { bootstrapOwner, loginOwner } from "./owner-bootstrap.js";
+import { registerAdminAuthGuard, sendAdminSession } from "./admin-auth.js";
 import { readAdminIndex, resolveAdminUiAsset } from "./admin-ui.js";
 import { readDocsPage } from "./docs-ui.js";
 import { registerContentRoutes } from "./content-routes.js";
@@ -36,6 +37,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
     prefix: "/adminui/",
     root: resolveAdminUiAsset().root,
   });
+  if (options.adminAuth !== "disabled") registerAdminAuthGuard(server, database);
   registerSchemaRoutes(server, database);
   const webhookOptions = options.webhookHttpClient ? { httpClient: options.webhookHttpClient } : {};
   registerEntryRoutes(server, database, webhookOptions, realtimeBroker);
@@ -96,6 +98,8 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
       return reply.code(401).send({ ok: false, error: message });
     }
   });
+
+  server.get("/api/auth/session", async (request, reply) => sendAdminSession(database, request, reply));
 
   server.get("/doc", async (_request, reply) => {
     return reply.type("text/html").send(await readDocsPage("doc"));

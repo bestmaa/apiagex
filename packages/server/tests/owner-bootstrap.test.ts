@@ -5,7 +5,7 @@ import { createServer } from "../src/app.js";
 describe("owner bootstrap API", () => {
   it("creates the first owner user and role", async () => {
     const database = openSqliteDatabase();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
 
     const response = await server.inject({
       method: "POST",
@@ -33,7 +33,7 @@ describe("owner bootstrap API", () => {
 
   it("seeds admin roles and lists API roles only", async () => {
     const database = openSqliteDatabase();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
 
     await server.inject({
       method: "POST",
@@ -66,7 +66,7 @@ describe("owner bootstrap API", () => {
 
   it("seeds default admin panel permissions", async () => {
     const database = openSqliteDatabase();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
 
     await server.inject({
       method: "POST",
@@ -91,7 +91,7 @@ describe("owner bootstrap API", () => {
 
   it("does not let owner role bypass content API permissions", async () => {
     const database = openSqliteDatabase();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
 
     await server.inject({
       method: "POST",
@@ -123,7 +123,7 @@ describe("owner bootstrap API", () => {
 
   it("blocks a second owner bootstrap", async () => {
     const database = openSqliteDatabase();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
 
     await server.inject({
       method: "POST",
@@ -151,7 +151,7 @@ describe("owner bootstrap API", () => {
 
   it("allows owner bootstrap when only non-owner users already exist", async () => {
     const database = openSqliteDatabase();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
     const now = new Date().toISOString();
     database
       .prepare(
@@ -185,7 +185,7 @@ describe("owner bootstrap API", () => {
 
   it("logs in an existing owner", async () => {
     const database = openSqliteDatabase();
-    const server = createServer({ database });
+    const server = createServer({ adminAuth: "disabled", database });
 
     await server.inject({
       method: "POST",

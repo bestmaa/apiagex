@@ -5,7 +5,7 @@ import { createServer } from "../src/app.js";
 
 describe("entry admin APIs", () => {
   it("creates, lists, reads, updates, and deletes entries per schema", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
 
     const create = await server.inject({
@@ -43,7 +43,7 @@ describe("entry admin APIs", () => {
   });
 
   it("returns schema validation errors from entry create", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
 
     const response = await server.inject({
@@ -60,7 +60,7 @@ describe("entry admin APIs", () => {
   });
 
   it("lists entries with search, field projection, and pagination metadata", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
     for (const [title, views] of [
       ["Alpha", 1],
@@ -89,7 +89,7 @@ describe("entry admin APIs", () => {
   });
 
   it("rejects unknown projected entry fields", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
 
     const response = await server.inject({
@@ -102,7 +102,7 @@ describe("entry admin APIs", () => {
   });
 
   it("returns relation validation errors from entry create and update", async () => {
-    const server = createServer({ database: openSqliteDatabase() });
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const authorSchemaId = await createAuthorSchema(server);
     const bookSchemaId = await createBookSchema(server, authorSchemaId);
     const author = await server.inject({
