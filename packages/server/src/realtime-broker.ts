@@ -9,6 +9,7 @@ import {
   getSchemaBySlug,
   isRealtimeEventEnabled,
   listRealtimeEventsAfter,
+  listRoles,
   pruneRealtimeEvents,
   recordRealtimeEvent,
   resolveApiToken,
@@ -146,7 +147,9 @@ export function createRealtimeBroker(database: ApiagexDatabase): RealtimeBroker 
       return { allowed: await canRoleAccess(database, apiToken.roleId, schemaId, "getAll") };
     }
     const roleId = url.searchParams.get("roleId")?.trim();
-    return roleId ? { allowed: await canRoleAccess(database, roleId, schemaId, "getAll") } : { allowed: true };
+    if (roleId) return { allowed: await canRoleAccess(database, roleId, schemaId, "getAll") };
+    const publicRole = (await listRoles(database)).find((role) => role.name === "public");
+    return { allowed: publicRole ? await canRoleAccess(database, publicRole.id, schemaId, "getAll") : false };
   }
 
   function handleMessage(ws: WebSocket, state: ClientState, text: string): void {

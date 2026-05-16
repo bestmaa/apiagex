@@ -1,4 +1,5 @@
-import { KeyRound, Radio, Send, Shield, Ticket } from "lucide-react";
+import { KeyRound, Radio, Send, Shield, SlidersHorizontal, Ticket } from "lucide-react";
+import { ApiPermissionManager } from "../ApiPermissionManager";
 import { RoleManager } from "../RoleManager";
 import type { AdminRoute } from "../app-route.type";
 import { SettingsApiTokens } from "./SettingsApiTokens";
@@ -9,6 +10,7 @@ import { RealtimeManager } from "../RealtimeManager";
 export function SettingsPage({ route }: { route: AdminRoute }) {
   if (route === "settings/admin-roles") return <SettingsAdminRoles />;
   if (route === "settings/content-roles") return <SettingsContentRoles />;
+  if (route === "settings/api-permissions") return <SettingsApiPermissions />;
   if (route === "settings/api-tokens") return <SettingsApiTokens />;
   if (route === "settings/webhooks") return <SettingsWebhooks />;
   if (route === "settings/realtime") return <SettingsRealtime />;
@@ -29,7 +31,12 @@ function SettingsOverview() {
         <a className="settings-option" href="#settings/content-roles">
           <KeyRound aria-hidden="true" size={20} />
           <strong>Content Roles</strong>
-          <span>Generated content API roles and per-API permissions.</span>
+          <span>Create generated content API roles.</span>
+        </a>
+        <a className="settings-option" href="#settings/api-permissions">
+          <SlidersHorizontal aria-hidden="true" size={20} />
+          <strong>API Permissions</strong>
+          <span>Allow, block, or open generated APIs per role.</span>
         </a>
         <a className="settings-option" href="#settings/api-tokens">
           <Ticket aria-hidden="true" size={20} />
@@ -57,6 +64,16 @@ function SettingsContentRoles() {
       <h2 id="settings-content-role-title">Content Roles</h2>
       <p>These roles work only with generated <code>/api/content</code> routes.</p>
       <RoleManager />
+    </section>
+  );
+}
+
+function SettingsApiPermissions() {
+  return (
+    <section aria-labelledby="settings-api-permission-title" className="settings-route-panel">
+      <h2 id="settings-api-permission-title">API Permissions</h2>
+      <p>Decide which generated APIs require tokens and which APIs are open.</p>
+      <ApiPermissionManager />
     </section>
   );
 }

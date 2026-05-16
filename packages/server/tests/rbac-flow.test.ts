@@ -11,11 +11,7 @@ describe("MVP RBAC flow", () => {
     await setGetAllPermission(server, readerRoleId, schemaId);
     await createUser(server, "reader@apiagex.local", readerRoleId);
     await createUser(server, "blocked@apiagex.local", blockedRoleId);
-    await server.inject({
-      method: "POST",
-      url: "/api/content/article",
-      payload: { data: { title: "RBAC visible" } },
-    });
+    await createAdminEntry(server, schemaId, { title: "RBAC visible" });
 
     const readerLogin = await loginUser(server, "reader@apiagex.local");
     const blockedLogin = await loginUser(server, "blocked@apiagex.local");
@@ -47,25 +43,17 @@ describe("MVP RBAC flow", () => {
     await setGetPermission(server, allowedRoleId, bookSchemaId);
     await setGetPermission(server, allowedRoleId, authorSchemaId);
     await setGetPermission(server, bookOnlyRoleId, bookSchemaId);
-    const author = await server.inject({
-      method: "POST",
-      url: "/api/content/author",
-      payload: { data: { name: "Martha Wells" } },
-    });
-    const authorId = author.json().entry.id as string;
-    const book = await server.inject({
-      method: "POST",
-      url: "/api/content/book",
-      payload: { data: { title: "All Systems Red", author: authorId } },
-    });
-    const bookId = book.json().entry.id as string;
+    const authorId = await createAdminEntry(server, authorSchemaId, { name: "Martha Wells" });
+    const bookId = await createAdminEntry(server, bookSchemaId, { title: "All Systems Red", author: authorId });
 
-    const ownerBypass = await server.inject({
+    await setGetPermission(server, await getOrCreatePublicRole(server), bookSchemaId);
+    await setGetPermission(server, await getOrCreatePublicRole(server), authorSchemaId);
+    const publicRead = await server.inject({
       method: "GET",
       url: `/api/content/book/${bookId}?populate=relations`,
     });
-    expect(ownerBypass.statusCode).toBe(200);
-    expect(ownerBypass.json().entry.data.author.data.name).toBe("Martha Wells");
+    expect(publicRead.statusCode).toBe(200);
+    expect(publicRead.json().entry.data.author.data.name).toBe("Martha Wells");
 
     const allowed = await server.inject({
       method: "GET",
@@ -200,4 +188,24 @@ async function loginUser(
     payload: { email, password: "UserPass123!" },
   });
   return response.json().user as { roleId: string };
+}
+
+async function createAdminEntry(
+  server: ReturnType<typeof createServer>,
+  schemaId: string,
+  data: Record<string, unknown>,
+): Promise<string> {
+  const response = await server.inject({
+    method: "POST",
+    url: `/api/admin/schemas/${schemaId}/entries`,
+    payload: { data },
+  });
+  return response.json().entry.id as string;
+}
+
+async function getOrCreatePublicRole(server: ReturnType<typeof createServer>): Promise<string> {
+  const list = await server.inject({ method: "GET", url: "/api/admin/roles" });
+  const existing = (list.json().roles as Array<{ id: string; name: string }>).find((role) => role.name === "public");
+  if (existing) return existing.id;
+  return createRole(server, "public");
 }

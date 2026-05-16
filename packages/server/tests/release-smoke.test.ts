@@ -21,6 +21,7 @@ describe("MVP release smoke", () => {
 
     const schema = await createArticleSchema(server);
     const entry = await createEntry(server, schema.id);
+    await saveGetAllPermission(server, await getOrCreatePublicRole(server), schema.id);
     const dynamic = await server.inject({ method: "GET", url: "/api/content/article" });
     expect(dynamic.json().entries[0].id).toBe(entry.id);
 
@@ -43,6 +44,13 @@ describe("MVP release smoke", () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const authorSchema = await createRelationAuthorSchema(server);
     const bookSchema = await createRelationBookSchema(server, authorSchema.id);
+    const publicRole = await getOrCreatePublicRole(server);
+    await savePermissions(server, publicRole, [
+      { schemaId: authorSchema.id, action: "create", allowed: true },
+      { schemaId: authorSchema.id, action: "get", allowed: true },
+      { schemaId: bookSchema.id, action: "create", allowed: true },
+      { schemaId: bookSchema.id, action: "get", allowed: true },
+    ]);
     const author = await server.inject({
       method: "POST",
       url: "/api/content/smoke-author",
@@ -185,6 +193,25 @@ async function saveGetPermission(
     url: `/api/admin/roles/${roleId}/permissions`,
     payload: { permissions: [{ schemaId, action: "get", allowed: true }] },
   });
+}
+
+async function savePermissions(
+  server: ReturnType<typeof createServer>,
+  roleId: string,
+  permissions: Array<Record<string, unknown>>,
+): Promise<void> {
+  await server.inject({
+    method: "PUT",
+    url: `/api/admin/roles/${roleId}/permissions`,
+    payload: { permissions },
+  });
+}
+
+async function getOrCreatePublicRole(server: ReturnType<typeof createServer>): Promise<string> {
+  const list = await server.inject({ method: "GET", url: "/api/admin/roles" });
+  const existing = (list.json().roles as Array<{ id: string; name: string }>).find((role) => role.name === "public");
+  if (existing) return existing.id;
+  return createRole(server, "public").then((role) => role.id);
 }
 
 async function createUser(

@@ -59,7 +59,8 @@ describe("webhook admin APIs", () => {
         return { body: "accepted", statusCode: 202 };
       },
     });
-    await createArticleSchema(server);
+    const schemaId = await createArticleSchema(server);
+    await allowPublicActions(server, schemaId, ["create"]);
     const webhook = await server.inject({
       method: "POST",
       url: "/api/admin/webhooks",
@@ -153,4 +154,25 @@ async function createArticleSchema(server: ReturnType<typeof createServer>): Pro
     },
   });
   return response.json().schema.id as string;
+}
+
+async function allowPublicActions(
+  server: ReturnType<typeof createServer>,
+  schemaId: string,
+  actions: Array<"create" | "delete" | "get" | "getAll" | "manage" | "update">,
+): Promise<void> {
+  const publicRole = await getOrCreatePublicRole(server);
+  await server.inject({
+    method: "PUT",
+    url: `/api/admin/roles/${publicRole}/permissions`,
+    payload: { permissions: actions.map((action) => ({ schemaId, action, allowed: true })) },
+  });
+}
+
+async function getOrCreatePublicRole(server: ReturnType<typeof createServer>): Promise<string> {
+  const list = await server.inject({ method: "GET", url: "/api/admin/roles" });
+  const existing = (list.json().roles as Array<{ id: string; name: string }>).find((role) => role.name === "public");
+  if (existing) return existing.id;
+  const response = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "public" } });
+  return response.json().role.id as string;
 }

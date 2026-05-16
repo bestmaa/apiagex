@@ -5,7 +5,8 @@ import { createServer } from "../src/app.js";
 describe("dynamic content APIs", () => {
   it("creates, lists, reads, updates, and deletes content by schema slug", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
-    await createArticleSchema(server);
+    const schemaId = await createArticleSchema(server);
+    await allowPublicActions(server, schemaId, ["create", "getAll", "get", "update", "delete"]);
 
     const create = await server.inject({
       method: "POST",
@@ -37,7 +38,8 @@ describe("dynamic content APIs", () => {
 
   it("returns schema and validation errors", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
-    await createArticleSchema(server);
+    const schemaId = await createArticleSchema(server);
+    await allowPublicActions(server, schemaId, ["create"]);
 
     const missingSchema = await server.inject({ method: "GET", url: "/api/content/missing" });
     expect(missingSchema.statusCode).toBe(404);
@@ -54,7 +56,8 @@ describe("dynamic content APIs", () => {
 
   it("supports dynamic content search, field projection, and pagination", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
-    await createArticleSchema(server);
+    const schemaId = await createArticleSchema(server);
+    await allowPublicActions(server, schemaId, ["create", "getAll", "get"]);
     for (const [title, views] of [
       ["Alpha", 1],
       ["Beta", 2],
@@ -89,7 +92,8 @@ describe("dynamic content APIs", () => {
 
   it("rejects unknown dynamic content projection fields", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
-    await createArticleSchema(server);
+    const schemaId = await createArticleSchema(server);
+    await allowPublicActions(server, schemaId, ["getAll"]);
 
     const response = await server.inject({
       method: "GET",
@@ -127,15 +131,23 @@ describe("dynamic content APIs", () => {
     expect(blocked.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
   });
 
+  it("blocks dynamic APIs without auth until public permissions are allowed", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+
+    const blocked = await server.inject({ method: "GET", url: "/api/content/article" });
+    await allowPublicActions(server, schemaId, ["getAll"]);
+    const open = await server.inject({ method: "GET", url: "/api/content/article" });
+
+    expect(blocked.statusCode).toBe(403);
+    expect(blocked.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
+    expect(open.statusCode).toBe(200);
+  });
+
   it("separates getAll list access from get single-entry access", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
-    const entry = await server.inject({
-      method: "POST",
-      url: "/api/content/article",
-      payload: { data: { title: "Split read", views: 7 } },
-    });
-    const entryId = entry.json().entry.id as string;
+    const entryId = await createAdminEntry(server, schemaId, { title: "Split read", views: 7 });
     const listRole = await createRole(server, "list-only");
     const getRole = await createRole(server, "get-only");
     await savePermission(server, listRole, schemaId, "getAll");
@@ -174,11 +186,7 @@ describe("dynamic content APIs", () => {
     const schemaId = await createArticleSchema(server);
     const roleId = await createRole(server, "token-reader");
     await savePermission(server, roleId, schemaId, "getAll");
-    await server.inject({
-      method: "POST",
-      url: "/api/content/article",
-      payload: { data: { title: "Token article" } },
-    });
+    await createAdminEntry(server, schemaId, { title: "Token article" });
     const created = await server.inject({
       method: "POST",
       url: `/api/admin/roles/${roleId}/tokens`,
@@ -216,7 +224,9 @@ describe("dynamic content APIs", () => {
   it("validates relation payloads after dynamic write permissions pass", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const authorSchemaId = await createAuthorSchema(server);
-    await createBookSchema(server, authorSchemaId);
+    const bookSchemaId = await createBookSchema(server, authorSchemaId);
+    await allowPublicActions(server, authorSchemaId, ["create"]);
+    await allowPublicActions(server, bookSchemaId, ["create", "update"]);
     const blockedRole = await createRole(server, "blocked-writer");
     const author = await server.inject({
       method: "POST",
@@ -278,6 +288,8 @@ describe("dynamic content APIs", () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const authorSchemaId = await createAuthorSchema(server);
     const bookSchemaId = await createBookSchema(server, authorSchemaId);
+    await allowPublicActions(server, authorSchemaId, ["create", "get"]);
+    await allowPublicActions(server, bookSchemaId, ["create", "get", "getAll"]);
     const author = await server.inject({
       method: "POST",
       url: "/api/content/author",
@@ -375,6 +387,41 @@ async function savePermission(
     url: `/api/admin/roles/${roleId}/permissions`,
     payload: { permissions: [{ schemaId, action, allowed: true }] },
   });
+}
+
+type ApiAction = "getAll" | "get" | "create" | "update" | "delete" | "manage";
+
+async function allowPublicActions(
+  server: ReturnType<typeof createServer>,
+  schemaId: string,
+  actions: ApiAction[],
+): Promise<void> {
+  const publicRole = await getOrCreatePublicRole(server);
+  await server.inject({
+    method: "PUT",
+    url: `/api/admin/roles/${publicRole}/permissions`,
+    payload: { permissions: actions.map((action) => ({ schemaId, action, allowed: true })) },
+  });
+}
+
+async function getOrCreatePublicRole(server: ReturnType<typeof createServer>): Promise<string> {
+  const list = await server.inject({ method: "GET", url: "/api/admin/roles" });
+  const existing = (list.json().roles as Array<{ id: string; name: string }>).find((role) => role.name === "public");
+  if (existing) return existing.id;
+  return createRole(server, "public");
+}
+
+async function createAdminEntry(
+  server: ReturnType<typeof createServer>,
+  schemaId: string,
+  data: Record<string, unknown>,
+): Promise<string> {
+  const response = await server.inject({
+    method: "POST",
+    url: `/api/admin/schemas/${schemaId}/entries`,
+    payload: { data },
+  });
+  return response.json().entry.id as string;
 }
 
 async function createAuthorSchema(server: ReturnType<typeof createServer>): Promise<string> {

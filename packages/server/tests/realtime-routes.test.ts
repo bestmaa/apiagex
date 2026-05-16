@@ -15,6 +15,7 @@ describe("realtime WebSocket APIs", () => {
   it("enables realtime per schema and publishes entry events with ack", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
+    await allowPublicActions(server, schemaId, ["create", "getAll"]);
     const list = await server.inject({ method: "GET", url: "/api/admin/realtime" });
     expect(list.json().configs[0]).toMatchObject({ enabled: false, schemaId });
 
@@ -85,6 +86,7 @@ describe("realtime WebSocket APIs", () => {
     const database = openMigratedSqliteAdapter();
     const server = createServer({ adminAuth: "disabled", database });
     const schemaId = await createArticleSchema(server);
+    await allowPublicActions(server, schemaId, ["create", "getAll"]);
     await server.inject({
       method: "PUT",
       url: `/api/admin/realtime/${schemaId}`,
@@ -208,6 +210,29 @@ async function createArticleSchema(server: ReturnType<typeof createServer>): Pro
     payload: { fields: [{ name: "Title", slug: "title", type: "text", required: true }], name: "Article", slug: "article" },
   });
   return response.json().schema.id as string;
+}
+
+type ApiAction = "getAll" | "get" | "create" | "update" | "delete" | "manage";
+
+async function allowPublicActions(
+  server: ReturnType<typeof createServer>,
+  schemaId: string,
+  actions: ApiAction[],
+): Promise<void> {
+  const publicRole = await getOrCreatePublicRole(server);
+  await server.inject({
+    method: "PUT",
+    url: `/api/admin/roles/${publicRole}/permissions`,
+    payload: { permissions: actions.map((action) => ({ schemaId, action, allowed: true })) },
+  });
+}
+
+async function getOrCreatePublicRole(server: ReturnType<typeof createServer>): Promise<string> {
+  const list = await server.inject({ method: "GET", url: "/api/admin/roles" });
+  const existing = (list.json().roles as Array<{ id: string; name: string }>).find((role) => role.name === "public");
+  if (existing) return existing.id;
+  const response = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "public" } });
+  return response.json().role.id as string;
 }
 
 function portOf(server: ReturnType<typeof createServer>): number {

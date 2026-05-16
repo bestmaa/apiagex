@@ -61,6 +61,15 @@ describe("project feature audit", () => {
       name: "Audit Article",
       slug: "audit-article",
     });
+    const publicRole = await getOrCreatePublicRole(server);
+    await setPermissions(server, publicRole.id, [
+      { action: "create", allowed: true, schemaId: authorSchema.id },
+      { action: "get", allowed: true, schemaId: authorSchema.id },
+      { action: "create", allowed: true, schemaId: articleSchema.id },
+      { action: "getAll", allowed: true, schemaId: articleSchema.id },
+      { action: "get", allowed: true, schemaId: articleSchema.id },
+      { action: "update", allowed: true, schemaId: articleSchema.id },
+    ]);
     const author = await createContent(server, "audit-author", { name: "Audit Writer" });
     const alpha = await createContent(server, "audit-article", {
       author: author.id,
@@ -178,6 +187,12 @@ async function createContent(server: ReturnType<typeof createServer>, slug: stri
 async function createRole(server: ReturnType<typeof createServer>, name: string) {
   const response = await expectOk(server.inject({ method: "POST", payload: { name }, url: "/api/admin/roles" }));
   return response.json().role as { id: string };
+}
+
+async function getOrCreatePublicRole(server: ReturnType<typeof createServer>) {
+  const list = await expectOk(server.inject({ method: "GET", url: "/api/admin/roles" }));
+  const existing = (list.json().roles as Array<{ id: string; name: string }>).find((role) => role.name === "public");
+  return existing ?? createRole(server, "public");
 }
 
 async function setPermissions(server: ReturnType<typeof createServer>, roleId: string, permissions: Array<Record<string, unknown>>) {

@@ -5,6 +5,7 @@ import {
   deleteEntry,
   getEntryById,
   getSchemaBySlug,
+  listRoles,
   listEntries,
   queryEntries,
   resolveApiToken,
@@ -173,8 +174,18 @@ async function canAccess(
     return { allowed: await canRoleAccess(database, apiToken.roleId, schema.id, action) };
   }
   const roleId = request.headers["x-apiagex-role-id"];
-  if (!roleId || Array.isArray(roleId)) return { allowed: true };
+  if (!roleId) return { allowed: await canPublicAccess(database, schema.id, action) };
+  if (Array.isArray(roleId)) return { allowed: false };
   return { allowed: await canRoleAccess(database, roleId, schema.id, action) };
+}
+
+async function canPublicAccess(
+  database: ApiagexDatabase,
+  schemaId: string,
+  action: "getAll" | "get" | "create" | "update" | "delete",
+): Promise<boolean> {
+  const publicRole = (await listRoles(database)).find((role) => role.name === "public");
+  return publicRole ? canRoleAccess(database, publicRole.id, schemaId, action) : false;
 }
 
 async function populateContentEntry(
