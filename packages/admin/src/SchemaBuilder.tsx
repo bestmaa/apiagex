@@ -154,6 +154,18 @@ export function SchemaBuilder() {
     setSelectedEntryCount(result.entries?.length ?? 0);
   }
 
+  function changeSchemaName(name: string) {
+    setDraft((current) => ({
+      ...current,
+      name,
+      slug: current.slug ? current.slug : normalizeSlugInput(name),
+    }));
+  }
+
+  function changeSchemaSlug(slug: string) {
+    setDraft((current) => ({ ...current, slug: normalizeSlugInput(slug) }));
+  }
+
   function updateField(index: number, patch: Partial<SchemaFieldDraft>) {
     setDraft((current) => ({
       ...current,
@@ -184,9 +196,10 @@ export function SchemaBuilder() {
           <fieldset className="schema-form-section">
             <legend>{selectedId ? "Edit schema basics" : "New schema basics"}</legend>
             <div className="schema-basics-grid">
-              <label>Name <input required placeholder="Article" value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
-              <label>Slug <input required pattern="[a-z](?:[a-z0-9]|-)*" placeholder="article" value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value })} /></label>
+              <label>Name <input required placeholder="Article" value={draft.name} onChange={(event) => changeSchemaName(event.target.value)} /></label>
+              <label>Slug <input required pattern="[a-z](?:[a-z0-9]|-)*" placeholder="article" value={draft.slug} onChange={(event) => changeSchemaSlug(event.target.value)} /></label>
             </div>
+            <p className="helper-text">Schema slug becomes the API path, for example /api/content/article.</p>
             <label>Description <textarea rows={3} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
           </fieldset>
           <fieldset className="schema-form-section">
@@ -196,7 +209,7 @@ export function SchemaBuilder() {
                 <SchemaFieldRow
                   field={field}
                   index={index}
-                  key={`${field.slug}-${index}`}
+                  key={index}
                   onChange={updateField}
                   onRemove={removeField}
                   removable={draft.fields.length > 1}
@@ -260,11 +273,12 @@ function SchemaFieldRow(props: {
         </button>
       </div>
       <div className="field-builder-grid">
-        <label>Field name <input required value={field.name} onChange={(event) => onChange(index, { name: event.target.value })} /></label>
-        <label>Field slug <input required pattern="[a-z](?:[a-z0-9]|-)*" value={field.slug} onChange={(event) => onChange(index, { slug: event.target.value })} /></label>
+        <label>Field name <input required value={field.name} onChange={(event) => onChange(index, fieldNamePatch(field, event.target.value))} /></label>
+        <label>Field slug <input required pattern="[a-z](?:[a-z0-9]|-)*" value={field.slug} onChange={(event) => onChange(index, { slug: normalizeSlugInput(event.target.value) })} /></label>
         <label>Type <select value={field.type} onChange={(event) => onChange(index, fieldTypePatch(event.target.value as FieldType))}>{fieldTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
         <label><input checked={field.required} type="checkbox" onChange={(event) => onChange(index, { required: event.target.checked })} /> Required</label>
       </div>
+      <p className="helper-text">Field slug becomes the JSON key and query field name, for example title.</p>
       {field.type === "relation" ? (
         <div className="field-relation-grid">
           <label>Relation type
@@ -333,6 +347,21 @@ function fieldTypePatch(type: FieldType): Partial<SchemaFieldDraft> {
     return { relationSchemaId: "", relationType: "manyToOne", type };
   }
   return { relationSchemaId: undefined, relationType: undefined, type };
+}
+
+function fieldNamePatch(field: SchemaFieldDraft, name: string): Partial<SchemaFieldDraft> {
+  return {
+    name,
+    slug: field.slug ? field.slug : normalizeSlugInput(name),
+  };
+}
+
+function normalizeSlugInput(value: string): string {
+  return value
+    .trimStart()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/^-+/, "");
 }
 
 function SchemaDetails({ schema }: { schema?: SchemaRecord }) {
