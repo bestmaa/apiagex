@@ -1,6 +1,7 @@
-import { KeyRound, Radio, Send, Shield } from "lucide-react";
+import { KeyRound, Radio, Send, Shield, Ticket } from "lucide-react";
 import { RoleManager } from "../RoleManager";
 import type { AdminRoute } from "../app-route.type";
+import { SettingsApiTokens } from "./SettingsApiTokens";
 import { SettingsAdminRoles } from "./SettingsAdminRoles";
 import { WebhookManager } from "../WebhookManager";
 import { RealtimeManager } from "../RealtimeManager";
@@ -8,6 +9,7 @@ import { RealtimeManager } from "../RealtimeManager";
 export function SettingsPage({ route }: { route: AdminRoute }) {
   if (route === "settings/admin-roles") return <SettingsAdminRoles />;
   if (route === "settings/content-roles") return <SettingsContentRoles />;
+  if (route === "settings/api-tokens") return <SettingsApiTokens />;
   if (route === "settings/webhooks") return <SettingsWebhooks />;
   if (route === "settings/realtime") return <SettingsRealtime />;
   return <SettingsOverview />;
@@ -28,6 +30,11 @@ function SettingsOverview() {
           <KeyRound aria-hidden="true" size={20} />
           <strong>Content Roles</strong>
           <span>Generated content API roles and per-API permissions.</span>
+        </a>
+        <a className="settings-option" href="#settings/api-tokens">
+          <Ticket aria-hidden="true" size={20} />
+          <strong>API Tokens</strong>
+          <span>Create and revoke tokens for content API roles.</span>
         </a>
         <a className="settings-option" href="#settings/webhooks">
           <Send aria-hidden="true" size={20} />

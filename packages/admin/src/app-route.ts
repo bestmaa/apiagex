@@ -12,6 +12,11 @@ export const settingsSubnavItems: AdminSubnavItem[] = [
     route: "settings/content-roles",
   },
   {
+    description: "Create tokens for API roles.",
+    label: "API Tokens",
+    route: "settings/api-tokens",
+  },
+  {
     description: "Send content change events.",
     label: "Webhooks",
     route: "settings/webhooks",
