@@ -71,6 +71,8 @@ export function SchemaBuilder() {
   const [schemas, setSchemas] = useState<SchemaRecord[]>([]);
   const [draft, setDraft] = useState<SchemaDraft>({ ...emptyDraft });
   const [editorOpen, setEditorOpen] = useState(false);
+  const [fieldSlugEdited, setFieldSlugEdited] = useState<boolean[]>([false]);
+  const [schemaSlugEdited, setSchemaSlugEdited] = useState(false);
   const [selectedEntryCount, setSelectedEntryCount] = useState(0);
   const [selectedId, setSelectedId] = useState("");
   const [, setStatus] = useState("Schema list loading");
@@ -102,6 +104,8 @@ export function SchemaBuilder() {
   function resetDraft() {
     setSelectedId("");
     setSelectedEntryCount(0);
+    setFieldSlugEdited([false]);
+    setSchemaSlugEdited(false);
     setDraft({ ...emptyDraft, fields: [{ ...emptyField }] });
     setStatus("Ready to create schema");
   }
@@ -114,6 +118,8 @@ export function SchemaBuilder() {
   function selectSchema(schema: SchemaRecord) {
     setSelectedId(schema.id);
     void refreshSelectedEntryCount(schema.id);
+    setFieldSlugEdited(schema.fields.map(() => true));
+    setSchemaSlugEdited(true);
     setDraft({
       name: schema.name,
       slug: schema.slug,
@@ -158,12 +164,28 @@ export function SchemaBuilder() {
     setDraft((current) => ({
       ...current,
       name,
-      slug: current.slug ? current.slug : normalizeSlugInput(name),
+      slug: schemaSlugEdited ? current.slug : normalizeSlugInput(name),
     }));
   }
 
   function changeSchemaSlug(slug: string) {
+    setSchemaSlugEdited(true);
     setDraft((current) => ({ ...current, slug: normalizeSlugInput(slug) }));
+  }
+
+  function changeFieldName(index: number, name: string) {
+    setDraft((current) => ({
+      ...current,
+      fields: current.fields.map((field, fieldIndex) =>
+        fieldIndex === index
+          ? { ...field, name, slug: fieldSlugEdited[index] ? field.slug : normalizeSlugInput(name) }
+          : field),
+    }));
+  }
+
+  function changeFieldSlug(index: number, slug: string) {
+    setFieldSlugEdited((current) => current.map((edited, fieldIndex) => fieldIndex === index ? true : edited));
+    updateField(index, { slug: normalizeSlugInput(slug) });
   }
 
   function updateField(index: number, patch: Partial<SchemaFieldDraft>) {
@@ -174,13 +196,18 @@ export function SchemaBuilder() {
     }));
   }
 
+  function addField() {
+    setDraft((current) => ({ ...current, fields: [...current.fields, { ...emptyField }] }));
+    setFieldSlugEdited((current) => [...current, false]);
+  }
+
   function removeField(index: number) {
+    if (draft.fields.length <= 1) return;
     setDraft((current) => ({
       ...current,
-      fields: current.fields.length > 1
-        ? current.fields.filter((_, fieldIndex) => fieldIndex !== index)
-        : current.fields,
+      fields: current.fields.filter((_, fieldIndex) => fieldIndex !== index),
     }));
+    setFieldSlugEdited((current) => current.filter((_, fieldIndex) => fieldIndex !== index));
   }
 
   return (
@@ -211,7 +238,9 @@ export function SchemaBuilder() {
                   index={index}
                   key={index}
                   onChange={updateField}
+                  onNameChange={changeFieldName}
                   onRemove={removeField}
+                  onSlugChange={changeFieldSlug}
                   removable={draft.fields.length > 1}
                   selectedEntryCount={selectedEntryCount}
                   selectedSchemaId={selectedId}
@@ -219,7 +248,7 @@ export function SchemaBuilder() {
                 />
               ))}
             </div>
-            <button type="button" onClick={() => setDraft({ ...draft, fields: [...draft.fields, { ...emptyField }] })}>
+            <button type="button" onClick={addField}>
               <Plus aria-hidden="true" size={16} />
               Add field
             </button>
@@ -253,13 +282,15 @@ function SchemaFieldRow(props: {
   field: SchemaFieldDraft;
   index: number;
   onChange: (index: number, patch: Partial<SchemaFieldDraft>) => void;
+  onNameChange: (index: number, name: string) => void;
   onRemove: (index: number) => void;
+  onSlugChange: (index: number, slug: string) => void;
   removable: boolean;
   selectedEntryCount: number;
   selectedSchemaId: string;
   schemas: SchemaRecord[];
 }) {
-  const { field, index, onChange, onRemove, removable, schemas, selectedEntryCount, selectedSchemaId } = props;
+  const { field, index, onChange, onNameChange, onRemove, onSlugChange, removable, schemas, selectedEntryCount, selectedSchemaId } = props;
   const selectedTarget = schemas.find((schema) => schema.id === field.relationSchemaId);
   const selectedRelation = relationTypes.find((relationType) => relationType.value === (field.relationType ?? "manyToOne"));
   const showEditWarning = Boolean(selectedSchemaId && field.type === "relation" && selectedEntryCount > 0);
@@ -273,8 +304,8 @@ function SchemaFieldRow(props: {
         </button>
       </div>
       <div className="field-builder-grid">
-        <label>Field name <input required value={field.name} onChange={(event) => onChange(index, fieldNamePatch(field, event.target.value))} /></label>
-        <label>Field slug <input required pattern="[a-z](?:[a-z0-9]|-)*" value={field.slug} onChange={(event) => onChange(index, { slug: normalizeSlugInput(event.target.value) })} /></label>
+        <label>Field name <input required value={field.name} onChange={(event) => onNameChange(index, event.target.value)} /></label>
+        <label>Field slug <input required pattern="[a-z](?:[a-z0-9]|-)*" value={field.slug} onChange={(event) => onSlugChange(index, event.target.value)} /></label>
         <label>Type <select value={field.type} onChange={(event) => onChange(index, fieldTypePatch(event.target.value as FieldType))}>{fieldTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
         <label><input checked={field.required} type="checkbox" onChange={(event) => onChange(index, { required: event.target.checked })} /> Required</label>
       </div>
@@ -347,13 +378,6 @@ function fieldTypePatch(type: FieldType): Partial<SchemaFieldDraft> {
     return { relationSchemaId: "", relationType: "manyToOne", type };
   }
   return { relationSchemaId: undefined, relationType: undefined, type };
-}
-
-function fieldNamePatch(field: SchemaFieldDraft, name: string): Partial<SchemaFieldDraft> {
-  return {
-    name,
-    slug: field.slug ? field.slug : normalizeSlugInput(name),
-  };
 }
 
 function normalizeSlugInput(value: string): string {

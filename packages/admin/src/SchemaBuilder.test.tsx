@@ -44,6 +44,29 @@ describe("SchemaBuilder", () => {
     expect(document.activeElement).toBe(fieldSlug);
     expect(fieldSlug.value).toBe("article-title");
   });
+
+  it("auto-fills slugs from names until the slug is edited manually", async () => {
+    const container = await renderSchemaBuilder();
+    await clickButton(container, "Add schema");
+    const [schemaName, schemaSlug, fieldName, fieldSlug] = [...container.querySelectorAll<HTMLInputElement>("input")];
+    if (!schemaName || !schemaSlug || !fieldName || !fieldSlug) throw new Error("Schema form inputs not found");
+
+    await setControlledInput(schemaName, "Blog Article");
+    await setControlledInput(fieldName, "Hero Title");
+
+    expect(schemaSlug.value).toBe("blog-article");
+    expect(fieldSlug.value).toBe("hero-title");
+
+    await setControlledInput(schemaSlug, "articles");
+    await setControlledInput(fieldSlug, "heading");
+    await setControlledInput(schemaName, "News Article");
+    await setControlledInput(fieldName, "Display Title");
+
+    expect(schemaSlug.value).toBe("articles");
+    expect(fieldSlug.value).toBe("heading");
+    expect(schemaName.value).toBe("News Article");
+    expect(fieldName.value).toBe("Display Title");
+  });
 });
 
 async function renderSchemaBuilder(): Promise<HTMLDivElement> {
