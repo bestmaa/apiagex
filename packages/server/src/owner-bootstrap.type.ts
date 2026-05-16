@@ -14,6 +14,11 @@ export type OwnerBootstrapResult = {
   };
 };
 
+export type OwnerStatusResult = {
+  hasOwner: boolean;
+  ok: true;
+};
+
 export type OwnerLoginResult = {
   ok: true;
   token: string;

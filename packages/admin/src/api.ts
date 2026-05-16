@@ -1,4 +1,4 @@
-import type { AuthResponse } from "./session.type";
+import type { AuthResponse, OwnerStatusResponse } from "./session.type";
 import type {
   EntryDeleteResponse,
   EntryData,
@@ -60,10 +60,18 @@ export async function validateOwnerSession(token: string): Promise<AuthResponse>
   return (await response.json()) as AuthResponse;
 }
 
+export async function readOwnerStatus(): Promise<OwnerStatusResponse> {
+  const response = await fetch("/api/auth/owner-status");
+  return (await response.json()) as OwnerStatusResponse;
+}
+
 export async function authenticateOwner(
   email: string,
   password: string,
+  hasOwner?: boolean | null,
 ): Promise<AuthResponse> {
+  if (hasOwner === true) return (await requestAuth("/api/auth/login", email, password)).body;
+  if (hasOwner === false) return (await requestAuth("/api/auth/bootstrap-owner", email, password)).body;
   let result = await requestAuth("/api/auth/bootstrap-owner", email, password);
   if (result.status === 409) {
     result = await requestAuth("/api/auth/login", email, password);

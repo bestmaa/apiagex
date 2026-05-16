@@ -3,6 +3,7 @@ import {
   authenticateOwner,
   ownerSessionStorageKey,
   readStoredOwnerSession,
+  readOwnerStatus,
   setAdminAuthToken,
   validateOwnerSession,
 } from "./api";
@@ -33,6 +34,7 @@ const navItems: AdminNavItem[] = [
   { label: "Docs", route: "docs" },
 ];
 export function App() {
+  const [ownerHasOwner, setOwnerHasOwner] = useState<boolean | null>(null);
   const [session, setSession] = useState<OwnerSession | null>(null);
   const [route, setRoute] = useState<AdminRoute>(readRoute());
   const [status, setStatus] = useState("No owner session");
@@ -40,28 +42,32 @@ export function App() {
 
   useEffect(() => {
     let cancelled = false;
-    const saved = readStoredOwnerSession();
-    if (!saved) return undefined;
-    setStatus("Checking saved owner session");
-    setAdminAuthToken(saved.token);
-    validateOwnerSession(saved.token).then((result) => {
+    async function loadOwnerState() {
+      const ownerStatus = await readOwnerStatus();
       if (cancelled) return;
-      if (!result.ok || !result.user) {
+      if (ownerStatus.ok && ownerStatus.hasOwner !== undefined) setOwnerHasOwner(ownerStatus.hasOwner);
+      const saved = readStoredOwnerSession();
+      if (!saved) {
+        setStatus(ownerStatus.hasOwner ? "Owner login ready" : "Owner setup ready");
+        return;
+      }
+      setStatus("Checking saved owner session");
+      setAdminAuthToken(saved.token);
+      const sessionResult = await validateOwnerSession(saved.token);
+      if (cancelled) return;
+      if (!sessionResult.ok || !sessionResult.user) {
         localStorage.removeItem(ownerSessionStorageKey);
         setAdminAuthToken(undefined);
         setSession(null);
-        setStatus("Owner session expired. Login again.");
+        setStatus(ownerStatus.hasOwner ? "Owner session expired. Login again." : "Owner setup ready");
         return;
       }
-      const nextSession = { email: result.user.email, token: saved.token };
+      const nextSession = { email: sessionResult.user.email, token: saved.token };
       setSession(nextSession);
       setStatus(`Logged in owner: ${nextSession.email}`);
-    }).catch(() => {
-      if (cancelled) return;
-      localStorage.removeItem(ownerSessionStorageKey);
-      setAdminAuthToken(undefined);
-      setSession(null);
-      setStatus("Owner session could not be verified. Login again.");
+    }
+    loadOwnerState().catch(() => {
+      if (!cancelled) setStatus("Owner setup status could not be loaded.");
     });
     return () => {
       cancelled = true;
@@ -90,8 +96,8 @@ export function App() {
     const data = new FormData(event.currentTarget);
     const email = String(data.get("email") ?? "");
     const password = String(data.get("password") ?? "");
-    setStatus("Checking owner setup/login");
-    const result = await authenticateOwner(email, password);
+    setStatus(ownerHasOwner ? "Checking owner login" : "Creating owner");
+    const result = await authenticateOwner(email, password, ownerHasOwner);
     if (!result.ok || !result.user) {
       setStatus(result.error ?? "Login failed");
       return;
@@ -103,6 +109,7 @@ export function App() {
     const nextSession = { email: result.user.email, token: result.token };
     setAdminAuthToken(nextSession.token);
     localStorage.setItem(ownerSessionStorageKey, JSON.stringify(nextSession));
+    setOwnerHasOwner(true);
     setSession(nextSession);
     setStatus(`Logged in owner: ${nextSession.email}`);
   }
@@ -123,7 +130,7 @@ export function App() {
       session={session}
       theme={theme}
     >
-      {renderRoute(route, session, status, submitLogin, logout)}
+      {renderRoute(route, session, ownerMode(ownerHasOwner), status, submitLogin, logout)}
     </AdminShell>
   );
 }
@@ -135,6 +142,7 @@ function readRoute(): AdminRoute {
 function renderRoute(
   route: AdminRoute,
   session: OwnerSession | null,
+  mode: "checking" | "login" | "setup",
   status: string,
   submitLogin: (event: FormEvent<HTMLFormElement>) => void,
   logout: () => void,
@@ -144,6 +152,7 @@ function renderRoute(
       <DashboardPage
         sessionPanel={
           <SessionPanel
+            mode={mode}
             onReset={logout}
             onSubmit={submitLogin}
             session={session}
@@ -155,7 +164,7 @@ function renderRoute(
     );
   }
   if (route === "docs" || route.startsWith("docs/")) return <DocsPage focus={route === "docs/webhooks" ? "webhooks" : route === "docs/realtime" ? "realtime" : undefined} />;
-  if (!session) return <LoginRequiredPage onReset={logout} status={status} onSubmit={submitLogin} />;
+  if (!session) return <LoginRequiredPage mode={mode} onReset={logout} status={status} onSubmit={submitLogin} />;
   if (route === "schemas") return <SchemaBuilder />;
   if (route === "entries") return <EntryManager />;
   if (route === "apis") return <ApiList />;
@@ -163,11 +172,18 @@ function renderRoute(
   return <UserManager />;
 }
 
+function ownerMode(hasOwner: boolean | null): "checking" | "login" | "setup" {
+  if (hasOwner === null) return "checking";
+  return hasOwner ? "login" : "setup";
+}
+
 function LoginRequiredPage({
   onReset,
+  mode,
   status,
   onSubmit,
 }: {
+  mode: "checking" | "login" | "setup";
   onReset: () => void;
   status: string;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -175,7 +191,7 @@ function LoginRequiredPage({
   return (
     <>
       <p className="empty-state">Login as owner to use this Admin UI page.</p>
-      <SessionPanel onReset={onReset} session={null} status={status} onSubmit={onSubmit} />
+      <SessionPanel mode={mode} onReset={onReset} session={null} status={status} onSubmit={onSubmit} />
     </>
   );
 }

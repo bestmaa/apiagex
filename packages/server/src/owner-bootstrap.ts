@@ -4,6 +4,7 @@ import type {
   OwnerBootstrapInput,
   OwnerBootstrapResult,
   OwnerLoginResult,
+  OwnerStatusResult,
 } from "./owner-bootstrap.type.js";
 import { issueOwnerToken } from "./admin-auth.js";
 
@@ -55,6 +56,13 @@ export async function bootstrapOwner(
   };
 }
 
+export async function getOwnerStatus(db: ApiagexDatabase): Promise<OwnerStatusResult> {
+  return {
+    hasOwner: await ownerExists(db),
+    ok: true,
+  };
+}
+
 export async function loginOwner(db: ApiagexDatabase, input: OwnerBootstrapInput): Promise<OwnerLoginResult> {
   const email = input.email.trim().toLowerCase();
   const row = await db
@@ -70,6 +78,13 @@ export async function loginOwner(db: ApiagexDatabase, input: OwnerBootstrapInput
     token: issueOwnerToken(row.id, row.password_hash),
     user: { id: row.id, email: row.email, role: "owner" },
   };
+}
+
+async function ownerExists(db: ApiagexDatabase): Promise<boolean> {
+  const ownerCount = await db
+    .prepare("SELECT COUNT(*) as count FROM users JOIN roles ON roles.id = users.role_id WHERE roles.is_owner = 1")
+    .get<{ count: number }>();
+  return (ownerCount?.count ?? 0) > 0;
 }
 
 function hashPassword(password: string): string {

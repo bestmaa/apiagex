@@ -3,21 +3,24 @@ import type { OwnerSession } from "../session.type";
 import { StatusToast } from "./StatusToast";
 
 export function SessionPanel({
+  mode,
   onReset,
   session,
   status,
   onSubmit,
 }: {
+  mode: "checking" | "login" | "setup";
   onReset: () => void;
   session: OwnerSession | null;
   status: string;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const title = session ? "Owner Session" : mode === "setup" ? "Owner Setup" : mode === "login" ? "Owner Login" : "Owner Access";
   return (
     <section aria-labelledby="owner-login-title">
-      <h2 id="owner-login-title">Owner Setup / Login</h2>
-      <p>First submit creates the owner when none exists; later submits log in.</p>
-      {!session ? <OwnerLoginForm onSubmit={onSubmit} /> : (
+      <h2 id="owner-login-title">{title}</h2>
+      {!session ? <p>{mode === "setup" ? "No owner exists yet. Create the first owner account." : mode === "login" ? "Owner already exists. Login with the owner account." : "Checking owner setup status."}</p> : null}
+      {!session ? <OwnerLoginForm mode={mode} onSubmit={onSubmit} /> : (
         <div className="api-row">
           <strong>{session.email}</strong>
           <span>Local owner session is active.</span>
@@ -29,12 +32,18 @@ export function SessionPanel({
   );
 }
 
-function OwnerLoginForm({ onSubmit }: { onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
+function OwnerLoginForm({
+  mode,
+  onSubmit,
+}: {
+  mode: "checking" | "login" | "setup";
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
   return (
     <form onSubmit={onSubmit}>
       <label>Email <input name="email" type="email" required /></label>
       <label>Password <input name="password" type="password" required minLength={8} /></label>
-      <button type="submit">Setup or login owner</button>
+      <button disabled={mode === "checking"} type="submit">{mode === "setup" ? "Create owner" : "Login owner"}</button>
     </form>
   );
 }

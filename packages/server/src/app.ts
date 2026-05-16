@@ -13,7 +13,7 @@ import type {
   CreateServerOptions,
   HealthResponse,
 } from "./app.type.js";
-import { bootstrapOwner, loginOwner } from "./owner-bootstrap.js";
+import { bootstrapOwner, getOwnerStatus, loginOwner } from "./owner-bootstrap.js";
 import { registerAdminAuthGuard, sendAdminSession } from "./admin-auth.js";
 import { readAdminIndex, resolveAdminUiAsset } from "./admin-ui.js";
 import { readDocsPage } from "./docs-ui.js";
@@ -61,6 +61,8 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   }));
 
   server.get("/favicon.ico", async (_request, reply) => reply.code(204).send());
+
+  server.get("/api/auth/owner-status", async () => getOwnerStatus(database));
 
   server.post("/api/auth/bootstrap-owner", async (request, reply) => {
     try {

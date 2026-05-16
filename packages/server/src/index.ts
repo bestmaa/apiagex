@@ -8,7 +8,7 @@ export {
 } from "./admin-auth.js";
 export { readDocsPage, resolveDocsUiAsset } from "./docs-ui.js";
 export { createServer } from "./app.js";
-export { bootstrapOwner, loginOwner } from "./owner-bootstrap.js";
+export { bootstrapOwner, getOwnerStatus, loginOwner } from "./owner-bootstrap.js";
 export { renderRuntimeHelp, runRuntimeCli, startApiagex, startApiagexServer } from "./runtime.js";
 export { ensureLocalServerPaths, resolveLocalServerConfig } from "./server-config.js";
 export type {
@@ -32,4 +32,5 @@ export type {
   OwnerBootstrapInput,
   OwnerBootstrapResult,
   OwnerLoginResult,
+  OwnerStatusResult,
 } from "./owner-bootstrap.type.js";

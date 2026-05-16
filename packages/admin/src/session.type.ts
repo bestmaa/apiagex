@@ -11,3 +11,9 @@ export type AuthResponse = {
   };
   error?: string;
 };
+
+export type OwnerStatusResponse = {
+  hasOwner?: boolean;
+  ok: boolean;
+  error?: string;
+};
