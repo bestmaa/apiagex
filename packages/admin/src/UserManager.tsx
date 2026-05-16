@@ -1,12 +1,15 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Plus, X } from "lucide-react";
-import { createUser, listRoles, listUsers } from "./api";
+import { createControlUser, createUser, listControlUsers, listUsers } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
 import type { RoleRecord } from "./role.type";
 import type { UserRecord } from "./user.type";
 
+type UserMode = "admin" | "content";
+
 export function UserManager() {
+  const [mode, setMode] = useState<UserMode>("content");
   const [roles, setRoles] = useState<RoleRecord[]>([]);
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
@@ -14,25 +17,29 @@ export function UserManager() {
 
   useEffect(() => {
     void loadData();
-  }, []);
+  }, [mode]);
 
   async function loadData() {
-    const roleResult = await listRoles();
-    const userResult = await listUsers();
-    if (!roleResult.ok || !userResult.ok) {
-      setStatus(roleResult.error ?? userResult.error ?? "Users failed");
+    const userResult = mode === "content" ? await listUsers() : await listControlUsers();
+    if (!userResult.ok) {
+      setStatus(userResult.error ?? "Users failed");
       return;
     }
-    setRoles(roleResult.roles ?? []);
+    setRoles((userResult.roles ?? []) as RoleRecord[]);
     setUsers(userResult.users ?? []);
-    setStatus((roleResult.roles ?? []).length ? "Users ready" : "Create an API role first");
+    setCreateOpen(false);
+    setStatus((userResult.roles ?? []).length ? `${modeLabel(mode)} users ready` : `Create a ${mode === "content" ? "content API" : "control admin"} role first`);
   }
 
   async function submitUser(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    const result = await createUser({
+    const result = mode === "content" ? await createUser({
+      email: String(data.get("email") ?? ""),
+      password: String(data.get("password") ?? ""),
+      roleId: String(data.get("roleId") ?? ""),
+    }) : await createControlUser({
       email: String(data.get("email") ?? ""),
       password: String(data.get("password") ?? ""),
       roleId: String(data.get("roleId") ?? ""),
@@ -44,19 +51,27 @@ export function UserManager() {
     form.reset();
     await loadData();
     setCreateOpen(false);
-    setStatus(`Created user: ${result.user?.email ?? "user"}`);
+    setStatus(`Created ${modeLabel(mode).toLowerCase()} user: ${result.user?.email ?? "user"}`);
   }
 
   return (
     <section aria-labelledby="user-manager-title">
       <h2 id="user-manager-title">Users</h2>
-      <p>Create content API users and assign exactly one API role.</p>
+      <p>Create content API users or control admin users and assign exactly one role.</p>
+      <div className="segmented-control" aria-label="User type">
+        <button className={mode === "content" ? "is-active" : ""} type="button" onClick={() => setMode("content")}>
+          Content users
+        </button>
+        <button className={mode === "admin" ? "is-active" : ""} type="button" onClick={() => setMode("admin")}>
+          Control admin users
+        </button>
+      </div>
       <div className="user-create-bar">
         <button disabled={roles.length === 0} type="button" onClick={() => setCreateOpen(true)}>
           <Plus aria-hidden="true" size={16} />
-          Create user
+          Create {modeLabel(mode)} user
         </button>
-        {roles.length === 0 ? <span className="helper-text">Create an API role before adding users.</span> : null}
+        {roles.length === 0 ? <span className="helper-text">Create a {mode === "content" ? "content API" : "control admin"} role before adding users.</span> : null}
       </div>
       {createOpen ? (
         <form className="user-form" aria-describedby="user-form-help" onSubmit={submitUser}>
@@ -77,9 +92,9 @@ export function UserManager() {
             />
           </div>
           <div>
-            <label htmlFor="user-role">API role</label>
+            <label htmlFor="user-role">{mode === "content" ? "API role" : "Admin role"}</label>
             <select disabled={roles.length === 0} id="user-role" name="roleId" required>
-              <option value="">Select API role</option>
+              <option value="">Select {mode === "content" ? "API" : "admin"} role</option>
               {roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}
             </select>
           </div>
@@ -89,7 +104,7 @@ export function UserManager() {
           <div className="user-form-actions">
             <button disabled={roles.length === 0} type="submit">
               <Plus aria-hidden="true" size={16} />
-              Create user
+              Create {modeLabel(mode)} user
             </button>
             <button type="button" onClick={() => setCreateOpen(false)}>
               <X aria-hidden="true" size={16} />
@@ -98,30 +113,34 @@ export function UserManager() {
           </div>
         </form>
       ) : null}
-      <UserList users={users} />
+      <UserList mode={mode} users={users} />
       <StatusToast title="User status">{status}</StatusToast>
     </section>
   );
 }
 
-function UserList({ users }: { users: UserRecord[] }) {
+function UserList({ mode, users }: { mode: UserMode; users: UserRecord[] }) {
   return (
     <section className="user-list" aria-labelledby="user-list-title">
-      <h3 id="user-list-title">User list</h3>
+      <h3 id="user-list-title">{modeLabel(mode)} user list</h3>
       {users.length === 0 ? (
         <StateMessage title="No users yet" variant="empty">
-          Create a user after at least one API role is available.
+          Create a {modeLabel(mode).toLowerCase()} user after at least one role is available.
         </StateMessage>
       ) : users.map((user) => (
         <article className="user-row" key={user.id}>
           <div>
             <strong>{user.email}</strong>
-            <span>API role: {user.roleName}</span>
+            <span>{mode === "content" ? "API" : "Admin"} role: {user.roleName}</span>
           </div>
-          <code>x-apiagex-role-id: {user.roleId}</code>
-          <p>Created/updated timestamps are not exposed by the current user API.</p>
+          {mode === "content" ? <code>x-apiagex-role-id: {user.roleId}</code> : <code>control role: {user.roleName}</code>}
+          <p>{mode === "content" ? "Use this user for generated content API login flows." : "Use this user for future Admin UI control-plane login flows."}</p>
         </article>
       ))}
     </section>
   );
+}
+
+function modeLabel(mode: UserMode): string {
+  return mode === "content" ? "Content" : "Control admin";
 }

@@ -82,4 +82,64 @@ describe("user admin APIs", () => {
     expect(list.statusCode).toBe(200);
     expect(list.json().users).toEqual([]);
   });
+
+  it("creates, lists, and reads control admin users separately", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+    await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: { email: "owner@apiagex.local", password: "OwnerPass123!" },
+    });
+
+    const create = await server.inject({
+      method: "POST",
+      url: "/api/admin/control-users",
+      payload: {
+        email: "schema-admin@apiagex.local",
+        password: "UserPass123!",
+        roleId: "role_schema_manager",
+      },
+    });
+    expect(create.statusCode).toBe(200);
+    expect(create.json().user.roleKind).toBe("admin");
+
+    const apiUsers = await server.inject({ method: "GET", url: "/api/admin/users" });
+    const adminUsers = await server.inject({ method: "GET", url: "/api/admin/control-users" });
+    const read = await server.inject({ method: "GET", url: `/api/admin/control-users/${create.json().user.id}` });
+
+    expect(apiUsers.json().users).toEqual([]);
+    expect(adminUsers.json().users.map((user: { email: string }) => user.email)).toEqual(["schema-admin@apiagex.local"]);
+    expect(adminUsers.json().roles.map((role: { name: string }) => role.name)).toEqual([
+      "admin",
+      "schema-manager",
+      "user-manager",
+    ]);
+    expect(read.json().user.roleName).toBe("schema-manager");
+  });
+
+  it("rejects control admin users assigned to API or owner roles", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+    await server.inject({
+      method: "POST",
+      url: "/api/auth/bootstrap-owner",
+      payload: { email: "owner@apiagex.local", password: "OwnerPass123!" },
+    });
+
+    const apiRole = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "custom-reader" } });
+    const apiResponse = await server.inject({
+      method: "POST",
+      url: "/api/admin/control-users",
+      payload: { email: "api@apiagex.local", password: "UserPass123!", roleId: apiRole.json().role.id },
+    });
+    const ownerResponse = await server.inject({
+      method: "POST",
+      url: "/api/admin/control-users",
+      payload: { email: "owner2@apiagex.local", password: "UserPass123!", roleId: "role_owner" },
+    });
+
+    expect(apiResponse.statusCode).toBe(400);
+    expect(apiResponse.json()).toEqual({ ok: false, error: "ROLE_ADMIN_REQUIRED" });
+    expect(ownerResponse.statusCode).toBe(400);
+    expect(ownerResponse.json()).toEqual({ ok: false, error: "ROLE_OWNER_LOCKED" });
+  });
 });

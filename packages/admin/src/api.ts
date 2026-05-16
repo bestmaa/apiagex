@@ -221,12 +221,28 @@ export async function listUsers(): Promise<UserListResponse> {
   return adminJson<UserListResponse>("/api/admin/users");
 }
 
+export async function listControlUsers(): Promise<UserListResponse> {
+  return adminJson<UserListResponse>("/api/admin/control-users");
+}
+
 export async function createUser(input: {
   email: string;
   password: string;
   roleId: string;
 }): Promise<UserMutationResponse> {
   return adminJson<UserMutationResponse>("/api/admin/users", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function createControlUser(input: {
+  email: string;
+  password: string;
+  roleId: string;
+}): Promise<UserMutationResponse> {
+  return adminJson<UserMutationResponse>("/api/admin/control-users", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),

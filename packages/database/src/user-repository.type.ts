@@ -2,6 +2,7 @@ export type CreateUserInput = {
   email: string;
   passwordHash: string;
   roleId: string;
+  roleKind?: "admin" | "api";
 };
 
 export type UserRecord = {
@@ -9,7 +10,7 @@ export type UserRecord = {
   email: string;
   roleId: string;
   roleName: string;
-  roleKind: "api";
+  roleKind: "admin" | "api";
   createdAt: string;
   updatedAt: string;
 };

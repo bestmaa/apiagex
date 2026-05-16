@@ -21,8 +21,16 @@ export async function listUsers(db: ApiagexDatabase): Promise<UserRecord[]> {
   return db.prepare(userSelectSql("WHERE roles.role_kind = 'api' ORDER BY users.created_at ASC")).all<UserRow>();
 }
 
+export async function listAdminUsers(db: ApiagexDatabase): Promise<UserRecord[]> {
+  return db.prepare(userSelectSql("WHERE roles.role_kind = 'admin' AND roles.is_owner = 0 ORDER BY users.created_at ASC")).all<UserRow>();
+}
+
 export async function getUserById(db: ApiagexDatabase, id: string): Promise<UserRecord | undefined> {
   return db.prepare(userSelectSql("WHERE users.id = ? AND roles.role_kind = 'api'")).get<UserRow>(id);
+}
+
+export async function getAdminUserById(db: ApiagexDatabase, id: string): Promise<UserRecord | undefined> {
+  return db.prepare(userSelectSql("WHERE users.id = ? AND roles.role_kind = 'admin' AND roles.is_owner = 0")).get<UserRow>(id);
 }
 
 export async function getUserPasswordHashByEmail(
@@ -43,11 +51,13 @@ async function validateUser(db: ApiagexDatabase, input: CreateUserInput): Promis
   if (!input.passwordHash) throw new Error("USER_PASSWORD_HASH_REQUIRED");
   const role = await getRoleById(db, input.roleId);
   if (!role) throw new Error("ROLE_NOT_FOUND");
-  if (role.roleKind !== "api") throw new Error("ROLE_API_REQUIRED");
+  if (role.isOwner) throw new Error("ROLE_OWNER_LOCKED");
+  const requiredKind = input.roleKind ?? "api";
+  if (role.roleKind !== requiredKind) throw new Error(requiredKind === "admin" ? "ROLE_ADMIN_REQUIRED" : "ROLE_API_REQUIRED");
 }
 
 async function requireUser(db: ApiagexDatabase, id: string): Promise<UserRecord> {
-  const user = await getUserById(db, id);
+  const user = await db.prepare(userSelectSql("WHERE users.id = ?")).get<UserRow>(id);
   if (!user) throw new Error("USER_NOT_FOUND");
   return user;
 }

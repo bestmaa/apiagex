@@ -98,8 +98,10 @@ export {
 } from "./permission-repository.js";
 export {
   createUser,
+  getAdminUserById,
   getUserById,
   getUserPasswordHashByEmail,
+  listAdminUsers,
   listUsers,
 } from "./user-repository.js";
 export {
