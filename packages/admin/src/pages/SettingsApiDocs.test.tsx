@@ -16,11 +16,11 @@ describe("SettingsApiDocs", () => {
   beforeEach(() => {
     vi.mocked(getApiDocsSettings).mockResolvedValue({
       ok: true,
-      settings: { enabled: false, updatedAt: null },
+      settings: { adminEnabled: false, contentEnabled: false, updatedAt: null },
     });
     vi.mocked(saveApiDocsSettings).mockResolvedValue({
       ok: true,
-      settings: { enabled: true, updatedAt: "2026-05-17T00:00:00.000Z" },
+      settings: { adminEnabled: false, contentEnabled: true, updatedAt: "2026-05-17T00:00:00.000Z" },
     });
   });
 
@@ -34,13 +34,15 @@ describe("SettingsApiDocs", () => {
 
   it("loads and saves Swagger visibility", async () => {
     const container = await renderSettingsApiDocs();
-    const checkbox = container.querySelector<HTMLInputElement>("input[type='checkbox']");
+    const checkboxes = container.querySelectorAll<HTMLInputElement>("input[type='checkbox']");
 
     expect(container.textContent).toContain("Swagger/OpenAPI visibility");
-    expect(checkbox?.checked).toBe(false);
+    expect(container.textContent).toContain("Content APIs");
+    expect(container.textContent).toContain("Admin APIs");
+    expect(checkboxes[0]?.checked).toBe(false);
 
     await act(async () => {
-      checkbox?.click();
+      checkboxes[0]?.click();
       await flushPromises();
     });
     await act(async () => {
@@ -48,7 +50,7 @@ describe("SettingsApiDocs", () => {
       await flushPromises();
     });
 
-    expect(saveApiDocsSettings).toHaveBeenCalledWith(true);
+    expect(saveApiDocsSettings).toHaveBeenCalledWith({ adminEnabled: false, contentEnabled: true });
     expect(container.textContent).toContain("Swagger docs enabled");
   });
 });

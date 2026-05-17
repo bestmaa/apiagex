@@ -1,8 +1,10 @@
 export type ApiDocsSettingsRecord = {
-  enabled: boolean;
+  adminEnabled: boolean;
+  contentEnabled: boolean;
   updatedAt: string | null;
 };
 
 export type SetApiDocsSettingsInput = {
-  enabled: boolean;
+  adminEnabled: boolean;
+  contentEnabled: boolean;
 };

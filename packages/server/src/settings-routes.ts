@@ -30,7 +30,7 @@ export function registerSettingsRoutes(server: FastifyInstance, database: Apiage
 
   server.put<{ Body: ApiDocsSettingsBody }>("/api/admin/settings/api-docs", async (request, reply) => {
     try {
-      return { ok: true, settings: await setApiDocsSettings(database, request.body.enabled) };
+      return { ok: true, settings: await setApiDocsSettings(database, request.body) };
     } catch (error) {
       return sendSettingsError(reply, error, 400);
     }

@@ -63,13 +63,13 @@ describe("settings access control APIs", () => {
     const save = await server.inject({
       method: "PUT",
       url: "/api/admin/settings/api-docs",
-      payload: { enabled: true },
+      payload: { adminEnabled: false, contentEnabled: true },
     });
 
     expect(initial.statusCode).toBe(200);
-    expect(initial.json()).toEqual({ ok: true, settings: { enabled: false, updatedAt: null } });
+    expect(initial.json()).toEqual({ ok: true, settings: { adminEnabled: false, contentEnabled: false, updatedAt: null } });
     expect(save.statusCode).toBe(200);
-    expect(save.json().settings.enabled).toBe(true);
+    expect(save.json().settings).toMatchObject({ adminEnabled: false, contentEnabled: true });
     expect(save.json().settings.updatedAt).toEqual(expect.any(String));
   });
 

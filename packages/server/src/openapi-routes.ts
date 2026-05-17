@@ -55,20 +55,20 @@ const queryParameters = {
 
 export function registerOpenApiRoutes(server: FastifyInstance, database: ApiagexDatabase): void {
   server.get("/api/openapi.json", async (_request, reply) => {
-    if (!(await apiDocsEnabled(database))) return sendApiDocsDisabled(reply);
+    if (!(await anyApiDocsEnabled(database))) return sendApiDocsDisabled(reply);
     return reply.type("application/json").send(await buildOpenApiDocument(database));
   });
 
   server.get("/api/swagger", async (_request, reply) => {
-    if (!(await apiDocsEnabled(database))) return sendApiDocsDisabled(reply);
+    if (!(await anyApiDocsEnabled(database))) return sendApiDocsDisabled(reply);
     return sendSwaggerUi(reply);
   });
   server.get("/api/docs", async (_request, reply) => {
-    if (!(await apiDocsEnabled(database))) return sendApiDocsDisabled(reply);
+    if (!(await anyApiDocsEnabled(database))) return sendApiDocsDisabled(reply);
     return sendSwaggerUi(reply);
   });
   server.get("/swagger", async (_request, reply) => {
-    if (!(await apiDocsEnabled(database))) return sendApiDocsDisabled(reply);
+    if (!(await anyApiDocsEnabled(database))) return sendApiDocsDisabled(reply);
     return sendSwaggerUi(reply);
   });
 }
@@ -76,6 +76,7 @@ export function registerOpenApiRoutes(server: FastifyInstance, database: Apiagex
 export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<OpenApiDocument> {
   const schemas = await listSchemas(database);
   const components = contentSchemaComponents(schemas);
+  const settings = await getApiDocsSettings(database);
   return {
     openapi: "3.0.3",
     info: {
@@ -85,7 +86,10 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
     },
     servers: [{ url: "/" }],
     tags: [
-      { name: "Content", description: "Generated content APIs. Requests need API permissions unless the public role allows the action." },
+      ...(settings.contentEnabled
+        ? [{ name: "Content", description: "Generated content APIs. Requests need API permissions unless the public role allows the action." }]
+        : []),
+      ...(settings.adminEnabled ? [
       { name: "Admin Auth", description: "Owner setup, login, and session checks for the control plane." },
       { name: "Admin Schemas", description: "Control-plane schema builder APIs." },
       { name: "Admin Entries", description: "Control-plane content entry management APIs." },
@@ -94,6 +98,7 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
       { name: "Admin Settings", description: "Control-plane settings including Swagger/OpenAPI visibility." },
       { name: "Admin Webhooks", description: "Signed content change hook configuration and delivery logs." },
       { name: "Admin Realtime", description: "Realtime WebSocket configuration and session-token APIs." },
+      ] : []),
       { name: "System", description: "Service health and OpenAPI endpoints." },
     ],
     paths: {
@@ -111,8 +116,8 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
           responses: okResponse({ type: "object" }),
         },
       },
-      ...adminPaths(),
-      ...Object.fromEntries(schemas.flatMap((schema) => contentPaths(schema))),
+      ...(settings.adminEnabled ? adminPaths() : {}),
+      ...(settings.contentEnabled ? Object.fromEntries(schemas.flatMap((schema) => contentPaths(schema))) : {}),
     },
     components: {
       securitySchemes: {
@@ -697,8 +702,11 @@ function adminSchemaComponents(): Record<string, OpenApiSchema> {
     },
     ApiDocsSettingsRequest: {
       type: "object",
-      properties: { enabled: { type: "boolean", example: true } },
-      required: ["enabled"],
+      properties: {
+        adminEnabled: { type: "boolean", example: false },
+        contentEnabled: { type: "boolean", example: true },
+      },
+      required: ["adminEnabled", "contentEnabled"],
     },
     ApiDocsSettingsResponse: {
       type: "object",
@@ -707,10 +715,11 @@ function adminSchemaComponents(): Record<string, OpenApiSchema> {
         settings: {
           type: "object",
           properties: {
-            enabled: { type: "boolean" },
+            adminEnabled: { type: "boolean" },
+            contentEnabled: { type: "boolean" },
             updatedAt: { type: "string", format: "date-time", nullable: true },
           },
-          required: ["enabled", "updatedAt"],
+          required: ["adminEnabled", "contentEnabled", "updatedAt"],
         },
       },
       required: ["ok", "settings"],
@@ -925,8 +934,9 @@ function okResponse(schema: OpenApiSchema): OpenApiSchema {
   };
 }
 
-async function apiDocsEnabled(database: ApiagexDatabase): Promise<boolean> {
-  return (await getApiDocsSettings(database)).enabled;
+async function anyApiDocsEnabled(database: ApiagexDatabase): Promise<boolean> {
+  const settings = await getApiDocsSettings(database);
+  return settings.adminEnabled || settings.contentEnabled;
 }
 
 function sendApiDocsDisabled(reply: FastifyReply): FastifyReply {

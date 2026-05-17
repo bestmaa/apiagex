@@ -11,9 +11,9 @@ const apiDocsSettingId = "api_docs";
 
 export async function getApiDocsSettings(db: ApiagexDatabase): Promise<ApiDocsSettingsRecord> {
   const row = await getAppSetting(db, apiDocsSettingId);
-  if (!row) return { enabled: false, updatedAt: null };
+  if (!row) return { adminEnabled: false, contentEnabled: false, updatedAt: null };
   return {
-    enabled: parseEnabled(row.valueJson),
+    ...parseSettings(row.valueJson),
     updatedAt: row.updatedAt,
   };
 }
@@ -23,7 +23,10 @@ export async function setApiDocsSettings(
   input: SetApiDocsSettingsInput,
 ): Promise<ApiDocsSettingsRecord> {
   const now = new Date().toISOString();
-  const valueJson = JSON.stringify({ enabled: Boolean(input.enabled) });
+  const valueJson = JSON.stringify({
+    adminEnabled: Boolean(input.adminEnabled),
+    contentEnabled: Boolean(input.contentEnabled),
+  });
   const existing = await getAppSetting(db, apiDocsSettingId);
   if (existing) {
     await db.prepare("UPDATE app_settings SET value_json = ?, updated_at = ? WHERE id = ?")
@@ -41,11 +44,19 @@ async function getAppSetting(db: ApiagexDatabase, id: string): Promise<AppSettin
     .get<AppSettingRow>(id);
 }
 
-function parseEnabled(valueJson: string): boolean {
+function parseSettings(valueJson: string): Pick<ApiDocsSettingsRecord, "adminEnabled" | "contentEnabled"> {
   try {
-    const value = JSON.parse(valueJson) as { enabled?: unknown };
-    return value.enabled === true;
+    const value = JSON.parse(valueJson) as {
+      adminEnabled?: unknown;
+      contentEnabled?: unknown;
+      enabled?: unknown;
+    };
+    const legacyEnabled = value.enabled === true;
+    return {
+      adminEnabled: value.adminEnabled === true || legacyEnabled,
+      contentEnabled: value.contentEnabled === true || legacyEnabled,
+    };
   } catch {
-    return false;
+    return { adminEnabled: false, contentEnabled: false };
   }
 }

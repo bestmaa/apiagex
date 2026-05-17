@@ -1,7 +1,8 @@
 import type { ApiagexDatabase } from "@apiagex/database";
 
 export type ApiDocsSettingsRecord = {
-  enabled: boolean;
+  adminEnabled: boolean;
+  contentEnabled: boolean;
   updatedAt: string | null;
 };
 
@@ -12,17 +13,20 @@ export async function getApiDocsSettings(database: ApiagexDatabase): Promise<Api
   const row = await database
     .prepare("SELECT value_json as valueJson, updated_at as updatedAt FROM app_settings WHERE id = ?")
     .get<{ valueJson: string; updatedAt: string }>(apiDocsSettingId);
-  if (!row) return { enabled: false, updatedAt: null };
-  return { enabled: parseEnabled(row.valueJson), updatedAt: row.updatedAt };
+  if (!row) return { adminEnabled: false, contentEnabled: false, updatedAt: null };
+  return { ...parseSettings(row.valueJson), updatedAt: row.updatedAt };
 }
 
 export async function setApiDocsSettings(
   database: ApiagexDatabase,
-  enabled: boolean,
+  input: { adminEnabled: boolean; contentEnabled: boolean },
 ): Promise<ApiDocsSettingsRecord> {
   await ensureApiDocsSettingsTable(database);
   const now = new Date().toISOString();
-  const valueJson = JSON.stringify({ enabled });
+  const valueJson = JSON.stringify({
+    adminEnabled: Boolean(input.adminEnabled),
+    contentEnabled: Boolean(input.contentEnabled),
+  });
   const existing = await database
     .prepare("SELECT id FROM app_settings WHERE id = ?")
     .get<{ id: string }>(apiDocsSettingId);
@@ -44,10 +48,19 @@ async function ensureApiDocsSettingsTable(database: ApiagexDatabase): Promise<vo
   await database.exec("CREATE TABLE IF NOT EXISTS app_settings (id TEXT PRIMARY KEY, value_json TEXT NOT NULL, updated_at TEXT NOT NULL)");
 }
 
-function parseEnabled(valueJson: string): boolean {
+function parseSettings(valueJson: string): Pick<ApiDocsSettingsRecord, "adminEnabled" | "contentEnabled"> {
   try {
-    return (JSON.parse(valueJson) as { enabled?: unknown }).enabled === true;
+    const value = JSON.parse(valueJson) as {
+      adminEnabled?: unknown;
+      contentEnabled?: unknown;
+      enabled?: unknown;
+    };
+    const legacyEnabled = value.enabled === true;
+    return {
+      adminEnabled: value.adminEnabled === true || legacyEnabled,
+      contentEnabled: value.contentEnabled === true || legacyEnabled,
+    };
   } catch {
-    return false;
+    return { adminEnabled: false, contentEnabled: false };
   }
 }

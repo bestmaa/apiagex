@@ -5,7 +5,7 @@ import { createServer } from "../src/app.js";
 describe("OpenAPI and Swagger routes", () => {
   it("generates dynamic OpenAPI paths and schemas from content schemas", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
-    await enableApiDocs(server);
+    await enableApiDocs(server, { adminEnabled: true, contentEnabled: true });
     await server.inject({
       method: "POST",
       url: "/api/admin/schemas",
@@ -48,6 +48,48 @@ describe("OpenAPI and Swagger routes", () => {
     });
   });
 
+  it("can expose only content API docs", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+    await enableApiDocs(server, { adminEnabled: false, contentEnabled: true });
+    await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Article",
+        slug: "article",
+        fields: [{ name: "Title", slug: "title", type: "text" }],
+      },
+    });
+
+    const response = await server.inject({ method: "GET", url: "/api/openapi.json" });
+    const spec = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(spec.paths["/api/content/article"]).toBeDefined();
+    expect(spec.paths["/api/admin/schemas"]).toBeUndefined();
+  });
+
+  it("can expose only admin API docs", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+    await enableApiDocs(server, { adminEnabled: true, contentEnabled: false });
+    await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Article",
+        slug: "article",
+        fields: [{ name: "Title", slug: "title", type: "text" }],
+      },
+    });
+
+    const response = await server.inject({ method: "GET", url: "/api/openapi.json" });
+    const spec = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(spec.paths["/api/admin/schemas"]).toBeDefined();
+    expect(spec.paths["/api/content/article"]).toBeUndefined();
+  });
+
   it("hides OpenAPI and Swagger until API docs are enabled", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
 
@@ -62,7 +104,7 @@ describe("OpenAPI and Swagger routes", () => {
 
   it("serves Swagger UI shell for generated OpenAPI docs", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
-    await enableApiDocs(server);
+    await enableApiDocs(server, { adminEnabled: true, contentEnabled: true });
 
     const swagger = await server.inject({ method: "GET", url: "/swagger" });
     const apiDocs = await server.inject({ method: "GET", url: "/api/docs" });
@@ -76,10 +118,13 @@ describe("OpenAPI and Swagger routes", () => {
   });
 });
 
-async function enableApiDocs(server: ReturnType<typeof createServer>): Promise<void> {
+async function enableApiDocs(
+  server: ReturnType<typeof createServer>,
+  payload: { adminEnabled: boolean; contentEnabled: boolean },
+): Promise<void> {
   await server.inject({
     method: "PUT",
     url: "/api/admin/settings/api-docs",
-    payload: { enabled: true },
+    payload,
   });
 }

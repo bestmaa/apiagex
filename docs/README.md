@@ -31,8 +31,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `/doc` aur `/readme` current MVP status English aur Hinglish me dikhate hain.
 - `/adminui` renders the MVP navigation shell: Dashboard, Schemas, Entries, APIs, Users, Settings, Docs.
 - `/adminui` MVP navigation shell dikhata hai: Dashboard, Schemas, Entries, APIs, Users, Settings, Docs.
-- Settings > API Docs controls whether `/swagger`, `/api/swagger`, `/api/docs`, and `/api/openapi.json` are visible.
-- Settings > API Docs control karta hai ki `/swagger`, `/api/swagger`, `/api/docs`, aur `/api/openapi.json` visible honge ya disabled.
+- Settings > API Docs separately controls generated Content API docs and Admin/control-plane API docs.
+- Settings > API Docs generated Content API docs aur Admin/control-plane API docs ko alag-alag control karta hai.
 - Base path checkpoint verifies `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 - Base path checkpoint `/api`, `/api/health`, `/doc`, `/readme`, aur `/adminui` verify karta hai.
 - SQLite foundation has MVP tables: migrations, roles, users, schemas, fields, entries, permissions.

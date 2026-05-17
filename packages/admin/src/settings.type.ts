@@ -33,7 +33,8 @@ export type AdminPermissionDraft = {
 };
 
 export type ApiDocsSettingsRecord = {
-  enabled: boolean;
+  adminEnabled: boolean;
+  contentEnabled: boolean;
   updatedAt: string | null;
 };
 

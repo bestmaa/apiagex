@@ -286,11 +286,11 @@ export async function getApiDocsSettings(): Promise<ApiDocsSettingsResponse> {
   return adminJson<ApiDocsSettingsResponse>("/api/admin/settings/api-docs");
 }
 
-export async function saveApiDocsSettings(enabled: boolean): Promise<ApiDocsSettingsResponse> {
+export async function saveApiDocsSettings(input: { adminEnabled: boolean; contentEnabled: boolean }): Promise<ApiDocsSettingsResponse> {
   return adminJson<ApiDocsSettingsResponse>("/api/admin/settings/api-docs", {
     method: "PUT",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ enabled }),
+    body: JSON.stringify(input),
   });
 }
 
