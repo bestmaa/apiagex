@@ -39,6 +39,21 @@ describe("permission repository", () => {
     expect(await canRoleAccess(db, role.id, schema.id, "get")).toBe(false);
   });
 
+  it("keeps realtime subscribe permission separate from list reads", async () => {
+    const db = openMigratedSqliteAdapter();
+    const role = await createRole(db, { name: "live-reader" });
+    const schema = await createSchema(db, {
+      name: "Article",
+      slug: "article",
+      fields: [{ name: "Title", slug: "title", type: "text" }],
+    });
+
+    await setPermission(db, { roleId: role.id, schemaId: schema.id, action: "realtime", allowed: true });
+
+    expect(await canRoleAccess(db, role.id, schema.id, "realtime")).toBe(true);
+    expect(await canRoleAccess(db, role.id, schema.id, "getAll")).toBe(false);
+  });
+
   it("lets manage allow all actions for a schema", async () => {
     const db = openMigratedSqliteAdapter();
     const role = await createRole(db, { name: "manager" });
@@ -54,6 +69,7 @@ describe("permission repository", () => {
     expect(await canRoleAccess(db, role.id, schema.id, "get")).toBe(true);
     expect(await canRoleAccess(db, role.id, schema.id, "create")).toBe(true);
     expect(await canRoleAccess(db, role.id, schema.id, "delete")).toBe(true);
+    expect(await canRoleAccess(db, role.id, schema.id, "realtime")).toBe(true);
   });
 
   it("blocks admin roles from content API permissions", async () => {

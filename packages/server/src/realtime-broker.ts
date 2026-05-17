@@ -144,12 +144,17 @@ export function createRealtimeBroker(database: ApiagexDatabase): RealtimeBroker 
     if (token) {
       const apiToken = await resolveApiToken(database, token);
       if (!apiToken) return { allowed: false, error: "API_TOKEN_INVALID" };
-      return { allowed: await canRoleAccess(database, apiToken.roleId, schemaId, "getAll") };
+      return { allowed: await canRealtimeSubscribe(apiToken.roleId, schemaId) };
     }
     const roleId = url.searchParams.get("roleId")?.trim();
-    if (roleId) return { allowed: await canRoleAccess(database, roleId, schemaId, "getAll") };
+    if (roleId) return { allowed: await canRealtimeSubscribe(roleId, schemaId) };
     const publicRole = (await listRoles(database)).find((role) => role.name === "public");
-    return { allowed: publicRole ? await canRoleAccess(database, publicRole.id, schemaId, "getAll") : false };
+    return { allowed: publicRole ? await canRealtimeSubscribe(publicRole.id, schemaId) : false };
+  }
+
+  async function canRealtimeSubscribe(roleId: string, schemaId: string): Promise<boolean> {
+    return (await canRoleAccess(database, roleId, schemaId, "realtime"))
+      || (await canRoleAccess(database, roleId, schemaId, "getAll"));
   }
 
   function handleMessage(ws: WebSocket, state: ClientState, text: string): void {

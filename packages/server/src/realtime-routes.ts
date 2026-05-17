@@ -56,7 +56,7 @@ export function registerRealtimeRoutes(
     if (!schema) return reply.code(404).send({ ok: false, error: "SCHEMA_NOT_FOUND" });
     const apiToken = await resolveApiToken(database, bearerToken(request.headers.authorization));
     if (!apiToken) return reply.code(401).send({ ok: false, error: "API_TOKEN_INVALID" });
-    if (!(await canRoleAccess(database, apiToken.roleId, schema.id, "getAll"))) {
+    if (!(await canRealtimeSubscribe(database, apiToken.roleId, schema.id))) {
       return reply.code(403).send({ ok: false, error: "API_PERMISSION_DENIED" });
     }
     const input = {
@@ -78,4 +78,13 @@ function sendRealtimeError(reply: FastifyReply, error: unknown): FastifyReply {
 function bearerToken(authorization: string | string[] | undefined): string {
   if (typeof authorization !== "string" || !authorization.toLowerCase().startsWith("bearer ")) return "";
   return authorization.slice(7).trim();
+}
+
+async function canRealtimeSubscribe(
+  database: ApiagexDatabase,
+  roleId: string,
+  schemaId: string,
+): Promise<boolean> {
+  return (await canRoleAccess(database, roleId, schemaId, "realtime"))
+    || (await canRoleAccess(database, roleId, schemaId, "getAll"));
 }

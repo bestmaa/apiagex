@@ -53,7 +53,7 @@ The admin backup export route lives at `/admin/backups/export`, restore lives at
 
 Generated content APIs now support opt-in realtime settings per schema. When enabled, a trusted backend creates a one-time WebSocket session with `POST /api/realtime/session`, returns only the `rt_` token to the browser, then the browser connects to `/api/realtime?schema=:schemaSlug&session=rt_...` for the enabled create/update/delete actions and reconnects with a fresh session plus `lastEventId=EVENT_ID` to replay missed schema events.
 
-Realtime sessions require a content API token whose role has `getAll` on the schema. Session tokens default to 5 minutes, can be used once, and are checked only while accepting a new socket. Existing `token=API_TOKEN` and `roleId=ROLE_ID` WebSocket query modes remain for development compatibility.
+Realtime sessions require a content API token whose role has `realtime` on the schema. `getAll` remains accepted as a backward-compatible realtime fallback. Session tokens default to 5 minutes, can be used once, and are checked only while accepting a new socket. Existing `token=API_TOKEN` and `roleId=ROLE_ID` WebSocket query modes remain for development compatibility.
 
 Realtime history keeps the latest 1000 events per schema for replay and prunes older rows after new events are recorded.
 
@@ -157,7 +157,7 @@ Admin backup export route `/admin/backups/export` par hai, restore `/admin/backu
 
 Generated content APIs me ab per schema opt-in realtime settings support hai. Enable hone par trusted backend pehle `POST /api/realtime/session` se one-time WebSocket session create karta hai, browser ko sirf `rt_` token return karta hai, phir browser `/api/realtime?schema=:schemaSlug&session=rt_...` par enabled create/update/delete actions receive karta hai aur missed schema events replay karne ke liye fresh session plus `lastEventId=EVENT_ID` ke saath reconnect karta hai.
 
-Realtime session ke liye content API token chahiye jiske role ke paas schema par `getAll` ho. Session token default 5 minute valid hota hai, one-time use hota hai, aur sirf naya socket accept karte waqt check hota hai. Existing `token=API_TOKEN` aur `roleId=ROLE_ID` WebSocket query modes development compatibility ke liye abhi supported hain.
+Realtime session ke liye content API token chahiye jiske role ke paas schema par `realtime` ho. `getAll` backward-compatible realtime fallback ke roop me abhi accepted hai. Session token default 5 minute valid hota hai, one-time use hota hai, aur sirf naya socket accept karte waqt check hota hai. Existing `token=API_TOKEN` aur `roleId=ROLE_ID` WebSocket query modes development compatibility ke liye abhi supported hain.
 
 Realtime history replay ke liye har schema ke latest 1000 events rakhti hai aur naye events record hone ke baad purane rows prune karti hai.
 

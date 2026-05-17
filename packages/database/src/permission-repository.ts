@@ -10,7 +10,7 @@ import { getSchemaById } from "./schema-repository.js";
 
 type PermissionRow = Omit<PermissionRecord, "allowed"> & { allowed: number };
 
-const permissionActions: PermissionAction[] = ["getAll", "get", "create", "update", "delete", "manage"];
+const permissionActions: PermissionAction[] = ["getAll", "get", "create", "update", "delete", "realtime", "manage"];
 
 export async function setPermission(
   db: ApiagexDatabase,

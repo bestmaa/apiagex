@@ -1,6 +1,6 @@
 import type { SchemaRecord } from "./schema.type";
 
-export type PermissionAction = "getAll" | "get" | "create" | "update" | "delete" | "manage";
+export type PermissionAction = "getAll" | "get" | "create" | "update" | "delete" | "realtime" | "manage";
 
 export type RoleKind = "admin" | "api";
 

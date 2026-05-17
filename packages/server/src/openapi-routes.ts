@@ -464,7 +464,7 @@ function adminPaths(): Record<string, OpenApiSchema> {
       post: {
         tags: ["Admin Realtime"],
         summary: "Create a one-time browser WebSocket session token",
-        description: "Requires a content API token with getAll permission for the schema.",
+        description: "Requires a content API token with realtime permission for the schema. getAll is accepted for backward compatibility.",
         security: apiTokenSecurity(),
         requestBody: requestBody("RealtimeSessionRequest"),
         responses: okResponse({ type: "object" }),
@@ -656,7 +656,7 @@ function adminSchemaComponents(): Record<string, OpenApiSchema> {
       },
       required: ["ok", "role"],
     },
-    PermissionSaveRequest: permissionSaveSchema(["getAll", "get", "create", "update", "delete"]),
+    PermissionSaveRequest: permissionSaveSchema(["getAll", "get", "create", "update", "delete", "realtime", "manage"]),
     AdminPermissionSaveRequest: permissionSaveSchema(["schemas", "entries", "apiRoles", "apiUsers", "settings"]),
     PermissionListResponse: permissionListSchema(),
     AdminPermissionListResponse: permissionListSchema(),

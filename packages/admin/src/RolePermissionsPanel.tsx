@@ -13,6 +13,7 @@ export const permissionActions: PermissionAction[] = [
   "create",
   "update",
   "delete",
+  "realtime",
   "manage",
 ];
 
@@ -22,6 +23,7 @@ const actionHelp = {
   get: "GET one entry",
   getAll: "GET list",
   manage: "Allow all actions",
+  realtime: "WebSocket subscribe",
   update: "PATCH/PUT entry",
 } satisfies Record<PermissionAction, string>;
 
@@ -74,7 +76,7 @@ export function PermissionGrid(props: {
         <fieldset className="permission-card" key={schema.id}>
           <legend>{schema.name}</legend>
           <code>/api/content/{schema.slug}</code>
-          <p className="permission-help">getAll = list API, get = one entry API, manage = all actions for this API.</p>
+          <p className="permission-help">getAll = list API, get = one entry API, realtime = WebSocket subscribe, manage = all actions for this API.</p>
           {permissionActions.map((action) => (
             <PermissionToggle
               action={action}

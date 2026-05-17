@@ -129,7 +129,7 @@ describe("realtime WebSocket APIs", () => {
     await server.close();
   });
 
-  it("rejects disabled schemas and roles without getAll permission", async () => {
+  it("rejects disabled schemas and roles without realtime or getAll permission", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
     await server.listen({ host: "127.0.0.1", port: 0 });
@@ -190,7 +190,57 @@ describe("realtime WebSocket APIs", () => {
     await server.close();
   });
 
-  it("rejects realtime session creation without getAll permission", async () => {
+  it("creates realtime sessions with realtime permission without list access", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+    const role = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "live-only" } });
+    await server.inject({
+      method: "PUT",
+      url: `/api/admin/roles/${role.json().role.id}/permissions`,
+      payload: { permissions: [{ action: "realtime", allowed: true, schemaId }] },
+    });
+    const token = await server.inject({ method: "POST", url: `/api/admin/roles/${role.json().role.id}/tokens`, payload: { name: "Realtime client" } });
+
+    const session = await server.inject({
+      method: "POST",
+      url: "/api/realtime/session",
+      headers: { authorization: `Bearer ${token.json().token}` },
+      payload: { schema: "article" },
+    });
+    const list = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { authorization: `Bearer ${token.json().token}` },
+    });
+
+    expect(session.statusCode).toBe(200);
+    expect(session.json().token).toMatch(/^rt_/);
+    expect(list.statusCode).toBe(403);
+  });
+
+  it("keeps getAll as a backward-compatible realtime fallback", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+    const role = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "legacy-live" } });
+    await server.inject({
+      method: "PUT",
+      url: `/api/admin/roles/${role.json().role.id}/permissions`,
+      payload: { permissions: [{ action: "getAll", allowed: true, schemaId }] },
+    });
+    const token = await server.inject({ method: "POST", url: `/api/admin/roles/${role.json().role.id}/tokens`, payload: { name: "Realtime client" } });
+
+    const session = await server.inject({
+      method: "POST",
+      url: "/api/realtime/session",
+      headers: { authorization: `Bearer ${token.json().token}` },
+      payload: { schema: "article" },
+    });
+
+    expect(session.statusCode).toBe(200);
+    expect(session.json().token).toMatch(/^rt_/);
+  });
+
+  it("rejects realtime session creation without realtime or getAll permission", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await createArticleSchema(server);
     const role = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "no-session" } });
@@ -212,7 +262,7 @@ async function createArticleSchema(server: ReturnType<typeof createServer>): Pro
   return response.json().schema.id as string;
 }
 
-type ApiAction = "getAll" | "get" | "create" | "update" | "delete" | "manage";
+type ApiAction = "getAll" | "get" | "create" | "update" | "delete" | "realtime" | "manage";
 
 async function allowPublicActions(
   server: ReturnType<typeof createServer>,

@@ -57,6 +57,7 @@ describe("ApiPermissionManager", () => {
 
     expect(container.textContent).toContain("All generated content APIs are blocked by default");
     expect(container.textContent).toContain("public - open/no token");
+    expect(container.textContent).toContain("realtime = WebSocket subscribe");
     expect(container.textContent).toContain("Allowed public actions are reachable without Authorization headers");
     expect(listRolePermissions).toHaveBeenCalledWith("role_public");
   });

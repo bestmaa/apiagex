@@ -189,9 +189,9 @@ Hinglish: Har schema /api/content/:schemaSlug create karta hai. Entry data { "da
 
 ## Access control
 
-English: Content API roles are separate from Admin UI roles. Give getAll, get, create, update, delete, or manage per schema.
+English: Content API roles are separate from Admin UI roles. Give getAll, get, create, update, delete, realtime, or manage per schema.
 
-Hinglish: Content API roles Admin UI roles se alag hain. Har schema ke liye getAll, get, create, update, delete, ya manage do.
+Hinglish: Content API roles Admin UI roles se alag hain. Har schema ke liye getAll, get, create, update, delete, realtime, ya manage do.
 
 ## Webhooks and Realtime
 

@@ -86,12 +86,13 @@ describe("role admin APIs", () => {
         permissions: [
           { schemaId: schema.json().schema.id, action: "getAll", allowed: true },
           { schemaId: schema.json().schema.id, action: "get", allowed: true },
+          { schemaId: schema.json().schema.id, action: "realtime", allowed: true },
         ],
       },
     });
 
     expect(save.statusCode).toBe(200);
-    expect(save.json().permissions).toHaveLength(2);
+    expect(save.json().permissions).toHaveLength(3);
   });
 
   it("creates, lists, and revokes API role tokens", async () => {
