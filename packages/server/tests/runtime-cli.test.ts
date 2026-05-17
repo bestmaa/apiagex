@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { AddressInfo } from "node:net";
 import { mkdtemp } from "node:fs/promises";
 import { join } from "node:path";
@@ -22,7 +22,7 @@ describe("apiagex runtime CLI", () => {
     const result = await runRuntimeCli(["--version"]);
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("apiagex 0.8.9");
+    expect(result.stdout).toContain("apiagex 0.8.10");
   });
 
   it("runs a health smoke check without a long-running server", async () => {
@@ -69,5 +69,43 @@ describe("apiagex runtime CLI", () => {
     });
     expect(login.status).toBe(200);
     await server?.close();
+  });
+
+  it("prints a visible startup error when the port is already in use", async () => {
+    const firstRoot = await mkdtemp(join(tmpdir(), "apiagex-runtime-port-first-"));
+    const secondRoot = await mkdtemp(join(tmpdir(), "apiagex-runtime-port-second-"));
+    const server = await startApiagex({
+      cwd: firstRoot,
+      env: {
+        APIAGEX_DATABASE_PATH: "data/runtime.sqlite",
+        APIAGEX_UPLOADS_PATH: "uploads",
+      },
+      host: "127.0.0.1",
+      port: 0,
+    });
+    const port = (server?.server.address() as AddressInfo).port;
+    const previousExitCode = process.exitCode;
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    try {
+      const blocked = await startApiagex({
+        cwd: secondRoot,
+        env: {
+          APIAGEX_DATABASE_PATH: "data/runtime.sqlite",
+          APIAGEX_UPLOADS_PATH: "uploads",
+        },
+        host: "127.0.0.1",
+        port,
+      });
+
+      expect(blocked).toBeUndefined();
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining(`http://127.0.0.1:${port} is already in use`),
+      );
+    } finally {
+      process.exitCode = previousExitCode;
+      errorSpy.mockRestore();
+      await server?.close();
+    }
   });
 });

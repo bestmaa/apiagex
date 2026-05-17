@@ -9,7 +9,7 @@ import {
 } from "@apiagex/database";
 import type { RuntimeCliOptions, RuntimeCliResult, StartedApiagexServer, StartServerOptions } from "./runtime.type.js";
 
-const runtimeVersion = "0.8.9";
+const runtimeVersion = "0.8.10";
 
 export async function startApiagex(options: StartServerOptions = {}): Promise<StartedApiagexServer | undefined> {
   return startApiagexServer(options);
@@ -36,6 +36,7 @@ export async function startApiagexServer(options: StartServerOptions = {}): Prom
     return server;
   } catch (error) {
     server.log.error(error);
+    console.error(startupErrorMessage(host, port, error));
     process.exitCode = 1;
     return undefined;
   }
@@ -94,6 +95,15 @@ function databaseLocationLine(config: { databasePath: string; databaseProvider: 
   if (config.databaseProvider === "postgres") return "Apiagex database provider: postgres";
   if (config.databaseProvider === "mysql") return "Apiagex database provider: mysql";
   return `Apiagex database path: ${config.databasePath}`;
+}
+
+function startupErrorMessage(host: string, port: number, error: unknown): string {
+  const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+  const detail = error instanceof Error ? error.message : String(error);
+  if (code === "EADDRINUSE") {
+    return `Apiagex failed to start: http://${host}:${port} is already in use. Stop the other server or set PORT to another value.`;
+  }
+  return `Apiagex failed to start on http://${host}:${port}: ${detail}`;
 }
 
 async function bootstrapInitialOwner(database: ApiagexDatabase, owner: { email: string; password: string }): Promise<void> {
