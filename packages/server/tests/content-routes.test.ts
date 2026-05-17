@@ -17,6 +17,7 @@ describe("dynamic content APIs", () => {
     const entry = create.json().entry as { id: string };
 
     const list = await server.inject({ method: "GET", url: "/api/content/article" });
+    expect(list.json()).toMatchObject({ limit: 50, offset: 0, total: 1 });
     expect(list.json().entries).toHaveLength(1);
 
     const read = await server.inject({ method: "GET", url: `/api/content/article/${entry.id}` });

@@ -6,7 +6,6 @@ import {
   getEntryById,
   getSchemaBySlug,
   listRoles,
-  listEntries,
   queryEntries,
   resolveApiToken,
   updateEntry,
@@ -40,11 +39,9 @@ export function registerContentRoutes(
       if (!schema) return reply;
       const access = await canAccess(database, request, schema, "getAll");
       if (!access.allowed) return forbidden(reply, access.error);
-      let result: { entries: EntryRecord[]; limit?: number; offset?: number; total?: number };
+      let result: { entries: EntryRecord[]; limit: number; offset: number; total: number };
       try {
-        result = hasContentListQuery(request.query)
-          ? await queryEntries(database, schema.id, contentListOptions(request.query))
-          : { entries: await listEntries(database, schema.id) };
+        result = await queryEntries(database, schema.id, contentListOptions(request.query));
       } catch (error) {
         return sendContentError(reply, error, 400);
       }
@@ -213,10 +210,6 @@ function headerString(value: string | string[] | undefined): string | undefined 
 
 function forbidden(reply: FastifyReply, error = "API_PERMISSION_DENIED"): FastifyReply {
   return reply.code(403).send({ ok: false, error });
-}
-
-function hasContentListQuery(query: ContentPopulateQuery): boolean {
-  return Boolean(query.fields || query.limit || query.offset || query.search);
 }
 
 function contentListOptions(query: ContentPopulateQuery): EntryListOptions {
