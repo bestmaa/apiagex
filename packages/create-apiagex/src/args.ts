@@ -1,4 +1,4 @@
-import type { CliOptions, DatabaseProvider, PackageManager, SetupMode } from "./create-apiagex.type.js";
+import type { CliOptions, DatabaseProvider, PackageManager, ProjectLanguage, SetupMode } from "./create-apiagex.type.js";
 
 export function parseArgs(args: string[]): CliOptions | string {
   const options: CliOptions = { dryRun: false, help: false, version: false, yes: false };
@@ -14,6 +14,12 @@ export function parseArgs(args: string[]): CliOptions | string {
     else if (arg === "--no-git") options.initGit = false;
     else if (arg === "--owner") options.bootstrapOwner = true;
     else if (arg === "--no-owner") options.bootstrapOwner = false;
+    else if (arg === "--language") {
+      const value = args[index + 1];
+      if (!isProjectLanguage(value)) return "Use --language js or ts.";
+      options.language = value;
+      index += 1;
+    }
     else if (arg === "--database") {
       const value = args[index + 1];
       if (!isDatabaseProvider(value)) return "Use --database sqlite, postgres, or mysql.";
@@ -89,4 +95,8 @@ function isDatabaseProvider(value: string | undefined): value is DatabaseProvide
 
 function isSetupMode(value: string | undefined): value is SetupMode {
   return value === "quickstart" || value === "custom";
+}
+
+function isProjectLanguage(value: string | undefined): value is ProjectLanguage {
+  return value === "js" || value === "ts";
 }

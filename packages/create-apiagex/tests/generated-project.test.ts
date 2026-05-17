@@ -10,7 +10,7 @@ import { runRuntimeCli, startApiagexServer } from "../../server/src/runtime.js";
 describe("generated Apiagex project", () => {
   it("scaffolds and runs through the runtime CLI", async () => {
     const root = await mkdtemp(join(tmpdir(), "apiagex-generated-"));
-    const create = await runCli(["generated-cms", "--yes"], root);
+    const create = await runCli(["generated-cms", "--yes", "--language", "js"], root);
     expect(create.code).toBe(0);
 
     const projectDir = join(root, "generated-cms");
@@ -47,6 +47,24 @@ describe("generated Apiagex project", () => {
     await expectText(`http://127.0.0.1:${port}/doc`, "Apiagex Docs");
     await expectText(`http://127.0.0.1:${port}/readme`, "Apiagex Readme");
     await server?.close();
+  });
+
+  it("scaffolds TypeScript custom routes with exported Apiagex route types", async () => {
+    const root = await mkdtemp(join(tmpdir(), "apiagex-generated-ts-"));
+    const create = await runCli(["typed-cms", "--yes"], root);
+    expect(create.code).toBe(0);
+
+    const projectDir = join(root, "typed-cms");
+    const packageJson = await readFile(join(projectDir, "package.json"), "utf8");
+    expect(packageJson).toContain('"dev": "node --env-file=.env --import tsx src/index.ts"');
+    expect(packageJson).toContain('"build": "tsc"');
+    expect(packageJson).toContain('"typescript"');
+    expect(await readFile(join(projectDir, "tsconfig.json"), "utf8")).toContain('"strict": true');
+    expect(await readFile(join(projectDir, "src/index.ts"), "utf8")).toContain("startApiagex");
+    const customRoutes = await readFile(join(projectDir, "src/custom-routes.ts"), "utf8");
+    expect(customRoutes).toContain("RegisterApiagexCustomRoutes");
+    expect(customRoutes).toContain("type OrderData");
+    expect(customRoutes).toContain("app.post<{ Params: PayOrderParams }>");
   });
 });
 

@@ -27,6 +27,8 @@ describe("create-apiagex CLI", () => {
       "--dry-run",
       "--package-manager",
       "pnpm",
+      "--language",
+      "ts",
       "--setup",
       "custom",
       "--install",
@@ -42,6 +44,7 @@ describe("create-apiagex CLI", () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("Dry run only");
     expect(result.stdout).toContain("Package manager: pnpm");
+    expect(result.stdout).toContain("Language: TypeScript");
     expect(result.stdout).toContain("Setup mode: custom");
     expect(result.stdout).toContain("SQLite path: data/custom.sqlite");
     expect(result.stdout).toContain("Server: http://0.0.0.0:5050");
@@ -51,7 +54,7 @@ describe("create-apiagex CLI", () => {
 
   it("prompts for setup answers when interactive", async () => {
     const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
-    const answers = ["prompt-cms", "custom", "sqlite", "data/prompt.sqlite", "0.0.0.0", "5050", "yarn", "yes", "owner@example.com", "OwnerPass123!", "no", "yes"];
+    const answers = ["prompt-cms", "ts", "custom", "sqlite", "data/prompt.sqlite", "0.0.0.0", "5050", "yarn", "yes", "owner@example.com", "OwnerPass123!", "no", "yes"];
     const result = await runCli(["--dry-run"], root, {
       interactive: true,
       prompt: async () => answers.shift() ?? "",
@@ -63,6 +66,7 @@ describe("create-apiagex CLI", () => {
     expect(result.stdout).toContain("SQLite path: data/prompt.sqlite");
     expect(result.stdout).toContain("Server: http://0.0.0.0:5050");
     expect(result.stdout).toContain("Package manager: yarn");
+    expect(result.stdout).toContain("Language: TypeScript");
     expect(result.stdout).toContain("Install dependencies: yes");
     expect(result.stdout).toContain("Initialize git: no");
     expect(result.stdout).toContain("Owner setup: create from .env on first start");
@@ -85,20 +89,36 @@ describe("create-apiagex CLI", () => {
     const result = await runCli(["my-cms"], root);
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("Created 9 files");
+    expect(result.stdout).toContain("Created 10 files");
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"name": "my-cms"');
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"@apiagex/server"');
-    await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"dev": "node --env-file=.env src/index.js"');
+    await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"dev": "node --env-file=.env --import tsx src/index.ts"');
+    await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"typescript"');
     await expect(readFile(join(root, "my-cms", ".env"), "utf8")).resolves.toContain("APIAGEX_SECRET=");
     await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.toContain("APIAGEX_DATABASE_PATH");
     await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"setupMode"');
-    await expect(readFile(join(root, "my-cms", "src/index.js"), "utf8")).resolves.toContain("startApiagex");
-    await expect(readFile(join(root, "my-cms", "src/index.js"), "utf8")).resolves.toContain("registerCustomRoutes");
-    await expect(readFile(join(root, "my-cms", "src/custom-routes.js"), "utf8")).resolves.toContain("/api/custom/orders/:entryId/pay");
+    await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"language": "ts"');
+    await expect(readFile(join(root, "my-cms", "tsconfig.json"), "utf8")).resolves.toContain('"strict": true');
+    await expect(readFile(join(root, "my-cms", "src/index.ts"), "utf8")).resolves.toContain("startApiagex");
+    await expect(readFile(join(root, "my-cms", "src/index.ts"), "utf8")).resolves.toContain("registerCustomRoutes");
+    await expect(readFile(join(root, "my-cms", "src/custom-routes.ts"), "utf8")).resolves.toContain("/api/custom/orders/:entryId/pay");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("Practical flow");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("REALTIME_SESSION_INVALID");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("many-to-many");
     await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("Webhooks and Realtime");
+  });
+
+  it("can create a JavaScript starter when requested", async () => {
+    const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
+    const result = await runCli(["js-cms", "--language", "js"], root);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Language: JavaScript");
+    expect(result.stdout).toContain("Created 9 files");
+    await expect(readFile(join(root, "js-cms", "package.json"), "utf8")).resolves.toContain('"dev": "node --env-file=.env src/index.js"');
+    await expect(readFile(join(root, "js-cms", "src/index.js"), "utf8")).resolves.toContain("startApiagex");
+    await expect(readFile(join(root, "js-cms", "src/custom-routes.js"), "utf8")).resolves.toContain("/api/custom/health");
+    await expect(readFile(join(root, "js-cms", "tsconfig.json"), "utf8")).rejects.toThrow();
   });
 
   it("creates PostgreSQL scaffold files with database URL env", async () => {
@@ -149,6 +169,7 @@ describe("create-apiagex CLI", () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("Setup mode: quickstart");
     expect(result.stdout).toContain("Database: sqlite");
+    expect(result.stdout).toContain("Language: TypeScript");
     expect(result.stdout).toContain("Package manager: npm");
     expect(result.stdout).toContain("Install dependencies: no");
   });

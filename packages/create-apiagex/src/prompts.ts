@@ -13,6 +13,7 @@ export async function resolveAnswers(options: CliOptions, io: RunCliOptions = {}
   const canAsk = Boolean((io.interactive || io.prompt) && !options.yes);
   const target = options.target ?? (canAsk ? await ask(prompt, "Project name", "my-apiagex") : undefined);
   if (!target) return "Target folder is required. Run create-apiagex --help for usage.";
+  const language = options.language ?? await choiceAnswer(prompt, canAsk, "Project language", "ts", ["ts", "js"]);
   const setupMode = options.setupMode ?? await choiceAnswer(prompt, canAsk, "Setup mode", "quickstart", ["quickstart", "custom"]);
   const databaseProvider = options.databaseProvider ?? await choiceAnswer(
     prompt,
@@ -45,6 +46,7 @@ export async function resolveAnswers(options: CliOptions, io: RunCliOptions = {}
     host,
     initGit: await boolAnswer(prompt, canAsk, "Initialize git repository?", options.initGit, true),
     installDependencies: await boolAnswer(prompt, canAsk, "Install dependencies after scaffold?", options.installDependencies, false),
+    language,
     ...(ownerEmail === undefined ? {} : { ownerEmail }),
     ...(ownerPassword === undefined ? {} : { ownerPassword }),
     packageManager,

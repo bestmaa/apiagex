@@ -1,28 +1,12 @@
 import type { ScaffoldAnswers, ScaffoldFile } from "./create-apiagex.type.js";
 
 export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
-  return [
+  const isTypeScript = answers.language === "ts";
+  const sourceExtension = isTypeScript ? "ts" : "js";
+  const files: ScaffoldFile[] = [
     {
       path: "package.json",
-      content: `${JSON.stringify(
-        {
-          name: answers.target,
-          version: "0.1.0",
-          private: true,
-          type: "module",
-          scripts: {
-            dev: "node --env-file=.env src/index.js",
-            start: "node --env-file=.env src/index.js",
-            build: "apiagex build",
-            smoke: "apiagex smoke",
-          },
-          dependencies: {
-            "@apiagex/server": "^0.8.10",
-          },
-        },
-        null,
-        2,
-      )}\n`,
+      content: packageJsonFile(answers),
     },
     {
       path: "README.md",
@@ -47,6 +31,7 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
           database: databaseConfig(answers),
           project: {
             appSecretEnv: "APIAGEX_SECRET",
+            language: answers.language,
             packageManager: answers.packageManager,
             setupMode: answers.setupMode,
           },
@@ -57,18 +42,25 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
       )}\n`,
     },
     {
-      path: "src/index.js",
-      content: serverEntryFile(),
+      path: `src/index.${sourceExtension}`,
+      content: isTypeScript ? serverEntryFileTs() : serverEntryFileJs(),
     },
     {
-      path: "src/custom-routes.js",
-      content: customRoutesFile(),
+      path: `src/custom-routes.${sourceExtension}`,
+      content: isTypeScript ? customRoutesFileTs() : customRoutesFileJs(),
     },
     {
       path: "docs/README.md",
       content: docsReadme(),
     },
   ];
+  if (isTypeScript) {
+    files.splice(7, 0, {
+      path: "tsconfig.json",
+      content: tsconfigFile(),
+    });
+  }
+  return files;
 }
 
 export function renderPlan(projectName: string, targetDir: string, files: ScaffoldFile[], answers: ScaffoldAnswers, dryRun: boolean): string {
@@ -83,6 +75,7 @@ export function renderPlan(projectName: string, targetDir: string, files: Scaffo
     `- Database: ${answers.databaseProvider}`,
     databasePlanLine(answers),
     `- Server: http://${answers.host}:${answers.port}`,
+    `- Language: ${languageLabel(answers.language)}`,
     `- Package manager: ${answers.packageManager}`,
     `- Install dependencies: ${answers.installDependencies ? "yes" : "no"}`,
     `- Initialize git: ${answers.initGit ? "yes" : "no"}`,
@@ -122,8 +115,8 @@ If .env contains APIAGEX_OWNER_EMAIL and APIAGEX_OWNER_PASSWORD, the first owner
 
 ## Scripts
 
-- \`${runCommand(answers.packageManager, "dev")}\`: start src/index.js with .env.
-- \`${runCommand(answers.packageManager, "start")}\`: start src/index.js with .env.
+- \`${runCommand(answers.packageManager, "dev")}\`: start ${entrySourcePath(answers)} with .env.
+- \`${runCommand(answers.packageManager, "start")}\`: start ${answers.language === "ts" ? "dist/index.js" : "src/index.js"} with .env.
 - \`${runCommand(answers.packageManager, "smoke")}\`: verify the runtime health route.
 - \`${runCommand(answers.packageManager, "build")}\`: print runtime build guidance.
 
@@ -150,7 +143,7 @@ English:
 3. Create entries from Entries or call POST /api/content/article.
 4. Create Content Roles, save permissions, then create users or API tokens.
 5. Use Webhooks for external server notifications and Realtime API for live browser screens.
-6. Add business APIs in src/custom-routes.js when generated CRUD is not enough.
+6. Add business APIs in ${customRoutesSourcePath(answers)} when generated CRUD is not enough.
 
 Hinglish:
 
@@ -159,7 +152,7 @@ Hinglish:
 3. Entries screen se entry banao ya POST /api/content/article call karo.
 4. Content Roles banao, permissions save karo, phir users ya API tokens create karo.
 5. External server notifications ke liye Webhooks aur live browser screens ke liye Realtime API use karo.
-6. Generated CRUD enough nahi ho to src/custom-routes.js me business APIs add karo.
+6. Generated CRUD enough nahi ho to ${customRoutesSourcePath(answers)} me business APIs add karo.
 
 ## Common errors
 
@@ -209,10 +202,74 @@ Relation docs: /doc explains relation field types, entry payloads, populate quer
 
 ## Custom business APIs
 
-English: Use src/custom-routes.js for endpoints such as checkout, pay order, assign rider, or reports. Custom routes run on the same server and can use Apiagex helpers for schemas, entries, roles, realtime sessions, and the raw database.
+English: Use src/custom-routes.ts or src/custom-routes.js for endpoints such as checkout, pay order, assign rider, or reports. Custom routes run on the same server and can use Apiagex helpers for schemas, entries, roles, realtime sessions, and the raw database.
 
-Hinglish: Checkout, pay order, assign rider, ya reports jaise endpoints ke liye src/custom-routes.js use karo. Custom routes same server par run hote hain aur schemas, entries, roles, realtime sessions, aur raw database ke Apiagex helpers use kar sakte hain.
+Hinglish: Checkout, pay order, assign rider, ya reports jaise endpoints ke liye src/custom-routes.ts ya src/custom-routes.js use karo. Custom routes same server par run hote hain aur schemas, entries, roles, realtime sessions, aur raw database ke Apiagex helpers use kar sakte hain.
 `;
+}
+
+function packageJsonFile(answers: ScaffoldAnswers): string {
+  const isTypeScript = answers.language === "ts";
+  return `${JSON.stringify(
+    {
+      name: answers.target,
+      version: "0.1.0",
+      private: true,
+      type: "module",
+      scripts: isTypeScript
+        ? {
+            dev: "node --env-file=.env --import tsx src/index.ts",
+            start: "node --env-file=.env dist/index.js",
+            build: "tsc",
+            smoke: "apiagex smoke",
+          }
+        : {
+            dev: "node --env-file=.env src/index.js",
+            start: "node --env-file=.env src/index.js",
+            build: "apiagex build",
+            smoke: "apiagex smoke",
+          },
+      dependencies: {
+        "@apiagex/server": "^0.8.10",
+      },
+      ...(isTypeScript
+        ? {
+            devDependencies: {
+              "@types/node": "^24.10.1",
+              tsx: "^4.21.0",
+              typescript: "^5.9.3",
+            },
+          }
+        : {}),
+    },
+    null,
+    2,
+  )}\n`;
+}
+
+function tsconfigFile(): string {
+  return `${JSON.stringify(
+    {
+      compilerOptions: {
+        declaration: true,
+        esModuleInterop: true,
+        exactOptionalPropertyTypes: true,
+        forceConsistentCasingInFileNames: true,
+        module: "NodeNext",
+        moduleResolution: "NodeNext",
+        noUncheckedIndexedAccess: true,
+        outDir: "dist",
+        rootDir: "src",
+        skipLibCheck: true,
+        strict: true,
+        target: "ES2022",
+        types: ["node"],
+      },
+      include: ["src/**/*.ts"],
+    },
+    null,
+    2,
+  )}\n`;
 }
 
 function envFile(answers: ScaffoldAnswers, includeSecrets: boolean): string {
@@ -258,7 +315,19 @@ function defaultDatabaseUrl(provider: Exclude<ScaffoldAnswers["databaseProvider"
   return "mysql://apiagex:change-me@localhost:3306/apiagex";
 }
 
-function serverEntryFile(): string {
+function entrySourcePath(answers: ScaffoldAnswers): string {
+  return `src/index.${answers.language === "ts" ? "ts" : "js"}`;
+}
+
+function customRoutesSourcePath(answers: ScaffoldAnswers): string {
+  return `src/custom-routes.${answers.language === "ts" ? "ts" : "js"}`;
+}
+
+function languageLabel(language: ScaffoldAnswers["language"]): string {
+  return language === "ts" ? "TypeScript" : "JavaScript";
+}
+
+function serverEntryFileJs(): string {
   return `import { startApiagex } from "@apiagex/server";
 import { registerCustomRoutes } from "./custom-routes.js";
 
@@ -268,15 +337,33 @@ const ownerPassword = process.env.APIAGEX_OWNER_PASSWORD;
 await startApiagex({
   host: process.env.HOST ?? "127.0.0.1",
   port: Number(process.env.PORT ?? 4000),
-  initialOwner: ownerEmail && ownerPassword
-    ? { email: ownerEmail, password: ownerPassword }
-    : undefined,
+  ...(ownerEmail && ownerPassword
+    ? { initialOwner: { email: ownerEmail, password: ownerPassword } }
+    : {}),
   customRoutes: registerCustomRoutes,
 });
 `;
 }
 
-function customRoutesFile(): string {
+function serverEntryFileTs(): string {
+  return `import { startApiagex } from "@apiagex/server";
+import { registerCustomRoutes } from "./custom-routes.js";
+
+const ownerEmail = process.env.APIAGEX_OWNER_EMAIL;
+const ownerPassword = process.env.APIAGEX_OWNER_PASSWORD;
+
+await startApiagex({
+  host: process.env.HOST ?? "127.0.0.1",
+  port: Number(process.env.PORT ?? 4000),
+  ...(ownerEmail && ownerPassword
+    ? { initialOwner: { email: ownerEmail, password: ownerPassword } }
+    : {}),
+  customRoutes: registerCustomRoutes,
+});
+`;
+}
+
+function customRoutesFileJs(): string {
   return `export async function registerCustomRoutes(app, apiagex) {
   app.get("/api/custom/health", async () => ({
     ok: true,
@@ -303,6 +390,53 @@ function customRoutesFile(): string {
     };
   });
 }
+`;
+}
+
+function customRoutesFileTs(): string {
+  return `import type { ApiagexCustomRouteContext, RegisterApiagexCustomRoutes } from "@apiagex/server";
+
+type ApiagexEntry<TData> =
+  NonNullable<Awaited<ReturnType<ApiagexCustomRouteContext["entries"]["getById"]>>> & {
+    data: TData;
+  };
+
+type OrderData = {
+  status: "pending" | "paid" | "cancelled";
+  paymentStatus?: "unpaid" | "paid";
+  total?: number;
+};
+
+type PayOrderParams = {
+  entryId: string;
+};
+
+export const registerCustomRoutes: RegisterApiagexCustomRoutes = async (app, apiagex) => {
+  app.get("/api/custom/health", async () => ({
+    ok: true,
+    service: "custom-api",
+  }));
+
+  app.get("/api/custom/schema-count", async () => ({
+    ok: true,
+    count: (await apiagex.schemas.list()).length,
+  }));
+
+  app.post<{ Params: PayOrderParams }>("/api/custom/orders/:entryId/pay", async (request, reply) => {
+    const entry = await apiagex.entries.getById(request.params.entryId) as ApiagexEntry<OrderData> | undefined;
+    if (!entry) return reply.code(404).send({ ok: false, error: "ORDER_NOT_FOUND" });
+    if (entry.data.status !== "pending") {
+      return reply.code(400).send({ ok: false, error: "ORDER_NOT_PAYABLE" });
+    }
+
+    return {
+      ok: true,
+      entry: await apiagex.entries.update(entry.id, {
+        data: { ...entry.data, status: "paid", paymentStatus: "paid" },
+      }),
+    };
+  });
+};
 `;
 }
 

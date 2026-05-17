@@ -55,6 +55,7 @@ Usage:
 
 Options:
   --setup quickstart|custom      Choose starter setup mode.
+  --language ts|js               Choose generated source language. Default ts.
   --database sqlite|postgres|mysql
                                 Choose database provider.
   --database-path <path>         Set the SQLite database path.

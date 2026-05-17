@@ -3,6 +3,7 @@ import type { Readable, Writable } from "node:stream";
 export type PackageManager = "npm" | "pnpm" | "yarn";
 export type SetupMode = "custom" | "quickstart";
 export type DatabaseProvider = "sqlite" | "postgres" | "mysql";
+export type ProjectLanguage = "js" | "ts";
 
 export type CliOptions = {
   appSecret?: string;
@@ -15,6 +16,7 @@ export type CliOptions = {
   host?: string;
   initGit?: boolean;
   installDependencies?: boolean;
+  language?: ProjectLanguage;
   ownerEmail?: string;
   ownerPassword?: string;
   packageManager?: PackageManager;
@@ -54,6 +56,7 @@ export type ScaffoldAnswers = {
   host: string;
   initGit: boolean;
   installDependencies: boolean;
+  language: ProjectLanguage;
   ownerEmail?: string;
   ownerPassword?: string;
   packageManager: PackageManager;
