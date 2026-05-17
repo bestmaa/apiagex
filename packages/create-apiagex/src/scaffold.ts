@@ -17,7 +17,7 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
             smoke: "apiagex smoke",
           },
           dependencies: {
-            "@apiagex/server": "^0.8.7",
+            "@apiagex/server": "^0.8.8",
           },
         },
         null,

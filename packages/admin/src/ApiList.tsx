@@ -30,6 +30,7 @@ export function ApiList() {
     <section aria-labelledby="api-list-title">
       <h2 id="api-list-title">API Explorer</h2>
       <p>Inspect generated content endpoints, payloads, role headers, and responses.</p>
+      <p><a href="/swagger" target="_blank" rel="noreferrer">Open Swagger UI</a> or use <code>/api/openapi.json</code> for the generated OpenAPI contract.</p>
       <StatusToast title="API status">{status}</StatusToast>
       {schemas.length === 0 ? (
         <StateMessage title="No generated APIs yet" variant="empty">

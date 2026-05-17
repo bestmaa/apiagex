@@ -187,6 +187,13 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
             </span>
             <code>/readme</code>
           </a>
+          <a aria-label="Open Swagger UI" href="/swagger">
+            <span>
+              <ClipboardList aria-hidden="true" size={16} />
+              Swagger UI
+            </span>
+            <code>/swagger</code>
+          </a>
         </div>
       </div>
 

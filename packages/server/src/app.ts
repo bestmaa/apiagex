@@ -27,6 +27,7 @@ import { registerWebhookRoutes } from "./webhook-routes.js";
 import { loginUser } from "./user-auth.js";
 import { createRealtimeBroker } from "./realtime-broker.js";
 import { registerRealtimeRoutes } from "./realtime-routes.js";
+import { registerOpenApiRoutes } from "./openapi-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -47,11 +48,12 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   registerSettingsRoutes(server, database);
   registerWebhookRoutes(server, database, webhookOptions);
   registerRealtimeRoutes(server, database, realtimeBroker);
+  registerOpenApiRoutes(server, database);
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,
     service: "apiagex",
-    paths: ["/api", "/doc", "/readme", "/adminui"],
+    paths: ["/api", "/api/openapi.json", "/swagger", "/doc", "/readme", "/adminui"],
   }));
 
   server.get("/api/health", async (): Promise<HealthResponse> => ({

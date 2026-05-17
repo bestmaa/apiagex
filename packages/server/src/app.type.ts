@@ -13,7 +13,7 @@ export type HealthResponse = {
 export type ApiRootResponse = {
   ok: true;
   service: "apiagex";
-  paths: ["/api", "/doc", "/readme", "/adminui"];
+  paths: string[];
 };
 
 export type CreateServerOptions = {

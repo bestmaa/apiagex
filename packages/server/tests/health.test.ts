@@ -14,7 +14,7 @@ describe("api health route", () => {
     expect(response.json()).toEqual({
       ok: true,
       service: "apiagex",
-      paths: ["/api", "/doc", "/readme", "/adminui"],
+      paths: ["/api", "/api/openapi.json", "/swagger", "/doc", "/readme", "/adminui"],
     });
   });
 
