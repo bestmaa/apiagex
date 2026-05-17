@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { ApiagexDatabase, SqliteDatabase } from "@apiagex/database";
+import type { RegisterApiagexCustomRoutes } from "./custom-routes.type.js";
 import type { WebhookHttpClient } from "./webhook-dispatcher.type.js";
 
 export type ApiagexServer = FastifyInstance;
@@ -20,6 +21,7 @@ export type CreateServerOptions = {
   adminAuth?: "disabled" | "required";
   database?: ApiagexDatabase | SqliteDatabase;
   databasePath?: string;
+  customRoutes?: RegisterApiagexCustomRoutes;
   uploadsPath?: string;
   webhookHttpClient?: WebhookHttpClient;
 };

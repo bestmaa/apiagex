@@ -61,6 +61,10 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
       content: serverEntryFile(),
     },
     {
+      path: "src/custom-routes.js",
+      content: customRoutesFile(),
+    },
+    {
       path: "docs/README.md",
       content: docsReadme(),
     },
@@ -146,6 +150,7 @@ English:
 3. Create entries from Entries or call POST /api/content/article.
 4. Create Content Roles, save permissions, then create users or API tokens.
 5. Use Webhooks for external server notifications and Realtime API for live browser screens.
+6. Add business APIs in src/custom-routes.js when generated CRUD is not enough.
 
 Hinglish:
 
@@ -154,6 +159,7 @@ Hinglish:
 3. Entries screen se entry banao ya POST /api/content/article call karo.
 4. Content Roles banao, permissions save karo, phir users ya API tokens create karo.
 5. External server notifications ke liye Webhooks aur live browser screens ke liye Realtime API use karo.
+6. Generated CRUD enough nahi ho to src/custom-routes.js me business APIs add karo.
 
 ## Common errors
 
@@ -200,6 +206,12 @@ English: Webhooks call external URLs after content changes. Realtime API sends W
 Hinglish: Webhooks content change ke baad external URLs call karte hain. Realtime API sirf enabled collections ke liye WebSocket events bhejta hai.
 
 Relation docs: /doc explains relation field types, entry payloads, populate query options, Admin UI entry pickers, and common errors.
+
+## Custom business APIs
+
+English: Use src/custom-routes.js for endpoints such as checkout, pay order, assign rider, or reports. Custom routes run on the same server and can use Apiagex helpers for schemas, entries, roles, realtime sessions, and the raw database.
+
+Hinglish: Checkout, pay order, assign rider, ya reports jaise endpoints ke liye src/custom-routes.js use karo. Custom routes same server par run hote hain aur schemas, entries, roles, realtime sessions, aur raw database ke Apiagex helpers use kar sakte hain.
 `;
 }
 
@@ -248,6 +260,7 @@ function defaultDatabaseUrl(provider: Exclude<ScaffoldAnswers["databaseProvider"
 
 function serverEntryFile(): string {
   return `import { startApiagex } from "@apiagex/server";
+import { registerCustomRoutes } from "./custom-routes.js";
 
 const ownerEmail = process.env.APIAGEX_OWNER_EMAIL;
 const ownerPassword = process.env.APIAGEX_OWNER_PASSWORD;
@@ -258,7 +271,38 @@ await startApiagex({
   initialOwner: ownerEmail && ownerPassword
     ? { email: ownerEmail, password: ownerPassword }
     : undefined,
+  customRoutes: registerCustomRoutes,
 });
+`;
+}
+
+function customRoutesFile(): string {
+  return `export async function registerCustomRoutes(app, apiagex) {
+  app.get("/api/custom/health", async () => ({
+    ok: true,
+    service: "custom-api",
+  }));
+
+  app.get("/api/custom/schema-count", async () => ({
+    ok: true,
+    count: (await apiagex.schemas.list()).length,
+  }));
+
+  app.post("/api/custom/orders/:entryId/pay", async (request, reply) => {
+    const entry = await apiagex.entries.getById(request.params.entryId);
+    if (!entry) return reply.code(404).send({ ok: false, error: "ORDER_NOT_FOUND" });
+    if (entry.data.status !== "pending") {
+      return reply.code(400).send({ ok: false, error: "ORDER_NOT_PAYABLE" });
+    }
+
+    return {
+      ok: true,
+      entry: await apiagex.entries.update(entry.id, {
+        data: { ...entry.data, status: "paid" },
+      }),
+    };
+  });
+}
 `;
 }
 

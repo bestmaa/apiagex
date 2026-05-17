@@ -1,5 +1,6 @@
 import type { LocalServerConfig, ServerConfigEnv } from "./server-config.type.js";
 import type { ApiagexServer } from "./app.type.js";
+import type { RegisterApiagexCustomRoutes } from "./custom-routes.type.js";
 
 export type RuntimeCliResult = {
   code: number;
@@ -19,6 +20,7 @@ export type InitialOwnerOptions = {
 
 export type StartServerOptions = {
   config?: LocalServerConfig;
+  customRoutes?: RegisterApiagexCustomRoutes;
   cwd?: string;
   env?: ServerConfigEnv;
   host?: string;

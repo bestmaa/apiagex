@@ -33,6 +33,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `/adminui` MVP navigation shell dikhata hai: Dashboard, Schemas, Entries, APIs, Users, Settings, Docs.
 - Settings > API Docs separately controls generated Content API docs and Admin/control-plane API docs.
 - Settings > API Docs generated Content API docs aur Admin/control-plane API docs ko alag-alag control karta hai.
+- Generated projects include `src/custom-routes.js` for business APIs that generated CRUD cannot model.
+- Generated projects me generated CRUD se bahar business APIs ke liye `src/custom-routes.js` hota hai.
 - Base path checkpoint verifies `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 - Base path checkpoint `/api`, `/api/health`, `/doc`, `/readme`, aur `/adminui` verify karta hai.
 - SQLite foundation has MVP tables: migrations, roles, users, schemas, fields, entries, permissions.

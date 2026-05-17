@@ -25,6 +25,7 @@ Generated starter files:
 - `.env.example`
 - `apiagex.config.json`
 - `src/index.js`
+- `src/custom-routes.js`
 - `README.md`
 - `docs/README.md`
 
@@ -32,9 +33,11 @@ The generated `.env` stores local setup values such as `APIAGEX_DATABASE_PROVIDE
 
 The generated `package.json` depends on `@apiagex/server` and exposes `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
 
+The generated `src/custom-routes.js` is the place for business APIs such as checkout, pay order, assign rider, and reports. These routes run on the same Fastify server and receive Apiagex helpers for schemas, entries, roles, realtime sessions, users, and the raw database.
+
 The generated starter README points users to `/doc`, `/readme`, and `/adminui`, includes practical owner/schema/entry/role/webhook/realtime flow, and explains common errors.
 
-The generated `docs/README.md` explains generated API shape, access control, webhooks, realtime, relation docs, payloads, populate options, Admin UI entry pickers, and common errors.
+The generated `docs/README.md` explains generated API shape, custom business APIs, access control, webhooks, realtime, relation docs, payloads, populate options, Admin UI entry pickers, and common errors.
 
 The generated-project test verifies this scaffold without network installs by creating a temporary project, running the runtime smoke command, starting Apiagex on a temporary port/database, and checking `/api/health`, `/adminui`, `/doc`, and `/readme`.
 
@@ -90,12 +93,15 @@ Generated starter files:
 - `.env.example`
 - `apiagex.config.json`
 - `src/index.js`
+- `src/custom-routes.js`
 - `README.md`
 - `docs/README.md`
 
 Generated `.env` local setup values store karta hai, jaise `APIAGEX_DATABASE_PROVIDER`, SQLite ke liye `APIAGEX_DATABASE_PATH` ya PostgreSQL/MySQL ke liye `APIAGEX_DATABASE_URL`, `APIAGEX_UPLOADS_PATH`, `APIAGEX_SECRET`, `HOST`, aur `PORT`. Owner bootstrap enable ho to `.env` me `APIAGEX_OWNER_EMAIL` aur `APIAGEX_OWNER_PASSWORD` bhi hota hai; first successful start ke baad password hata do.
 
 Generated `package.json` `@apiagex/server` par depend karta hai aur `npm run dev`, `npm run start`, `npm run smoke`, aur `npm run build` expose karta hai.
+
+Generated `src/custom-routes.js` business APIs ke liye jagah hai, jaise checkout, pay order, assign rider, aur reports. Ye routes same Fastify server par run hote hain aur schemas, entries, roles, realtime sessions, users, aur raw database ke Apiagex helpers receive karte hain.
 
 Generated starter README users ko `/doc`, `/readme`, aur `/adminui` par point karta hai, practical owner/schema/entry/role/webhook/realtime flow include karta hai, aur common errors explain karta hai.
 

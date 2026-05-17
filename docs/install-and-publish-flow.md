@@ -101,7 +101,7 @@ Open karo:
 - `npm run smoke`: checks runtime health through `apiagex smoke`
 - `npm run build`: prints runtime build guidance through `apiagex build`
 
-The generated project depends on `@apiagex/server`, which exposes both the `apiagex` command and the `startApiagex()` API for the generated `src/index.js` entry file.
+The generated project depends on `@apiagex/server`, which exposes both the `apiagex` command and the `startApiagex()` API for the generated `src/index.js` entry file. Add business APIs in `src/custom-routes.js` when generated CRUD cannot model the endpoint, such as checkout, pay order, assignment, and reporting routes.
 
 ### Hinglish
 
@@ -110,13 +110,13 @@ The generated project depends on `@apiagex/server`, which exposes both the `apia
 - `npm run smoke`: `apiagex smoke` se runtime health check karta hai
 - `npm run build`: `apiagex build` se runtime build guidance print karta hai
 
-Generated project `@apiagex/server` par depend karta hai, jo installed `apiagex` command aur generated `src/index.js` ke liye `startApiagex()` API expose karta hai.
+Generated project `@apiagex/server` par depend karta hai, jo installed `apiagex` command aur generated `src/index.js` ke liye `startApiagex()` API expose karta hai. Generated CRUD endpoint ko model nahi kar sakta to `src/custom-routes.js` me business APIs add karo, jaise checkout, pay order, assignment, aur reporting routes.
 
 ## Environment
 
 ### English
 
-Generated projects include `.env`, `.env.example`, and `src/index.js`.
+Generated projects include `.env`, `.env.example`, `src/index.js`, and `src/custom-routes.js`.
 
 - `APIAGEX_DATABASE_PROVIDER=sqlite`
 - `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite`
@@ -130,7 +130,7 @@ SQLite is supported today. Postgres and MySQL are planned provider choices for a
 
 ### Hinglish
 
-Generated projects me `.env`, `.env.example`, aur `src/index.js` hota hai.
+Generated projects me `.env`, `.env.example`, `src/index.js`, aur `src/custom-routes.js` hota hai.
 
 - `APIAGEX_DATABASE_PROVIDER=sqlite`
 - `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite`

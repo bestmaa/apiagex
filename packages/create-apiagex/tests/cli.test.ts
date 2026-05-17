@@ -85,7 +85,7 @@ describe("create-apiagex CLI", () => {
     const result = await runCli(["my-cms"], root);
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("Created 8 files");
+    expect(result.stdout).toContain("Created 9 files");
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"name": "my-cms"');
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"@apiagex/server"');
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"dev": "node --env-file=.env src/index.js"');
@@ -93,6 +93,8 @@ describe("create-apiagex CLI", () => {
     await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.toContain("APIAGEX_DATABASE_PATH");
     await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"setupMode"');
     await expect(readFile(join(root, "my-cms", "src/index.js"), "utf8")).resolves.toContain("startApiagex");
+    await expect(readFile(join(root, "my-cms", "src/index.js"), "utf8")).resolves.toContain("registerCustomRoutes");
+    await expect(readFile(join(root, "my-cms", "src/custom-routes.js"), "utf8")).resolves.toContain("/api/custom/orders/:entryId/pay");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("Practical flow");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("REALTIME_SESSION_INVALID");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("many-to-many");

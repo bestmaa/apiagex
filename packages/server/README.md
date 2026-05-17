@@ -104,6 +104,8 @@ apiagex --help
 
 New users normally get this runtime through `npm create apiagex@latest my-cms` or `npx create-apiagex my-cms`, which scaffolds a project that depends on `@apiagex/server`.
 
+Generated projects can pass `customRoutes` to `startApiagex()` for business APIs that generated CRUD cannot represent. Custom routes run on the same Fastify server and receive helpers for entries, schemas, roles, users, realtime sessions, and the raw database.
+
 ## Hindi
 
 Ye package Fastify API server ka owner hai. Ye `/docs` par docs page, `/health` par health status, aur `/admin/content-types` par starter admin content-type API serve karta hai.
@@ -189,6 +191,8 @@ apiagex --help
 `apiagex dev` aur `apiagex start` same `/api`, `/adminui`, `/doc`, aur `/readme` paths serve karte hain. `apiagex smoke` long-running server start kiye bina `/api/health` check karta hai. Local persistence abhi bhi `APIAGEX_DATABASE_PATH` aur `APIAGEX_UPLOADS_PATH` use karti hai, default `.apiagex/apiagex.sqlite` aur `.apiagex/uploads`. PostgreSQL ya MySQL use karne ke liye `APIAGEX_DATABASE_PROVIDER=postgres` ya `APIAGEX_DATABASE_PROVIDER=mysql` ke saath `APIAGEX_DATABASE_URL` set karo.
 
 New users usually ye runtime `npm create apiagex@latest my-cms` ya `npx create-apiagex my-cms` ke through lete hain, jo `@apiagex/server` dependency wala project scaffold karta hai.
+
+Generated projects `startApiagex()` me `customRoutes` pass kar sakte hain business APIs ke liye jo generated CRUD represent nahi kar sakta. Custom routes same Fastify server par run hote hain aur entries, schemas, roles, users, realtime sessions, aur raw database helpers receive karte hain.
 
 Admin list route `q`, `page`, `pageSize`, aur `sort` query parameters bhi accept karti hai search, pagination, aur newest/oldest sorting ke liye.
 

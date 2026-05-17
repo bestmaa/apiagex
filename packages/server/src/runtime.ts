@@ -23,7 +23,11 @@ export async function startApiagexServer(options: StartServerOptions = {}): Prom
   await ensureLocalServerPaths(config);
   const database = await openRuntimeDatabase(config);
   if (options.initialOwner) await bootstrapInitialOwner(database, options.initialOwner);
-  const server = createServer({ ...config, database });
+  const server = createServer({
+    ...config,
+    database,
+    ...(options.customRoutes ? { customRoutes: options.customRoutes } : {}),
+  });
   try {
     await server.listen({ host, port });
     console.log(`Apiagex listening on http://${host}:${port}`);
