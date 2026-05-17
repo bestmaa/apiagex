@@ -499,6 +499,27 @@ code {
   margin: 0;
 }
 
+.settings-action-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+}
+
+.button-secondary {
+  align-items: center;
+  background: var(--admin-color-surface-muted);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text);
+  display: inline-flex;
+  font-weight: 800;
+  gap: var(--admin-space-2);
+  min-height: var(--admin-control-height);
+  padding: var(--admin-space-3) var(--admin-space-4);
+  text-decoration: none;
+}
+
 .api-role-list {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 }

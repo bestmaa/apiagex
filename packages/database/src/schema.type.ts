@@ -5,6 +5,7 @@ export type MvpTableName =
   | "fields"
   | "entries"
   | "permissions"
+  | "app_settings"
   | "admin_permissions"
   | "api_tokens"
   | "webhooks"

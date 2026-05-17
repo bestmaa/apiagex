@@ -2,6 +2,11 @@ export const MVP_ADDITIVE_MIGRATIONS_SQL = [
   "ALTER TABLE fields ADD COLUMN relation_type TEXT",
   "ALTER TABLE roles ADD COLUMN role_kind TEXT NOT NULL DEFAULT 'api'",
   "UPDATE roles SET role_kind = 'admin' WHERE is_owner = 1 OR name IN ('owner', 'admin', 'schema-manager', 'user-manager')",
+  `CREATE TABLE IF NOT EXISTS app_settings (
+    id TEXT PRIMARY KEY,
+    value_json TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
   `CREATE TABLE IF NOT EXISTS admin_permissions (
     id TEXT PRIMARY KEY,
     role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,

@@ -9,6 +9,7 @@ export type AdminRoute =
   | "settings/content-roles"
   | "settings/api-permissions"
   | "settings/api-tokens"
+  | "settings/api-docs"
   | "settings/webhooks"
   | "settings/realtime"
   | "docs/webhooks"

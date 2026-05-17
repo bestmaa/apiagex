@@ -1,8 +1,9 @@
-import { KeyRound, Radio, Send, Shield, SlidersHorizontal, Ticket } from "lucide-react";
+import { FileJson, KeyRound, Radio, Send, Shield, SlidersHorizontal, Ticket } from "lucide-react";
 import { ApiPermissionManager } from "../ApiPermissionManager";
 import { RoleManager } from "../RoleManager";
 import type { AdminRoute } from "../app-route.type";
 import { SettingsApiTokens } from "./SettingsApiTokens";
+import { SettingsApiDocs } from "./SettingsApiDocs";
 import { SettingsAdminRoles } from "./SettingsAdminRoles";
 import { WebhookManager } from "../WebhookManager";
 import { RealtimeManager } from "../RealtimeManager";
@@ -12,6 +13,7 @@ export function SettingsPage({ route }: { route: AdminRoute }) {
   if (route === "settings/content-roles") return <SettingsContentRoles />;
   if (route === "settings/api-permissions") return <SettingsApiPermissions />;
   if (route === "settings/api-tokens") return <SettingsApiTokens />;
+  if (route === "settings/api-docs") return <SettingsApiDocs />;
   if (route === "settings/webhooks") return <SettingsWebhooks />;
   if (route === "settings/realtime") return <SettingsRealtime />;
   return <SettingsOverview />;
@@ -42,6 +44,11 @@ function SettingsOverview() {
           <Ticket aria-hidden="true" size={20} />
           <strong>API Tokens</strong>
           <span>Create and revoke tokens for content API roles.</span>
+        </a>
+        <a className="settings-option" href="#settings/api-docs">
+          <FileJson aria-hidden="true" size={20} />
+          <strong>API Docs</strong>
+          <span>Publish Swagger UI and OpenAPI JSON when needed.</span>
         </a>
         <a className="settings-option" href="#settings/webhooks">
           <Send aria-hidden="true" size={20} />

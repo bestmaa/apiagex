@@ -101,6 +101,12 @@ CREATE TABLE IF NOT EXISTS permissions (
   UNIQUE(role_id, schema_id, action)
 );
 
+CREATE TABLE IF NOT EXISTS app_settings (
+  id TEXT PRIMARY KEY,
+  value_json TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS admin_permissions (
   id TEXT PRIMARY KEY,
   role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
@@ -202,6 +208,7 @@ CREATE TABLE IF NOT EXISTS schemas (id VARCHAR(191) PRIMARY KEY, name VARCHAR(19
 CREATE TABLE IF NOT EXISTS fields (id VARCHAR(191) PRIMARY KEY, schema_id VARCHAR(191) NOT NULL, name VARCHAR(191) NOT NULL, slug VARCHAR(191) NOT NULL, type VARCHAR(64) NOT NULL, relation_schema_id VARCHAR(191), relation_type VARCHAR(64), required TINYINT(1) NOT NULL DEFAULT 0, position INTEGER NOT NULL, UNIQUE(schema_id, slug), CONSTRAINT fk_fields_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE, CONSTRAINT fk_fields_relation_schema FOREIGN KEY (relation_schema_id) REFERENCES schemas(id)) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS entries (id VARCHAR(191) PRIMARY KEY, schema_id VARCHAR(191) NOT NULL, data_json LONGTEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, CONSTRAINT fk_entries_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS permissions (id VARCHAR(191) PRIMARY KEY, role_id VARCHAR(191) NOT NULL, schema_id VARCHAR(191) NOT NULL, action VARCHAR(64) NOT NULL, allowed TINYINT(1) NOT NULL DEFAULT 0, UNIQUE(role_id, schema_id, action), CONSTRAINT fk_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE, CONSTRAINT fk_permissions_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS app_settings (id VARCHAR(191) PRIMARY KEY, value_json LONGTEXT NOT NULL, updated_at TEXT NOT NULL) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS admin_permissions (id VARCHAR(191) PRIMARY KEY, role_id VARCHAR(191) NOT NULL, action VARCHAR(64) NOT NULL, allowed TINYINT(1) NOT NULL DEFAULT 0, UNIQUE(role_id, action), CONSTRAINT fk_admin_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS api_tokens (id VARCHAR(191) PRIMARY KEY, role_id VARCHAR(191) NOT NULL, name VARCHAR(191) NOT NULL, token_hash VARCHAR(191) NOT NULL UNIQUE, token_prefix VARCHAR(32) NOT NULL, created_at TEXT NOT NULL, last_used_at TEXT, revoked_at TEXT, CONSTRAINT fk_api_tokens_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS webhooks (id VARCHAR(191) PRIMARY KEY, name VARCHAR(191) NOT NULL, url TEXT NOT NULL, secret VARCHAR(191) NOT NULL, events_json LONGTEXT NOT NULL, schema_id VARCHAR(191), active TINYINT(1) NOT NULL DEFAULT 1, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, CONSTRAINT fk_webhooks_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE SET NULL) ENGINE=InnoDB;

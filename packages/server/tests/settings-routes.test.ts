@@ -55,6 +55,24 @@ describe("settings access control APIs", () => {
     ]);
   });
 
+  it("reads and updates API docs visibility", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+    await bootstrap(server);
+
+    const initial = await server.inject({ method: "GET", url: "/api/admin/settings/api-docs" });
+    const save = await server.inject({
+      method: "PUT",
+      url: "/api/admin/settings/api-docs",
+      payload: { enabled: true },
+    });
+
+    expect(initial.statusCode).toBe(200);
+    expect(initial.json()).toEqual({ ok: true, settings: { enabled: false, updatedAt: null } });
+    expect(save.statusCode).toBe(200);
+    expect(save.json().settings.enabled).toBe(true);
+    expect(save.json().settings.updatedAt).toEqual(expect.any(String));
+  });
+
   it("rejects owner permission edits and API roles in admin permissions", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await bootstrap(server);

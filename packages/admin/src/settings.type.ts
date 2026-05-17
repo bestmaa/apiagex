@@ -31,3 +31,14 @@ export type AdminPermissionDraft = {
   action: AdminPermissionAction;
   allowed: boolean;
 };
+
+export type ApiDocsSettingsRecord = {
+  enabled: boolean;
+  updatedAt: string | null;
+};
+
+export type ApiDocsSettingsResponse = {
+  ok: boolean;
+  settings?: ApiDocsSettingsRecord;
+  error?: string;
+};

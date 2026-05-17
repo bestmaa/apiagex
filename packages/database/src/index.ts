@@ -86,6 +86,10 @@ export {
   setRealtimeConfig,
 } from "./realtime-repository.js";
 export {
+  getApiDocsSettings,
+  setApiDocsSettings,
+} from "./app-setting-repository.js";
+export {
   adminPermissionActions,
   canAdminRoleAccess,
   listAdminRolePermissions,
@@ -185,6 +189,10 @@ export type {
   AdminPermissionRecord,
   SetAdminPermissionInput,
 } from "./admin-permission-repository.type.js";
+export type {
+  ApiDocsSettingsRecord,
+  SetApiDocsSettingsInput,
+} from "./app-setting-repository.type.js";
 export type {
   PermissionAction,
   PermissionRecord,

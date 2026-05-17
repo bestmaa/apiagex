@@ -75,6 +75,16 @@ describe("MVP database foundation", () => {
     expect(listMvpTables(db)).toContain("api_tokens");
   });
 
+  it("adds app settings for control-plane feature flags", () => {
+    const db = openSqliteDatabase();
+
+    migrateMvpDatabase(db);
+
+    const columns = db.prepare("PRAGMA table_info(app_settings)").all() as Array<{ name: string }>;
+    expect(columns.map((column) => column.name)).toEqual(["id", "value_json", "updated_at"]);
+    expect(listMvpTables(db)).toContain("app_settings");
+  });
+
   it("adds webhook tables for content change hooks", () => {
     const db = openSqliteDatabase();
 

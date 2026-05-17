@@ -8,7 +8,9 @@ import {
   setAdminPermission,
   type ApiagexDatabase,
 } from "@apiagex/database";
+import { getApiDocsSettings, setApiDocsSettings } from "./api-docs-settings.js";
 import type {
+  ApiDocsSettingsBody,
   AdminRoleBody,
   AdminRoleParams,
   AdminRolePermissionsBody,
@@ -20,6 +22,19 @@ export function registerSettingsRoutes(server: FastifyInstance, database: Apiage
     adminRoles: await listAdminRoles(database),
     apiRoles: await listRoles(database),
   }));
+
+  server.get("/api/admin/settings/api-docs", async () => ({
+    ok: true,
+    settings: await getApiDocsSettings(database),
+  }));
+
+  server.put<{ Body: ApiDocsSettingsBody }>("/api/admin/settings/api-docs", async (request, reply) => {
+    try {
+      return { ok: true, settings: await setApiDocsSettings(database, request.body.enabled) };
+    } catch (error) {
+      return sendSettingsError(reply, error, 400);
+    }
+  });
 
   server.post<{ Body: AdminRoleBody }>("/api/admin/settings/access/admin-roles", async (request, reply) => {
     try {

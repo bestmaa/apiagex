@@ -19,6 +19,7 @@ import type {
   AccessSettingsResponse,
   AdminPermissionDraft,
   AdminPermissionListResponse,
+  ApiDocsSettingsResponse,
 } from "./settings.type";
 import type { UserListResponse, UserMutationResponse } from "./user.type";
 import type {
@@ -278,6 +279,18 @@ export async function saveAdminRolePermissions(
     method: "PUT",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ permissions }),
+  });
+}
+
+export async function getApiDocsSettings(): Promise<ApiDocsSettingsResponse> {
+  return adminJson<ApiDocsSettingsResponse>("/api/admin/settings/api-docs");
+}
+
+export async function saveApiDocsSettings(enabled: boolean): Promise<ApiDocsSettingsResponse> {
+  return adminJson<ApiDocsSettingsResponse>("/api/admin/settings/api-docs", {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ enabled }),
   });
 }
 

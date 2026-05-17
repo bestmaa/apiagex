@@ -15,3 +15,7 @@ export type AdminRolePermissionsBody = {
     allowed: boolean;
   }>;
 };
+
+export type ApiDocsSettingsBody = {
+  enabled: boolean;
+};

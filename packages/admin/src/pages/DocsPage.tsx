@@ -192,7 +192,7 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
               <ClipboardList aria-hidden="true" size={16} />
               Swagger UI
             </span>
-            <code>/swagger</code>
+            <code>enable in Settings / API Docs</code>
           </a>
         </div>
       </div>

@@ -10,6 +10,7 @@ export const MVP_TABLES = [
   "fields",
   "entries",
   "permissions",
+  "app_settings",
   "admin_permissions",
   "api_tokens",
   "webhooks",
@@ -82,6 +83,12 @@ CREATE TABLE IF NOT EXISTS permissions (
   action TEXT NOT NULL,
   allowed INTEGER NOT NULL DEFAULT 0,
   UNIQUE(role_id, schema_id, action)
+);
+
+CREATE TABLE IF NOT EXISTS app_settings (
+  id TEXT PRIMARY KEY,
+  value_json TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS admin_permissions (

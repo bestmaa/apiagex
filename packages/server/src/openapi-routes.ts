@@ -5,6 +5,7 @@ import {
   type FieldRecord,
   type SchemaRecord,
 } from "@apiagex/database";
+import { getApiDocsSettings } from "./api-docs-settings.js";
 
 type OpenApiSchema = Record<string, unknown>;
 type OpenApiDocument = {
@@ -54,12 +55,22 @@ const queryParameters = {
 
 export function registerOpenApiRoutes(server: FastifyInstance, database: ApiagexDatabase): void {
   server.get("/api/openapi.json", async (_request, reply) => {
+    if (!(await apiDocsEnabled(database))) return sendApiDocsDisabled(reply);
     return reply.type("application/json").send(await buildOpenApiDocument(database));
   });
 
-  server.get("/api/swagger", async (_request, reply) => sendSwaggerUi(reply));
-  server.get("/api/docs", async (_request, reply) => sendSwaggerUi(reply));
-  server.get("/swagger", async (_request, reply) => sendSwaggerUi(reply));
+  server.get("/api/swagger", async (_request, reply) => {
+    if (!(await apiDocsEnabled(database))) return sendApiDocsDisabled(reply);
+    return sendSwaggerUi(reply);
+  });
+  server.get("/api/docs", async (_request, reply) => {
+    if (!(await apiDocsEnabled(database))) return sendApiDocsDisabled(reply);
+    return sendSwaggerUi(reply);
+  });
+  server.get("/swagger", async (_request, reply) => {
+    if (!(await apiDocsEnabled(database))) return sendApiDocsDisabled(reply);
+    return sendSwaggerUi(reply);
+  });
 }
 
 export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<OpenApiDocument> {
@@ -75,6 +86,14 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
     servers: [{ url: "/" }],
     tags: [
       { name: "Content", description: "Generated content APIs. Requests need API permissions unless the public role allows the action." },
+      { name: "Admin Auth", description: "Owner setup, login, and session checks for the control plane." },
+      { name: "Admin Schemas", description: "Control-plane schema builder APIs." },
+      { name: "Admin Entries", description: "Control-plane content entry management APIs." },
+      { name: "Admin Roles", description: "Control-plane roles, content roles, permissions, and tokens." },
+      { name: "Admin Users", description: "Content API users and control admin users." },
+      { name: "Admin Settings", description: "Control-plane settings including Swagger/OpenAPI visibility." },
+      { name: "Admin Webhooks", description: "Signed content change hook configuration and delivery logs." },
+      { name: "Admin Realtime", description: "Realtime WebSocket configuration and session-token APIs." },
       { name: "System", description: "Service health and OpenAPI endpoints." },
     ],
     paths: {
@@ -92,6 +111,7 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
           responses: okResponse({ type: "object" }),
         },
       },
+      ...adminPaths(),
       ...Object.fromEntries(schemas.flatMap((schema) => contentPaths(schema))),
     },
     components: {
@@ -105,6 +125,12 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
           in: "header",
           name: "x-apiagex-api-token",
           type: "apiKey",
+        },
+        adminBearerAuth: {
+          bearerFormat: "ADMIN_SESSION_TOKEN",
+          description: "Owner/control-plane session token returned by /api/auth/login or /api/auth/bootstrap-owner.",
+          scheme: "bearer",
+          type: "http",
         },
         roleIdHeader: {
           description: "Development/testing header for API role id. API tokens are preferred for real clients.",
@@ -184,6 +210,264 @@ function contentPaths(schema: SchemaRecord): Array<[string, OpenApiSchema]> {
   ];
 }
 
+function adminPaths(): Record<string, OpenApiSchema> {
+  return {
+    "/api/auth/owner-status": {
+      get: {
+        tags: ["Admin Auth"],
+        summary: "Check whether the first owner exists",
+        responses: okResponse({ $ref: "#/components/schemas/OwnerStatusResponse" }),
+      },
+    },
+    "/api/auth/bootstrap-owner": {
+      post: {
+        tags: ["Admin Auth"],
+        summary: "Create the first owner account",
+        requestBody: requestBody("AuthRequest"),
+        responses: okResponse({ $ref: "#/components/schemas/AuthResponse" }),
+      },
+    },
+    "/api/auth/login": {
+      post: {
+        tags: ["Admin Auth"],
+        summary: "Log in to the control plane",
+        requestBody: requestBody("AuthRequest"),
+        responses: okResponse({ $ref: "#/components/schemas/AuthResponse" }),
+      },
+    },
+    "/api/auth/session": {
+      get: {
+        tags: ["Admin Auth"],
+        summary: "Validate a control-plane session token",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/AuthResponse" }),
+      },
+    },
+    "/api/admin/schemas": {
+      get: {
+        tags: ["Admin Schemas"],
+        summary: "List admin schemas",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/AdminSchemaListResponse" }),
+      },
+      post: {
+        tags: ["Admin Schemas"],
+        summary: "Create an admin schema",
+        security: adminSecurity(),
+        requestBody: requestBody("AdminSchemaDraft"),
+        responses: okResponse({ $ref: "#/components/schemas/AdminSchemaMutationResponse" }),
+      },
+    },
+    "/api/admin/schemas/{schemaId}": {
+      parameters: [pathParameter("schemaId", "Schema id.")],
+      get: {
+        tags: ["Admin Schemas"],
+        summary: "Read one admin schema",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/AdminSchemaMutationResponse" }),
+      },
+      put: {
+        tags: ["Admin Schemas"],
+        summary: "Update one admin schema",
+        security: adminSecurity(),
+        requestBody: requestBody("AdminSchemaDraft"),
+        responses: okResponse({ $ref: "#/components/schemas/AdminSchemaMutationResponse" }),
+      },
+      delete: {
+        tags: ["Admin Schemas"],
+        summary: "Delete one admin schema",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/DeleteResponse" }),
+      },
+    },
+    "/api/admin/schemas/{schemaId}/entries": {
+      parameters: [pathParameter("schemaId", "Schema id.")],
+      get: {
+        tags: ["Admin Entries"],
+        summary: "List admin entries for one schema",
+        security: adminSecurity(),
+        parameters: [queryParameters.fields, queryParameters.search, queryParameters.limit, queryParameters.offset],
+        responses: okResponse({ $ref: "#/components/schemas/AdminEntryListResponse" }),
+      },
+      post: {
+        tags: ["Admin Entries"],
+        summary: "Create an admin entry",
+        security: adminSecurity(),
+        requestBody: requestBody("AdminEntryMutationRequest"),
+        responses: okResponse({ $ref: "#/components/schemas/AdminEntryMutationResponse" }),
+      },
+    },
+    "/api/admin/schemas/{schemaId}/entries/{entryId}": {
+      parameters: [pathParameter("schemaId", "Schema id."), pathParameter("entryId", "Entry id.")],
+      get: {
+        tags: ["Admin Entries"],
+        summary: "Read one admin entry",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/AdminEntryMutationResponse" }),
+      },
+      put: {
+        tags: ["Admin Entries"],
+        summary: "Update one admin entry",
+        security: adminSecurity(),
+        requestBody: requestBody("AdminEntryMutationRequest"),
+        responses: okResponse({ $ref: "#/components/schemas/AdminEntryMutationResponse" }),
+      },
+      delete: {
+        tags: ["Admin Entries"],
+        summary: "Delete one admin entry",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/DeleteResponse" }),
+      },
+    },
+    "/api/admin/roles": adminCollectionPath("Admin Roles", "content API role", "RoleDraft", "RoleListResponse", "RoleMutationResponse"),
+    "/api/admin/roles/{roleId}/permissions": {
+      parameters: [pathParameter("roleId", "Content API role id.")],
+      get: {
+        tags: ["Admin Roles"],
+        summary: "List content role permissions",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/PermissionListResponse" }),
+      },
+      put: {
+        tags: ["Admin Roles"],
+        summary: "Save content role permissions",
+        security: adminSecurity(),
+        requestBody: requestBody("PermissionSaveRequest"),
+        responses: okResponse({ $ref: "#/components/schemas/PermissionListResponse" }),
+      },
+    },
+    "/api/admin/roles/{roleId}/tokens": {
+      parameters: [pathParameter("roleId", "Content API role id.")],
+      get: {
+        tags: ["Admin Roles"],
+        summary: "List content API tokens",
+        security: adminSecurity(),
+        responses: okResponse({ type: "object" }),
+      },
+      post: {
+        tags: ["Admin Roles"],
+        summary: "Create a content API token",
+        security: adminSecurity(),
+        requestBody: requestBody("TokenCreateRequest"),
+        responses: okResponse({ type: "object" }),
+      },
+    },
+    "/api/admin/roles/{roleId}/tokens/{tokenId}": {
+      parameters: [pathParameter("roleId", "Content API role id."), pathParameter("tokenId", "API token id.")],
+      delete: {
+        tags: ["Admin Roles"],
+        summary: "Revoke a content API token",
+        security: adminSecurity(),
+        responses: okResponse({ type: "object" }),
+      },
+    },
+    "/api/admin/users": adminCollectionPath("Admin Users", "content API user", "UserCreateRequest", "UserListResponse", "UserMutationResponse"),
+    "/api/admin/control-users": adminCollectionPath("Admin Users", "control admin user", "UserCreateRequest", "UserListResponse", "UserMutationResponse"),
+    "/api/admin/settings/access": {
+      get: {
+        tags: ["Admin Settings"],
+        summary: "List separated admin and content roles",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/AccessSettingsResponse" }),
+      },
+    },
+    "/api/admin/settings/api-docs": {
+      get: {
+        tags: ["Admin Settings"],
+        summary: "Read Swagger/OpenAPI visibility setting",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/ApiDocsSettingsResponse" }),
+      },
+      put: {
+        tags: ["Admin Settings"],
+        summary: "Enable or disable Swagger/OpenAPI visibility",
+        security: adminSecurity(),
+        requestBody: requestBody("ApiDocsSettingsRequest"),
+        responses: okResponse({ $ref: "#/components/schemas/ApiDocsSettingsResponse" }),
+      },
+    },
+    "/api/admin/settings/access/admin-roles": {
+      post: {
+        tags: ["Admin Settings"],
+        summary: "Create a control admin role",
+        security: adminSecurity(),
+        requestBody: requestBody("RoleDraft"),
+        responses: okResponse({ $ref: "#/components/schemas/RoleMutationResponse" }),
+      },
+    },
+    "/api/admin/settings/access/admin-roles/{roleId}/permissions": {
+      parameters: [pathParameter("roleId", "Control admin role id.")],
+      get: {
+        tags: ["Admin Settings"],
+        summary: "List control admin role permissions",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/AdminPermissionListResponse" }),
+      },
+      put: {
+        tags: ["Admin Settings"],
+        summary: "Save control admin role permissions",
+        security: adminSecurity(),
+        requestBody: requestBody("AdminPermissionSaveRequest"),
+        responses: okResponse({ $ref: "#/components/schemas/AdminPermissionListResponse" }),
+      },
+    },
+    "/api/admin/webhooks": adminCollectionPath("Admin Webhooks", "webhook", "WebhookDraft", "WebhookListResponse", "WebhookMutationResponse"),
+    "/api/admin/webhooks/{webhookId}": {
+      parameters: [pathParameter("webhookId", "Webhook id.")],
+      put: {
+        tags: ["Admin Webhooks"],
+        summary: "Update one webhook",
+        security: adminSecurity(),
+        requestBody: requestBody("WebhookDraft"),
+        responses: okResponse({ $ref: "#/components/schemas/WebhookMutationResponse" }),
+      },
+      delete: {
+        tags: ["Admin Webhooks"],
+        summary: "Delete one webhook",
+        security: adminSecurity(),
+        responses: okResponse({ $ref: "#/components/schemas/DeleteResponse" }),
+      },
+    },
+    "/api/admin/webhooks/{webhookId}/deliveries": {
+      parameters: [pathParameter("webhookId", "Webhook id.")],
+      get: {
+        tags: ["Admin Webhooks"],
+        summary: "List webhook delivery history",
+        security: adminSecurity(),
+        responses: okResponse({ type: "object" }),
+      },
+    },
+    "/api/admin/realtime": {
+      get: {
+        tags: ["Admin Realtime"],
+        summary: "List realtime configuration, connections, and event history",
+        security: adminSecurity(),
+        responses: okResponse({ type: "object" }),
+      },
+    },
+    "/api/admin/realtime/{schemaId}": {
+      parameters: [pathParameter("schemaId", "Schema id.")],
+      put: {
+        tags: ["Admin Realtime"],
+        summary: "Enable or disable realtime events for one schema",
+        security: adminSecurity(),
+        requestBody: requestBody("RealtimeConfigRequest"),
+        responses: okResponse({ type: "object" }),
+      },
+    },
+    "/api/realtime/session": {
+      post: {
+        tags: ["Admin Realtime"],
+        summary: "Create a one-time browser WebSocket session token",
+        description: "Requires a content API token with getAll permission for the schema.",
+        security: apiTokenSecurity(),
+        requestBody: requestBody("RealtimeSessionRequest"),
+        responses: okResponse({ type: "object" }),
+      },
+    },
+  };
+}
+
 function contentSchemaComponents(schemas: SchemaRecord[]): Record<string, OpenApiSchema> {
   const components: Record<string, OpenApiSchema> = {
     DeleteResponse: {
@@ -202,6 +486,7 @@ function contentSchemaComponents(schemas: SchemaRecord[]): Record<string, OpenAp
       },
       required: ["ok", "error"],
     },
+    ...adminSchemaComponents(),
   };
   for (const schema of schemas) {
     const names = componentNames(schema);
@@ -244,10 +529,237 @@ function contentSchemaComponents(schemas: SchemaRecord[]): Record<string, OpenAp
         limit: { type: "integer" },
         offset: { type: "integer" },
       },
-      required: ["ok", "schema", "entries"],
+      required: ["ok", "schema", "entries", "total", "limit", "offset"],
     };
   }
   return components;
+}
+
+function adminSchemaComponents(): Record<string, OpenApiSchema> {
+  return {
+    AuthRequest: {
+      type: "object",
+      properties: {
+        email: { type: "string", format: "email", example: "owner@example.com" },
+        password: { type: "string", format: "password", minLength: 8 },
+      },
+      required: ["email", "password"],
+    },
+    AuthResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        token: { type: "string" },
+        user: { type: "object" },
+      },
+      required: ["ok"],
+    },
+    OwnerStatusResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        hasOwner: { type: "boolean" },
+      },
+      required: ["ok", "hasOwner"],
+    },
+    AdminFieldDraft: {
+      type: "object",
+      properties: {
+        name: { type: "string", example: "Title" },
+        slug: { type: "string", example: "title" },
+        type: { type: "string", enum: ["text", "number", "boolean", "date", "json", "media", "relation"] },
+        required: { type: "boolean", example: false },
+        relationSchemaId: { type: "string", nullable: true },
+        relationType: { type: "string", enum: ["oneToOne", "oneToMany", "manyToOne", "manyToMany"], nullable: true },
+      },
+      required: ["name", "slug", "type"],
+    },
+    AdminSchemaDraft: {
+      type: "object",
+      properties: {
+        name: { type: "string", example: "Article" },
+        slug: { type: "string", example: "article" },
+        description: { type: "string" },
+        fields: {
+          type: "array",
+          items: { $ref: "#/components/schemas/AdminFieldDraft" },
+        },
+      },
+      required: ["name", "slug", "fields"],
+    },
+    AdminSchemaListResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        schemas: { type: "array", items: { type: "object" } },
+      },
+      required: ["ok", "schemas"],
+    },
+    AdminSchemaMutationResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        schema: { type: "object" },
+      },
+      required: ["ok", "schema"],
+    },
+    AdminEntryMutationRequest: {
+      type: "object",
+      properties: { data: { type: "object", additionalProperties: true } },
+      required: ["data"],
+    },
+    AdminEntryListResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        entries: { type: "array", items: { type: "object" } },
+        total: { type: "integer" },
+        limit: { type: "integer" },
+        offset: { type: "integer" },
+      },
+      required: ["ok", "entries"],
+    },
+    AdminEntryMutationResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        entry: { type: "object" },
+      },
+      required: ["ok", "entry"],
+    },
+    RoleDraft: {
+      type: "object",
+      properties: {
+        name: { type: "string", example: "reader" },
+        description: { type: "string" },
+      },
+      required: ["name"],
+    },
+    RoleListResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        roles: { type: "array", items: { type: "object" } },
+      },
+      required: ["ok", "roles"],
+    },
+    RoleMutationResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        role: { type: "object" },
+      },
+      required: ["ok", "role"],
+    },
+    PermissionSaveRequest: permissionSaveSchema(["getAll", "get", "create", "update", "delete"]),
+    AdminPermissionSaveRequest: permissionSaveSchema(["schemas", "entries", "apiRoles", "apiUsers", "settings"]),
+    PermissionListResponse: permissionListSchema(),
+    AdminPermissionListResponse: permissionListSchema(),
+    TokenCreateRequest: {
+      type: "object",
+      properties: { name: { type: "string", example: "Kitchen app" } },
+      required: ["name"],
+    },
+    UserCreateRequest: {
+      type: "object",
+      properties: {
+        email: { type: "string", format: "email" },
+        password: { type: "string", format: "password", minLength: 8 },
+        roleId: { type: "string" },
+      },
+      required: ["email", "password", "roleId"],
+    },
+    UserListResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        roles: { type: "array", items: { type: "object" } },
+        users: { type: "array", items: { type: "object" } },
+      },
+      required: ["ok", "roles", "users"],
+    },
+    UserMutationResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        user: { type: "object" },
+      },
+      required: ["ok", "user"],
+    },
+    AccessSettingsResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        adminRoles: { type: "array", items: { type: "object" } },
+        apiRoles: { type: "array", items: { type: "object" } },
+      },
+      required: ["ok", "adminRoles", "apiRoles"],
+    },
+    ApiDocsSettingsRequest: {
+      type: "object",
+      properties: { enabled: { type: "boolean", example: true } },
+      required: ["enabled"],
+    },
+    ApiDocsSettingsResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        settings: {
+          type: "object",
+          properties: {
+            enabled: { type: "boolean" },
+            updatedAt: { type: "string", format: "date-time", nullable: true },
+          },
+          required: ["enabled", "updatedAt"],
+        },
+      },
+      required: ["ok", "settings"],
+    },
+    WebhookDraft: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        url: { type: "string", format: "uri" },
+        secret: { type: "string", description: "Generated when empty." },
+        events: { type: "array", items: { type: "string", enum: ["entry.created", "entry.updated", "entry.deleted"] } },
+        schemaId: { type: "string", nullable: true },
+        active: { type: "boolean" },
+      },
+      required: ["name", "url", "events", "active"],
+    },
+    WebhookListResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        webhooks: { type: "array", items: { type: "object" } },
+      },
+      required: ["ok", "webhooks"],
+    },
+    WebhookMutationResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        webhook: { type: "object" },
+      },
+      required: ["ok", "webhook"],
+    },
+    RealtimeConfigRequest: {
+      type: "object",
+      properties: {
+        enabled: { type: "boolean" },
+        events: { type: "array", items: { type: "string", enum: ["entry.created", "entry.updated", "entry.deleted"] } },
+      },
+      required: ["enabled", "events"],
+    },
+    RealtimeSessionRequest: {
+      type: "object",
+      properties: {
+        schema: { type: "string", example: "orders" },
+        ttlSeconds: { type: "integer", minimum: 30, maximum: 300 },
+      },
+      required: ["schema"],
+    },
+  };
 }
 
 function entryDataSchema(fields: FieldRecord[]): OpenApiSchema {
@@ -304,6 +816,83 @@ function apiSecurity(): OpenApiSchema[] {
   ];
 }
 
+function apiTokenSecurity(): OpenApiSchema[] {
+  return [
+    { bearerAuth: [] },
+    { apiTokenHeader: [] },
+  ];
+}
+
+function adminSecurity(): OpenApiSchema[] {
+  return [{ adminBearerAuth: [] }];
+}
+
+function adminCollectionPath(
+  tag: string,
+  noun: string,
+  requestSchema: string,
+  listResponseSchema: string,
+  mutationResponseSchema: string,
+): OpenApiSchema {
+  return {
+    get: {
+      tags: [tag],
+      summary: `List ${noun}s`,
+      security: adminSecurity(),
+      responses: okResponse({ $ref: `#/components/schemas/${listResponseSchema}` }),
+    },
+    post: {
+      tags: [tag],
+      summary: `Create a ${noun}`,
+      security: adminSecurity(),
+      requestBody: requestBody(requestSchema),
+      responses: okResponse({ $ref: `#/components/schemas/${mutationResponseSchema}` }),
+    },
+  };
+}
+
+function pathParameter(name: string, description: string): OpenApiSchema {
+  return {
+    description,
+    in: "path",
+    name,
+    required: true,
+    schema: { type: "string" },
+  };
+}
+
+function permissionSaveSchema(actions: string[]): OpenApiSchema {
+  return {
+    type: "object",
+    properties: {
+      permissions: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            schemaId: { type: "string", description: "Required for content API permissions." },
+            action: { type: "string", enum: actions },
+            allowed: { type: "boolean" },
+          },
+          required: ["action", "allowed"],
+        },
+      },
+    },
+    required: ["permissions"],
+  };
+}
+
+function permissionListSchema(): OpenApiSchema {
+  return {
+    type: "object",
+    properties: {
+      ok: { type: "boolean", example: true },
+      permissions: { type: "array", items: { type: "object" } },
+    },
+    required: ["ok", "permissions"],
+  };
+}
+
 function requestBody(schemaName: string): OpenApiSchema {
   return {
     required: true,
@@ -334,6 +923,14 @@ function okResponse(schema: OpenApiSchema): OpenApiSchema {
       content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } },
     },
   };
+}
+
+async function apiDocsEnabled(database: ApiagexDatabase): Promise<boolean> {
+  return (await getApiDocsSettings(database)).enabled;
+}
+
+function sendApiDocsDisabled(reply: FastifyReply): FastifyReply {
+  return reply.code(404).send({ ok: false, error: "API_DOCS_DISABLED" });
 }
 
 function sendSwaggerUi(reply: FastifyReply): FastifyReply {

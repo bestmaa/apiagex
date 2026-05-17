@@ -22,6 +22,11 @@ export const settingsSubnavItems: AdminSubnavItem[] = [
     route: "settings/api-tokens",
   },
   {
+    description: "Publish Swagger/OpenAPI docs.",
+    label: "API Docs",
+    route: "settings/api-docs",
+  },
+  {
     description: "Send content change events.",
     label: "Webhooks",
     route: "settings/webhooks",
