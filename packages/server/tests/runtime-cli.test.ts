@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AddressInfo } from "node:net";
-import { mkdtemp } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { runRuntimeCli, startApiagex } from "../src/runtime.js";
+import { createSchema, openMigratedSqliteAdapter } from "@apiagex/database";
 
 describe("apiagex runtime CLI", () => {
   it("prints help", async () => {
@@ -38,6 +39,41 @@ describe("apiagex runtime CLI", () => {
 
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("does not need a project build");
+  });
+
+  it("generates TypeScript schema helpers from the runtime database", async () => {
+    const root = await mkdtemp(join(tmpdir(), "apiagex-runtime-types-"));
+    await mkdir(join(root, "data"));
+    const databasePath = join(root, "data/runtime.sqlite");
+    const database = openMigratedSqliteAdapter(databasePath);
+    await createSchema(database, {
+      name: "Products",
+      slug: "products",
+      fields: [
+        { name: "Name", slug: "name", type: "text", required: true },
+        { name: "Price", slug: "price", type: "number", required: true },
+        { name: "Published", slug: "published", type: "boolean" },
+      ],
+    });
+    await database.close();
+
+    const result = await runRuntimeCli(["types"], {
+      cwd: root,
+      env: {
+        APIAGEX_DATABASE_PATH: "data/runtime.sqlite",
+        APIAGEX_UPLOADS_PATH: "uploads",
+      },
+    });
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Generated 1 schema type");
+    const generated = await readFile(join(root, "src/apiagex-types.ts"), "utf8");
+    expect(generated).toContain('"products"');
+    expect(generated).toContain("export type ProductsData");
+    expect(generated).toContain("name: string;");
+    expect(generated).toContain("price: number;");
+    expect(generated).toContain("published?: boolean | null;");
+    expect(generated).toContain("queryApiagexEntries");
   });
 
   it("rejects unknown commands", async () => {

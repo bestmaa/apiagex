@@ -12,6 +12,7 @@ export { createCustomRouteContext } from "./custom-routes.js";
 export { bootstrapOwner, getOwnerStatus, loginOwner } from "./owner-bootstrap.js";
 export { renderRuntimeHelp, runRuntimeCli, startApiagex, startApiagexServer } from "./runtime.js";
 export { ensureLocalServerPaths, resolveLocalServerConfig } from "./server-config.js";
+export { generateApiagexTypes, renderApiagexTypes } from "./typegen.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";
@@ -26,6 +27,10 @@ export type {
   RegisterApiagexCustomRoutes,
 } from "./custom-routes.type.js";
 export type { LocalServerConfig, ServerConfigEnv } from "./server-config.type.js";
+export type {
+  GenerateApiagexTypesOptions,
+  GenerateApiagexTypesResult,
+} from "./typegen.js";
 export type {
   InitialOwnerOptions,
   RuntimeCliOptions,

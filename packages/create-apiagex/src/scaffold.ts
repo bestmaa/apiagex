@@ -117,8 +117,9 @@ If .env contains APIAGEX_OWNER_EMAIL and APIAGEX_OWNER_PASSWORD, the first owner
 
 - \`${runCommand(answers.packageManager, "dev")}\`: start ${entrySourcePath(answers)} with .env.
 - \`${runCommand(answers.packageManager, "start")}\`: start ${answers.language === "ts" ? "dist/index.js" : "src/index.js"} with .env.
+${answers.language === "ts" ? `- \`${runCommand(answers.packageManager, "types")}\`: generate src/apiagex-types.ts from Admin UI schemas.\n` : ""}
 - \`${runCommand(answers.packageManager, "smoke")}\`: verify the runtime health route.
-- \`${runCommand(answers.packageManager, "build")}\`: print runtime build guidance.
+- \`${runCommand(answers.packageManager, "build")}\`: ${answers.language === "ts" ? "compile TypeScript to dist." : "print runtime build guidance."}
 
 ## Environment
 
@@ -144,6 +145,7 @@ English:
 4. Create Content Roles, save permissions, then create users or API tokens.
 5. Use Webhooks for external server notifications and Realtime API for live browser screens.
 6. Add business APIs in ${customRoutesSourcePath(answers)} when generated CRUD is not enough.
+7. Run ${answers.language === "ts" ? `\`${runCommand(answers.packageManager, "types")}\`` : "`apiagex types`"} after schema changes to refresh slug and field autocomplete.
 
 Hinglish:
 
@@ -153,6 +155,7 @@ Hinglish:
 4. Content Roles banao, permissions save karo, phir users ya API tokens create karo.
 5. External server notifications ke liye Webhooks aur live browser screens ke liye Realtime API use karo.
 6. Generated CRUD enough nahi ho to ${customRoutesSourcePath(answers)} me business APIs add karo.
+7. Schema change ke baad ${answers.language === "ts" ? `\`${runCommand(answers.packageManager, "types")}\`` : "`apiagex types`"} chalao, taaki slug aur field autocomplete refresh ho.
 
 ## Common errors
 
@@ -205,6 +208,12 @@ Relation docs: /doc explains relation field types, entry payloads, populate quer
 English: Use src/custom-routes.ts or src/custom-routes.js for endpoints such as checkout, pay order, assign rider, or reports. Custom routes run on the same server and can use Apiagex helpers for schemas, entries, roles, realtime sessions, and the raw database.
 
 Hinglish: Checkout, pay order, assign rider, ya reports jaise endpoints ke liye src/custom-routes.ts ya src/custom-routes.js use karo. Custom routes same server par run hote hain aur schemas, entries, roles, realtime sessions, aur raw database ke Apiagex helpers use kar sakte hain.
+
+## Type generation
+
+English: In TypeScript projects, run npm run types after creating or changing schemas. It writes src/apiagex-types.ts with schema slug autocomplete, field data types, and typed entry query helpers.
+
+Hinglish: TypeScript project me schema create ya change karne ke baad npm run types chalao. Ye src/apiagex-types.ts banata hai jisme schema slug autocomplete, field data types, aur typed entry query helpers milte hain.
 `;
 }
 
@@ -221,6 +230,7 @@ function packageJsonFile(answers: ScaffoldAnswers): string {
             dev: "node --env-file=.env --import tsx src/index.ts",
             start: "node --env-file=.env dist/index.js",
             build: "tsc",
+            types: "apiagex types",
             smoke: "apiagex smoke",
           }
         : {

@@ -58,6 +58,7 @@ describe("generated Apiagex project", () => {
     const packageJson = await readFile(join(projectDir, "package.json"), "utf8");
     expect(packageJson).toContain('"dev": "node --env-file=.env --import tsx src/index.ts"');
     expect(packageJson).toContain('"build": "tsc"');
+    expect(packageJson).toContain('"types": "apiagex types"');
     expect(packageJson).toContain('"typescript"');
     expect(await readFile(join(projectDir, "tsconfig.json"), "utf8")).toContain('"strict": true');
     expect(await readFile(join(projectDir, "src/index.ts"), "utf8")).toContain("startApiagex");

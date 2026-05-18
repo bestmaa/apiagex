@@ -1,6 +1,9 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { createServer } from "./app.js";
 import { ensureLocalServerPaths, resolveLocalServerConfig } from "./server-config.js";
 import { bootstrapOwner } from "./owner-bootstrap.js";
+import { generateApiagexTypes } from "./typegen.js";
 import {
   openMigratedSqliteAdapter,
   openMySqlAdapter,
@@ -47,6 +50,7 @@ export async function runRuntimeCli(args: string[], options: RuntimeCliOptions =
   if (command === "--help" || command === "-h") return ok(renderRuntimeHelp());
   if (command === "--version" || command === "-v") return ok(`apiagex ${runtimeVersion}\n`);
   if (command === "smoke") return smoke(options);
+  if (command === "types") return generateTypes(args.slice(1), options);
   if (command === "build") return ok("Apiagex runtime does not need a project build. Run apiagex smoke to verify.\n");
   if (command === "dev" || command === "start") {
     const startOptions = {
@@ -66,9 +70,11 @@ Usage:
   apiagex dev       Start the Apiagex server for local development.
   apiagex start     Start the Apiagex server.
   apiagex smoke     Verify the runtime health route without a long-running server.
+  apiagex types     Generate TypeScript helpers from the current database schemas.
   apiagex build     Print build guidance for generated projects.
 
 Options:
+  --out <path>       apiagex types output file. Default: src/apiagex-types.ts.
   -h, --help        Show help.
   -v, --version     Show version.
 
@@ -89,6 +95,70 @@ async function openRuntimeDatabase(config: { databasePath: string; databaseProvi
   if (config.databaseProvider === "postgres") return openPostgresAdapter(config.databaseUrl, { migrate: true });
   if (config.databaseProvider === "mysql") return openMySqlAdapter(config.databaseUrl, { migrate: true });
   return openMigratedSqliteAdapter(config.databasePath);
+}
+
+async function generateTypes(args: string[], options: RuntimeCliOptions): Promise<RuntimeCliResult> {
+  const parsed = parseTypesArgs(args);
+  if (typeof parsed === "string") return fail(parsed);
+  const cwd = options.cwd ?? process.cwd();
+  const env = { ...await readProjectEnv(cwd), ...process.env, INIT_CWD: cwd, ...options.env };
+  const config = resolveLocalServerConfig(env, cwd);
+  await ensureLocalServerPaths(config);
+  const database = await openRuntimeDatabase(config);
+  try {
+    const result = await generateApiagexTypes(database, {
+      cwd,
+      ...(parsed.outFile === undefined ? {} : { outFile: parsed.outFile }),
+    });
+    return ok(`Generated ${result.schemaCount} schema type${result.schemaCount === 1 ? "" : "s"} at ${result.outFile}\n`);
+  } finally {
+    await database.close();
+  }
+}
+
+function parseTypesArgs(args: string[]): { outFile?: string } | string {
+  const parsed: { outFile?: string } = {};
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index] ?? "";
+    if (arg === "--out" || arg === "-o") {
+      const outFile = args[index + 1];
+      if (!outFile) return "Use apiagex types --out <path>.";
+      parsed.outFile = outFile;
+      index += 1;
+    } else if (arg.startsWith("-")) return `Unknown apiagex types option: ${arg}`;
+    else return `Unknown apiagex types argument: ${arg}`;
+  }
+  return parsed;
+}
+
+async function readProjectEnv(cwd: string): Promise<Record<string, string>> {
+  try {
+    return parseDotEnv(await readFile(join(cwd, ".env"), "utf8"));
+  } catch (error) {
+    if (typeof error === "object" && error && "code" in error && error.code === "ENOENT") return {};
+    throw error;
+  }
+}
+
+function parseDotEnv(content: string): Record<string, string> {
+  const env: Record<string, string> = {};
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+    const separator = line.indexOf("=");
+    if (separator === -1) continue;
+    const key = line.slice(0, separator).trim();
+    if (!key) continue;
+    env[key] = unquoteEnvValue(line.slice(separator + 1).trim());
+  }
+  return env;
+}
+
+function unquoteEnvValue(value: string): string {
+  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    return value.slice(1, -1);
+  }
+  return value;
 }
 
 function databaseLocationLine(config: { databasePath: string; databaseProvider: string; databaseUrl?: string }): string {
