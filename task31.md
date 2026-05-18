@@ -30,6 +30,15 @@ Goal: Make generated TypeScript project types useful inside custom routes withou
 
 ## T3104 - Release
 
-- Status: `in_progress`
+- Status: `completed`
 - Task: Run verification, bump release version, commit, push, publish to npm, and verify published package versions.
 - Verify: `npm run check`, release check, GitHub publish workflow, and `npm view` package versions.
+
+## Verification Results
+
+- `npm run build -w @apiagex/server && npm run build -w create-apiagex && npx vitest run packages/server/tests/custom-routes.test.ts packages/server/tests/runtime-cli.test.ts packages/create-apiagex/tests`: passed.
+- `npm run check`: passed with 49 test files, 196 tests passed, and 2 skipped.
+- `npx npm@10.9.7 run release:check`: passed with build, tests, smoke, and high audit.
+- GitHub publish workflow `npm-v0.8.13`: passed.
+- Provider E2E workflow on `main`: passed.
+- `npm view @apiagex/database version`, `npm view @apiagex/server version`, and `npm view create-apiagex version`: all returned `0.8.13`.
