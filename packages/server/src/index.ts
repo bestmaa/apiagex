@@ -24,6 +24,11 @@ export type {
 } from "./app.type.js";
 export type {
   ApiagexCustomRouteContext,
+  ApiagexEntryDataFor,
+  ApiagexEntryFor,
+  ApiagexProjectSchemaMap,
+  ApiagexProjectTypes,
+  ApiagexSchemaSlug,
   RegisterApiagexCustomRoutes,
 } from "./custom-routes.type.js";
 export type { LocalServerConfig, ServerConfigEnv } from "./server-config.type.js";

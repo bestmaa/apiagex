@@ -211,9 +211,9 @@ Hinglish: Checkout, pay order, assign rider, ya reports jaise endpoints ke liye 
 
 ## Type generation
 
-English: In TypeScript projects, run npm run types after creating or changing schemas. It writes src/apiagex-types.ts with schema slug autocomplete, field data types, and typed entry query helpers.
+English: In TypeScript projects, run npm run types after creating or changing schemas. It writes src/apiagex-types.ts so RegisterApiagexCustomRoutes automatically gets schema slug and field autocomplete.
 
-Hinglish: TypeScript project me schema create ya change karne ke baad npm run types chalao. Ye src/apiagex-types.ts banata hai jisme schema slug autocomplete, field data types, aur typed entry query helpers milte hain.
+Hinglish: TypeScript project me schema create ya change karne ke baad npm run types chalao. Ye src/apiagex-types.ts banata hai jisse RegisterApiagexCustomRoutes me schema slug aur field autocomplete automatic milta hai.
 `;
 }
 
@@ -404,12 +404,7 @@ function customRoutesFileJs(): string {
 }
 
 function customRoutesFileTs(): string {
-  return `import type { ApiagexCustomRouteContext, RegisterApiagexCustomRoutes } from "@apiagex/server";
-
-type ApiagexEntry<TData> =
-  NonNullable<Awaited<ReturnType<ApiagexCustomRouteContext["entries"]["getById"]>>> & {
-    data: TData;
-  };
+  return `import type { RegisterApiagexCustomRoutes } from "@apiagex/server";
 
 type OrderData = {
   status: "pending" | "paid" | "cancelled";
@@ -433,16 +428,17 @@ export const registerCustomRoutes: RegisterApiagexCustomRoutes = async (app, api
   }));
 
   app.post<{ Params: PayOrderParams }>("/api/custom/orders/:entryId/pay", async (request, reply) => {
-    const entry = await apiagex.entries.getById(request.params.entryId) as ApiagexEntry<OrderData> | undefined;
+    const entry = await apiagex.entries.getById(request.params.entryId);
     if (!entry) return reply.code(404).send({ ok: false, error: "ORDER_NOT_FOUND" });
-    if (entry.data.status !== "pending") {
+    const data = entry.data as OrderData;
+    if (data.status !== "pending") {
       return reply.code(400).send({ ok: false, error: "ORDER_NOT_PAYABLE" });
     }
 
     return {
       ok: true,
       entry: await apiagex.entries.update(entry.id, {
-        data: { ...entry.data, status: "paid", paymentStatus: "paid" },
+        data: { ...data, status: "paid", paymentStatus: "paid" },
       }),
     };
   });

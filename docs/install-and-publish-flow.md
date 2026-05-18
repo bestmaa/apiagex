@@ -121,8 +121,8 @@ This writes `src/apiagex-types.ts` with:
 - `apiagexSchemaSlugs`
 - `ApiagexSchemaSlug`
 - one data type per schema, for example `ProductsData`
-- `queryApiagexEntries(apiagex, "products", options)` for typed entry reads
-- `typedApiagexEntry<"products">(entry)` for typing one fetched entry
+- automatic schema slug and field autocomplete inside `RegisterApiagexCustomRoutes`
+- typed slug helpers such as `apiagex.schemas.getBySlug("products")`, `apiagex.entries.query("products", options)`, and `apiagex.entries.create("products", { data })`
 
 ### Hinglish
 
@@ -140,7 +140,7 @@ Admin UI se schema create ya change karne ke baad chalao:
 npm run types
 ```
 
-Ye `src/apiagex-types.ts` likhta hai jisme schema slug autocomplete, per-schema data types, typed entry query helper, aur typed single entry helper milte hain.
+Ye `src/apiagex-types.ts` likhta hai jisse `RegisterApiagexCustomRoutes` ke andar schema slug aur field autocomplete automatic milta hai. Iske baad `apiagex.schemas.getBySlug("products")`, `apiagex.entries.query("products", options)`, aur `apiagex.entries.create("products", { data })` jaise helpers typed ho jaate hain.
 
 ## Environment
 

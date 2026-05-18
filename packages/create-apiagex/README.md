@@ -43,7 +43,7 @@ For TypeScript projects, run this after creating or changing schemas in Admin UI
 npm run types
 ```
 
-It generates `src/apiagex-types.ts` with schema slug autocomplete, per-schema data types, `queryApiagexEntries()`, and `typedApiagexEntry()`.
+It generates `src/apiagex-types.ts` so `RegisterApiagexCustomRoutes` automatically gets schema slug and field autocomplete. Custom routes can call typed helpers such as `apiagex.schemas.getBySlug("products")`, `apiagex.entries.query("products", options)`, and `apiagex.entries.create("products", { data })`.
 
 The generated starter README points users to `/doc`, `/readme`, and `/adminui`, includes practical owner/schema/entry/role/webhook/realtime flow, and explains common errors.
 
@@ -122,7 +122,7 @@ TypeScript projects me Admin UI se schema create/change karne ke baad ye chalao:
 npm run types
 ```
 
-Ye `src/apiagex-types.ts` generate karta hai jisme schema slug autocomplete, per-schema data types, `queryApiagexEntries()`, aur `typedApiagexEntry()` milte hain.
+Ye `src/apiagex-types.ts` generate karta hai jisse `RegisterApiagexCustomRoutes` me schema slug aur field autocomplete automatic milta hai. Custom routes me `apiagex.schemas.getBySlug("products")`, `apiagex.entries.query("products", options)`, aur `apiagex.entries.create("products", { data })` jaise helpers typed ho jaate hain.
 
 Generated starter README users ko `/doc`, `/readme`, aur `/adminui` par point karta hai, practical owner/schema/entry/role/webhook/realtime flow include karta hai, aur common errors explain karta hai.
 

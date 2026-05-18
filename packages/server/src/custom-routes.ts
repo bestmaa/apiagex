@@ -16,6 +16,11 @@ import {
   resolveApiToken,
   updateEntry,
   type ApiagexDatabase,
+  type CreateEntryInput,
+  type EntryData,
+  type EntryListOptions,
+  type SchemaRecord,
+  type UpdateEntryInput,
 } from "@apiagex/database";
 import type { ApiagexCustomRouteContext } from "./custom-routes.type.js";
 
@@ -23,17 +28,40 @@ export function createCustomRouteContext(database: ApiagexDatabase): ApiagexCust
   return {
     database,
     entries: {
-      create: (input) => createEntry(database, input),
+      create: (async (inputOrSlug: CreateEntryInput | string, input?: { data: EntryData }) => {
+        if (typeof inputOrSlug !== "string") return createEntry(database, inputOrSlug);
+        const schema = await resolveSchema(database, inputOrSlug);
+        return createEntry(database, { schemaId: schema.id, data: input?.data ?? {} });
+      }) as ApiagexCustomRouteContext["entries"]["create"],
       delete: (entryId) => deleteEntry(database, entryId),
-      getById: (entryId) => getEntryById(database, entryId),
-      list: (schemaId) => listEntries(database, schemaId),
-      query: (schemaId, options = {}) => queryEntries(database, schemaId, options),
-      update: (entryId, input) => updateEntry(database, entryId, input),
+      getById: (async (schemaSlugOrEntryId: string, entryId?: string) => {
+        if (entryId === undefined) return getEntryById(database, schemaSlugOrEntryId);
+        const schema = await resolveSchema(database, schemaSlugOrEntryId);
+        const entry = await getEntryById(database, entryId);
+        if (entry && entry.schemaId !== schema.id) return undefined;
+        return entry;
+      }) as ApiagexCustomRouteContext["entries"]["getById"],
+      list: (async (schemaSlugOrId: string) => {
+        const schema = await resolveSchema(database, schemaSlugOrId);
+        return listEntries(database, schema.id);
+      }) as ApiagexCustomRouteContext["entries"]["list"],
+      query: (async (schemaSlugOrId: string, options: EntryListOptions = {}) => {
+        const schema = await resolveSchema(database, schemaSlugOrId);
+        return queryEntries(database, schema.id, options);
+      }) as ApiagexCustomRouteContext["entries"]["query"],
+      update: (async (entryIdOrSlug: string, inputOrEntryId: UpdateEntryInput | string, input?: UpdateEntryInput) => {
+        if (typeof inputOrEntryId !== "string") return updateEntry(database, entryIdOrSlug, inputOrEntryId);
+        const schema = await resolveSchema(database, entryIdOrSlug);
+        const entry = await getEntryById(database, inputOrEntryId);
+        if (!entry) throw new Error("ENTRY_NOT_FOUND");
+        if (entry.schemaId !== schema.id) throw new Error("ENTRY_SCHEMA_MISMATCH");
+        return updateEntry(database, inputOrEntryId, input ?? { data: {} });
+      }) as ApiagexCustomRouteContext["entries"]["update"],
     },
     schemas: {
       create: (input) => createSchema(database, input),
       getById: (schemaId) => getSchemaById(database, schemaId),
-      getBySlug: (slug) => getSchemaBySlug(database, slug),
+      getBySlug: ((slug: string) => getSchemaBySlug(database, slug)) as ApiagexCustomRouteContext["schemas"]["getBySlug"],
       list: () => listSchemas(database),
     },
     roles: {
@@ -56,4 +84,10 @@ export function createCustomRouteContext(database: ApiagexDatabase): ApiagexCust
       create: (input) => createUser(database, input),
     },
   };
+}
+
+async function resolveSchema(database: ApiagexDatabase, slugOrId: string): Promise<SchemaRecord> {
+  const schema = await getSchemaBySlug(database, slugOrId) ?? await getSchemaById(database, slugOrId);
+  if (!schema) throw new Error(`SCHEMA_NOT_FOUND:${slugOrId}`);
+  return schema;
 }

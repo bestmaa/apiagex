@@ -34,7 +34,7 @@ After creating or changing schemas in Admin UI, generate TypeScript helpers:
 npm run types
 ```
 
-That writes `src/apiagex-types.ts` with schema slug autocomplete, per-schema data types, and typed entry query helpers for custom business APIs in `src/custom-routes.ts`.
+That writes `src/apiagex-types.ts`, and `RegisterApiagexCustomRoutes` automatically uses it for schema slug and field autocomplete in `src/custom-routes.ts`.
 
 ## Open Source License
 

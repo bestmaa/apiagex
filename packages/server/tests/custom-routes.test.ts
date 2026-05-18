@@ -82,4 +82,46 @@ describe("custom business route extension", () => {
     expect(paidAgain.statusCode).toBe(400);
     expect(paidAgain.json()).toEqual({ ok: false, error: "ORDER_NOT_PAYABLE" });
   });
+
+  it("supports slug-based entry helpers for custom routes", async () => {
+    const server = createServer({
+      adminAuth: "disabled",
+      database: openSqliteDatabase(),
+      async customRoutes(app, apiagex) {
+        app.post("/api/custom/products", async () => ({
+          ok: true,
+          entry: await apiagex.entries.create("products", {
+            data: { name: "Phone", price: 1000 },
+          }),
+        }));
+
+        app.get("/api/custom/products", async () => ({
+          ok: true,
+          result: await apiagex.entries.query("products", { search: "Phone", limit: 10, offset: 0 }),
+        }));
+      },
+    });
+
+    await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        fields: [
+          { name: "Name", slug: "name", type: "text", required: true },
+          { name: "Price", slug: "price", type: "number", required: true },
+        ],
+        name: "Products",
+        slug: "products",
+      },
+    });
+
+    const created = await server.inject({ method: "POST", url: "/api/custom/products" });
+    const listed = await server.inject({ method: "GET", url: "/api/custom/products" });
+
+    expect(created.statusCode).toBe(200);
+    expect(created.json().entry.data).toEqual({ name: "Phone", price: 1000 });
+    expect(listed.statusCode).toBe(200);
+    expect(listed.json().result.total).toBe(1);
+    expect(listed.json().result.entries[0].data.name).toBe("Phone");
+  });
 });

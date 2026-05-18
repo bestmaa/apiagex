@@ -73,7 +73,9 @@ describe("apiagex runtime CLI", () => {
     expect(generated).toContain("name: string;");
     expect(generated).toContain("price: number;");
     expect(generated).toContain("published?: boolean | null;");
-    expect(generated).toContain("queryApiagexEntries");
+    expect(generated).toContain('declare module "@apiagex/server"');
+    expect(generated).toContain("interface ApiagexProjectTypes");
+    expect(generated).toContain("schemas: ApiagexEntryDataBySlug;");
   });
 
   it("rejects unknown commands", async () => {
