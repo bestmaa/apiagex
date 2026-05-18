@@ -16,10 +16,25 @@ Then:
 
 ```bash
 cd my-cms
+npm install
 npm run dev
 ```
 
 Open `http://127.0.0.1:4000/adminui`.
+
+TypeScript is the default starter language. Use JavaScript explicitly when needed:
+
+```bash
+npx create-apiagex@latest my-cms --language js
+```
+
+After creating or changing schemas in Admin UI, generate TypeScript helpers:
+
+```bash
+npm run types
+```
+
+That writes `src/apiagex-types.ts` with schema slug autocomplete, per-schema data types, and typed entry query helpers for custom business APIs in `src/custom-routes.ts`.
 
 ## Open Source License
 
@@ -132,6 +147,8 @@ GitHub repo secret me `NPM_TOKEN` add karo. Pehle `dry_run=true` se check karo; 
 - Strapi-style install aur publish flow [docs/install-and-publish-flow.md](./docs/install-and-publish-flow.md) me documented hai.
 - Database provider setup for SQLite, PostgreSQL, and MySQL is documented at [docs/database-provider-setup.md](./docs/database-provider-setup.md).
 - SQLite, PostgreSQL, aur MySQL database provider setup [docs/database-provider-setup.md](./docs/database-provider-setup.md) me documented hai.
+- `create-apiagex` defaults to TypeScript, supports `--language js`, and TypeScript starters can run `npm run types` to generate schema slug and field autocomplete helpers.
+- `create-apiagex` default TypeScript use karta hai, `--language js` support karta hai, aur TypeScript starters `npm run types` se schema slug aur field autocomplete helpers generate kar sakte hain.
 - Apiagex MVP release gate is ready at version `v1.0.0`.
 - Apiagex MVP release gate version `v1.0.0` par ready hai.
 - Apiagex task2 release gate is ready at version `v2.0.0`.

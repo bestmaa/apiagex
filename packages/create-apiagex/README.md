@@ -16,6 +16,7 @@ Current CLI behavior:
 - Creates a small starter scaffold when the target folder is missing or empty.
 
 Interactive setup asks for setup mode, database provider, SQLite database path or PostgreSQL/MySQL database URL, host, port, package manager, dependency install preference, git init preference, and optional first owner bootstrap credentials.
+TypeScript is the default language. Use `--language js` when a JavaScript starter is preferred.
 
 Generated starter files:
 
@@ -24,16 +25,25 @@ Generated starter files:
 - `.env`
 - `.env.example`
 - `apiagex.config.json`
-- `src/index.js`
-- `src/custom-routes.js`
+- `src/index.ts` by default, or `src/index.js` with `--language js`
+- `src/custom-routes.ts` by default, or `src/custom-routes.js` with `--language js`
+- `tsconfig.json` for TypeScript projects
 - `README.md`
 - `docs/README.md`
 
 The generated `.env` stores local setup values such as `APIAGEX_DATABASE_PROVIDER`, `APIAGEX_DATABASE_PATH` for SQLite or `APIAGEX_DATABASE_URL` for PostgreSQL/MySQL, `APIAGEX_UPLOADS_PATH`, `APIAGEX_SECRET`, `HOST`, and `PORT`. If owner bootstrap is enabled, `.env` also contains `APIAGEX_OWNER_EMAIL` and `APIAGEX_OWNER_PASSWORD`; remove the password after the first successful start.
 
-The generated `package.json` depends on `@apiagex/server` and exposes `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`.
+The generated `package.json` depends on `@apiagex/server` and exposes `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`. TypeScript projects also expose `npm run types`.
 
-The generated `src/custom-routes.js` is the place for business APIs such as checkout, pay order, assign rider, and reports. These routes run on the same Fastify server and receive Apiagex helpers for schemas, entries, roles, realtime sessions, users, and the raw database.
+The generated `src/custom-routes.ts` or `src/custom-routes.js` is the place for business APIs such as checkout, pay order, assign rider, and reports. These routes run on the same Fastify server and receive Apiagex helpers for schemas, entries, roles, realtime sessions, users, and the raw database.
+
+For TypeScript projects, run this after creating or changing schemas in Admin UI:
+
+```bash
+npm run types
+```
+
+It generates `src/apiagex-types.ts` with schema slug autocomplete, per-schema data types, `queryApiagexEntries()`, and `typedApiagexEntry()`.
 
 The generated starter README points users to `/doc`, `/readme`, and `/adminui`, includes practical owner/schema/entry/role/webhook/realtime flow, and explains common errors.
 
@@ -46,6 +56,7 @@ Example:
 ```bash
 npm create apiagex@latest my-cms
 npx create-apiagex my-cms
+npx create-apiagex my-cms --language js
 npm run build -w create-apiagex
 node packages/create-apiagex/dist/index.js my-cms --dry-run
 node packages/create-apiagex/dist/index.js my-cms --yes
@@ -84,6 +95,7 @@ Current CLI behavior:
 - Target folder missing ya empty ho to small starter scaffold create hota hai.
 
 Interactive setup setup mode, database provider, SQLite database path ya PostgreSQL/MySQL database URL, host, port, package manager, dependency install preference, git init preference, aur optional first owner bootstrap credentials puchta hai.
+TypeScript default language hai. JavaScript starter chahiye ho to `--language js` use karo.
 
 Generated starter files:
 
@@ -92,16 +104,25 @@ Generated starter files:
 - `.env`
 - `.env.example`
 - `apiagex.config.json`
-- `src/index.js`
-- `src/custom-routes.js`
+- default me `src/index.ts`, ya `--language js` ke saath `src/index.js`
+- default me `src/custom-routes.ts`, ya `--language js` ke saath `src/custom-routes.js`
+- TypeScript projects ke liye `tsconfig.json`
 - `README.md`
 - `docs/README.md`
 
 Generated `.env` local setup values store karta hai, jaise `APIAGEX_DATABASE_PROVIDER`, SQLite ke liye `APIAGEX_DATABASE_PATH` ya PostgreSQL/MySQL ke liye `APIAGEX_DATABASE_URL`, `APIAGEX_UPLOADS_PATH`, `APIAGEX_SECRET`, `HOST`, aur `PORT`. Owner bootstrap enable ho to `.env` me `APIAGEX_OWNER_EMAIL` aur `APIAGEX_OWNER_PASSWORD` bhi hota hai; first successful start ke baad password hata do.
 
-Generated `package.json` `@apiagex/server` par depend karta hai aur `npm run dev`, `npm run start`, `npm run smoke`, aur `npm run build` expose karta hai.
+Generated `package.json` `@apiagex/server` par depend karta hai aur `npm run dev`, `npm run start`, `npm run smoke`, aur `npm run build` expose karta hai. TypeScript projects me `npm run types` bhi hota hai.
 
-Generated `src/custom-routes.js` business APIs ke liye jagah hai, jaise checkout, pay order, assign rider, aur reports. Ye routes same Fastify server par run hote hain aur schemas, entries, roles, realtime sessions, users, aur raw database ke Apiagex helpers receive karte hain.
+Generated `src/custom-routes.ts` ya `src/custom-routes.js` business APIs ke liye jagah hai, jaise checkout, pay order, assign rider, aur reports. Ye routes same Fastify server par run hote hain aur schemas, entries, roles, realtime sessions, users, aur raw database ke Apiagex helpers receive karte hain.
+
+TypeScript projects me Admin UI se schema create/change karne ke baad ye chalao:
+
+```bash
+npm run types
+```
+
+Ye `src/apiagex-types.ts` generate karta hai jisme schema slug autocomplete, per-schema data types, `queryApiagexEntries()`, aur `typedApiagexEntry()` milte hain.
 
 Generated starter README users ko `/doc`, `/readme`, aur `/adminui` par point karta hai, practical owner/schema/entry/role/webhook/realtime flow include karta hai, aur common errors explain karta hai.
 
@@ -114,6 +135,7 @@ Example:
 ```bash
 npm create apiagex@latest my-cms
 npx create-apiagex my-cms
+npx create-apiagex my-cms --language js
 npm run build -w create-apiagex
 node packages/create-apiagex/dist/index.js my-cms --dry-run
 node packages/create-apiagex/dist/index.js my-cms --yes

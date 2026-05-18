@@ -33,8 +33,10 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `/adminui` MVP navigation shell dikhata hai: Dashboard, Schemas, Entries, APIs, Users, Settings, Docs.
 - Settings > API Docs separately controls generated Content API docs and Admin/control-plane API docs.
 - Settings > API Docs generated Content API docs aur Admin/control-plane API docs ko alag-alag control karta hai.
-- Generated projects include `src/custom-routes.js` for business APIs that generated CRUD cannot model.
-- Generated projects me generated CRUD se bahar business APIs ke liye `src/custom-routes.js` hota hai.
+- Generated projects default to TypeScript and include `src/custom-routes.ts` for business APIs that generated CRUD cannot model.
+- Generated projects default TypeScript hote hain aur generated CRUD se bahar business APIs ke liye `src/custom-routes.ts` hota hai.
+- TypeScript projects can run `npm run types` to generate `src/apiagex-types.ts` from current schemas for slug and field autocomplete.
+- TypeScript projects current schemas se slug aur field autocomplete ke liye `npm run types` chala kar `src/apiagex-types.ts` generate kar sakte hain.
 - Base path checkpoint verifies `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.
 - Base path checkpoint `/api`, `/api/health`, `/doc`, `/readme`, aur `/adminui` verify karta hai.
 - SQLite foundation has MVP tables: migrations, roles, users, schemas, fields, entries, permissions.

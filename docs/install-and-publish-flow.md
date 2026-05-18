@@ -18,8 +18,10 @@ npx create-apiagex my-cms
 The installer asks for:
 
 - project name
+- language: `ts` or `js` (`ts` is the default)
 - setup mode: `quickstart` or `custom`
-- SQLite database path
+- database provider: `sqlite`, `postgres`, or `mysql`
+- SQLite database path or PostgreSQL/MySQL database URL
 - server host and port
 - package manager: `npm`, `pnpm`, or `yarn`
 - whether dependencies should be installed after scaffold
@@ -30,6 +32,7 @@ For CI or scripted setup:
 
 ```bash
 npx create-apiagex my-cms --yes
+npx create-apiagex my-cms --language js
 npx create-apiagex my-cms --setup quickstart --package-manager npm --no-install --no-git --no-owner
 npx create-apiagex my-cms --setup custom --database sqlite --database-path data/apiagex.sqlite --host 0.0.0.0 --port 4000
 ```
@@ -61,8 +64,10 @@ npx create-apiagex my-cms
 Installer ye puchega:
 
 - project name
+- language: `ts` ya `js` (`ts` default hai)
 - setup mode: `quickstart` ya `custom`
-- SQLite database path
+- database provider: `sqlite`, `postgres`, ya `mysql`
+- SQLite database path ya PostgreSQL/MySQL database URL
 - server host aur port
 - package manager: `npm`, `pnpm`, ya `yarn`
 - scaffold ke baad dependencies install karni hain ya nahi
@@ -73,6 +78,7 @@ CI ya scripted setup ke liye:
 
 ```bash
 npx create-apiagex my-cms --yes
+npx create-apiagex my-cms --language js
 npx create-apiagex my-cms --setup quickstart --package-manager npm --no-install --no-git --no-owner
 npx create-apiagex my-cms --setup custom --database sqlite --database-path data/apiagex.sqlite --host 0.0.0.0 --port 4000
 ```
@@ -96,27 +102,51 @@ Open karo:
 
 ### English
 
-- `npm run dev`: starts `src/index.js` with `.env`
-- `npm run start`: starts `src/index.js` with `.env`
+- `npm run dev`: starts `src/index.ts` through `tsx` in TypeScript projects, or `src/index.js` in JavaScript projects.
+- `npm run start`: starts compiled `dist/index.js` in TypeScript projects, or `src/index.js` in JavaScript projects.
+- `npm run types`: TypeScript projects only; generates `src/apiagex-types.ts` from current Admin UI schemas.
 - `npm run smoke`: checks runtime health through `apiagex smoke`
-- `npm run build`: prints runtime build guidance through `apiagex build`
+- `npm run build`: compiles TypeScript projects with `tsc`; JavaScript projects print runtime build guidance through `apiagex build`.
 
-The generated project depends on `@apiagex/server`, which exposes both the `apiagex` command and the `startApiagex()` API for the generated `src/index.js` entry file. Add business APIs in `src/custom-routes.js` when generated CRUD cannot model the endpoint, such as checkout, pay order, assignment, and reporting routes.
+The generated project depends on `@apiagex/server`, which exposes both the `apiagex` command and the `startApiagex()` API for the generated entry file. Add business APIs in `src/custom-routes.ts` or `src/custom-routes.js` when generated CRUD cannot model the endpoint, such as checkout, pay order, assignment, and reporting routes.
+
+When schemas are created or changed from Admin UI, run:
+
+```bash
+npm run types
+```
+
+This writes `src/apiagex-types.ts` with:
+
+- `apiagexSchemaSlugs`
+- `ApiagexSchemaSlug`
+- one data type per schema, for example `ProductsData`
+- `queryApiagexEntries(apiagex, "products", options)` for typed entry reads
+- `typedApiagexEntry<"products">(entry)` for typing one fetched entry
 
 ### Hinglish
 
-- `npm run dev`: `.env` ke saath `src/index.js` start karta hai
-- `npm run start`: `.env` ke saath `src/index.js` start karta hai
+- `npm run dev`: TypeScript project me `tsx` ke through `src/index.ts` start karta hai, JavaScript project me `src/index.js` start karta hai.
+- `npm run start`: TypeScript project me compiled `dist/index.js` start karta hai, JavaScript project me `src/index.js` start karta hai.
+- `npm run types`: sirf TypeScript projects ke liye; current Admin UI schemas se `src/apiagex-types.ts` generate karta hai.
 - `npm run smoke`: `apiagex smoke` se runtime health check karta hai
-- `npm run build`: `apiagex build` se runtime build guidance print karta hai
+- `npm run build`: TypeScript projects ko `tsc` se compile karta hai; JavaScript projects me `apiagex build` se runtime build guidance print hoti hai.
 
-Generated project `@apiagex/server` par depend karta hai, jo installed `apiagex` command aur generated `src/index.js` ke liye `startApiagex()` API expose karta hai. Generated CRUD endpoint ko model nahi kar sakta to `src/custom-routes.js` me business APIs add karo, jaise checkout, pay order, assignment, aur reporting routes.
+Generated project `@apiagex/server` par depend karta hai, jo installed `apiagex` command aur generated entry file ke liye `startApiagex()` API expose karta hai. Generated CRUD endpoint ko model nahi kar sakta to `src/custom-routes.ts` ya `src/custom-routes.js` me business APIs add karo, jaise checkout, pay order, assignment, aur reporting routes.
+
+Admin UI se schema create ya change karne ke baad chalao:
+
+```bash
+npm run types
+```
+
+Ye `src/apiagex-types.ts` likhta hai jisme schema slug autocomplete, per-schema data types, typed entry query helper, aur typed single entry helper milte hain.
 
 ## Environment
 
 ### English
 
-Generated projects include `.env`, `.env.example`, `src/index.js`, and `src/custom-routes.js`.
+Generated projects include `.env`, `.env.example`, TypeScript files `src/index.ts` and `src/custom-routes.ts` by default, or JavaScript files when `--language js` is used.
 
 - `APIAGEX_DATABASE_PROVIDER=sqlite`
 - `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite`
@@ -126,11 +156,11 @@ Generated projects include `.env`, `.env.example`, `src/index.js`, and `src/cust
 - `HOST=127.0.0.1`
 - `APIAGEX_OWNER_EMAIL` and `APIAGEX_OWNER_PASSWORD` are optional first-owner bootstrap values.
 
-SQLite is supported today. Postgres and MySQL are planned provider choices for a later adapter release. Remove `APIAGEX_OWNER_PASSWORD` from `.env` after the first owner is created.
+SQLite, PostgreSQL, and MySQL are supported provider choices. Remove `APIAGEX_OWNER_PASSWORD` from `.env` after the first owner is created.
 
 ### Hinglish
 
-Generated projects me `.env`, `.env.example`, `src/index.js`, aur `src/custom-routes.js` hota hai.
+Generated projects me default TypeScript files `src/index.ts` aur `src/custom-routes.ts` hote hain; `--language js` use karne par JavaScript files milte hain.
 
 - `APIAGEX_DATABASE_PROVIDER=sqlite`
 - `APIAGEX_DATABASE_PATH=.apiagex/apiagex.sqlite`
@@ -140,7 +170,7 @@ Generated projects me `.env`, `.env.example`, `src/index.js`, aur `src/custom-ro
 - `HOST=127.0.0.1`
 - `APIAGEX_OWNER_EMAIL` aur `APIAGEX_OWNER_PASSWORD` optional first-owner bootstrap values hain.
 
-SQLite aaj supported hai. Postgres aur MySQL later adapter release ke liye planned provider choices hain. First owner create hone ke baad `.env` se `APIAGEX_OWNER_PASSWORD` hata do.
+SQLite, PostgreSQL, aur MySQL supported provider choices hain. First owner create hone ke baad `.env` se `APIAGEX_OWNER_PASSWORD` hata do.
 
 ## Maintainer Publish Checks
 
