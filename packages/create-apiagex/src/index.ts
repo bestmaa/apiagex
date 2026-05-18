@@ -9,7 +9,7 @@ import { resolveAnswers } from "./prompts.js";
 import { createScaffoldFiles, renderPlan } from "./scaffold.js";
 import type { CliResult, RunCliOptions } from "./create-apiagex.type.js";
 
-const packageVersion = "0.8.11";
+const packageVersion = "0.8.12";
 
 export async function runCli(args: string[], cwd = process.cwd(), io: RunCliOptions = {}): Promise<CliResult> {
   const parsed = parseArgs(args);
