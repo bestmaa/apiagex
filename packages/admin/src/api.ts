@@ -16,9 +16,12 @@ import type {
   RoleMutationResponse,
 } from "./role.type";
 import type {
+  CustomApiPermissionHistoryResponse,
   CustomApiPermissionDraft,
   CustomApiPermissionListResponse,
+  CustomApiRouteDeleteResponse,
   CustomApiRouteListResponse,
+  CustomApiRouteMutationResponse,
 } from "./custom-api.type";
 import type {
   AccessSettingsResponse,
@@ -204,6 +207,27 @@ export async function saveRolePermissions(
 
 export async function listCustomApiRoutes(): Promise<CustomApiRouteListResponse> {
   return adminJson<CustomApiRouteListResponse>("/api/admin/custom-api-routes");
+}
+
+export async function updateCustomApiRoute(
+  routeId: string,
+  input: { groupName: string; name: string },
+): Promise<CustomApiRouteMutationResponse> {
+  return adminJson<CustomApiRouteMutationResponse>(`/api/admin/custom-api-routes/${routeId}`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function deleteCustomApiRoute(routeId: string): Promise<CustomApiRouteDeleteResponse> {
+  return adminJson<CustomApiRouteDeleteResponse>(`/api/admin/custom-api-routes/${routeId}`, {
+    method: "DELETE",
+  });
+}
+
+export async function listCustomApiPermissionHistory(routeId: string): Promise<CustomApiPermissionHistoryResponse> {
+  return adminJson<CustomApiPermissionHistoryResponse>(`/api/admin/custom-api-routes/${routeId}/history`);
 }
 
 export async function listCustomApiPermissions(roleId: string): Promise<CustomApiPermissionListResponse> {

@@ -261,6 +261,54 @@ code {
   width: fit-content;
 }
 
+.custom-api-route-editor {
+  align-items: end;
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: repeat(2, minmax(160px, 1fr)) auto;
+}
+
+.custom-api-route-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+}
+
+.custom-api-history {
+  background: var(--admin-color-surface-muted);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-4);
+}
+
+.custom-api-history h3 {
+  font-size: var(--admin-font-sm);
+  margin: 0;
+}
+
+.custom-api-history ul {
+  display: grid;
+  gap: var(--admin-space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.custom-api-history li {
+  align-items: center;
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.custom-api-history span,
+.custom-api-history time {
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+}
+
 .permission-toggle {
   align-items: center;
   background: var(--admin-color-surface-muted);
@@ -2138,6 +2186,8 @@ code {
   .entry-selector,
   .entry-form-grid,
   .entry-table-toolbar,
+  .custom-api-route-editor,
+  .custom-api-history li,
   .entry-query-guide dl,
   .entry-summary-list,
   .admin-doc-checklist-grid,

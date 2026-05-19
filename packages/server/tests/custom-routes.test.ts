@@ -162,6 +162,88 @@ describe("custom business route extension", () => {
       },
     ]);
   });
+
+  it("persists manual route labels across rediscovery", async () => {
+    const db = openSqliteDatabase();
+    let server = createServer({
+      adminAuth: "disabled",
+      database: db,
+      async customRoutes(app) {
+        app.get("/reports/sales", async () => ({ ok: true }));
+      },
+    });
+    const route = (await server.inject({ method: "GET", url: "/api/admin/custom-api-routes" })).json().routes[0];
+
+    const renamed = await server.inject({
+      method: "PUT",
+      payload: { groupName: "Finance", name: "Sales export" },
+      url: `/api/admin/custom-api-routes/${route.id}`,
+    });
+    server = createServer({
+      adminAuth: "disabled",
+      database: db,
+      async customRoutes(app) {
+        app.get("/reports/sales", async () => ({ ok: true }));
+      },
+    });
+    const rediscovered = await server.inject({ method: "GET", url: "/api/admin/custom-api-routes" });
+
+    expect(renamed.statusCode).toBe(200);
+    expect(rediscovered.json().routes[0]).toMatchObject({
+      groupName: "Finance",
+      name: "Sales export",
+      path: "/api/custom/reports/sales",
+    });
+  });
+
+  it("records custom API permission history and deletes inactive routes only", async () => {
+    const db = openSqliteDatabase();
+    let server = createServer({
+      adminAuth: "disabled",
+      database: db,
+      async customRoutes(app) {
+        app.post("/orders/:entryId/pay", async () => ({ ok: true }));
+      },
+    });
+    const roleId = await ensureApiRole(server, "writer");
+    const route = (await server.inject({ method: "GET", url: "/api/admin/custom-api-routes" })).json().routes[0];
+    const blockedDelete = await server.inject({
+      method: "DELETE",
+      url: `/api/admin/custom-api-routes/${route.id}`,
+    });
+    await server.inject({
+      method: "PUT",
+      payload: { permissions: [{ allowed: true, customApiRouteId: route.id }] },
+      url: `/api/admin/roles/${roleId}/custom-api-permissions`,
+    });
+    await server.inject({
+      method: "PUT",
+      payload: { permissions: [{ allowed: false, customApiRouteId: route.id }] },
+      url: `/api/admin/roles/${roleId}/custom-api-permissions`,
+    });
+    const history = await server.inject({
+      method: "GET",
+      url: `/api/admin/custom-api-routes/${route.id}/history`,
+    });
+
+    server = createServer({
+      adminAuth: "disabled",
+      database: db,
+      async customRoutes() {},
+    });
+    const inactive = (await server.inject({ method: "GET", url: "/api/admin/custom-api-routes" })).json().routes[0];
+    const deleted = await server.inject({
+      method: "DELETE",
+      url: `/api/admin/custom-api-routes/${inactive.id}`,
+    });
+    const afterDelete = await server.inject({ method: "GET", url: "/api/admin/custom-api-routes" });
+
+    expect(blockedDelete.statusCode).toBe(400);
+    expect(blockedDelete.json().error).toBe("CUSTOM_API_ROUTE_ACTIVE");
+    expect(history.json().events.map((event: { allowed: boolean }) => event.allowed)).toEqual([false, true]);
+    expect(deleted.statusCode).toBe(200);
+    expect(afterDelete.json().routes).toEqual([]);
+  });
 });
 
 async function allowPublicCustomApi(server: ReturnType<typeof createServer>, method: string, path: string): Promise<void> {

@@ -2,14 +2,20 @@ import { randomUUID } from "node:crypto";
 import type { ApiagexDatabase } from "./database-adapter.type.js";
 import { getRoleById } from "./role-repository.js";
 import type {
+  CustomApiPermissionEventRecord,
   CustomApiPermissionRecord,
   CustomApiRouteRecord,
+  RecordCustomApiPermissionEventInput,
   SetCustomApiPermissionInput,
   SyncCustomApiRouteInput,
+  UpdateCustomApiRouteMetadataInput,
 } from "./custom-api-repository.type.js";
 
 type CustomApiRouteRow = Omit<CustomApiRouteRecord, "active"> & { active: number };
 type CustomApiPermissionRow = Omit<CustomApiPermissionRecord, "allowed"> & { allowed: number };
+type CustomApiPermissionEventRow = Omit<CustomApiPermissionEventRecord, "allowed"> & { allowed: number };
+
+let customApiPermissionEventClock = 0;
 
 export async function syncCustomApiRoutes(
   db: ApiagexDatabase,
@@ -21,8 +27,8 @@ export async function syncCustomApiRoutes(
     const existing = await findCustomApiRoute(db, route.method, route.path);
     if (existing) {
       await db.prepare(
-        "UPDATE custom_api_routes SET name = ?, group_name = ?, permission_key = ?, active = 1, updated_at = ?, last_seen_at = ? WHERE id = ?",
-      ).run(route.name, route.groupName, route.permissionKey, now, now, existing.id);
+        "UPDATE custom_api_routes SET permission_key = ?, active = 1, updated_at = ?, last_seen_at = ? WHERE id = ?",
+      ).run(route.permissionKey, now, now, existing.id);
     } else {
       await db.prepare(
         "INSERT INTO custom_api_routes (id, method, path, name, group_name, permission_key, active, created_at, updated_at, last_seen_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -37,6 +43,28 @@ export async function listCustomApiRoutes(db: ApiagexDatabase): Promise<CustomAp
     .prepare(customApiRouteSelectSql("ORDER BY active DESC, group_name ASC, path ASC, method ASC"))
     .all<CustomApiRouteRow>();
   return rows.map(rowToCustomApiRoute);
+}
+
+export async function updateCustomApiRouteMetadata(
+  db: ApiagexDatabase,
+  input: UpdateCustomApiRouteMetadataInput,
+): Promise<CustomApiRouteRecord> {
+  const name = input.name.trim();
+  const groupName = input.groupName.trim();
+  if (!name) throw new Error("CUSTOM_API_ROUTE_NAME_REQUIRED");
+  if (!groupName) throw new Error("CUSTOM_API_ROUTE_GROUP_REQUIRED");
+  const existing = await getCustomApiRouteById(db, input.id);
+  if (!existing) throw new Error("CUSTOM_API_ROUTE_NOT_FOUND");
+  await db.prepare("UPDATE custom_api_routes SET name = ?, group_name = ?, updated_at = ? WHERE id = ?")
+    .run(name, groupName, new Date().toISOString(), input.id);
+  return requireCustomApiRoute(db, input.id);
+}
+
+export async function deleteInactiveCustomApiRoute(db: ApiagexDatabase, id: string): Promise<void> {
+  const existing = await getCustomApiRouteById(db, id);
+  if (!existing) throw new Error("CUSTOM_API_ROUTE_NOT_FOUND");
+  if (existing.active) throw new Error("CUSTOM_API_ROUTE_ACTIVE");
+  await db.prepare("DELETE FROM custom_api_routes WHERE id = ?").run(id);
 }
 
 export async function getCustomApiRouteByMethodPath(
@@ -75,6 +103,33 @@ export async function listCustomApiPermissions(
   return rows.map(rowToCustomApiPermission);
 }
 
+export async function listCustomApiPermissionEvents(
+  db: ApiagexDatabase,
+  customApiRouteId?: string,
+): Promise<CustomApiPermissionEventRecord[]> {
+  const suffix = customApiRouteId
+    ? "WHERE custom_api_route_id = ? ORDER BY created_at DESC LIMIT 100"
+    : "ORDER BY created_at DESC LIMIT 100";
+  const statement = db.prepare(customApiPermissionEventSelectSql(suffix));
+  const rows = customApiRouteId
+    ? await statement.all<CustomApiPermissionEventRow>(customApiRouteId)
+    : await statement.all<CustomApiPermissionEventRow>();
+  return rows.map(rowToCustomApiPermissionEvent);
+}
+
+export async function recordCustomApiPermissionEvent(
+  db: ApiagexDatabase,
+  input: RecordCustomApiPermissionEventInput,
+): Promise<CustomApiPermissionEventRecord> {
+  await validateCustomApiPermissionInput(db, input);
+  const id = randomUUID();
+  const now = nextCustomApiPermissionEventTimestamp();
+  await db.prepare(
+    "INSERT INTO custom_api_permission_events (id, role_id, custom_api_route_id, allowed, actor_id, actor_email, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+  ).run(id, input.roleId, input.customApiRouteId, input.allowed ? 1 : 0, input.actorId, input.actorEmail, now);
+  return requireCustomApiPermissionEvent(db, id);
+}
+
 export async function canRoleAccessCustomApi(
   db: ApiagexDatabase,
   roleId: string,
@@ -104,6 +159,12 @@ async function getCustomApiRouteById(
 ): Promise<CustomApiRouteRecord | undefined> {
   const row = await db.prepare(customApiRouteSelectSql("WHERE id = ?")).get<CustomApiRouteRow>(id);
   return row ? rowToCustomApiRoute(row) : undefined;
+}
+
+async function requireCustomApiRoute(db: ApiagexDatabase, id: string): Promise<CustomApiRouteRecord> {
+  const route = await getCustomApiRouteById(db, id);
+  if (!route) throw new Error("CUSTOM_API_ROUTE_NOT_FOUND");
+  return route;
 }
 
 async function findCustomApiRoute(
@@ -137,6 +198,15 @@ async function requireCustomApiPermission(
   return rowToCustomApiPermission(row);
 }
 
+async function requireCustomApiPermissionEvent(
+  db: ApiagexDatabase,
+  id: string,
+): Promise<CustomApiPermissionEventRecord> {
+  const row = await db.prepare(customApiPermissionEventSelectSql("WHERE id = ?")).get<CustomApiPermissionEventRow>(id);
+  if (!row) throw new Error("CUSTOM_API_PERMISSION_EVENT_NOT_FOUND");
+  return rowToCustomApiPermissionEvent(row);
+}
+
 function uniqueRoutes(routes: SyncCustomApiRouteInput[]): SyncCustomApiRouteInput[] {
   return [...new Map(routes.map((route) => [`${route.method}:${route.path}`, route])).values()];
 }
@@ -149,10 +219,24 @@ function rowToCustomApiPermission(row: CustomApiPermissionRow): CustomApiPermiss
   return { ...row, allowed: Boolean(row.allowed) };
 }
 
+function rowToCustomApiPermissionEvent(row: CustomApiPermissionEventRow): CustomApiPermissionEventRecord {
+  return { ...row, allowed: Boolean(row.allowed) };
+}
+
 function customApiRouteSelectSql(suffix: string): string {
   return `SELECT id, method, path, name, group_name as groupName, permission_key as permissionKey, active, created_at as createdAt, updated_at as updatedAt, last_seen_at as lastSeenAt FROM custom_api_routes ${suffix}`;
 }
 
 function customApiPermissionSelectSql(suffix: string): string {
   return `SELECT id, role_id as roleId, custom_api_route_id as customApiRouteId, allowed FROM custom_api_permissions ${suffix}`;
+}
+
+function customApiPermissionEventSelectSql(suffix: string): string {
+  return `SELECT id, role_id as roleId, custom_api_route_id as customApiRouteId, allowed, actor_id as actorId, actor_email as actorEmail, created_at as createdAt FROM custom_api_permission_events ${suffix}`;
+}
+
+function nextCustomApiPermissionEventTimestamp(): string {
+  const now = Date.now();
+  customApiPermissionEventClock = Math.max(customApiPermissionEventClock + 1, now);
+  return new Date(customApiPermissionEventClock).toISOString();
 }

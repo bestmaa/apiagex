@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
-import { Save } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { History, Save, Search, Trash2 } from "lucide-react";
 import {
+  deleteCustomApiRoute,
+  listCustomApiPermissionHistory,
   listCustomApiPermissions,
   listCustomApiRoutes,
   listRoles,
   saveCustomApiPermissions,
+  updateCustomApiRoute,
 } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
 import type {
+  CustomApiPermissionEventRecord,
   CustomApiPermissionRecord,
   CustomApiRouteRecord,
 } from "./custom-api.type";
@@ -19,6 +23,10 @@ export function CustomApiPermissionManager() {
   const [routes, setRoutes] = useState<CustomApiRouteRecord[]>([]);
   const [roleId, setRoleId] = useState("");
   const [permissions, setPermissions] = useState<CustomApiPermissionRecord[]>([]);
+  const [routeDrafts, setRouteDrafts] = useState<Record<string, { groupName: string; name: string }>>({});
+  const [history, setHistory] = useState<Record<string, CustomApiPermissionEventRecord[]>>({});
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [status, setStatus] = useState("Custom API permissions loading");
 
   useEffect(() => {
@@ -34,11 +42,20 @@ export function CustomApiPermissionManager() {
     }
     const nextRoles = sortRoles(roleResult.roles ?? []);
     setRoles(nextRoles);
-    setRoutes(sortRoutes(routeResult.routes ?? []));
+    setSortedRoutes(routeResult.routes ?? []);
     const firstRoleId = nextRoles[0]?.id ?? "";
     setRoleId(firstRoleId);
     if (firstRoleId) await loadPermissions(firstRoleId);
     setStatus("Custom API permissions ready");
+  }
+
+  function setSortedRoutes(nextRoutes: CustomApiRouteRecord[]) {
+    const sorted = sortRoutes(nextRoutes);
+    setRoutes(sorted);
+    setRouteDrafts(Object.fromEntries(sorted.map((route) => [
+      route.id,
+      { groupName: route.groupName, name: route.name },
+    ])));
   }
 
   async function loadPermissions(nextRoleId: string) {
@@ -65,6 +82,38 @@ export function CustomApiPermissionManager() {
     setStatus(result.ok ? `Saved custom API permissions for ${roleName}` : result.error ?? "Save failed");
   }
 
+  async function saveRouteDetails(route: CustomApiRouteRecord) {
+    const draft = routeDrafts[route.id] ?? { groupName: route.groupName, name: route.name };
+    const result = await updateCustomApiRoute(route.id, draft);
+    if (result.ok && result.route) {
+      setSortedRoutes(routes.map((item) => item.id === route.id ? result.route as CustomApiRouteRecord : item));
+      setStatus(`Saved route details for ${result.route.name}`);
+      return;
+    }
+    setStatus(result.error ?? "Route detail save failed");
+  }
+
+  async function deleteInactiveRoute(route: CustomApiRouteRecord) {
+    const result = await deleteCustomApiRoute(route.id);
+    if (result.ok) {
+      setSortedRoutes(routes.filter((item) => item.id !== route.id));
+      setPermissions((current) => current.filter((item) => item.customApiRouteId !== route.id));
+      setStatus(`Deleted inactive custom API ${route.path}`);
+      return;
+    }
+    setStatus(result.error ?? "Inactive route delete failed");
+  }
+
+  async function showHistory(route: CustomApiRouteRecord) {
+    const result = await listCustomApiPermissionHistory(route.id);
+    if (result.ok) {
+      setHistory((current) => ({ ...current, [route.id]: result.events ?? [] }));
+      setStatus(`Loaded permission history for ${route.name}`);
+      return;
+    }
+    setStatus(result.error ?? "History load failed");
+  }
+
   function toggle(customApiRouteId: string, allowed: boolean) {
     setPermissions((current) => {
       const exists = current.some((item) => item.customApiRouteId === customApiRouteId);
@@ -77,7 +126,22 @@ export function CustomApiPermissionManager() {
     });
   }
 
+  function updateRouteDraft(routeId: string, field: "groupName" | "name", value: string) {
+    setRouteDrafts((current) => ({
+      ...current,
+      [routeId]: {
+        groupName: current[routeId]?.groupName ?? "",
+        name: current[routeId]?.name ?? "",
+        [field]: value,
+      },
+    }));
+  }
+
   const activeRole = roles.find((role) => role.id === roleId);
+  const filteredRoutes = useMemo(
+    () => filterRoutes(routes, search, statusFilter),
+    [routes, search, statusFilter],
+  );
 
   return (
     <section aria-labelledby="custom-api-permission-title">
@@ -97,7 +161,37 @@ export function CustomApiPermissionManager() {
       {activeRole?.name === "public" ? (
         <p className="warning-text">Allowed public custom APIs are reachable without Authorization headers or API tokens.</p>
       ) : null}
-      <CustomApiGrid permissions={permissions} routes={routes} toggle={toggle} />
+      <div className="entry-table-toolbar">
+        <label className="entry-search-field">Find custom API
+          <span>
+            <Search aria-hidden="true" size={16} />
+            <input
+              placeholder="Search method, path, label, group, or permission key"
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </span>
+        </label>
+        <label>Status
+          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+            <option value="all">All routes</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+      </div>
+      <CustomApiGrid
+        deleteInactiveRoute={deleteInactiveRoute}
+        history={history}
+        permissions={permissions}
+        routeDrafts={routeDrafts}
+        routes={filteredRoutes}
+        saveRouteDetails={saveRouteDetails}
+        showHistory={showHistory}
+        toggle={toggle}
+        updateRouteDraft={updateRouteDraft}
+      />
       <button disabled={!roleId || routes.length === 0} type="button" onClick={() => void savePermissions()}>
         <Save aria-hidden="true" size={16} />
         Save custom API permissions
@@ -108,9 +202,15 @@ export function CustomApiPermissionManager() {
 }
 
 function CustomApiGrid(props: {
+  deleteInactiveRoute: (route: CustomApiRouteRecord) => Promise<void>;
+  history: Record<string, CustomApiPermissionEventRecord[]>;
   permissions: CustomApiPermissionRecord[];
+  routeDrafts: Record<string, { groupName: string; name: string }>;
   routes: CustomApiRouteRecord[];
+  saveRouteDetails: (route: CustomApiRouteRecord) => Promise<void>;
+  showHistory: (route: CustomApiRouteRecord) => Promise<void>;
   toggle: (customApiRouteId: string, allowed: boolean) => void;
+  updateRouteDraft: (routeId: string, field: "groupName" | "name", value: string) => void;
 }) {
   if (props.routes.length === 0) {
     return (
@@ -121,24 +221,79 @@ function CustomApiGrid(props: {
   }
   return (
     <div className="permission-grid">
-      {props.routes.map((route) => (
-        <fieldset className={route.active ? "permission-card" : "permission-card is-muted"} key={route.id}>
-          <legend>{route.name}</legend>
-          <code>{route.method} {route.path}</code>
-          <p className="permission-help">{route.groupName} group · {route.permissionKey}</p>
-          <label className={isAllowed(props.permissions, route.id) ? "permission-toggle is-allowed" : "permission-toggle"}>
-            <input
-              checked={isAllowed(props.permissions, route.id)}
-              disabled={!route.active}
-              type="checkbox"
-              onChange={(event) => props.toggle(route.id, event.target.checked)}
-            />
-            <span>access</span>
-            <small>{route.active ? "Allow this role to call this custom API." : "Route not seen on last server start."}</small>
-            <strong>{isAllowed(props.permissions, route.id) ? "Allowed" : "Blocked"}</strong>
-          </label>
-        </fieldset>
-      ))}
+      {props.routes.map((route) => {
+        const draft = props.routeDrafts[route.id] ?? { groupName: route.groupName, name: route.name };
+        const events = props.history[route.id];
+        return (
+          <fieldset className={route.active ? "permission-card" : "permission-card is-muted"} key={route.id}>
+            <legend>{route.name}</legend>
+            <code>{route.method} {route.path}</code>
+            <p className="permission-help">{route.groupName} group · {route.permissionKey}</p>
+            <div className="custom-api-route-editor">
+              <label>Label
+                <input
+                  value={draft.name}
+                  onChange={(event) => props.updateRouteDraft(route.id, "name", event.target.value)}
+                />
+              </label>
+              <label>Group
+                <input
+                  value={draft.groupName}
+                  onChange={(event) => props.updateRouteDraft(route.id, "groupName", event.target.value)}
+                />
+              </label>
+              <button type="button" onClick={() => void props.saveRouteDetails(route)}>
+                <Save aria-hidden="true" size={16} />
+                Save details
+              </button>
+            </div>
+            <label className={isAllowed(props.permissions, route.id) ? "permission-toggle is-allowed" : "permission-toggle"}>
+              <input
+                checked={isAllowed(props.permissions, route.id)}
+                disabled={!route.active}
+                type="checkbox"
+                onChange={(event) => props.toggle(route.id, event.target.checked)}
+              />
+              <span>access</span>
+              <small>{route.active ? "Allow this role to call this custom API." : "Route not seen on last server start."}</small>
+              <strong>{isAllowed(props.permissions, route.id) ? "Allowed" : "Blocked"}</strong>
+            </label>
+            <div className="custom-api-route-actions">
+              <button type="button" onClick={() => void props.showHistory(route)}>
+                <History aria-hidden="true" size={16} />
+                View history
+              </button>
+              {!route.active ? (
+                <button className="danger-button" type="button" onClick={() => void props.deleteInactiveRoute(route)}>
+                  <Trash2 aria-hidden="true" size={16} />
+                  Delete inactive
+                </button>
+              ) : null}
+            </div>
+            {events ? <CustomApiHistory events={events} /> : null}
+          </fieldset>
+        );
+      })}
+    </div>
+  );
+}
+
+function CustomApiHistory(props: { events: CustomApiPermissionEventRecord[] }) {
+  if (props.events.length === 0) {
+    return <p className="permission-help">No allow/block history for this custom API yet.</p>;
+  }
+  return (
+    <div className="custom-api-history">
+      <h3>Permission history</h3>
+      <ul>
+        {props.events.map((event) => (
+          <li key={event.id}>
+            <strong>{event.allowed ? "Allowed" : "Blocked"}</strong>
+            <span>{event.actorEmail}</span>
+            <time dateTime={event.createdAt}>{new Date(event.createdAt).toLocaleString()}</time>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -162,4 +317,22 @@ function sortRoutes(routes: CustomApiRouteRecord[]): CustomApiRouteRecord[] {
 
 function isAllowed(permissions: CustomApiPermissionRecord[], customApiRouteId: string): boolean {
   return Boolean(permissions.find((item) => item.customApiRouteId === customApiRouteId)?.allowed);
+}
+
+function filterRoutes(routes: CustomApiRouteRecord[], search: string, statusFilter: string): CustomApiRouteRecord[] {
+  const normalized = search.trim().toLowerCase();
+  return routes.filter((route) => {
+    const statusMatches = statusFilter === "all"
+      || (statusFilter === "active" && route.active)
+      || (statusFilter === "inactive" && !route.active);
+    if (!statusMatches) return false;
+    if (!normalized) return true;
+    return [
+      route.groupName,
+      route.method,
+      route.name,
+      route.path,
+      route.permissionKey,
+    ].some((value) => value.toLowerCase().includes(normalized));
+  });
 }

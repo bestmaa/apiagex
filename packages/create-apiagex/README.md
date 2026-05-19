@@ -37,6 +37,20 @@ The generated `package.json` depends on `@apiagex/server` and exposes `npm run d
 
 The generated `src/custom-routes.ts` or `src/custom-routes.js` is the place for business APIs such as checkout, pay order, assign rider, and reports. Write routes such as `/orders/:id/pay`; Apiagex mounts them under `/api/custom/orders/:id/pay`, discovers them for Admin UI, and blocks them until Settings / Custom API Permissions allows a role.
 
+Practical custom route flow:
+
+1. Add a route in `src/custom-routes.ts`, for example `app.post("/orders/:entryId/pay", handler)`.
+2. Restart the server. It appears as `POST /api/custom/orders/:entryId/pay`.
+3. Open `/adminui#settings/custom-api-permissions`, select the content API role, search the route, allow it, and save.
+4. Open Settings / API Tokens, create a token for that role, then call it:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \
+  -H "Authorization: Bearer API_TOKEN"
+```
+
+The same screen can rename the route label/group, show allow/block history, and delete old inactive routes after they are removed from code.
+
 For TypeScript projects, run this after creating or changing schemas in Admin UI:
 
 ```bash
@@ -115,6 +129,20 @@ Generated `.env` local setup values store karta hai, jaise `APIAGEX_DATABASE_PRO
 Generated `package.json` `@apiagex/server` par depend karta hai aur `npm run dev`, `npm run start`, `npm run smoke`, aur `npm run build` expose karta hai. TypeScript projects me `npm run types` bhi hota hai.
 
 Generated `src/custom-routes.ts` ya `src/custom-routes.js` business APIs ke liye jagah hai, jaise checkout, pay order, assign rider, aur reports. Route `/orders/:id/pay` jaisa likho; Apiagex usko `/api/custom/orders/:id/pay` par mount karta hai, Admin UI me discover karta hai, aur Settings / Custom API Permissions me role allow hone tak block rakhta hai.
+
+Practical custom route flow:
+
+1. `src/custom-routes.ts` me route add karo, jaise `app.post("/orders/:entryId/pay", handler)`.
+2. Server restart karo. Ye `POST /api/custom/orders/:entryId/pay` ke roop me dikhega.
+3. `/adminui#settings/custom-api-permissions` open karo, content API role select karo, route search karo, allow karo, aur save karo.
+4. Settings / API Tokens me us role ka token banao, phir call karo:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \
+  -H "Authorization: Bearer API_TOKEN"
+```
+
+Same screen se route label/group rename, allow/block history, aur code se remove hone ke baad old inactive route delete bhi ho sakta hai.
 
 TypeScript projects me Admin UI se schema create/change karne ke baad ye chalao:
 
