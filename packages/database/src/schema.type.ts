@@ -14,6 +14,8 @@ export type MvpTableName =
   | "realtime_configs"
   | "realtime_events"
   | "realtime_sessions"
+  | "custom_api_routes"
+  | "custom_api_permissions"
   | "migrations";
 
 export type MigrationRecord = {

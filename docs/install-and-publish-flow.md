@@ -108,7 +108,7 @@ Open karo:
 - `npm run smoke`: checks runtime health through `apiagex smoke`
 - `npm run build`: compiles TypeScript projects with `tsc`; JavaScript projects print runtime build guidance through `apiagex build`.
 
-The generated project depends on `@apiagex/server`, which exposes both the `apiagex` command and the `startApiagex()` API for the generated entry file. Add business APIs in `src/custom-routes.ts` or `src/custom-routes.js` when generated CRUD cannot model the endpoint, such as checkout, pay order, assignment, and reporting routes.
+The generated project depends on `@apiagex/server`, which exposes both the `apiagex` command and the `startApiagex()` API for the generated entry file. Add business APIs in `src/custom-routes.ts` or `src/custom-routes.js` when generated CRUD cannot model the endpoint, such as checkout, pay order, assignment, and reporting routes. Write custom paths like `/orders/:id/pay`; Apiagex mounts them under `/api/custom/orders/:id/pay`, discovers them for Settings / Custom API Permissions, and blocks them until a role is allowed.
 
 When schemas are created or changed from Admin UI, run:
 
@@ -132,7 +132,7 @@ This writes `src/apiagex-types.ts` with:
 - `npm run smoke`: `apiagex smoke` se runtime health check karta hai
 - `npm run build`: TypeScript projects ko `tsc` se compile karta hai; JavaScript projects me `apiagex build` se runtime build guidance print hoti hai.
 
-Generated project `@apiagex/server` par depend karta hai, jo installed `apiagex` command aur generated entry file ke liye `startApiagex()` API expose karta hai. Generated CRUD endpoint ko model nahi kar sakta to `src/custom-routes.ts` ya `src/custom-routes.js` me business APIs add karo, jaise checkout, pay order, assignment, aur reporting routes.
+Generated project `@apiagex/server` par depend karta hai, jo installed `apiagex` command aur generated entry file ke liye `startApiagex()` API expose karta hai. Generated CRUD endpoint ko model nahi kar sakta to `src/custom-routes.ts` ya `src/custom-routes.js` me business APIs add karo, jaise checkout, pay order, assignment, aur reporting routes. Custom path `/orders/:id/pay` jaisa likho; Apiagex usko `/api/custom/orders/:id/pay` par mount karta hai, Settings / Custom API Permissions me dikhata hai, aur role allow hone tak block rakhta hai.
 
 Admin UI se schema create ya change karne ke baad chalao:
 

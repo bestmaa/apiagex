@@ -28,7 +28,8 @@ import { loginUser } from "./user-auth.js";
 import { createRealtimeBroker } from "./realtime-broker.js";
 import { registerRealtimeRoutes } from "./realtime-routes.js";
 import { registerOpenApiRoutes } from "./openapi-routes.js";
-import { createCustomRouteContext } from "./custom-routes.js";
+import { registerProjectCustomRoutes } from "./custom-api-routes.js";
+import { registerCustomApiAdminRoutes } from "./custom-api-admin-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -49,12 +50,10 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   registerSettingsRoutes(server, database);
   registerWebhookRoutes(server, database, webhookOptions);
   registerRealtimeRoutes(server, database, realtimeBroker);
+  registerCustomApiAdminRoutes(server, database);
   registerOpenApiRoutes(server, database);
   if (options.customRoutes) {
-    const customRoutes = options.customRoutes;
-    server.register(async (customServer) => {
-      await customRoutes(customServer, createCustomRouteContext(database));
-    });
+    registerProjectCustomRoutes(server, database, options.customRoutes);
   }
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({

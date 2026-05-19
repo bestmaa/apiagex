@@ -36,6 +36,8 @@ npm run types
 
 That writes `src/apiagex-types.ts`, and `RegisterApiagexCustomRoutes` automatically uses it for schema slug and field autocomplete in `src/custom-routes.ts`.
 
+Custom business routes can be written as relative paths such as `/orders/:id/pay`. Apiagex mounts them under `/api/custom/orders/:id/pay`, discovers them in Settings / Custom API Permissions, and blocks them until an API role or the public role is allowed.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

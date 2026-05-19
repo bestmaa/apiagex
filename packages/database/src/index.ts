@@ -101,6 +101,14 @@ export {
   setPermission,
 } from "./permission-repository.js";
 export {
+  canRoleAccessCustomApi,
+  getCustomApiRouteByMethodPath,
+  listCustomApiPermissions,
+  listCustomApiRoutes,
+  setCustomApiPermission,
+  syncCustomApiRoutes,
+} from "./custom-api-repository.js";
+export {
   createUser,
   getAdminUserById,
   getUserById,
@@ -198,6 +206,12 @@ export type {
   PermissionRecord,
   SetPermissionInput,
 } from "./permission-repository.type.js";
+export type {
+  CustomApiPermissionRecord,
+  CustomApiRouteRecord,
+  SetCustomApiPermissionInput,
+  SyncCustomApiRouteInput,
+} from "./custom-api-repository.type.js";
 export type { CreateUserInput, UserRecord } from "./user-repository.type.js";
 export type {
   CreateFieldInput,

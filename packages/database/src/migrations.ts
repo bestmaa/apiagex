@@ -19,6 +19,8 @@ export const MVP_TABLES = [
   "realtime_configs",
   "realtime_events",
   "realtime_sessions",
+  "custom_api_routes",
+  "custom_api_permissions",
 ] as const;
 
 export const MVP_FOUNDATION_SQL = `
@@ -181,5 +183,27 @@ CREATE TABLE IF NOT EXISTS realtime_sessions (
   created_at TEXT NOT NULL,
   expires_at TEXT NOT NULL,
   used_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS custom_api_routes (
+  id TEXT PRIMARY KEY,
+  method TEXT NOT NULL,
+  path TEXT NOT NULL,
+  name TEXT NOT NULL,
+  group_name TEXT NOT NULL,
+  permission_key TEXT NOT NULL UNIQUE,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  last_seen_at TEXT NOT NULL,
+  UNIQUE(method, path)
+);
+
+CREATE TABLE IF NOT EXISTS custom_api_permissions (
+  id TEXT PRIMARY KEY,
+  role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  custom_api_route_id TEXT NOT NULL REFERENCES custom_api_routes(id) ON DELETE CASCADE,
+  allowed INTEGER NOT NULL DEFAULT 0,
+  UNIQUE(role_id, custom_api_route_id)
 );
 `;

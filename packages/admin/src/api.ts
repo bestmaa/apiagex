@@ -16,6 +16,11 @@ import type {
   RoleMutationResponse,
 } from "./role.type";
 import type {
+  CustomApiPermissionDraft,
+  CustomApiPermissionListResponse,
+  CustomApiRouteListResponse,
+} from "./custom-api.type";
+import type {
   AccessSettingsResponse,
   AdminPermissionDraft,
   AdminPermissionListResponse,
@@ -191,6 +196,25 @@ export async function saveRolePermissions(
   permissions: PermissionDraft[],
 ): Promise<PermissionListResponse> {
   return adminJson<PermissionListResponse>(`/api/admin/roles/${roleId}/permissions`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ permissions }),
+  });
+}
+
+export async function listCustomApiRoutes(): Promise<CustomApiRouteListResponse> {
+  return adminJson<CustomApiRouteListResponse>("/api/admin/custom-api-routes");
+}
+
+export async function listCustomApiPermissions(roleId: string): Promise<CustomApiPermissionListResponse> {
+  return adminJson<CustomApiPermissionListResponse>(`/api/admin/roles/${roleId}/custom-api-permissions`);
+}
+
+export async function saveCustomApiPermissions(
+  roleId: string,
+  permissions: CustomApiPermissionDraft[],
+): Promise<CustomApiPermissionListResponse> {
+  return adminJson<CustomApiPermissionListResponse>(`/api/admin/roles/${roleId}/custom-api-permissions`, {
     method: "PUT",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ permissions }),

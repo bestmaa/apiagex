@@ -198,6 +198,28 @@ CREATE TABLE IF NOT EXISTS realtime_sessions (
   expires_at TEXT NOT NULL,
   used_at TEXT
 );
+
+CREATE TABLE IF NOT EXISTS custom_api_routes (
+  id TEXT PRIMARY KEY,
+  method TEXT NOT NULL,
+  path TEXT NOT NULL,
+  name TEXT NOT NULL,
+  group_name TEXT NOT NULL,
+  permission_key TEXT NOT NULL UNIQUE,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  last_seen_at TEXT NOT NULL,
+  UNIQUE(method, path)
+);
+
+CREATE TABLE IF NOT EXISTS custom_api_permissions (
+  id TEXT PRIMARY KEY,
+  role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  custom_api_route_id TEXT NOT NULL REFERENCES custom_api_routes(id) ON DELETE CASCADE,
+  allowed INTEGER NOT NULL DEFAULT 0,
+  UNIQUE(role_id, custom_api_route_id)
+);
 `;
 
 export const MYSQL_FOUNDATION_SQL = `
@@ -217,4 +239,6 @@ CREATE TABLE IF NOT EXISTS webhook_deliveries (id VARCHAR(191) PRIMARY KEY, even
 CREATE TABLE IF NOT EXISTS realtime_configs (schema_id VARCHAR(191) PRIMARY KEY, enabled TINYINT(1) NOT NULL DEFAULT 0, events_json LONGTEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, CONSTRAINT fk_realtime_configs_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS realtime_events (sequence BIGINT AUTO_INCREMENT PRIMARY KEY, id VARCHAR(191) NOT NULL UNIQUE, message_id VARCHAR(191) NOT NULL UNIQUE, event_type VARCHAR(64) NOT NULL, schema_id VARCHAR(191) NOT NULL, schema_slug VARCHAR(191) NOT NULL, entry_id VARCHAR(191) NOT NULL, entry_json LONGTEXT NOT NULL, occurred_at TEXT NOT NULL, created_at TEXT NOT NULL, CONSTRAINT fk_realtime_events_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS realtime_sessions (id VARCHAR(191) PRIMARY KEY, token_hash VARCHAR(191) NOT NULL UNIQUE, token_prefix VARCHAR(32) NOT NULL, role_id VARCHAR(191) NOT NULL, schema_id VARCHAR(191) NOT NULL, schema_slug VARCHAR(191) NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL, used_at TEXT, CONSTRAINT fk_realtime_sessions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE, CONSTRAINT fk_realtime_sessions_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS custom_api_routes (id VARCHAR(191) PRIMARY KEY, method VARCHAR(16) NOT NULL, path VARCHAR(512) NOT NULL, name VARCHAR(191) NOT NULL, group_name VARCHAR(191) NOT NULL, permission_key VARCHAR(191) NOT NULL UNIQUE, active TINYINT(1) NOT NULL DEFAULT 1, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, last_seen_at TEXT NOT NULL, UNIQUE(method, path)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS custom_api_permissions (id VARCHAR(191) PRIMARY KEY, role_id VARCHAR(191) NOT NULL, custom_api_route_id VARCHAR(191) NOT NULL, allowed TINYINT(1) NOT NULL DEFAULT 0, UNIQUE(role_id, custom_api_route_id), CONSTRAINT fk_custom_api_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE, CONSTRAINT fk_custom_api_permissions_route FOREIGN KEY (custom_api_route_id) REFERENCES custom_api_routes(id) ON DELETE CASCADE) ENGINE=InnoDB;
 `;

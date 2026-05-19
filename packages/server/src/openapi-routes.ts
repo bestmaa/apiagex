@@ -341,6 +341,54 @@ function adminPaths(): Record<string, OpenApiSchema> {
         responses: okResponse({ $ref: "#/components/schemas/PermissionListResponse" }),
       },
     },
+    "/api/admin/custom-api-routes": {
+      get: {
+        tags: ["Admin Roles"],
+        summary: "List discovered custom APIs",
+        description: "Custom routes written in project code are mounted under /api/custom and listed here for permission setup.",
+        security: adminSecurity(),
+        responses: okResponse({ type: "object" }),
+      },
+    },
+    "/api/admin/roles/{roleId}/custom-api-permissions": {
+      parameters: [pathParameter("roleId", "Content API role id.")],
+      get: {
+        tags: ["Admin Roles"],
+        summary: "List custom API role permissions",
+        security: adminSecurity(),
+        responses: okResponse({ type: "object" }),
+      },
+      put: {
+        tags: ["Admin Roles"],
+        summary: "Save custom API role permissions",
+        security: adminSecurity(),
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  permissions: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        customApiRouteId: { type: "string" },
+                        allowed: { type: "boolean" },
+                      },
+                      required: ["customApiRouteId", "allowed"],
+                    },
+                  },
+                },
+                required: ["permissions"],
+              },
+            },
+          },
+        },
+        responses: okResponse({ type: "object" }),
+      },
+    },
     "/api/admin/roles/{roleId}/tokens": {
       parameters: [pathParameter("roleId", "Content API role id.")],
       get: {

@@ -20,7 +20,7 @@ describe("generated Apiagex project", () => {
     const entry = await readFile(join(projectDir, "src/index.js"), "utf8");
     expect(entry).toContain("startApiagex");
     expect(entry).toContain("registerCustomRoutes");
-    await expect(readFile(join(projectDir, "src/custom-routes.js"), "utf8")).resolves.toContain("/api/custom/health");
+    await expect(readFile(join(projectDir, "src/custom-routes.js"), "utf8")).resolves.toContain("/health");
 
     const smoke = await runRuntimeCli(["smoke"], { cwd: projectDir });
     expect(smoke.code).toBe(0);
@@ -42,7 +42,7 @@ describe("generated Apiagex project", () => {
     expect(server).toBeTruthy();
     const port = (server?.server.address() as AddressInfo).port;
     await expectText(`http://127.0.0.1:${port}/api/health`, "apiagex");
-    await expectText(`http://127.0.0.1:${port}/api/custom/health`, "custom-api");
+    await expectStatus(`http://127.0.0.1:${port}/api/custom/health`, 403);
     await expectText(`http://127.0.0.1:${port}/adminui`, "Apiagex");
     await expectText(`http://127.0.0.1:${port}/doc`, "Apiagex Docs");
     await expectText(`http://127.0.0.1:${port}/readme`, "Apiagex Readme");
@@ -73,4 +73,9 @@ async function expectText(url: string, expected: string): Promise<void> {
   const response = await fetch(url);
   expect(response.status).toBe(200);
   expect(await response.text()).toContain(expected);
+}
+
+async function expectStatus(url: string, status: number): Promise<void> {
+  const response = await fetch(url);
+  expect(response.status).toBe(status);
 }

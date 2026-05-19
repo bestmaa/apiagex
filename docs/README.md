@@ -35,6 +35,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Settings > API Docs generated Content API docs aur Admin/control-plane API docs ko alag-alag control karta hai.
 - Generated projects default to TypeScript and include `src/custom-routes.ts` for business APIs that generated CRUD cannot model.
 - Generated projects default TypeScript hote hain aur generated CRUD se bahar business APIs ke liye `src/custom-routes.ts` hota hai.
+- Custom routes written as `/orders/:id/pay` are mounted at `/api/custom/orders/:id/pay`, listed in Settings > Custom API Permissions, and blocked until a role is allowed.
+- Custom routes `/orders/:id/pay` jaisa likhne par `/api/custom/orders/:id/pay` par mount hote hain, Settings > Custom API Permissions me dikhte hain, aur role allow hone tak blocked rehte hain.
 - TypeScript projects can run `npm run types` to generate `src/apiagex-types.ts` from current schemas for slug and field autocomplete.
 - TypeScript projects current schemas se slug aur field autocomplete ke liye `npm run types` chala kar `src/apiagex-types.ts` generate kar sakte hain.
 - Base path checkpoint verifies `/api`, `/api/health`, `/doc`, `/readme`, and `/adminui`.

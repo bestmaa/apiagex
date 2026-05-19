@@ -17,6 +17,11 @@ export const settingsSubnavItems: AdminSubnavItem[] = [
     route: "settings/api-permissions",
   },
   {
+    description: "Allow or block custom APIs.",
+    label: "Custom API Permissions",
+    route: "settings/custom-api-permissions",
+  },
+  {
     description: "Create tokens for API roles.",
     label: "API Tokens",
     route: "settings/api-tokens",

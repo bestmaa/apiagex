@@ -97,6 +97,17 @@ describe("MVP database foundation", () => {
     expect(columns.map((column) => column.name)).toContain("events_json");
   });
 
+  it("adds custom API permission tables", () => {
+    const db = openSqliteDatabase();
+
+    migrateMvpDatabase(db);
+
+    expect(listMvpTables(db)).toContain("custom_api_routes");
+    expect(listMvpTables(db)).toContain("custom_api_permissions");
+    const columns = db.prepare("PRAGMA table_info(custom_api_routes)").all() as Array<{ name: string }>;
+    expect(columns.map((column) => column.name)).toContain("permission_key");
+  });
+
   it("seeds existing admin role permissions during additive migration", () => {
     const db = openSqliteDatabase();
     const now = new Date().toISOString();

@@ -205,9 +205,9 @@ Relation docs: /doc explains relation field types, entry payloads, populate quer
 
 ## Custom business APIs
 
-English: Use src/custom-routes.ts or src/custom-routes.js for endpoints such as checkout, pay order, assign rider, or reports. Custom routes run on the same server and can use Apiagex helpers for schemas, entries, roles, realtime sessions, and the raw database.
+English: Use src/custom-routes.ts or src/custom-routes.js for endpoints such as checkout, pay order, assign rider, or reports. Write routes like /orders/:id/pay; Apiagex mounts them under /api/custom/orders/:id/pay, discovers them, and blocks them until Settings / Custom API Permissions allows a role.
 
-Hinglish: Checkout, pay order, assign rider, ya reports jaise endpoints ke liye src/custom-routes.ts ya src/custom-routes.js use karo. Custom routes same server par run hote hain aur schemas, entries, roles, realtime sessions, aur raw database ke Apiagex helpers use kar sakte hain.
+Hinglish: Checkout, pay order, assign rider, ya reports jaise endpoints ke liye src/custom-routes.ts ya src/custom-routes.js use karo. Route /orders/:id/pay jaisa likho; Apiagex usko /api/custom/orders/:id/pay par mount karta hai, Admin UI me discover karta hai, aur Settings / Custom API Permissions me role allow hone tak block rakhta hai.
 
 ## Type generation
 
@@ -375,17 +375,17 @@ await startApiagex({
 
 function customRoutesFileJs(): string {
   return `export async function registerCustomRoutes(app, apiagex) {
-  app.get("/api/custom/health", async () => ({
+  app.get("/health", async () => ({
     ok: true,
     service: "custom-api",
   }));
 
-  app.get("/api/custom/schema-count", async () => ({
+  app.get("/schema-count", async () => ({
     ok: true,
     count: (await apiagex.schemas.list()).length,
   }));
 
-  app.post("/api/custom/orders/:entryId/pay", async (request, reply) => {
+  app.post("/orders/:entryId/pay", async (request, reply) => {
     const entry = await apiagex.entries.getById(request.params.entryId);
     if (!entry) return reply.code(404).send({ ok: false, error: "ORDER_NOT_FOUND" });
     if (entry.data.status !== "pending") {
@@ -417,17 +417,17 @@ type PayOrderParams = {
 };
 
 export const registerCustomRoutes: RegisterApiagexCustomRoutes = async (app, apiagex) => {
-  app.get("/api/custom/health", async () => ({
+  app.get("/health", async () => ({
     ok: true,
     service: "custom-api",
   }));
 
-  app.get("/api/custom/schema-count", async () => ({
+  app.get("/schema-count", async () => ({
     ok: true,
     count: (await apiagex.schemas.list()).length,
   }));
 
-  app.post<{ Params: PayOrderParams }>("/api/custom/orders/:entryId/pay", async (request, reply) => {
+  app.post<{ Params: PayOrderParams }>("/orders/:entryId/pay", async (request, reply) => {
     const entry = await apiagex.entries.getById(request.params.entryId);
     if (!entry) return reply.code(404).send({ ok: false, error: "ORDER_NOT_FOUND" });
     const data = entry.data as OrderData;

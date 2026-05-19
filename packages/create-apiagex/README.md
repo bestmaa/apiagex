@@ -35,7 +35,7 @@ The generated `.env` stores local setup values such as `APIAGEX_DATABASE_PROVIDE
 
 The generated `package.json` depends on `@apiagex/server` and exposes `npm run dev`, `npm run start`, `npm run smoke`, and `npm run build`. TypeScript projects also expose `npm run types`.
 
-The generated `src/custom-routes.ts` or `src/custom-routes.js` is the place for business APIs such as checkout, pay order, assign rider, and reports. These routes run on the same Fastify server and receive Apiagex helpers for schemas, entries, roles, realtime sessions, users, and the raw database.
+The generated `src/custom-routes.ts` or `src/custom-routes.js` is the place for business APIs such as checkout, pay order, assign rider, and reports. Write routes such as `/orders/:id/pay`; Apiagex mounts them under `/api/custom/orders/:id/pay`, discovers them for Admin UI, and blocks them until Settings / Custom API Permissions allows a role.
 
 For TypeScript projects, run this after creating or changing schemas in Admin UI:
 
@@ -114,7 +114,7 @@ Generated `.env` local setup values store karta hai, jaise `APIAGEX_DATABASE_PRO
 
 Generated `package.json` `@apiagex/server` par depend karta hai aur `npm run dev`, `npm run start`, `npm run smoke`, aur `npm run build` expose karta hai. TypeScript projects me `npm run types` bhi hota hai.
 
-Generated `src/custom-routes.ts` ya `src/custom-routes.js` business APIs ke liye jagah hai, jaise checkout, pay order, assign rider, aur reports. Ye routes same Fastify server par run hote hain aur schemas, entries, roles, realtime sessions, users, aur raw database ke Apiagex helpers receive karte hain.
+Generated `src/custom-routes.ts` ya `src/custom-routes.js` business APIs ke liye jagah hai, jaise checkout, pay order, assign rider, aur reports. Route `/orders/:id/pay` jaisa likho; Apiagex usko `/api/custom/orders/:id/pay` par mount karta hai, Admin UI me discover karta hai, aur Settings / Custom API Permissions me role allow hone tak block rakhta hai.
 
 TypeScript projects me Admin UI se schema create/change karne ke baad ye chalao:
 

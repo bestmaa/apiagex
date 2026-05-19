@@ -1,5 +1,6 @@
-import { FileJson, KeyRound, Radio, Send, Shield, SlidersHorizontal, Ticket } from "lucide-react";
+import { FileJson, KeyRound, Radio, Route, Send, Shield, SlidersHorizontal, Ticket } from "lucide-react";
 import { ApiPermissionManager } from "../ApiPermissionManager";
+import { CustomApiPermissionManager } from "../CustomApiPermissionManager";
 import { RoleManager } from "../RoleManager";
 import type { AdminRoute } from "../app-route.type";
 import { SettingsApiTokens } from "./SettingsApiTokens";
@@ -12,6 +13,7 @@ export function SettingsPage({ route }: { route: AdminRoute }) {
   if (route === "settings/admin-roles") return <SettingsAdminRoles />;
   if (route === "settings/content-roles") return <SettingsContentRoles />;
   if (route === "settings/api-permissions") return <SettingsApiPermissions />;
+  if (route === "settings/custom-api-permissions") return <SettingsCustomApiPermissions />;
   if (route === "settings/api-tokens") return <SettingsApiTokens />;
   if (route === "settings/api-docs") return <SettingsApiDocs />;
   if (route === "settings/webhooks") return <SettingsWebhooks />;
@@ -39,6 +41,11 @@ function SettingsOverview() {
           <SlidersHorizontal aria-hidden="true" size={20} />
           <strong>API Permissions</strong>
           <span>Allow, block, or open generated APIs per role.</span>
+        </a>
+        <a className="settings-option" href="#settings/custom-api-permissions">
+          <Route aria-hidden="true" size={20} />
+          <strong>Custom API Permissions</strong>
+          <span>Allow, block, or open custom business APIs per role.</span>
         </a>
         <a className="settings-option" href="#settings/api-tokens">
           <Ticket aria-hidden="true" size={20} />
@@ -81,6 +88,16 @@ function SettingsApiPermissions() {
       <h2 id="settings-api-permission-title">API Permissions</h2>
       <p>Decide which generated APIs require tokens and which APIs are open.</p>
       <ApiPermissionManager />
+    </section>
+  );
+}
+
+function SettingsCustomApiPermissions() {
+  return (
+    <section aria-labelledby="settings-custom-api-permission-title" className="settings-route-panel">
+      <h2 id="settings-custom-api-permission-title">Custom API Permissions</h2>
+      <p>Decide which custom APIs require tokens and which custom APIs are open.</p>
+      <CustomApiPermissionManager />
     </section>
   );
 }
