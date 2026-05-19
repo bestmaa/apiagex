@@ -254,7 +254,7 @@ function packageJsonFile(answers: ScaffoldAnswers): string {
             smoke: "apiagex smoke",
           },
       dependencies: {
-        "@apiagex/server": "^0.8.14",
+        "@apiagex/server": "^0.8.15",
       },
       ...(isTypeScript
         ? {

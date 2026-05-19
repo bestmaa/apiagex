@@ -23,7 +23,7 @@ describe("apiagex runtime CLI", () => {
     const result = await runRuntimeCli(["--version"]);
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("apiagex 0.8.14");
+    expect(result.stdout).toContain("apiagex 0.8.15");
   });
 
   it("runs a health smoke check without a long-running server", async () => {
