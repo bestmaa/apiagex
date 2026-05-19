@@ -31,3 +31,27 @@ export type SetCustomApiPermissionInput = {
   customApiRouteId: string;
   allowed: boolean;
 };
+
+export type UpdateCustomApiRouteMetadataInput = {
+  id: string;
+  groupName: string;
+  name: string;
+};
+
+export type CustomApiPermissionEventRecord = {
+  id: string;
+  roleId: string;
+  customApiRouteId: string;
+  allowed: boolean;
+  actorId: string;
+  actorEmail: string;
+  createdAt: string;
+};
+
+export type RecordCustomApiPermissionEventInput = {
+  roleId: string;
+  customApiRouteId: string;
+  allowed: boolean;
+  actorId: string;
+  actorEmail: string;
+};

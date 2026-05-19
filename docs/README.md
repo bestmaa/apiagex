@@ -251,6 +251,62 @@ Permissions are stored per API role, schema, and action. Actions are `getAll`, `
 
 Permissions API role, schema, aur action ke hisab se store hote hain. Actions `getAll`, `get`, `create`, `update`, `delete`, aur `manage` hain. Missing permission ka matlab block hai. `manage` us schema ke sab content API actions allow karta hai. Owner/admin roles content API permission checks bypass nahi karte.
 
+## Custom Business API End-To-End
+
+### English
+
+Use custom routes when generated CRUD is not enough, for example payment, workflow, report, or kitchen-board actions.
+
+1. Add the route in `src/custom-routes.ts`:
+
+```ts
+import type { RegisterApiagexCustomRoutes } from "@apiagex/server";
+
+export const registerCustomRoutes: RegisterApiagexCustomRoutes = async (app, apiagex) => {
+  app.post("/orders/:entryId/pay", async (request, reply) => {
+    const entry = await apiagex.entries.getById(request.params.entryId);
+    if (!entry) return reply.code(404).send({ ok: false, error: "ORDER_NOT_FOUND" });
+    return {
+      ok: true,
+      entry: await apiagex.entries.update(entry.id, {
+        data: { ...entry.data, status: "paid" },
+      }),
+    };
+  });
+};
+```
+
+2. Restart the server. Apiagex discovers it as `POST /api/custom/orders/:entryId/pay`.
+3. Open `/adminui#settings/custom-api-permissions`.
+4. Create or select a content API role, for example `writer`.
+5. Search `orders`, allow the route, and click **Save custom API permissions**.
+6. Open Settings > API Tokens, create a token for the same role, and call the route:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \
+  -H "Authorization: Bearer API_TOKEN"
+```
+
+Custom API routes are blocked by default. Public/no-token access works only when the `public` role is explicitly allowed. You can rename the route label/group in Admin UI, view permission history, and delete old inactive routes after the route is removed from code and the server restarts.
+
+### Hinglish
+
+Generated CRUD kaafi na ho, jaise payment, workflow, report, ya kitchen-board action, tab custom routes use karo.
+
+1. `src/custom-routes.ts` me route add karo.
+2. Server restart karo. Apiagex usko `POST /api/custom/orders/:entryId/pay` ke roop me discover karega.
+3. `/adminui#settings/custom-api-permissions` open karo.
+4. Content API role create/select karo, jaise `writer`.
+5. `orders` search karo, route allow karo, aur **Save custom API permissions** click karo.
+6. Settings > API Tokens me same role ke liye token banao, phir curl se call karo:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \
+  -H "Authorization: Bearer API_TOKEN"
+```
+
+Custom API default me blocked hoti hai. Public/no-token access tabhi milega jab `public` role ko explicitly allow karoge. Admin UI me route label/group rename, permission history view, aur code se remove hone ke baad inactive route delete kar sakte ho.
+
 ## Admin UI Role Permissions
 
 ### English

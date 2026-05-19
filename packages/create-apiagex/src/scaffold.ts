@@ -209,6 +209,20 @@ English: Use src/custom-routes.ts or src/custom-routes.js for endpoints such as 
 
 Hinglish: Checkout, pay order, assign rider, ya reports jaise endpoints ke liye src/custom-routes.ts ya src/custom-routes.js use karo. Route /orders/:id/pay jaisa likho; Apiagex usko /api/custom/orders/:id/pay par mount karta hai, Admin UI me discover karta hai, aur Settings / Custom API Permissions me role allow hone tak block rakhta hai.
 
+Practical flow:
+
+1. Add app.post("/orders/:entryId/pay", handler) in src/custom-routes.ts or src/custom-routes.js.
+2. Restart the server. It appears as POST /api/custom/orders/:entryId/pay.
+3. Open /adminui#settings/custom-api-permissions, select a content API role, search orders, allow it, and save.
+4. Open Settings / API Tokens, create a token for that role, then call:
+
+\`\`\`bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \\
+  -H "Authorization: Bearer API_TOKEN"
+\`\`\`
+
+The Custom API Permissions screen can also rename route labels/groups, show allow/block history, and delete old inactive routes after they are removed from code.
+
 ## Type generation
 
 English: In TypeScript projects, run npm run types after creating or changing schemas. It writes src/apiagex-types.ts so RegisterApiagexCustomRoutes automatically gets schema slug and field autocomplete.

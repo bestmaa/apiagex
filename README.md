@@ -38,6 +38,15 @@ That writes `src/apiagex-types.ts`, and `RegisterApiagexCustomRoutes` automatica
 
 Custom business routes can be written as relative paths such as `/orders/:id/pay`. Apiagex mounts them under `/api/custom/orders/:id/pay`, discovers them in Settings / Custom API Permissions, and blocks them until an API role or the public role is allowed.
 
+Practical flow: add `app.post("/orders/:entryId/pay", handler)` in `src/custom-routes.ts`, restart, open `/adminui#settings/custom-api-permissions`, allow that route for a content API role, create a token for the same role in Settings / API Tokens, then call:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \
+  -H "Authorization: Bearer API_TOKEN"
+```
+
+The Custom API Permissions screen also supports search, route label/group rename, allow/block history, and cleanup for inactive routes removed from code.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

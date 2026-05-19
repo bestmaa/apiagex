@@ -104,8 +104,11 @@ describe("MVP database foundation", () => {
 
     expect(listMvpTables(db)).toContain("custom_api_routes");
     expect(listMvpTables(db)).toContain("custom_api_permissions");
+    expect(listMvpTables(db)).toContain("custom_api_permission_events");
     const columns = db.prepare("PRAGMA table_info(custom_api_routes)").all() as Array<{ name: string }>;
     expect(columns.map((column) => column.name)).toContain("permission_key");
+    const eventColumns = db.prepare("PRAGMA table_info(custom_api_permission_events)").all() as Array<{ name: string }>;
+    expect(eventColumns.map((column) => column.name)).toContain("actor_email");
   });
 
   it("seeds existing admin role permissions during additive migration", () => {

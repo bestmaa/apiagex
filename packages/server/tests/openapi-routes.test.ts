@@ -69,6 +69,46 @@ describe("OpenAPI and Swagger routes", () => {
     expect(spec.paths["/api/admin/schemas"]).toBeUndefined();
   });
 
+  it("includes active discovered custom APIs in content OpenAPI docs", async () => {
+    const server = createServer({
+      adminAuth: "disabled",
+      database: openSqliteDatabase(),
+      async customRoutes(app) {
+        app.post("/orders/:entryId/pay", async () => ({ ok: true }));
+      },
+    });
+    await enableApiDocs(server, { adminEnabled: false, contentEnabled: true });
+
+    const response = await server.inject({ method: "GET", url: "/api/openapi.json" });
+    const spec = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(spec.paths["/api/custom/orders/{entryId}/pay"].post).toMatchObject({
+      summary: "Pay",
+      tags: ["Custom APIs", "Orders"],
+    });
+    expect(spec.paths["/api/custom/orders/{entryId}/pay"].post.parameters).toMatchObject([
+      { in: "path", name: "entryId", required: true },
+    ]);
+  });
+
+  it("hides custom APIs when content docs are disabled", async () => {
+    const server = createServer({
+      adminAuth: "disabled",
+      database: openSqliteDatabase(),
+      async customRoutes(app) {
+        app.get("/reports/sales", async () => ({ ok: true }));
+      },
+    });
+    await enableApiDocs(server, { adminEnabled: true, contentEnabled: false });
+
+    const response = await server.inject({ method: "GET", url: "/api/openapi.json" });
+    const spec = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(spec.paths["/api/custom/reports/sales"]).toBeUndefined();
+  });
+
   it("can expose only admin API docs", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     await enableApiDocs(server, { adminEnabled: true, contentEnabled: false });

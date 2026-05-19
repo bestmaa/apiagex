@@ -1,7 +1,9 @@
 import type { FastifyInstance, FastifyReply } from "fastify";
 import {
+  listCustomApiRoutes,
   listSchemas,
   type ApiagexDatabase,
+  type CustomApiRouteRecord,
   type FieldRecord,
   type SchemaRecord,
 } from "@apiagex/database";
@@ -75,6 +77,7 @@ export function registerOpenApiRoutes(server: FastifyInstance, database: Apiagex
 
 export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<OpenApiDocument> {
   const schemas = await listSchemas(database);
+  const customApiRoutes = await listCustomApiRoutes(database);
   const components = contentSchemaComponents(schemas);
   const settings = await getApiDocsSettings(database);
   return {
@@ -88,6 +91,9 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
     tags: [
       ...(settings.contentEnabled
         ? [{ name: "Content", description: "Generated content APIs. Requests need API permissions unless the public role allows the action." }]
+        : []),
+      ...(settings.contentEnabled
+        ? [{ name: "Custom APIs", description: "Project custom APIs discovered from code and mounted under /api/custom." }]
         : []),
       ...(settings.adminEnabled ? [
       { name: "Admin Auth", description: "Owner setup, login, and session checks for the control plane." },
@@ -118,6 +124,7 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
       },
       ...(settings.adminEnabled ? adminPaths() : {}),
       ...(settings.contentEnabled ? Object.fromEntries(schemas.flatMap((schema) => contentPaths(schema))) : {}),
+      ...(settings.contentEnabled ? customApiPaths(customApiRoutes) : {}),
     },
     components: {
       securitySchemes: {
@@ -147,6 +154,33 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
       schemas: components,
     },
   };
+}
+
+function customApiPaths(routes: CustomApiRouteRecord[]): Record<string, OpenApiSchema> {
+  const paths: Record<string, OpenApiSchema> = {};
+  for (const route of routes.filter((item) => item.active)) {
+    const method = route.method.toLowerCase();
+    if (!["delete", "get", "head", "patch", "post", "put"].includes(method)) continue;
+    const path = openApiPath(route.path);
+    const operation: OpenApiSchema = {
+      tags: ["Custom APIs", route.groupName],
+      summary: route.name,
+      description: [
+        `Discovered custom route: ${route.method} ${route.path}.`,
+        `Permission key: ${route.permissionKey}.`,
+        "Requires this custom API permission for an API role, or public permission for no-token access.",
+      ].join(" "),
+      security: apiTokenSecurity(),
+      responses: okResponse({ type: "object", additionalProperties: true }),
+    };
+    const parameters = pathParametersFromRoute(path);
+    if (parameters.length > 0) operation.parameters = parameters;
+    paths[path] = {
+      ...(paths[path] ?? {}),
+      [method]: operation,
+    };
+  }
+  return paths;
 }
 
 function contentPaths(schema: SchemaRecord): Array<[string, OpenApiSchema]> {
@@ -213,6 +247,15 @@ function contentPaths(schema: SchemaRecord): Array<[string, OpenApiSchema]> {
       },
     ],
   ];
+}
+
+function openApiPath(path: string): string {
+  return path.replace(/:([A-Za-z0-9_]+)/g, "{$1}");
+}
+
+function pathParametersFromRoute(path: string): OpenApiSchema[] {
+  const names = [...path.matchAll(/\{([^}]+)\}/g)].flatMap((match) => match[1] ? [match[1]] : []);
+  return [...new Set(names)].map((name) => pathParameter(name, "Custom route path parameter."));
 }
 
 function adminPaths(): Record<string, OpenApiSchema> {
@@ -346,6 +389,46 @@ function adminPaths(): Record<string, OpenApiSchema> {
         tags: ["Admin Roles"],
         summary: "List discovered custom APIs",
         description: "Custom routes written in project code are mounted under /api/custom and listed here for permission setup.",
+        security: adminSecurity(),
+        responses: okResponse({ type: "object" }),
+      },
+    },
+    "/api/admin/custom-api-routes/{routeId}": {
+      parameters: [pathParameter("routeId", "Custom API route id.")],
+      put: {
+        tags: ["Admin Roles"],
+        summary: "Rename a discovered custom API label and group",
+        security: adminSecurity(),
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  groupName: { type: "string" },
+                  name: { type: "string" },
+                },
+                required: ["groupName", "name"],
+              },
+            },
+          },
+        },
+        responses: okResponse({ type: "object" }),
+      },
+      delete: {
+        tags: ["Admin Roles"],
+        summary: "Delete an inactive custom API route from permissions",
+        description: "Only routes not seen on the last server start can be deleted.",
+        security: adminSecurity(),
+        responses: okResponse({ type: "object" }),
+      },
+    },
+    "/api/admin/custom-api-routes/{routeId}/history": {
+      parameters: [pathParameter("routeId", "Custom API route id.")],
+      get: {
+        tags: ["Admin Roles"],
+        summary: "List custom API permission audit history",
         security: adminSecurity(),
         responses: okResponse({ type: "object" }),
       },

@@ -17,6 +17,18 @@ export type CustomApiRouteListResponse = {
   error?: string;
 };
 
+export type CustomApiRouteMutationResponse = {
+  ok: boolean;
+  route?: CustomApiRouteRecord;
+  error?: string;
+};
+
+export type CustomApiRouteDeleteResponse = {
+  ok: boolean;
+  deleted?: boolean;
+  error?: string;
+};
+
 export type CustomApiPermissionRecord = {
   id: string;
   roleId: string;
@@ -32,5 +44,21 @@ export type CustomApiPermissionDraft = {
 export type CustomApiPermissionListResponse = {
   ok: boolean;
   permissions?: CustomApiPermissionRecord[];
+  error?: string;
+};
+
+export type CustomApiPermissionEventRecord = {
+  id: string;
+  roleId: string;
+  customApiRouteId: string;
+  allowed: boolean;
+  actorId: string;
+  actorEmail: string;
+  createdAt: string;
+};
+
+export type CustomApiPermissionHistoryResponse = {
+  ok: boolean;
+  events?: CustomApiPermissionEventRecord[];
   error?: string;
 };

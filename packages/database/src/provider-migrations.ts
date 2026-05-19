@@ -220,6 +220,16 @@ CREATE TABLE IF NOT EXISTS custom_api_permissions (
   allowed INTEGER NOT NULL DEFAULT 0,
   UNIQUE(role_id, custom_api_route_id)
 );
+
+CREATE TABLE IF NOT EXISTS custom_api_permission_events (
+  id TEXT PRIMARY KEY,
+  role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  custom_api_route_id TEXT NOT NULL REFERENCES custom_api_routes(id) ON DELETE CASCADE,
+  allowed INTEGER NOT NULL DEFAULT 0,
+  actor_id TEXT NOT NULL,
+  actor_email TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
 `;
 
 export const MYSQL_FOUNDATION_SQL = `
@@ -241,4 +251,5 @@ CREATE TABLE IF NOT EXISTS realtime_events (sequence BIGINT AUTO_INCREMENT PRIMA
 CREATE TABLE IF NOT EXISTS realtime_sessions (id VARCHAR(191) PRIMARY KEY, token_hash VARCHAR(191) NOT NULL UNIQUE, token_prefix VARCHAR(32) NOT NULL, role_id VARCHAR(191) NOT NULL, schema_id VARCHAR(191) NOT NULL, schema_slug VARCHAR(191) NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL, used_at TEXT, CONSTRAINT fk_realtime_sessions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE, CONSTRAINT fk_realtime_sessions_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS custom_api_routes (id VARCHAR(191) PRIMARY KEY, method VARCHAR(16) NOT NULL, path VARCHAR(512) NOT NULL, name VARCHAR(191) NOT NULL, group_name VARCHAR(191) NOT NULL, permission_key VARCHAR(191) NOT NULL UNIQUE, active TINYINT(1) NOT NULL DEFAULT 1, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, last_seen_at TEXT NOT NULL, UNIQUE(method, path)) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS custom_api_permissions (id VARCHAR(191) PRIMARY KEY, role_id VARCHAR(191) NOT NULL, custom_api_route_id VARCHAR(191) NOT NULL, allowed TINYINT(1) NOT NULL DEFAULT 0, UNIQUE(role_id, custom_api_route_id), CONSTRAINT fk_custom_api_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE, CONSTRAINT fk_custom_api_permissions_route FOREIGN KEY (custom_api_route_id) REFERENCES custom_api_routes(id) ON DELETE CASCADE) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS custom_api_permission_events (id VARCHAR(191) PRIMARY KEY, role_id VARCHAR(191) NOT NULL, custom_api_route_id VARCHAR(191) NOT NULL, allowed TINYINT(1) NOT NULL DEFAULT 0, actor_id VARCHAR(191) NOT NULL, actor_email VARCHAR(191) NOT NULL, created_at TEXT NOT NULL, CONSTRAINT fk_custom_api_permission_events_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE, CONSTRAINT fk_custom_api_permission_events_route FOREIGN KEY (custom_api_route_id) REFERENCES custom_api_routes(id) ON DELETE CASCADE) ENGINE=InnoDB;
 `;

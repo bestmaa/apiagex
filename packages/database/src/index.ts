@@ -102,11 +102,15 @@ export {
 } from "./permission-repository.js";
 export {
   canRoleAccessCustomApi,
+  deleteInactiveCustomApiRoute,
   getCustomApiRouteByMethodPath,
+  listCustomApiPermissionEvents,
   listCustomApiPermissions,
   listCustomApiRoutes,
+  recordCustomApiPermissionEvent,
   setCustomApiPermission,
   syncCustomApiRoutes,
+  updateCustomApiRouteMetadata,
 } from "./custom-api-repository.js";
 export {
   createUser,
@@ -207,10 +211,13 @@ export type {
   SetPermissionInput,
 } from "./permission-repository.type.js";
 export type {
+  CustomApiPermissionEventRecord,
   CustomApiPermissionRecord,
   CustomApiRouteRecord,
+  RecordCustomApiPermissionEventInput,
   SetCustomApiPermissionInput,
   SyncCustomApiRouteInput,
+  UpdateCustomApiRouteMetadataInput,
 } from "./custom-api-repository.type.js";
 export type { CreateUserInput, UserRecord } from "./user-repository.type.js";
 export type {
