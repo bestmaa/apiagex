@@ -32,6 +32,16 @@ Goal: Make project custom routes simple to write while keeping them under a secu
 
 ## T3204 - Release
 
-- Status: `in_progress`
+- Status: `completed`
 - Task: Run release verification, bump version, push, publish to npm, and verify package versions.
 - Verify: `release:check`, publish workflow, provider E2E, and `npm view`.
+
+## Verification Results
+
+- `npm run check`: passed with 49 test files, 198 tests passed, and 2 skipped.
+- Focused tests for database migrations, custom routes, Admin UI routing, and generated project scaffolding passed.
+- `npx npm@10.9.7 run release:check`: passed with build, tests, smoke, and audit.
+- `npm ci --dry-run`: passed after regenerating the lockfile.
+- GitHub publish workflow `npm-v0.8.14`: passed.
+- Provider E2E workflow on `main`: passed.
+- `npm view @apiagex/database version`, `npm view @apiagex/server version`, and `npm view create-apiagex version`: all returned `0.8.14`.
