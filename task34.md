@@ -218,7 +218,7 @@ Each task uses this structure:
 #### T3412 - Implement Safe Template Resolver
 
 - Version: `v0.10.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Resolve `{{path.to.value}}` templates safely from workflow context.
 - Persona: Runtime safety engineer; avoid arbitrary code execution.
 - Success Criteria: Resolver supports string interpolation, whole-value substitution, arrays, objects, missing-path errors, and tests.

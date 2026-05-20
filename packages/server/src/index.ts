@@ -21,6 +21,12 @@ export {
   setWorkflowStepOutput,
   setWorkflowVariable,
 } from "./workflow-context.js";
+export {
+  resolveWorkflowPath,
+  resolveWorkflowTemplateString,
+  resolveWorkflowTemplateValue,
+  WorkflowTemplateError,
+} from "./workflow-template.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";
@@ -63,6 +69,9 @@ export type {
   WorkflowRequestHeaders,
   WorkflowResponseDraft,
 } from "./workflow-context.js";
+export type {
+  WorkflowTemplateResolution,
+} from "./workflow-template.js";
 export type {
   AnyWorkflowNodeDefinition,
   WorkflowDefinition,
