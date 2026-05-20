@@ -407,6 +407,23 @@ code {
   color: var(--admin-color-text-muted);
 }
 
+.workflow-graph-toolbar {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+}
+
+.workflow-graph-toolbar label {
+  min-width: min(220px, 100%);
+}
+
+.workflow-graph-layout {
+  display: grid;
+  gap: var(--admin-space-4);
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+}
+
 .workflow-graph-canvas {
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--admin-color-surface-muted) 72%, transparent), var(--admin-color-surface));
@@ -415,6 +432,54 @@ code {
   height: clamp(360px, 52vh, 620px);
   min-height: 360px;
   overflow: hidden;
+}
+
+.workflow-graph-inspector {
+  align-self: stretch;
+  background: var(--admin-color-surface-muted);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  display: grid;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-4);
+}
+
+.workflow-graph-inspector h4 {
+  margin: 0;
+}
+
+.workflow-graph-inspector span,
+.workflow-graph-inspector p {
+  color: var(--admin-color-text-muted);
+}
+
+.workflow-graph-inspector textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  min-height: 190px;
+  resize: vertical;
+}
+
+.workflow-graph-errors {
+  background: var(--admin-color-warning-bg);
+  border-left: var(--admin-space-1) solid var(--admin-color-warning-border);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-warning-text);
+  display: grid;
+  gap: var(--admin-space-2);
+  padding: var(--admin-space-3);
+}
+
+.workflow-graph-errors ul {
+  margin: 0;
+  padding-left: var(--admin-space-6);
+}
+
+.workflow-graph-ok {
+  background: var(--admin-color-primary-muted);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-primary-strong);
+  font-weight: 700;
+  padding: var(--admin-space-3);
 }
 
 .workflow-step-editor {
@@ -2575,6 +2640,7 @@ code {
   .workflow-form-grid,
   .workflow-step-fields,
   .workflow-step-identity,
+  .workflow-graph-layout,
   .workflow-graph-route,
   .workflow-history-row,
   .workflow-test-grid,

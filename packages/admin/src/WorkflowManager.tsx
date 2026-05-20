@@ -1,8 +1,8 @@
-import { Background, Controls, Handle, MiniMap, Position, ReactFlow } from "@xyflow/react";
-import type { Edge, Node, NodeProps } from "@xyflow/react";
+import { addEdge, Background, Controls, Handle, MiniMap, Position, ReactFlow, useEdgesState, useNodesState } from "@xyflow/react";
+import type { Connection, Edge, Node, NodeProps } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Edit3, Plus, RefreshCw, Save, Search, UserPlus, X } from "lucide-react";
+import { Copy, Edit3, Plus, RefreshCw, Save, Search, Trash2, UserPlus, X } from "lucide-react";
 import { createWorkflow, listSchemas, listWorkflowRuns, listWorkflows, testWorkflow, updateWorkflow } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
@@ -35,6 +35,7 @@ type WorkflowStepDraft = {
   type: WorkflowStepType;
 };
 type WorkflowGraphNodeData = {
+  config: Record<string, unknown>;
   configSummary: string;
   label: string;
   state: "error" | "ok" | "warning";
@@ -306,6 +307,13 @@ export function WorkflowManager() {
       {!loading && !loadError && workflows.length > 0 && viewMode === "graph" ? (
         <WorkflowGraphShell
           onSelectWorkflow={setGraphWorkflowId}
+          onStatus={setStatus}
+          onWorkflowSaved={(savedWorkflow) => {
+            setWorkflows((current) => sortWorkflows(current.map((workflow) => (
+              workflow.id === savedWorkflow.id ? savedWorkflow : workflow
+            ))));
+            setGraphWorkflowId(savedWorkflow.id);
+          }}
           selectedWorkflowId={graphWorkflowId}
           workflows={workflows}
         />
@@ -364,29 +372,182 @@ export function WorkflowManager() {
 
 function WorkflowGraphShell({
   onSelectWorkflow,
+  onStatus,
+  onWorkflowSaved,
   selectedWorkflowId,
   workflows,
 }: {
   onSelectWorkflow: (workflowId: string) => void;
+  onStatus: (status: string) => void;
+  onWorkflowSaved: (workflow: WorkflowRecord) => void;
   selectedWorkflowId: string;
   workflows: WorkflowRecord[];
 }) {
   const selectedWorkflow = workflows.find((workflow) => workflow.id === selectedWorkflowId) ?? workflows[0] ?? null;
-  const graph = useMemo(
+  const initialGraph = useMemo(
     () => selectedWorkflow ? workflowGraphFromDefinition(selectedWorkflow) : { edges: [], nodes: [] },
     [selectedWorkflow],
   );
+  const [nodes, setNodes, onNodesChange] = useNodesState<WorkflowGraphNode>(initialGraph.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<WorkflowGraphEdge>(initialGraph.edges);
+  const [selectedNodeId, setSelectedNodeId] = useState("");
+  const [selectedEdgeId, setSelectedEdgeId] = useState("");
+  const [configJson, setConfigJson] = useState("{}");
+  const [graphStatus, setGraphStatus] = useState("Graph editor ready");
+
+  useEffect(() => {
+    setNodes(initialGraph.nodes);
+    setEdges(initialGraph.edges);
+    const firstNode = initialGraph.nodes[0] ?? null;
+    setSelectedNodeId(firstNode?.id ?? "");
+    setSelectedEdgeId("");
+    setConfigJson(jsonText(firstNode?.data.config ?? {}));
+    setGraphStatus("Graph loaded");
+  }, [initialGraph.edges, initialGraph.nodes, setEdges, setNodes]);
+
+  const selectedNode = nodes.find((node) => node.id === selectedNodeId) ?? null;
+  const graphErrors = useMemo(() => validateWorkflowGraph(nodes, edges), [edges, nodes]);
 
   if (!selectedWorkflow) {
     return <StateMessage title="No workflow graph" variant="empty">Create a workflow to preview the graph.</StateMessage>;
+  }
+
+  function onConnect(connection: Connection) {
+    if (!connection.source || !connection.target) return;
+    setEdges((currentEdges) => addEdge({
+      ...connection,
+      id: `edge-${connection.source}-${connection.sourceHandle ?? "next"}-${connection.target}`,
+    }, currentEdges));
+    setGraphStatus("Edge added. Save graph to persist.");
+  }
+
+  function selectNode(nodeId: string) {
+    const node = nodes.find((item) => item.id === nodeId);
+    setSelectedNodeId(nodeId);
+    setSelectedEdgeId("");
+    setConfigJson(jsonText(node?.data.config ?? {}));
+  }
+
+  function addGraphNode(type: string) {
+    const id = uniqueNodeId(nodes, type);
+    const config = defaultGraphNodeConfig(type);
+    const validation = graphNodeValidation(type, config);
+    const nextNode: WorkflowGraphNode = {
+      data: {
+        config,
+        configSummary: graphConfigSummary(config),
+        label: id,
+        state: validation.state,
+        stateText: validation.text,
+        workflowType: type,
+      },
+      id,
+      position: {
+        x: 80 + (nodes.length * 210),
+        y: nodes.length % 2 === 0 ? 120 : 260,
+      },
+      type: "workflow",
+    };
+    setNodes((currentNodes) => [...currentNodes, nextNode]);
+    setSelectedNodeId(id);
+    setSelectedEdgeId("");
+    setConfigJson(jsonText(config));
+    setGraphStatus(`Added ${nodeLabel(type)}. Connect it before saving.`);
+  }
+
+  function applySelectedConfig(): boolean {
+    if (!selectedNode) {
+      setGraphStatus("Select a node before editing config.");
+      return false;
+    }
+    let config: Record<string, unknown>;
+    try {
+      config = parseJsonObject(configJson, "Node config must be a JSON object.");
+    } catch (error) {
+      setGraphStatus(error instanceof Error ? error.message : "Node config invalid");
+      return false;
+    }
+    const validation = graphNodeValidation(selectedNode.data.workflowType, config);
+    setNodes((currentNodes) => currentNodes.map((node) => {
+      if (node.id !== selectedNode.id) return node;
+      return graphNodeWithConfig(node, config, validation);
+    }));
+    setGraphStatus(`Updated ${selectedNode.id} config.`);
+    return true;
+  }
+
+  function deleteSelectedGraphItem() {
+    if (selectedEdgeId) {
+      setEdges((currentEdges) => currentEdges.filter((edge) => edge.id !== selectedEdgeId));
+      setSelectedEdgeId("");
+      setGraphStatus("Edge removed. Save graph to persist.");
+      return;
+    }
+    if (!selectedNode) {
+      setGraphStatus("Select a node or edge to delete.");
+      return;
+    }
+    if (selectedNode.data.workflowType === "routeTrigger") {
+      setGraphStatus("Route trigger cannot be deleted.");
+      return;
+    }
+    setNodes((currentNodes) => currentNodes.filter((node) => node.id !== selectedNode.id));
+    setEdges((currentEdges) => currentEdges.filter((edge) => edge.source !== selectedNode.id && edge.target !== selectedNode.id));
+    setSelectedNodeId("");
+    setConfigJson("{}");
+    setGraphStatus(`Removed ${selectedNode.id}. Save graph to persist.`);
+  }
+
+  async function saveGraph() {
+    let nextNodes = nodes;
+    if (selectedNode) {
+      let config: Record<string, unknown>;
+      try {
+        config = parseJsonObject(configJson, "Node config must be a JSON object.");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Node config invalid";
+        setGraphStatus(message);
+        onStatus(message);
+        return;
+      }
+      nextNodes = nodes.map((node) => node.id === selectedNode.id
+        ? graphNodeWithConfig(node, config)
+        : node);
+      setNodes(nextNodes);
+    }
+    const nextErrors = validateWorkflowGraph(nextNodes, edges);
+    if (nextErrors.length > 0) {
+      setGraphStatus(`Graph save blocked: ${nextErrors[0]}`);
+      onStatus(`Graph save blocked: ${nextErrors[0]}`);
+      return;
+    }
+    const definition = workflowDefinitionFromGraph(selectedWorkflow, nextNodes, edges);
+    const result = await updateWorkflow(selectedWorkflow.id, {
+      active: selectedWorkflow.active,
+      definition,
+      description: selectedWorkflow.description,
+      method: selectedWorkflow.method,
+      name: selectedWorkflow.name,
+      path: selectedWorkflow.path,
+      version: selectedWorkflow.version,
+    });
+    if (!result.ok || !result.workflow) {
+      const message = result.error ?? "Graph save failed";
+      setGraphStatus(message);
+      onStatus(message);
+      return;
+    }
+    onWorkflowSaved(result.workflow);
+    setGraphStatus("Graph saved");
+    onStatus(`Saved graph for ${result.workflow.name}`);
   }
 
   return (
     <section aria-labelledby="workflow-graph-title" className="workflow-graph-shell">
       <div className="entry-table-meta">
         <div>
-          <h3 id="workflow-graph-title">Graph preview</h3>
-          <span>Read-only workflow canvas</span>
+          <h3 id="workflow-graph-title">Graph editor</h3>
+          <span>Select nodes, edit config, connect edges, then save.</span>
         </div>
         <label>Workflow
           <select value={selectedWorkflow.id} onChange={(event) => onSelectWorkflow(event.target.value)}>
@@ -398,29 +559,97 @@ function WorkflowGraphShell({
           </select>
         </label>
       </div>
+      <div className="workflow-graph-toolbar">
+        <label>Add node
+          <select
+            value=""
+            onChange={(event) => {
+              if (event.target.value) addGraphNode(event.target.value);
+              event.target.value = "";
+            }}
+          >
+            <option value="">Select node</option>
+            <option value="validateBody">Validate body</option>
+            <option value="queryEntries">Query entries</option>
+            <option value="getEntry">Get entry</option>
+            <option value="createEntry">Create entry</option>
+            <option value="updateEntry">Update entry</option>
+            <option value="deleteEntry">Delete entry</option>
+            <option value="branch">Branch</option>
+            <option value="setVariable">Set variable</option>
+            <option value="returnResponse">Return response</option>
+          </select>
+        </label>
+        <button type="button" onClick={deleteSelectedGraphItem}>
+          <Trash2 aria-hidden="true" size={16} />
+          Delete selected
+        </button>
+        <button type="button" onClick={() => void saveGraph()}>
+          <Save aria-hidden="true" size={16} />
+          Save graph
+        </button>
+      </div>
       <div className="workflow-graph-route">
         <strong>{selectedWorkflow.name}</strong>
         <code>{selectedWorkflow.method} {mountedWorkflowPath(selectedWorkflow.path)}</code>
         <span>{selectedWorkflow.active ? "Active route" : "Inactive draft"}</span>
       </div>
-      <div className="workflow-graph-canvas" aria-label={`${selectedWorkflow.name} workflow graph`}>
-        <ReactFlow
-          colorMode="light"
-          edges={graph.edges}
-          elementsSelectable
-          fitView
-          fitViewOptions={{ padding: 0.2 }}
-          minZoom={0.2}
-          nodes={graph.nodes}
-          nodesConnectable={false}
-          nodesDraggable={false}
-          nodeTypes={workflowGraphNodeTypes}
-          proOptions={{ hideAttribution: true }}
-        >
-          <Background gap={18} />
-          <MiniMap pannable zoomable />
-          <Controls showInteractive={false} />
-        </ReactFlow>
+      <div className="workflow-graph-layout">
+        <div className="workflow-graph-canvas" aria-label={`${selectedWorkflow.name} workflow graph`}>
+          <ReactFlow
+            colorMode="light"
+            edges={edges}
+            fitView
+            fitViewOptions={{ padding: 0.2 }}
+            minZoom={0.2}
+            nodes={nodes}
+            nodeTypes={workflowGraphNodeTypes}
+            proOptions={{ hideAttribution: true }}
+            onConnect={onConnect}
+            onEdgesChange={onEdgesChange}
+            onEdgeClick={(_event, edge) => {
+              setSelectedEdgeId(edge.id);
+              setSelectedNodeId("");
+              setGraphStatus(`Selected edge ${edge.id}`);
+            }}
+            onNodeClick={(_event, node) => selectNode(node.id)}
+            onNodesChange={onNodesChange}
+            onPaneClick={() => {
+              setSelectedEdgeId("");
+              setSelectedNodeId("");
+            }}
+          >
+            <Background gap={18} />
+            <MiniMap pannable zoomable />
+            <Controls showInteractive={false} />
+          </ReactFlow>
+        </div>
+        <aside className="workflow-graph-inspector" aria-label="Graph inspector">
+          <h4>Inspector</h4>
+          {selectedNode ? (
+            <>
+              <strong>{selectedNode.id}</strong>
+              <span>{nodeLabel(selectedNode.data.workflowType)}</span>
+              <label>Config JSON
+                <textarea value={configJson} onChange={(event) => setConfigJson(event.target.value)} />
+              </label>
+              <button type="button" onClick={applySelectedConfig}>Apply config</button>
+            </>
+          ) : selectedEdgeId ? (
+            <p>Selected edge: <code>{selectedEdgeId}</code></p>
+          ) : (
+            <p>Select a node to edit its config.</p>
+          )}
+          {graphErrors.length ? (
+            <div className="workflow-graph-errors">
+              <strong>Graph errors</strong>
+              <ul>
+                {graphErrors.map((error) => <li key={error}>{error}</li>)}
+              </ul>
+            </div>
+          ) : <p className="workflow-graph-ok">Graph is valid.</p>}
+          <StatusToast title="Graph status">{graphStatus}</StatusToast>
+        </aside>
       </div>
     </section>
   );
@@ -1006,10 +1235,12 @@ function graphNodeFromWorkflowNode(node: Record<string, unknown>, index: number)
   const id = typeof node.id === "string" && node.id.trim() ? node.id : `node-${index + 1}`;
   const workflowType = typeof node.type === "string" && node.type.trim() ? node.type : "unknown";
   const position = graphNodePosition(node, index);
-  const validation = graphNodeValidation(workflowType, node.config);
+  const config = isRecord(node.config) ? node.config : {};
+  const validation = graphNodeValidation(workflowType, config);
   return {
     data: {
-      configSummary: graphConfigSummary(node.config),
+      config,
+      configSummary: graphConfigSummary(config),
       label: id,
       state: validation.state,
       stateText: validation.text,
@@ -1020,6 +1251,103 @@ function graphNodeFromWorkflowNode(node: Record<string, unknown>, index: number)
     position,
     type: "workflow",
   };
+}
+
+function graphNodeWithConfig(
+  node: WorkflowGraphNode,
+  config: Record<string, unknown>,
+  validation = graphNodeValidation(node.data.workflowType, config),
+): WorkflowGraphNode {
+  return {
+    ...node,
+    data: {
+      ...node.data,
+      config,
+      configSummary: graphConfigSummary(config),
+      state: validation.state,
+      stateText: validation.text,
+    },
+  };
+}
+
+function workflowDefinitionFromGraph(
+  workflow: WorkflowRecord,
+  nodes: WorkflowGraphNode[],
+  edges: WorkflowGraphEdge[],
+): Record<string, unknown> {
+  const startNode = nodes.find((node) => node.data.workflowType === "routeTrigger") ?? nodes[0];
+  return {
+    edges: edges.map((edge) => ({
+      id: edge.id,
+      ...(edge.sourceHandle ? { sourceHandle: edge.sourceHandle } : {}),
+      ...(edge.targetHandle ? { targetHandle: edge.targetHandle } : {}),
+      from: edge.source,
+      to: edge.target,
+    })),
+    nodes: nodes.map((node) => ({
+      config: node.data.config,
+      id: node.id,
+      position: node.position,
+      type: node.data.workflowType,
+    })),
+    route: { method: workflow.method, path: workflow.path },
+    startNodeId: startNode?.id ?? "start",
+    version: 1,
+  };
+}
+
+function validateWorkflowGraph(nodes: WorkflowGraphNode[], edges: WorkflowGraphEdge[]): string[] {
+  const errors: string[] = [];
+  const nodeIds = new Set<string>();
+  for (const node of nodes) {
+    if (nodeIds.has(node.id)) errors.push(`Duplicate node id ${node.id}.`);
+    nodeIds.add(node.id);
+    if (node.data.state === "error") errors.push(`${node.id}: ${node.data.stateText}.`);
+  }
+  const triggerNodes = nodes.filter((node) => node.data.workflowType === "routeTrigger");
+  if (triggerNodes.length !== 1) errors.push("Graph needs exactly one route trigger.");
+  if (!nodes.some((node) => node.data.workflowType === "returnResponse")) errors.push("Graph needs at least one return response.");
+  for (const edge of edges) {
+    if (!nodeIds.has(edge.source)) errors.push(`Edge ${edge.id} source node is missing.`);
+    if (!nodeIds.has(edge.target)) errors.push(`Edge ${edge.id} target node is missing.`);
+  }
+  const edgeIds = new Set<string>();
+  for (const edge of edges) {
+    if (edgeIds.has(edge.id)) errors.push(`Duplicate edge id ${edge.id}.`);
+    edgeIds.add(edge.id);
+  }
+  for (const node of nodes) {
+    if (node.data.workflowType === "routeTrigger") continue;
+    if (!edges.some((edge) => edge.target === node.id)) errors.push(`${node.id} needs an incoming edge.`);
+  }
+  for (const node of nodes) {
+    if (node.data.workflowType !== "returnResponse") continue;
+    if (edges.some((edge) => edge.source === node.id)) errors.push(`${node.id} cannot have outgoing edges.`);
+  }
+  return errors;
+}
+
+function uniqueNodeId(nodes: WorkflowGraphNode[], type: string): string {
+  const base = type.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`).replace(/^-/, "");
+  const existingIds = new Set(nodes.map((node) => node.id));
+  for (let index = 1; index < 1000; index += 1) {
+    const id = `${base}-${index}`;
+    if (!existingIds.has(id)) return id;
+  }
+  return `${base}-${Date.now()}`;
+}
+
+function defaultGraphNodeConfig(type: string): Record<string, unknown> {
+  if (type === "validateBody") return { fields: { field: { required: true, type: "string" } } };
+  if (type === "queryEntries") return { limit: 10, schema: "" };
+  if (type === "getEntry") return { entryId: "{{body.id}}" };
+  if (type === "createEntry") return { data: {}, schema: "" };
+  if (type === "updateEntry") return { data: {}, entryId: "{{body.id}}" };
+  if (type === "deleteEntry") return { entryId: "{{body.id}}" };
+  if (type === "branch") return { left: "{{body.value}}", operator: "exists" };
+  if (type === "setVariable") return { values: {} };
+  if (type === "returnResponse") return { body: { ok: true }, status: 200 };
+  return {};
 }
 
 function graphNodePosition(node: Record<string, unknown>, index: number): { x: number; y: number } {
@@ -1078,7 +1406,8 @@ function graphNodeValidation(type: string, config: unknown): { state: WorkflowGr
   ]);
   if (!knownTypes.has(type)) return { state: "error", text: "Unsupported node" };
   if (!isRecord(config)) return { state: "warning", text: "Config not readable" };
-  if (["createEntry", "queryEntries"].includes(type) && typeof config.schema !== "string") {
+  if (["createEntry", "queryEntries"].includes(type)
+    && (typeof config.schema !== "string" || !config.schema.trim())) {
     return { state: "error", text: "Schema missing" };
   }
   if (type === "returnResponse" && typeof config.status !== "number") {

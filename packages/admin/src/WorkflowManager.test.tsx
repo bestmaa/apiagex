@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, createElement } from "react";
+import { act, createElement, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createWorkflow, listSchemas, listWorkflowRuns, listWorkflows, testWorkflow, updateWorkflow } from "./api";
@@ -17,6 +17,7 @@ vi.mock("./api", () => ({
 }));
 
 vi.mock("@xyflow/react", () => ({
+  addEdge: (connection: Record<string, unknown>, edges: Array<Record<string, unknown>>) => [...edges, connection],
   Background: () => createElement("div", { "data-testid": "graph-background" }),
   Controls: () => createElement("div", { "data-testid": "graph-controls" }),
   Handle: () => createElement("span", { "data-testid": "graph-handle" }),
@@ -47,6 +48,14 @@ vi.mock("@xyflow/react", () => ({
     }),
     children,
   ),
+  useEdgesState: (initialEdges: Array<Record<string, unknown>>) => {
+    const [edges, setEdges] = useState(initialEdges);
+    return [edges, setEdges, vi.fn()];
+  },
+  useNodesState: (initialNodes: Array<Record<string, unknown>>) => {
+    const [nodes, setNodes] = useState(initialNodes);
+    return [nodes, setNodes, vi.fn()];
+  },
 }));
 
 const roots: Array<{ container: HTMLDivElement; root: Root }> = [];
@@ -165,8 +174,8 @@ describe("WorkflowManager", () => {
       await flushPromises();
     });
 
-    expect(container.textContent).toContain("Graph preview");
-    expect(container.textContent).toContain("Read-only workflow canvas");
+    expect(container.textContent).toContain("Graph editor");
+    expect(container.textContent).toContain("Select nodes, edit config, connect edges, then save.");
     expect(container.textContent).toContain("Route trigger");
     expect(container.textContent).toContain("Return response");
     expect(container.textContent).toContain("Ready");
@@ -174,6 +183,75 @@ describe("WorkflowManager", () => {
     const graph = container.querySelector<HTMLElement>("[data-testid='react-flow']");
     expect(graph?.dataset.nodeCount).toBe("2");
     expect(graph?.dataset.edgeCount).toBe("1");
+  });
+
+  it("saves graph node config edits through the workflow API", async () => {
+    vi.mocked(listWorkflows).mockResolvedValueOnce({
+      ok: true,
+      workflows: [workflow({
+        definition: {
+          edges: [{ from: "start", id: "edge-start-return-ok", to: "return-ok" }],
+          nodes: [
+            { config: {}, id: "start", type: "routeTrigger" },
+            { config: { body: { ok: true }, status: 200 }, id: "return-ok", type: "returnResponse" },
+          ],
+          route: { method: "POST", path: "/orders/pay" },
+          startNodeId: "start",
+          version: 1,
+        },
+      })],
+    });
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Graph");
+      await flushPromises();
+    });
+    const config = container.querySelector<HTMLTextAreaElement>(".workflow-graph-inspector textarea");
+    if (!config) throw new Error("GRAPH_CONFIG_TEXTAREA_MISSING");
+
+    await act(async () => {
+      setTextAreaValue(config, JSON.stringify({ audit: true }, null, 2));
+      clickButton(container, "Apply config");
+      await flushPromises();
+    });
+    await act(async () => {
+      clickButton(container, "Save graph");
+      await flushPromises();
+    });
+
+    expect(updateWorkflow).toHaveBeenCalledWith("workflow_pay", expect.objectContaining({
+      definition: expect.objectContaining({
+        nodes: expect.arrayContaining([
+          expect.objectContaining({
+            config: { audit: true },
+            id: "start",
+            type: "routeTrigger",
+          }),
+        ]),
+      }),
+    }));
+    expect(container.textContent).toContain("Saved graph for Pay order updated");
+  });
+
+  it("blocks saving invalid graph edits", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Graph");
+      await flushPromises();
+    });
+    await act(async () => {
+      setSelectValue(selectByLabel(container, "Add node"), "queryEntries");
+      await flushPromises();
+    });
+    await act(async () => {
+      clickButton(container, "Save graph");
+      await flushPromises();
+    });
+
+    expect(container.textContent).toContain("Graph save blocked");
+    expect(updateWorkflow).not.toHaveBeenCalled();
   });
 
   it("explains activation behavior in the workflow form", async () => {

@@ -668,7 +668,7 @@ Each task uses this structure:
 #### T3446 - Add Graph Editing Interactions
 
 - Version: `v0.14.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Allow add node, connect edge, delete node, delete edge, select node, and edit node config.
 - Persona: Workflow builder; make visual editing useful.
 - Success Criteria: Graph edits update workflow draft JSON and save through existing workflow APIs.
