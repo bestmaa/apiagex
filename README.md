@@ -81,6 +81,8 @@ OTP login workflow requirements are planned in [docs/otp-workflow-template-plan.
 
 Google login workflow requirements are planned in [docs/google-login-workflow-template-plan.md](./docs/google-login-workflow-template-plan.md). The plan requires server-side Google ID token verification, allowed-domain policy, user lookup/create rules, and first-party session/token handoff before implementation.
 
+The Workflows screen also includes `Create order status template`. It creates an inactive `POST /api/custom/orders/status` workflow that expects `{ "orderId": "ENTRY_ID", "status": "preparing|ready|completed|cancelled" }`, updates the order entry status, and blocks invalid transitions such as `preparing -> completed`. Realtime and webhooks still come from the normal content entry update path when enabled for the orders schema.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

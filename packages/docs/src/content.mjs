@@ -291,6 +291,10 @@ export const readmePage = {
         "Google login plan: docs/google-login-workflow-template-plan.md server-side ID token verification, user lookup/create, allowed domains, aur session/token handoff needs define karta hai.",
         "Google safety: never trust client-supplied profile fields or decode-only JWT payloads; verify signature, issuer, audience, expiry, subject, verified email, and optional hosted domain.",
         "Google safety: client-supplied profile fields ya decode-only JWT payloads trust mat karo; signature, issuer, audience, expiry, subject, verified email, aur optional hosted domain verify karo.",
+        "Order status template: Settings > Workflows can create an inactive POST /api/custom/orders/status starter that validates orderId/status, updates the order entry, and blocks invalid transitions.",
+        "Order status template: Settings > Workflows inactive POST /api/custom/orders/status starter bana sakta hai jo orderId/status validate karta hai, order entry update karta hai, aur invalid transitions block karta hai.",
+        "Order status transitions: pending can move to preparing or cancelled, preparing can move to ready or cancelled, ready can move to completed, and invalid transitions return ORDER_STATUS_TRANSITION_INVALID.",
+        "Order status transitions: pending se preparing ya cancelled, preparing se ready ya cancelled, ready se completed allowed hai, aur invalid transitions ORDER_STATUS_TRANSITION_INVALID return karte hain.",
       ],
     },
     {

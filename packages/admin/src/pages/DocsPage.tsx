@@ -274,6 +274,11 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <p>Google login is planning-only. Read <code>docs/google-login-workflow-template-plan.md</code> before implementation; it requires server-side ID token verification, allowed domains, user lookup/create rules, and session/token handoff.</p>
           <p>Do not trust client profile fields or decode-only JWT payloads. Verify signature, issuer, audience, expiry, subject, verified email, and optional hosted domain.</p>
         </article>
+        <article className="api-row">
+          <strong>Order status template</strong>
+          <p><code>Create order status template</code> creates an inactive <code>POST /api/custom/orders/status</code> starter. It validates <code>orderId</code> and <code>status</code>, updates the order entry, and returns the updated order.</p>
+          <p>Allowed transitions are <code>pending -&gt; preparing</code>, <code>pending -&gt; cancelled</code>, <code>preparing -&gt; ready</code>, <code>preparing -&gt; cancelled</code>, and <code>ready -&gt; completed</code>. Invalid transitions return <code>ORDER_STATUS_TRANSITION_INVALID</code>.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

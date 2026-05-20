@@ -601,7 +601,7 @@ Each task uses this structure:
 #### T3441 - Add Order Status Workflow Template
 
 - Version: `v0.13.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a practical order status update template.
 - Persona: Business workflow builder; show restaurant/kitchen-board style use case.
 - Success Criteria: Template updates order status, validates allowed transitions, returns updated order, and can trigger realtime/webhook if enabled.

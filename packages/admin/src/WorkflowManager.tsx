@@ -109,6 +109,20 @@ export function WorkflowManager() {
     setStatus("Created register user template. Review schema fields and password hashing before activation.");
   }
 
+  async function createOrderStatusTemplate() {
+    const draft = orderStatusWorkflowTemplate();
+    const result = await createWorkflow(draft);
+    if (!result.ok || !result.workflow) {
+      setStatus(result.error ?? "Order status template create failed");
+      return;
+    }
+    setWorkflows((current) => sortWorkflows([...current, result.workflow as WorkflowRecord]));
+    setFormOpen(false);
+    setEditingWorkflowId(null);
+    setForm(emptyWorkflowForm());
+    setStatus("Created order status template. Review transition rules before activation.");
+  }
+
   function openEditForm(workflow: WorkflowRecord) {
     setEditingWorkflowId(workflow.id);
     setForm({
@@ -168,6 +182,10 @@ export function WorkflowManager() {
           <button type="button" onClick={() => void createRegisterTemplate()}>
             <UserPlus aria-hidden="true" size={16} />
             Create register template
+          </button>
+          <button type="button" onClick={() => void createOrderStatusTemplate()}>
+            <Plus aria-hidden="true" size={16} />
+            Create order status template
           </button>
           <button type="button" onClick={() => void loadWorkflows()}>
             <RefreshCw aria-hidden="true" size={16} />
@@ -936,6 +954,148 @@ function registerUserWorkflowDefinition(method: string, path: string): Record<st
     route: { method, path },
     startNodeId: "start",
     version: 1,
+  };
+}
+
+function orderStatusWorkflowTemplate(): WorkflowDraft {
+  const path = "/orders/status";
+  const method = "POST";
+  return {
+    active: false,
+    definition: orderStatusWorkflowDefinition(method, path),
+    description: "Starter order status API. Requires orderId to be an entry id and allows pending->preparing, pending->cancelled, preparing->ready, preparing->cancelled, and ready->completed.",
+    method,
+    name: "Order status template",
+    path,
+    version: 1,
+  };
+}
+
+function orderStatusWorkflowDefinition(method: string, path: string): Record<string, unknown> {
+  return {
+    edges: [
+      { from: "start", id: "edge-start-validate-order-id", to: "validate-order-id" },
+      { from: "validate-order-id", id: "edge-validate-order-id-validate-status", to: "validate-status" },
+      { from: "validate-status", id: "edge-validate-status-get-order", to: "get-order" },
+      { from: "get-order", id: "edge-get-order-check-current-pending", to: "check-current-pending" },
+      { from: "check-current-pending", id: "edge-check-current-pending-check-pending-preparing", to: "check-pending-preparing" },
+      { from: "check-current-pending", id: "edge-check-current-pending-check-current-preparing", to: "check-current-preparing" },
+      { from: "check-pending-preparing", id: "edge-check-pending-preparing-update-order", to: "update-order" },
+      { from: "check-pending-preparing", id: "edge-check-pending-preparing-check-pending-cancelled", to: "check-pending-cancelled" },
+      { from: "check-pending-cancelled", id: "edge-check-pending-cancelled-update-order", to: "update-order" },
+      { from: "check-pending-cancelled", id: "edge-check-pending-cancelled-return-invalid", to: "return-invalid-transition" },
+      { from: "check-current-preparing", id: "edge-check-current-preparing-check-preparing-ready", to: "check-preparing-ready" },
+      { from: "check-current-preparing", id: "edge-check-current-preparing-check-current-ready", to: "check-current-ready" },
+      { from: "check-preparing-ready", id: "edge-check-preparing-ready-update-order", to: "update-order" },
+      { from: "check-preparing-ready", id: "edge-check-preparing-ready-check-preparing-cancelled", to: "check-preparing-cancelled" },
+      { from: "check-preparing-cancelled", id: "edge-check-preparing-cancelled-update-order", to: "update-order" },
+      { from: "check-preparing-cancelled", id: "edge-check-preparing-cancelled-return-invalid", to: "return-invalid-transition" },
+      { from: "check-current-ready", id: "edge-check-current-ready-check-ready-completed", to: "check-ready-completed" },
+      { from: "check-current-ready", id: "edge-check-current-ready-return-invalid", to: "return-invalid-transition" },
+      { from: "check-ready-completed", id: "edge-check-ready-completed-update-order", to: "update-order" },
+      { from: "check-ready-completed", id: "edge-check-ready-completed-return-invalid", to: "return-invalid-transition" },
+      { from: "update-order", id: "edge-update-order-return-updated", to: "return-updated" },
+    ],
+    nodes: [
+      { config: {}, id: "start", type: "routeTrigger" },
+      {
+        config: {
+          fields: {
+            orderId: { required: true, type: "string" },
+          },
+        },
+        id: "validate-order-id",
+        type: "validateBody",
+      },
+      {
+        config: {
+          fields: {
+            status: {
+              enum: ["preparing", "ready", "completed", "cancelled"],
+              required: true,
+              type: "string",
+            },
+          },
+        },
+        id: "validate-status",
+        type: "validateBody",
+      },
+      {
+        config: {
+          entryId: "{{body.orderId}}",
+        },
+        id: "get-order",
+        type: "getEntry",
+      },
+      orderBranch("check-current-pending", "{{steps.get-order.entry.data.status}}", "pending", "check-pending-preparing", "check-current-preparing"),
+      orderBranch("check-pending-preparing", "{{body.status}}", "preparing", "update-order", "check-pending-cancelled"),
+      orderBranch("check-pending-cancelled", "{{body.status}}", "cancelled", "update-order", "return-invalid-transition"),
+      orderBranch("check-current-preparing", "{{steps.get-order.entry.data.status}}", "preparing", "check-preparing-ready", "check-current-ready"),
+      orderBranch("check-preparing-ready", "{{body.status}}", "ready", "update-order", "check-preparing-cancelled"),
+      orderBranch("check-preparing-cancelled", "{{body.status}}", "cancelled", "update-order", "return-invalid-transition"),
+      orderBranch("check-current-ready", "{{steps.get-order.entry.data.status}}", "ready", "check-ready-completed", "return-invalid-transition"),
+      orderBranch("check-ready-completed", "{{body.status}}", "completed", "update-order", "return-invalid-transition"),
+      {
+        config: {
+          data: {
+            status: "{{body.status}}",
+          },
+          entryId: "{{body.orderId}}",
+        },
+        id: "update-order",
+        type: "updateEntry",
+      },
+      {
+        config: {
+          body: {
+            ok: true,
+            order: "{{steps.update-order.entry}}",
+            status: "{{body.status}}",
+          },
+          status: 200,
+        },
+        id: "return-updated",
+        type: "returnResponse",
+      },
+      {
+        config: {
+          body: {
+            currentStatus: "{{steps.get-order.entry.data.status}}",
+            error: "ORDER_STATUS_TRANSITION_INVALID",
+            ok: false,
+            requestedStatus: "{{body.status}}",
+          },
+          status: 409,
+        },
+        id: "return-invalid-transition",
+        type: "returnResponse",
+      },
+    ],
+    route: { method, path },
+    startNodeId: "start",
+    version: 1,
+  };
+}
+
+function orderBranch(
+  id: string,
+  left: string,
+  right: string,
+  thenNodeId: string,
+  elseNodeId: string,
+): Record<string, unknown> {
+  return {
+    config: {
+      condition: {
+        left,
+        operator: "eq",
+        right,
+      },
+      elseNodeId,
+      thenNodeId,
+    },
+    id,
+    type: "branch",
   };
 }
 

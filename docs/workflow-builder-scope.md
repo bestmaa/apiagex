@@ -669,6 +669,14 @@ Google login template status:
 - The future route must verify signature, issuer, audience, expiry, subject, verified email, and optional allowed domain.
 - The future route must not trust client-supplied profile fields or fake Google verification.
 
+Order status template status:
+
+- Admin UI can create an inactive `POST /api/custom/orders/status` starter.
+- It expects `orderId` to be an order entry id and `status` to be one of `preparing`, `ready`, `completed`, or `cancelled`.
+- It allows `pending -> preparing`, `pending -> cancelled`, `preparing -> ready`, `preparing -> cancelled`, and `ready -> completed`.
+- It returns `ORDER_STATUS_TRANSITION_INVALID` for invalid transitions.
+- It uses normal content entry update behavior, so existing webhook and realtime settings can emit events for the orders schema.
+
 ### Hinglish
 
 Templates tab add karne chahiye jab storage, runtime, permissions, aur Admin UI basics stable ho jaye.
@@ -705,6 +713,14 @@ Google login template status:
 - Implementation tab tak blocked hai jab tak server-side Google ID token verification aur first-party token issuance available na ho.
 - Future route signature, issuer, audience, expiry, subject, verified email, aur optional allowed domain verify karega.
 - Future route client-supplied profile fields trust nahi karega aur fake Google verification nahi karega.
+
+Order status template status:
+
+- Admin UI inactive `POST /api/custom/orders/status` starter bana sakta hai.
+- Ye `orderId` ko order entry id aur `status` ko `preparing`, `ready`, `completed`, ya `cancelled` me se ek expect karta hai.
+- Ye `pending -> preparing`, `pending -> cancelled`, `preparing -> ready`, `preparing -> cancelled`, aur `ready -> completed` allow karta hai.
+- Invalid transitions par `ORDER_STATUS_TRANSITION_INVALID` return karta hai.
+- Ye normal content entry update behavior use karta hai, isliye existing webhook aur realtime settings orders schema ke liye events emit kar sakte hain.
 
 ## Non Goals For MVP
 

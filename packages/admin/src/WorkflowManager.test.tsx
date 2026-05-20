@@ -249,6 +249,71 @@ describe("WorkflowManager", () => {
     expect(container.textContent).toContain("Created register user template");
   });
 
+  it("creates the order status template with transition guards", async () => {
+    vi.mocked(createWorkflow).mockResolvedValueOnce({
+      ok: true,
+      workflow: workflow({ id: "workflow_order_status", name: "Order status template", path: "/orders/status" }),
+    });
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create order status template");
+      await flushPromises();
+    });
+
+    const draft = vi.mocked(createWorkflow).mock.calls[0]?.[0];
+    expect(draft).toMatchObject({
+      active: false,
+      method: "POST",
+      name: "Order status template",
+      path: "/orders/status",
+    });
+    expect(draft?.description).toContain("pending->preparing");
+    expect(draft?.definition).toEqual(expect.objectContaining({
+      edges: expect.arrayContaining([
+        expect.objectContaining({ from: "check-pending-preparing", to: "update-order" }),
+        expect.objectContaining({ from: "check-ready-completed", to: "return-invalid-transition" }),
+      ]),
+      nodes: expect.arrayContaining([
+        expect.objectContaining({
+          config: { entryId: "{{body.orderId}}" },
+          id: "get-order",
+          type: "getEntry",
+        }),
+        expect.objectContaining({
+          config: {
+            condition: {
+              left: "{{steps.get-order.entry.data.status}}",
+              operator: "eq",
+              right: "pending",
+            },
+            elseNodeId: "check-current-preparing",
+            thenNodeId: "check-pending-preparing",
+          },
+          id: "check-current-pending",
+          type: "branch",
+        }),
+        expect.objectContaining({
+          config: {
+            data: { status: "{{body.status}}" },
+            entryId: "{{body.orderId}}",
+          },
+          id: "update-order",
+          type: "updateEntry",
+        }),
+        expect.objectContaining({
+          config: {
+            body: expect.objectContaining({ error: "ORDER_STATUS_TRANSITION_INVALID" }),
+            status: 409,
+          },
+          id: "return-invalid-transition",
+          type: "returnResponse",
+        }),
+      ]),
+    }));
+    expect(container.textContent).toContain("Created order status template");
+  });
+
   it("creates a workflow with ordered query and return steps", async () => {
     const { container } = await renderWorkflowManagerLoaded();
 
