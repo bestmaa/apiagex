@@ -99,6 +99,8 @@ Workflow client token issuing is planned in [docs/workflow-issue-token-node-plan
 
 Workflow Builder practical setup is documented in [docs/workflow-builder-practical-guide.md](./docs/workflow-builder-practical-guide.md): create schema, add workflow steps, test run, allow Custom API Permission, create token, and call `/api/custom/...`.
 
+Workflow Builder browser verification is documented in [docs/workflow-builder-browser-check.md](./docs/workflow-builder-browser-check.md). It covers owner login, schema and entry setup, workflow creation, test run, activation, permission allow, token variant, and API call.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

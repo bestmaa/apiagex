@@ -29,6 +29,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Workflow password node plan: [workflow-password-node-plan.md](./workflow-password-node-plan.md)
 - Workflow issue-token node plan: [workflow-issue-token-node-plan.md](./workflow-issue-token-node-plan.md)
 - Workflow builder practical guide: [workflow-builder-practical-guide.md](./workflow-builder-practical-guide.md)
+- Workflow builder browser check: [workflow-builder-browser-check.md](./workflow-builder-browser-check.md)
 
 ## Implemented Now
 
@@ -92,6 +93,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Workflow issue-token node planning `docs/workflow-issue-token-node-plan.md` me documented hai.
 - Workflow builder practical guide is documented in `docs/workflow-builder-practical-guide.md`.
 - Workflow builder practical guide `docs/workflow-builder-practical-guide.md` me documented hai.
+- Workflow builder browser check is documented in `docs/workflow-builder-browser-check.md`.
+- Workflow builder browser check `docs/workflow-builder-browser-check.md` me documented hai.
 
 ## Owner Bootstrap And Login
 

@@ -802,7 +802,7 @@ Each task uses this structure:
 #### T3456 - Add Workflow Builder Browser Tests
 
 - Version: `v0.16.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add Playwright/browser verification for workflow builder Admin UI.
 - Persona: QA engineer; protect the no-code API builder flow.
 - Success Criteria: Test covers login, create workflow, add steps, test run, activate, permission allow, and API call.

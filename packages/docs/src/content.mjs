@@ -147,6 +147,8 @@ export const docPage = {
         "Register template safety: pehle email, passwordHash, aur status fields wala users schema banao. Template body.password store nahi karta; real server-side hashing add hone tak PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING likhta hai.",
         "Practical guide: docs/workflow-builder-practical-guide.md shows the current schema, workflow steps, test run, permission allow, token, and curl flow.",
         "Practical guide: docs/workflow-builder-practical-guide.md current schema, workflow steps, test run, permission allow, token, aur curl flow dikhata hai.",
+        "Browser check: docs/workflow-builder-browser-check.md covers owner login, schema, entries, workflow create, test run, activation, permission allow, token variant, and API call.",
+        "Browser check: docs/workflow-builder-browser-check.md owner login, schema, entries, workflow create, test run, activation, permission allow, token variant, aur API call cover karta hai.",
       ],
     },
     {

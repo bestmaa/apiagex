@@ -319,6 +319,10 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <strong>Workflow builder practical guide</strong>
           <p>Read <code>docs/workflow-builder-practical-guide.md</code> for the current end-to-end flow: create schema, add workflow steps, run a test, activate, allow Custom API Permission, create a token, and call <code>/api/custom/...</code>.</p>
         </article>
+        <article className="api-row">
+          <strong>Workflow browser check</strong>
+          <p>Read <code>docs/workflow-builder-browser-check.md</code> for the Playwright/browser verification covering owner login, schema and entry setup, workflow create, test run, activation, permission allow, token variant, and API call.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />
