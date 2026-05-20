@@ -6,11 +6,11 @@ import {
 } from "@apiagex/database";
 import { setWorkflowStepOutput } from "./workflow-context.js";
 import type { WorkflowExecutionContext } from "./workflow-context.js";
+import { entryToWorkflowJson } from "./workflow-entry-json.js";
 import type { WorkflowNodeExecutionResult } from "./workflow-node-result.type.js";
 import { resolveWorkflowTemplateValue, WorkflowTemplateError } from "./workflow-template.js";
 import type {
   WorkflowEntryFilter,
-  WorkflowJsonValue,
   WorkflowNodeDefinition,
   WorkflowNodeOutputByType,
 } from "./workflow.type.js";
@@ -93,27 +93,6 @@ function compareValues(left: unknown, right: unknown): number {
 function clampLimit(value: number | undefined): number {
   if (value === undefined || !Number.isFinite(value)) return 50;
   return Math.min(100, Math.max(1, Math.floor(value)));
-}
-
-function entryToWorkflowJson(entry: EntryRecord): WorkflowJsonValue {
-  return {
-    createdAt: entry.createdAt,
-    data: toWorkflowJsonValue(entry.data),
-    id: entry.id,
-    schemaId: entry.schemaId,
-    updatedAt: entry.updatedAt,
-  };
-}
-
-function toWorkflowJsonValue(value: unknown): WorkflowJsonValue {
-  if (value === null || typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return value;
-  }
-  if (Array.isArray(value)) return value.map(toWorkflowJsonValue);
-  if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, toWorkflowJsonValue(item)]));
-  }
-  return null;
 }
 
 function workflowQueryFailure(

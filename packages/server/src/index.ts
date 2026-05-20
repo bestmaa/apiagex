@@ -33,6 +33,9 @@ export {
 export {
   executeWorkflowQueryEntriesNode,
 } from "./workflow-query-node.js";
+export {
+  executeWorkflowGetEntryNode,
+} from "./workflow-get-entry-node.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";

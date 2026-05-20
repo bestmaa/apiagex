@@ -257,7 +257,7 @@ Each task uses this structure:
 #### T3415 - Implement Entry Get Node
 
 - Version: `v0.10.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Read one entry by id from workflow.
 - Persona: Workflow API engineer; support detail and approval APIs.
 - Success Criteria: Node reads entry id from params/body/template and exposes entry output or not-found behavior.
