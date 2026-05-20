@@ -19,11 +19,32 @@ vi.mock("./api", () => ({
 vi.mock("@xyflow/react", () => ({
   Background: () => createElement("div", { "data-testid": "graph-background" }),
   Controls: () => createElement("div", { "data-testid": "graph-controls" }),
+  Handle: () => createElement("span", { "data-testid": "graph-handle" }),
   MiniMap: () => createElement("div", { "data-testid": "graph-minimap" }),
-  ReactFlow: ({ children, edges, nodes }: { children: unknown; edges: Array<{ id: string }>; nodes: Array<{ data: { label: string } }> }) => createElement(
+  Position: {
+    Left: "left",
+    Right: "right",
+  },
+  ReactFlow: ({
+    children,
+    edges,
+    nodes,
+    nodeTypes,
+  }: {
+    children: unknown;
+    edges: Array<{ id: string }>;
+    nodes: Array<{ data: { configSummary: string; label: string; stateText: string }; id: string; type?: string }>;
+    nodeTypes?: Record<string, (props: { data: { configSummary: string; label: string; stateText: string }; selected: boolean }) => unknown>;
+  }) => createElement(
     "div",
     { "data-edge-count": edges.length, "data-node-count": nodes.length, "data-testid": "react-flow" },
-    nodes.map((node) => createElement("div", { key: node.data.label }, node.data.label)),
+    nodes.map((node, index) => {
+      const NodeComponent = node.type ? nodeTypes?.[node.type] : undefined;
+      if (NodeComponent) {
+        return createElement(NodeComponent, { data: node.data, key: node.id, selected: index === 0 });
+      }
+      return createElement("div", { key: node.data.label }, node.data.label, node.data.configSummary, node.data.stateText);
+    }),
     children,
   ),
 }));
@@ -148,6 +169,8 @@ describe("WorkflowManager", () => {
     expect(container.textContent).toContain("Read-only workflow canvas");
     expect(container.textContent).toContain("Route trigger");
     expect(container.textContent).toContain("Return response");
+    expect(container.textContent).toContain("Ready");
+    expect(container.textContent).toContain("status: 200");
     const graph = container.querySelector<HTMLElement>("[data-testid='react-flow']");
     expect(graph?.dataset.nodeCount).toBe("2");
     expect(graph?.dataset.edgeCount).toBe("1");

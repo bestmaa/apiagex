@@ -417,21 +417,87 @@ code {
   overflow: hidden;
 }
 
-.workflow-graph-canvas .react-flow__node-default {
-  border-color: var(--admin-color-border);
-  border-radius: var(--admin-radius-sm);
-  color: var(--admin-color-text);
-  font-weight: 700;
-  min-width: 150px;
-  text-align: left;
-  white-space: pre-line;
-}
-
 .workflow-step-editor {
   border-top: 1px solid var(--admin-color-border-soft);
   display: grid;
   gap: var(--admin-space-4);
   padding-top: var(--admin-space-4);
+}
+
+.workflow-graph-node {
+  background: var(--admin-color-surface);
+  border: 1px solid var(--admin-color-border);
+  border-left: var(--admin-space-1) solid var(--admin-color-border-strong);
+  border-radius: var(--admin-radius-sm);
+  box-shadow: var(--admin-shadow-sm);
+  color: var(--admin-color-text);
+  display: grid;
+  gap: var(--admin-space-2);
+  max-width: 192px;
+  min-width: 172px;
+  padding: var(--admin-space-3);
+}
+
+.workflow-graph-node.is-selected {
+  border-color: var(--admin-color-primary);
+  border-left-color: var(--admin-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--admin-color-primary) 24%, transparent);
+}
+
+.workflow-graph-node-header {
+  display: grid;
+  gap: var(--admin-space-1);
+}
+
+.workflow-graph-node-header strong,
+.workflow-graph-node p,
+.workflow-graph-node small {
+  overflow-wrap: anywhere;
+}
+
+.workflow-graph-node-header strong {
+  font-size: var(--admin-font-sm);
+  line-height: 1.25;
+}
+
+.workflow-graph-node-header span {
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.workflow-graph-node p {
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.workflow-graph-node-state {
+  align-self: start;
+  background: var(--admin-color-surface-muted);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  font-weight: 700;
+  line-height: 1.2;
+  padding: var(--admin-space-1) var(--admin-space-2);
+}
+
+.workflow-graph-node-state.is-ok {
+  background: var(--admin-color-primary-muted);
+  color: var(--admin-color-primary-strong);
+}
+
+.workflow-graph-node-state.is-warning {
+  background: var(--admin-color-warning-bg);
+  color: var(--admin-color-warning-text);
+}
+
+.workflow-graph-node-state.is-error {
+  background: var(--admin-color-danger-bg, var(--admin-color-warning-bg));
+  color: var(--admin-color-danger-text, var(--admin-color-warning-text));
 }
 
 .workflow-step-editor h3 {

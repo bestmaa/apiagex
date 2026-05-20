@@ -655,7 +655,7 @@ Each task uses this structure:
 #### T3445 - Add Graph Node Components
 
 - Version: `v0.14.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Render node cards for trigger, validate, query, create, update, branch, and return.
 - Persona: Visual UX engineer; make workflow graphs understandable at a glance.
 - Success Criteria: Each node shows label, type, key config summary, error state, and selected state.

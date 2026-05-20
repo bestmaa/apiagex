@@ -1,5 +1,5 @@
-import { Background, Controls, MiniMap, ReactFlow } from "@xyflow/react";
-import type { Edge, Node } from "@xyflow/react";
+import { Background, Controls, Handle, MiniMap, Position, ReactFlow } from "@xyflow/react";
+import type { Edge, Node, NodeProps } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useEffect, useMemo, useState } from "react";
 import { Copy, Edit3, Plus, RefreshCw, Save, Search, UserPlus, X } from "lucide-react";
@@ -37,9 +37,11 @@ type WorkflowStepDraft = {
 type WorkflowGraphNodeData = {
   configSummary: string;
   label: string;
+  state: "error" | "ok" | "warning";
+  stateText: string;
   workflowType: string;
 };
-type WorkflowGraphNode = Node<WorkflowGraphNodeData>;
+type WorkflowGraphNode = Node<WorkflowGraphNodeData, "workflow">;
 type WorkflowGraphEdge = Edge;
 
 const workflowStepTypes: WorkflowStepType[] = [
@@ -49,6 +51,9 @@ const workflowStepTypes: WorkflowStepType[] = [
   "updateEntry",
   "returnResponse",
 ];
+const workflowGraphNodeTypes = {
+  workflow: WorkflowGraphNodeCard,
+};
 
 export function WorkflowManager() {
   const [workflows, setWorkflows] = useState<WorkflowRecord[]>([]);
@@ -402,13 +407,14 @@ function WorkflowGraphShell({
         <ReactFlow
           colorMode="light"
           edges={graph.edges}
-          elementsSelectable={false}
+          elementsSelectable
           fitView
           fitViewOptions={{ padding: 0.2 }}
           minZoom={0.2}
           nodes={graph.nodes}
           nodesConnectable={false}
           nodesDraggable={false}
+          nodeTypes={workflowGraphNodeTypes}
           proOptions={{ hideAttribution: true }}
         >
           <Background gap={18} />
@@ -417,6 +423,31 @@ function WorkflowGraphShell({
         </ReactFlow>
       </div>
     </section>
+  );
+}
+
+function WorkflowGraphNodeCard({ data, selected }: NodeProps<WorkflowGraphNode>) {
+  const handles = graphHandlesForType(data.workflowType);
+  return (
+    <article className={selected ? "workflow-graph-node is-selected" : "workflow-graph-node"}>
+      {handles.target ? <Handle id="in" isConnectable={false} position={Position.Left} type="target" /> : null}
+      <div className="workflow-graph-node-header">
+        <strong>{data.label}</strong>
+        <span>{nodeLabel(data.workflowType)}</span>
+      </div>
+      <p>{data.configSummary}</p>
+      <small className={`workflow-graph-node-state is-${data.state}`}>{data.stateText}</small>
+      {handles.sources.map((handle) => (
+        <Handle
+          id={handle.id}
+          isConnectable={false}
+          key={handle.id}
+          position={Position.Right}
+          style={{ top: handle.top }}
+          type="source"
+        />
+      ))}
+    </article>
   );
 }
 
@@ -975,16 +1006,19 @@ function graphNodeFromWorkflowNode(node: Record<string, unknown>, index: number)
   const id = typeof node.id === "string" && node.id.trim() ? node.id : `node-${index + 1}`;
   const workflowType = typeof node.type === "string" && node.type.trim() ? node.type : "unknown";
   const position = graphNodePosition(node, index);
+  const validation = graphNodeValidation(workflowType, node.config);
   return {
     data: {
       configSummary: graphConfigSummary(node.config),
-      label: `${nodeLabel(workflowType)}\n${id}`,
+      label: id,
+      state: validation.state,
+      stateText: validation.text,
       workflowType,
     },
     draggable: false,
     id,
     position,
-    type: "default",
+    type: "workflow",
   };
 }
 
@@ -1027,6 +1061,43 @@ function graphConfigSummary(config: unknown): string {
   if (isRecord(config.fields)) return `${Object.keys(config.fields).length} field rule(s)`;
   if (Object.keys(config).length === 0) return "No config";
   return `${Object.keys(config).length} config value(s)`;
+}
+
+function graphNodeValidation(type: string, config: unknown): { state: WorkflowGraphNodeData["state"]; text: string } {
+  const knownTypes = new Set([
+    "branch",
+    "createEntry",
+    "deleteEntry",
+    "getEntry",
+    "queryEntries",
+    "returnResponse",
+    "routeTrigger",
+    "setVariable",
+    "updateEntry",
+    "validateBody",
+  ]);
+  if (!knownTypes.has(type)) return { state: "error", text: "Unsupported node" };
+  if (!isRecord(config)) return { state: "warning", text: "Config not readable" };
+  if (["createEntry", "queryEntries"].includes(type) && typeof config.schema !== "string") {
+    return { state: "error", text: "Schema missing" };
+  }
+  if (type === "returnResponse" && typeof config.status !== "number") {
+    return { state: "warning", text: "Status default needed" };
+  }
+  return { state: "ok", text: "Ready" };
+}
+
+function graphHandlesForType(type: string): { sources: Array<{ id: string; top?: number }>; target: boolean } {
+  if (type === "routeTrigger") return { sources: [{ id: "next" }], target: false };
+  if (type === "returnResponse") return { sources: [], target: true };
+  if (type === "branch") return {
+    sources: [
+      { id: "then", top: 42 },
+      { id: "else", top: 86 },
+    ],
+    target: true,
+  };
+  return { sources: [{ id: "next" }], target: true };
 }
 
 function nodeLabel(type: string): string {
