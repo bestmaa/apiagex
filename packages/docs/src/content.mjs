@@ -145,6 +145,8 @@ export const docPage = {
         "Register template: Settings > Workflows inactive POST /api/custom/auth/register starter bana sakta hai jo email/password validate karta hai, users schema check karta hai, inactive user entry banata hai, aur 201 ya 409 return karta hai.",
         "Register template safety: create a users schema with email, passwordHash, and status fields first. The template does not store body.password; it writes PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING until real server-side hashing is added.",
         "Register template safety: pehle email, passwordHash, aur status fields wala users schema banao. Template body.password store nahi karta; real server-side hashing add hone tak PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING likhta hai.",
+        "Practical guide: docs/workflow-builder-practical-guide.md shows the current schema, workflow steps, test run, permission allow, token, and curl flow.",
+        "Practical guide: docs/workflow-builder-practical-guide.md current schema, workflow steps, test run, permission allow, token, aur curl flow dikhata hai.",
       ],
     },
     {
@@ -315,6 +317,8 @@ export const readmePage = {
         "Implemented password nodes Node crypto.scrypt, per-password salts, aur timing-safe verify use karte hain; plain passwords node output me return nahi hote.",
         "Issue-token plan: docs/workflow-issue-token-node-plan.md keeps app-user tokens separate from Admin owner sessions and binds them to Content/API roles.",
         "Issue-token plan: docs/workflow-issue-token-node-plan.md app-user tokens ko Admin owner sessions se alag rakhta hai aur Content/API roles se bind karta hai.",
+        "Practical guide: docs/workflow-builder-practical-guide.md shows schema creation, workflow steps, test run, permission allow, token creation, and curl calls.",
+        "Practical guide: docs/workflow-builder-practical-guide.md schema creation, workflow steps, test run, permission allow, token creation, aur curl calls dikhata hai.",
       ],
     },
     {

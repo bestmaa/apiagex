@@ -250,6 +250,16 @@ Blocked workflow calls return CUSTOM_API_PERMISSION_DENIED. Wrong or revoked tok
 
 Register template: Settings > Workflows can create an inactive POST /api/custom/auth/register starter. Create a users content schema with email, passwordHash, and status fields first. The template validates password but does not store it; replace PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING with real server-side hashing before production.
 
+Practical workflow builder flow:
+
+1. Create a content schema and sample entries in /adminui.
+2. Open /adminui#settings/workflows and create a route such as POST /products/lookup.
+3. Add Query entries and Return response steps, then run the test panel.
+4. Activate the workflow.
+5. Open /adminui#settings/custom-api-permissions, allow public or a content API role, and save.
+6. For role-protected calls, create a token in /adminui#settings/api-tokens.
+7. Call /api/custom/products/lookup with curl or your app.
+
 ## Type generation
 
 English: In TypeScript projects, run npm run types after creating or changing schemas. It writes src/apiagex-types.ts so RegisterApiagexCustomRoutes automatically gets schema slug and field autocomplete.

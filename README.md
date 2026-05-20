@@ -97,6 +97,8 @@ Workflow `hashPassword` and `verifyPassword` nodes are available using Node `cry
 
 Workflow client token issuing is planned in [docs/workflow-issue-token-node-plan.md](./docs/workflow-issue-token-node-plan.md). The plan keeps workflow-issued app-user tokens separate from Admin UI owner sessions and binds them to Content/API roles with expiry and revocation.
 
+Workflow Builder practical setup is documented in [docs/workflow-builder-practical-guide.md](./docs/workflow-builder-practical-guide.md): create schema, add workflow steps, test run, allow Custom API Permission, create token, and call `/api/custom/...`.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

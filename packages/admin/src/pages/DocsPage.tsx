@@ -315,6 +315,10 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <p>Login, OTP, and Google workflows need a client token node before production use. Workflow-issued tokens are app-user tokens, not Admin UI owner sessions.</p>
           <p>Read <code>docs/workflow-issue-token-node-plan.md</code> for opaque token storage, expiry, role binding, revocation, and Content/API permission integration.</p>
         </article>
+        <article className="api-row">
+          <strong>Workflow builder practical guide</strong>
+          <p>Read <code>docs/workflow-builder-practical-guide.md</code> for the current end-to-end flow: create schema, add workflow steps, run a test, activate, allow Custom API Permission, create a token, and call <code>/api/custom/...</code>.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

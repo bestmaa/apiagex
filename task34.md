@@ -789,7 +789,7 @@ Each task uses this structure:
 #### T3455 - Write Workflow Builder Practical Guide
 
 - Version: `v0.16.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Write practical docs for building a workflow API from scratch.
 - Persona: Teacher; make a beginner successful.
 - Success Criteria: Docs show create schema, create workflow route, add nodes, test run, allow permission, create token, call API.
