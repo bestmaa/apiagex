@@ -575,7 +575,7 @@ Each task uses this structure:
 #### T3439 - Add OTP Login Workflow Template Plan
 
 - Version: `v0.13.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Plan OTP login template requirements before implementation.
 - Persona: Auth system architect; avoid insecure OTP flow.
 - Success Criteria: Docs explain OTP request, OTP verify, expiry, retry limit, provider config, and token issuance needs.

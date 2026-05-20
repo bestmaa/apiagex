@@ -655,6 +655,13 @@ Register user template status:
 - It does not store `{{body.password}}`; `passwordHash` is a placeholder until real server-side hashing is added.
 - Production use requires replacing `PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING` with a real hash flow.
 
+OTP login template status:
+
+- Planning is documented in `docs/otp-workflow-template-plan.md`.
+- Implementation is intentionally blocked until hashed OTP storage, expiry, retry limits, delivery provider config, and token issuance are available.
+- The future OTP request route should return generic responses and must not reveal whether an account exists.
+- The future OTP verify route must consume the challenge and issue a secure session/token only after successful verification.
+
 ### Hinglish
 
 Templates tab add karne chahiye jab storage, runtime, permissions, aur Admin UI basics stable ho jaye.
@@ -677,6 +684,13 @@ Register user template status:
 - Ye `email`, `passwordHash`, aur `status` ke saath inactive user entry banata hai.
 - Ye `{{body.password}}` store nahi karta; real server-side hashing add hone tak `passwordHash` placeholder hai.
 - Production use ke liye `PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING` ko real hash flow se replace karna zaruri hai.
+
+OTP login template status:
+
+- Planning `docs/otp-workflow-template-plan.md` me documented hai.
+- Implementation tab tak blocked hai jab tak hashed OTP storage, expiry, retry limits, delivery provider config, aur token issuance available na ho.
+- Future OTP request route generic response dega aur account exist karta hai ya nahi ye reveal nahi karega.
+- Future OTP verify route successful verification ke baad challenge consume karega aur secure session/token issue karega.
 
 ## Non Goals For MVP
 

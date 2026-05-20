@@ -21,6 +21,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Install and publish flow: [install-and-publish-flow.md](./install-and-publish-flow.md)
 - Database provider setup: [database-provider-setup.md](./database-provider-setup.md)
 - Planned Workflow API Builder scope: [workflow-builder-scope.md](./workflow-builder-scope.md)
+- OTP workflow template plan: [otp-workflow-template-plan.md](./otp-workflow-template-plan.md)
 
 ## Implemented Now
 
@@ -68,6 +69,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Database provider setup `docs/database-provider-setup.md` me documented hai.
 - Planned Workflow API Builder scope is documented in `docs/workflow-builder-scope.md`.
 - Planned Workflow API Builder scope `docs/workflow-builder-scope.md` me documented hai.
+- OTP workflow template planning is documented in `docs/otp-workflow-template-plan.md`.
+- OTP workflow template planning `docs/otp-workflow-template-plan.md` me documented hai.
 
 ## Owner Bootstrap And Login
 

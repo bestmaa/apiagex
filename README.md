@@ -77,6 +77,8 @@ The Workflows screen includes a `Create register template` starter. It creates a
 
 Planned next layer: Workflow API Builder will let admins create safe custom APIs from Admin UI using saved workflow definitions before the graph editor is added. Scope and safety rules are documented in [docs/workflow-builder-scope.md](./docs/workflow-builder-scope.md).
 
+OTP login workflow requirements are planned in [docs/otp-workflow-template-plan.md](./docs/otp-workflow-template-plan.md). The plan requires hashed OTP storage, expiry, retry/rate limits, provider configuration, and secure token issuance before any OTP template is implemented.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

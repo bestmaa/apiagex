@@ -264,6 +264,11 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <p><code>Create register template</code> creates an inactive <code>POST /api/custom/auth/register</code> starter. Create a <code>users</code> content schema with <code>email</code>, <code>passwordHash</code>, and <code>status</code> fields before testing it.</p>
           <p>The template validates <code>password</code> but does not store <code>{`{{body.password}}`}</code>. It writes <code>PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING</code> until you add real server-side hashing.</p>
         </article>
+        <article className="api-row">
+          <strong>OTP template plan</strong>
+          <p>OTP login is planning-only. Read <code>docs/otp-workflow-template-plan.md</code> before implementation; it requires hashed OTP storage, expiry, retry limits, provider config, and secure token issuance.</p>
+          <p>Raw OTP codes must never be stored, logged, or returned, and verify must consume the challenge before issuing a session/token.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />
