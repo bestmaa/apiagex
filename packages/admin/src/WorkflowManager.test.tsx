@@ -2,12 +2,14 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createWorkflow, listWorkflows, updateWorkflow } from "./api";
+import { createWorkflow, listSchemas, listWorkflows, updateWorkflow } from "./api";
 import { WorkflowManager } from "./WorkflowManager";
+import type { SchemaRecord } from "./schema.type";
 import type { WorkflowRecord } from "./workflow.type";
 
 vi.mock("./api", () => ({
   createWorkflow: vi.fn(),
+  listSchemas: vi.fn(),
   listWorkflows: vi.fn(),
   updateWorkflow: vi.fn(),
 }));
@@ -16,6 +18,7 @@ const roots: Array<{ container: HTMLDivElement; root: Root }> = [];
 
 describe("WorkflowManager", () => {
   beforeEach(() => {
+    vi.mocked(listSchemas).mockResolvedValue({ ok: true, schemas: [schema()] });
     vi.mocked(listWorkflows).mockResolvedValue({ ok: true, workflows: [workflow(), workflow({ active: false, name: "Archive order", path: "/orders/archive" })] });
     vi.mocked(createWorkflow).mockResolvedValue({ ok: true, workflow: workflow({ id: "workflow_created", name: "Created workflow", path: "/created" }) });
     vi.mocked(updateWorkflow).mockResolvedValue({ ok: true, workflow: workflow({ id: "workflow_pay", name: "Pay order updated", path: "/orders/pay-now" }) });
@@ -153,6 +156,36 @@ describe("WorkflowManager", () => {
     });
   });
 
+  it("uses schema and field pickers without hiding the slug inputs", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create workflow");
+      await flushPromises();
+    });
+    setInputValue(inputByPlaceholder(container, "Pay order"), "Create product");
+    setInputValue(inputByPlaceholder(container, "/orders/pay"), "/products/create");
+    await addWorkflowStep(container, "createEntry");
+    setSelectValue(selectByLabel(container, "Pick schema"), "products");
+    setSelectValue(selectByLabel(container, "Add data field"), "title");
+
+    expect(inputByDisplayValue(container, "products")).toBeTruthy();
+    expect(textareaWithValue(container, "{{body.title}}")).toBeTruthy();
+
+    await act(async () => {
+      clickButton(container, "Save workflow");
+      await flushPromises();
+    });
+
+    expect(vi.mocked(createWorkflow).mock.calls[0]?.[0].definition).toMatchObject({
+      nodes: [
+        { id: "start", type: "routeTrigger" },
+        { config: { data: { title: "{{body.title}}" }, schema: "products" }, type: "createEntry" },
+        { type: "returnResponse" },
+      ],
+    });
+  });
+
   it("supports adding, reordering, and removing workflow steps", async () => {
     const { container } = await renderWorkflowManagerLoaded();
 
@@ -259,6 +292,20 @@ function workflow(overrides: Partial<WorkflowRecord> = {}): WorkflowRecord {
   };
 }
 
+function schema(overrides: Partial<SchemaRecord> = {}): SchemaRecord {
+  return {
+    description: "Product catalog",
+    fields: [
+      { name: "Title", required: true, slug: "title", type: "text" },
+      { name: "Price", required: false, slug: "price", type: "number" },
+    ],
+    id: "schema_products",
+    name: "Products",
+    slug: "products",
+    ...overrides,
+  };
+}
+
 function createDeferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
   let resolve!: (value: T) => void;
   const promise = new Promise<T>((nextResolve) => {
@@ -315,6 +362,12 @@ function inputByDisplayValue(container: HTMLDivElement, value: string): HTMLInpu
   const input = [...container.querySelectorAll<HTMLInputElement>("input")].find((item) => item.value === value);
   if (!input) throw new Error(`INPUT_VALUE_NOT_FOUND_${value}`);
   return input;
+}
+
+function textareaWithValue(container: HTMLDivElement, value: string): HTMLTextAreaElement {
+  const textarea = [...container.querySelectorAll<HTMLTextAreaElement>("textarea")].find((item) => item.value.includes(value));
+  if (!textarea) throw new Error(`TEXTAREA_VALUE_NOT_FOUND_${value}`);
+  return textarea;
 }
 
 function selectByLabel(container: HTMLDivElement, labelName: string): HTMLSelectElement {

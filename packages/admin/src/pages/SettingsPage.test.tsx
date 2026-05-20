@@ -2,11 +2,12 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createWorkflow, listWorkflows, updateWorkflow } from "../api";
+import { createWorkflow, listSchemas, listWorkflows, updateWorkflow } from "../api";
 import { SettingsPage } from "./SettingsPage";
 
 vi.mock("../api", () => ({
   createWorkflow: vi.fn(),
+  listSchemas: vi.fn(),
   listWorkflows: vi.fn(),
   updateWorkflow: vi.fn(),
 }));
@@ -15,6 +16,7 @@ const roots: Array<{ container: HTMLDivElement; root: Root }> = [];
 
 describe("SettingsPage", () => {
   beforeEach(() => {
+    vi.mocked(listSchemas).mockResolvedValue({ ok: true, schemas: [] });
     vi.mocked(listWorkflows).mockResolvedValue({ ok: true, workflows: [] });
     vi.mocked(createWorkflow).mockResolvedValue({ ok: true });
     vi.mocked(updateWorkflow).mockResolvedValue({ ok: true });

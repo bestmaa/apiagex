@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Copy, Edit3, Plus, RefreshCw, Save, Search, X } from "lucide-react";
-import { createWorkflow, listWorkflows, updateWorkflow } from "./api";
+import { createWorkflow, listSchemas, listWorkflows, updateWorkflow } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
+import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
 import type { WorkflowDraft, WorkflowRecord } from "./workflow.type";
 
 type WorkflowStatusFilter = "active" | "all" | "inactive";
@@ -43,6 +44,7 @@ export function WorkflowManager() {
   const [editingWorkflowId, setEditingWorkflowId] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState<WorkflowFormDraft>(emptyWorkflowForm());
+  const [schemas, setSchemas] = useState<SchemaRecord[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("Workflow list loading");
   const [statusFilter, setStatusFilter] = useState<WorkflowStatusFilter>("all");
@@ -51,6 +53,7 @@ export function WorkflowManager() {
 
   useEffect(() => {
     void loadWorkflows();
+    void loadSchemaMetadata();
   }, []);
 
   async function loadWorkflows() {
@@ -69,6 +72,11 @@ export function WorkflowManager() {
     const nextWorkflows = result.workflows ?? [];
     setWorkflows(sortWorkflows(nextWorkflows));
     setStatus(nextWorkflows.length ? "Workflow list ready" : "No workflows yet");
+  }
+
+  async function loadSchemaMetadata() {
+    const result = await listSchemas();
+    setSchemas(sortSchemas(result.schemas ?? []));
   }
 
   async function copyRoute(workflow: WorkflowRecord) {
@@ -158,6 +166,7 @@ export function WorkflowManager() {
             setEditingWorkflowId(null);
           }}
           onChange={setForm}
+          schemas={schemas}
           onSave={() => void saveWorkflowBasics()}
         />
       ) : null}
@@ -243,12 +252,14 @@ function WorkflowBasicsForm({
   mode,
   onCancel,
   onChange,
+  schemas,
   onSave,
 }: {
   draft: WorkflowFormDraft;
   mode: "create" | "edit";
   onCancel: () => void;
   onChange: (draft: WorkflowFormDraft) => void;
+  schemas: SchemaRecord[];
   onSave: () => void;
 }) {
   return (
@@ -300,6 +311,7 @@ function WorkflowBasicsForm({
       </div>
       <WorkflowStepEditor
         onChange={(steps) => onChange({ ...draft, steps })}
+        schemas={schemas}
         steps={draft.steps}
       />
       <p className="helper-text">Mounted route: <code>{mountedWorkflowPath(draft.path)}</code></p>
@@ -313,9 +325,11 @@ function WorkflowBasicsForm({
 
 function WorkflowStepEditor({
   onChange,
+  schemas,
   steps,
 }: {
   onChange: (steps: WorkflowStepDraft[]) => void;
+  schemas: SchemaRecord[];
   steps: WorkflowStepDraft[];
 }) {
   function addStep(type: WorkflowStepType) {
@@ -386,7 +400,11 @@ function WorkflowStepEditor({
                 </select>
               </label>
             </div>
-            <WorkflowStepFields step={step} onChange={(nextStep) => updateStep(index, nextStep)} />
+            <WorkflowStepFields
+              schemas={schemas}
+              step={step}
+              onChange={(nextStep) => updateStep(index, nextStep)}
+            />
             <div className="entry-table-actions">
               <button disabled={index === 0} type="button" onClick={() => moveStep(index, -1)}>Move up</button>
               <button disabled={index === steps.length - 1} type="button" onClick={() => moveStep(index, 1)}>Move down</button>
@@ -401,11 +419,14 @@ function WorkflowStepEditor({
 
 function WorkflowStepFields({
   onChange,
+  schemas,
   step,
 }: {
   onChange: (step: WorkflowStepDraft) => void;
+  schemas: SchemaRecord[];
   step: WorkflowStepDraft;
 }) {
+  const selectedSchema = schemaForSlug(schemas, step.schema);
   if (step.type === "validateBody") {
     return (
       <div className="workflow-step-fields">
@@ -427,9 +448,19 @@ function WorkflowStepFields({
   if (step.type === "queryEntries") {
     return (
       <div className="workflow-step-fields">
+        <SchemaPicker
+          schemas={schemas}
+          value={step.schema}
+          onChange={(schemaSlug) => onChange({ ...step, schema: schemaSlug })}
+        />
         <label>Schema slug
           <input value={step.schema} placeholder="orders" onChange={(event) => onChange({ ...step, schema: event.target.value })} />
         </label>
+        <FieldTemplatePicker
+          fields={selectedSchema?.fields ?? []}
+          label="Search from field"
+          onPick={(field) => onChange({ ...step, search: `{{body.${field.slug}}}` })}
+        />
         <label>Search
           <input value={step.search} placeholder="{{body.email}}" onChange={(event) => onChange({ ...step, search: event.target.value })} />
         </label>
@@ -442,9 +473,19 @@ function WorkflowStepFields({
   if (step.type === "createEntry") {
     return (
       <div className="workflow-step-fields">
+        <SchemaPicker
+          schemas={schemas}
+          value={step.schema}
+          onChange={(schemaSlug) => onChange({ ...step, schema: schemaSlug })}
+        />
         <label>Schema slug
           <input value={step.schema} placeholder="orders" onChange={(event) => onChange({ ...step, schema: event.target.value })} />
         </label>
+        <FieldTemplatePicker
+          fields={selectedSchema?.fields ?? []}
+          label="Add data field"
+          onPick={(field) => onChange({ ...step, dataJson: addFieldMapping(step.dataJson, field.slug) })}
+        />
         <label>Data JSON
           <textarea value={step.dataJson} onChange={(event) => onChange({ ...step, dataJson: event.target.value })} />
         </label>
@@ -454,9 +495,22 @@ function WorkflowStepFields({
   if (step.type === "updateEntry") {
     return (
       <div className="workflow-step-fields">
+        <SchemaPicker
+          schemas={schemas}
+          value={step.schema}
+          onChange={(schemaSlug) => onChange({ ...step, schema: schemaSlug })}
+        />
+        <label>Schema slug
+          <input value={step.schema} placeholder="orders" onChange={(event) => onChange({ ...step, schema: event.target.value })} />
+        </label>
         <label>Entry id
           <input value={step.entryId} placeholder="{{body.id}}" onChange={(event) => onChange({ ...step, entryId: event.target.value })} />
         </label>
+        <FieldTemplatePicker
+          fields={selectedSchema?.fields ?? []}
+          label="Add data field"
+          onPick={(field) => onChange({ ...step, dataJson: addFieldMapping(step.dataJson, field.slug) })}
+        />
         <label>Data JSON
           <textarea value={step.dataJson} onChange={(event) => onChange({ ...step, dataJson: event.target.value })} />
         </label>
@@ -472,6 +526,55 @@ function WorkflowStepFields({
         <textarea value={step.body} onChange={(event) => onChange({ ...step, body: event.target.value })} />
       </label>
     </div>
+  );
+}
+
+function SchemaPicker({
+  onChange,
+  schemas,
+  value,
+}: {
+  onChange: (schemaSlug: string) => void;
+  schemas: SchemaRecord[];
+  value: string;
+}) {
+  return (
+    <label>Pick schema
+      <select value={value} onChange={(event) => onChange(event.target.value)}>
+        <option value="">{schemas.length ? "Select schema" : "No schemas available"}</option>
+        {schemas.map((schema) => (
+          <option key={schema.id} value={schema.slug}>{schema.name} ({schema.slug})</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function FieldTemplatePicker({
+  fields,
+  label,
+  onPick,
+}: {
+  fields: SchemaFieldDraft[];
+  label: string;
+  onPick: (field: SchemaFieldDraft) => void;
+}) {
+  return (
+    <label>{label}
+      <select
+        value=""
+        onChange={(event) => {
+          const field = fields.find((item) => item.slug === event.target.value);
+          if (field) onPick(field);
+          event.target.value = "";
+        }}
+      >
+        <option value="">{fields.length ? "Select field" : "Select schema first"}</option>
+        {fields.map((field) => (
+          <option key={field.slug} value={field.slug}>{field.name} ({field.slug})</option>
+        ))}
+      </select>
+    </label>
   );
 }
 
@@ -508,6 +611,14 @@ function sortWorkflows(workflows: WorkflowRecord[]): WorkflowRecord[] {
     if (left.active !== right.active) return left.active ? -1 : 1;
     return right.updatedAt.localeCompare(left.updatedAt) || left.name.localeCompare(right.name);
   });
+}
+
+function sortSchemas(schemas: SchemaRecord[]): SchemaRecord[] {
+  return [...schemas].sort((left, right) => left.name.localeCompare(right.name));
+}
+
+function schemaForSlug(schemas: SchemaRecord[], slug: string): SchemaRecord | undefined {
+  return schemas.find((schema) => schema.slug === slug);
 }
 
 function formatDate(value: string): string {
@@ -666,6 +777,14 @@ function configFromStep(step: WorkflowStepDraft): Record<string, unknown> {
   };
 }
 
+function addFieldMapping(dataJson: string, fieldSlug: string): string {
+  const current = safeJsonObject(dataJson);
+  return jsonText({
+    ...current,
+    [fieldSlug]: `{{body.${fieldSlug}}}`,
+  });
+}
+
 function stepsFromDefinition(definition?: Record<string, unknown>): WorkflowStepDraft[] {
   const nodes = Array.isArray(definition?.nodes) ? definition.nodes : [];
   const steps = nodes
@@ -773,6 +892,15 @@ function parseJsonObject(text: string, errorMessage: string): Record<string, unk
   const value = parseJsonValue(text, errorMessage);
   if (!isRecord(value)) throw new Error(errorMessage);
   return value;
+}
+
+function safeJsonObject(text: string): Record<string, unknown> {
+  try {
+    const value = JSON.parse(text) as unknown;
+    return isRecord(value) ? value : {};
+  } catch {
+    return {};
+  }
 }
 
 function parseJsonValue(text: string, errorMessage: string): unknown {

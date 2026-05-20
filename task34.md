@@ -482,7 +482,7 @@ Each task uses this structure:
 #### T3432 - Add Schema And Field Pickers In Workflow Forms
 
 - Version: `v0.12.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Use live schemas and fields in node config forms.
 - Persona: Workflow builder user; avoid typing schema/field slugs manually.
 - Success Criteria: Query/create/update nodes can pick schema and fields from existing Admin UI metadata.
