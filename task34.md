@@ -296,7 +296,7 @@ Each task uses this structure:
 #### T3418 - Implement Entry Delete Node
 
 - Version: `v0.10.7`
-- Status: `pending`
+- Status: `completed`
 - Goal: Delete entries from workflow when explicitly configured.
 - Persona: Data safety engineer; make delete powerful but deliberate.
 - Success Criteria: Delete node requires explicit entry id and returns deleted status.

@@ -42,6 +42,9 @@ export {
 export {
   executeWorkflowUpdateEntryNode,
 } from "./workflow-update-entry-node.js";
+export {
+  executeWorkflowDeleteEntryNode,
+} from "./workflow-delete-entry-node.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";
