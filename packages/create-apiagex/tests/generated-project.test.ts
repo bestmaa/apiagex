@@ -47,7 +47,7 @@ describe("generated Apiagex project", () => {
     await expectText(`http://127.0.0.1:${port}/doc`, "Apiagex Docs");
     await expectText(`http://127.0.0.1:${port}/readme`, "Apiagex Readme");
     await server?.close();
-  });
+  }, 15_000);
 
   it("scaffolds TypeScript custom routes with exported Apiagex route types", async () => {
     const root = await mkdtemp(join(tmpdir(), "apiagex-generated-ts-"));

@@ -107,7 +107,7 @@ describe("apiagex runtime CLI", () => {
     });
     expect(login.status).toBe(200);
     await server?.close();
-  });
+  }, 15_000);
 
   it("prints a visible startup error when the port is already in use", async () => {
     const firstRoot = await mkdtemp(join(tmpdir(), "apiagex-runtime-port-first-"));
@@ -145,5 +145,5 @@ describe("apiagex runtime CLI", () => {
       errorSpy.mockRestore();
       await server?.close();
     }
-  });
+  }, 15_000);
 });

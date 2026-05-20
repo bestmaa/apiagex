@@ -20,6 +20,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Project stabilization audit: [project-stabilization-audit.md](./project-stabilization-audit.md)
 - Install and publish flow: [install-and-publish-flow.md](./install-and-publish-flow.md)
 - Database provider setup: [database-provider-setup.md](./database-provider-setup.md)
+- Planned Workflow API Builder scope: [workflow-builder-scope.md](./workflow-builder-scope.md)
 
 ## Implemented Now
 
@@ -65,6 +66,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Install aur publish flow `docs/install-and-publish-flow.md` me documented hai.
 - Database provider setup is documented in `docs/database-provider-setup.md`.
 - Database provider setup `docs/database-provider-setup.md` me documented hai.
+- Planned Workflow API Builder scope is documented in `docs/workflow-builder-scope.md`.
+- Planned Workflow API Builder scope `docs/workflow-builder-scope.md` me documented hai.
 
 ## Owner Bootstrap And Login
 

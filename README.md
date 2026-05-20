@@ -47,6 +47,8 @@ curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \
 
 The Custom API Permissions screen also supports search, route label/group rename, allow/block history, and cleanup for inactive routes removed from code.
 
+Planned next layer: Workflow API Builder will let admins create safe custom APIs from Admin UI using saved workflow definitions before the graph editor is added. Scope and safety rules are documented in [docs/workflow-builder-scope.md](./docs/workflow-builder-scope.md).
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.
