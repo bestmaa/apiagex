@@ -722,7 +722,7 @@ Each task uses this structure:
 #### T3450 - Add HTTP Request Node Plan
 
 - Version: `v0.15.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Plan external HTTP request node for APIs like SMS, email, payment, and OAuth.
 - Persona: Integration architect; make external calls useful and safe.
 - Success Criteria: Plan covers method, URL allowlist, headers, body templates, timeout, retry, and secret references.

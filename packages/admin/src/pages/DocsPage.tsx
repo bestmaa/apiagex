@@ -300,6 +300,11 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <p>Provider credentials for workflow nodes must use references such as <code>secret:stripe.secretKey</code>. Real API keys must stay in env-backed or encrypted secret storage, not workflow JSON.</p>
           <p>Read <code>docs/workflow-secret-store-plan.md</code> before implementing HTTP, SMS, email, payment, OAuth, or any provider node that needs a secret. Test results, workflow history, webhooks, realtime events, and logs must redact resolved values.</p>
         </article>
+        <article className="api-row">
+          <strong>HTTP request node plan</strong>
+          <p>The planned HTTP node supports external provider calls with method, allowed URL, headers, query/body templates, timeout, retry, success status, and response mapping.</p>
+          <p>Read <code>docs/workflow-http-request-node-plan.md</code> before implementation. Unrestricted URLs are not allowed; hosts need an allowlist, private-network targets are blocked, and secret references must be redacted from history.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

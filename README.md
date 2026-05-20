@@ -87,6 +87,8 @@ The Workflows screen also includes `Create order status template`. It creates an
 
 Workflow provider secrets are planned in [docs/workflow-secret-store-plan.md](./docs/workflow-secret-store-plan.md). Workflow JSON must store only references such as `secret:stripe.secretKey`; real API keys stay in env-backed or encrypted secret storage and are redacted from logs/history.
 
+External HTTP provider calls for workflow nodes are planned in [docs/workflow-http-request-node-plan.md](./docs/workflow-http-request-node-plan.md). The HTTP node requires a URL allowlist, SSRF/private-network guards, bounded timeout/retry, secret references, and redacted history before implementation.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

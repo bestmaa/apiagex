@@ -305,6 +305,8 @@ export const readmePage = {
         "Secret store plan: docs/workflow-secret-store-plan.md workflow JSON me sirf secret:stripe.secretKey jaise references allow karta hai.",
         "Secret values must live in env-backed or encrypted secret storage and must be redacted from workflow history, tests, webhooks, realtime events, and logs.",
         "Secret values env-backed ya encrypted secret storage me rahenge aur workflow history, tests, webhooks, realtime events, aur logs se redact honge.",
+        "HTTP node plan: docs/workflow-http-request-node-plan.md requires method, URL allowlist, SSRF guard, headers, body templates, timeout, retry, and secret references.",
+        "HTTP node plan: docs/workflow-http-request-node-plan.md method, URL allowlist, SSRF guard, headers, body templates, timeout, retry, aur secret references require karta hai.",
       ],
     },
     {

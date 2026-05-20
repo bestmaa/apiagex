@@ -25,6 +25,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - OTP workflow template plan: [otp-workflow-template-plan.md](./otp-workflow-template-plan.md)
 - Google login workflow template plan: [google-login-workflow-template-plan.md](./google-login-workflow-template-plan.md)
 - Workflow secret store plan: [workflow-secret-store-plan.md](./workflow-secret-store-plan.md)
+- Workflow HTTP request node plan: [workflow-http-request-node-plan.md](./workflow-http-request-node-plan.md)
 
 ## Implemented Now
 
@@ -78,6 +79,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Google login workflow template planning `docs/google-login-workflow-template-plan.md` me documented hai.
 - Workflow secret store planning is documented in `docs/workflow-secret-store-plan.md`.
 - Workflow secret store planning `docs/workflow-secret-store-plan.md` me documented hai.
+- Workflow HTTP request node planning is documented in `docs/workflow-http-request-node-plan.md`.
+- Workflow HTTP request node planning `docs/workflow-http-request-node-plan.md` me documented hai.
 
 ## Owner Bootstrap And Login
 
