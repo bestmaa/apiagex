@@ -261,6 +261,31 @@ code {
   width: fit-content;
 }
 
+.permission-card legend {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-2);
+}
+
+.custom-api-source-badge {
+  background: var(--admin-color-surface-muted);
+  border: 1px solid var(--admin-color-border);
+  border-radius: var(--admin-radius-xs);
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-xs);
+  font-weight: 800;
+  line-height: 1;
+  padding: var(--admin-space-1) var(--admin-space-2);
+  text-transform: uppercase;
+}
+
+.custom-api-source-badge.is-workflow {
+  background: var(--admin-color-primary-soft);
+  border-color: var(--admin-color-primary);
+  color: var(--admin-color-text-strong);
+}
+
 .custom-api-route-editor {
   align-items: end;
   display: grid;

@@ -130,6 +130,73 @@ describe("workflow admin routes", () => {
     expect(await listCustomApiPermissions(database, publicRole.id)).toEqual([]);
   });
 
+  it("manages workflow APIs through the existing custom API permission routes", async () => {
+    const database = openMigratedSqliteAdapter();
+    const publicRole = await createRole(database, { description: "Public", name: "public" });
+    const server = createServer({ adminAuth: "disabled", database });
+
+    const created = await server.inject({
+      method: "POST",
+      payload: {
+        active: true,
+        definition: echoWorkflowDefinition("/echo"),
+        method: "POST",
+        name: "Echo workflow",
+        path: "/echo",
+        version: 1,
+      },
+      url: "/api/admin/workflows",
+    });
+    const workflowId = created.json().workflow.id;
+    const routes = await server.inject({ method: "GET", url: "/api/admin/custom-api-routes" });
+    const route = routes.json().routes.find((item: { permissionKey: string }) => item.permissionKey === "workflow.echo.post");
+    if (!route) throw new Error("WORKFLOW_ROUTE_NOT_LISTED");
+
+    const saved = await server.inject({
+      method: "PUT",
+      payload: { permissions: [{ allowed: true, customApiRouteId: route.id }] },
+      url: `/api/admin/roles/${publicRole.id}/custom-api-permissions`,
+    });
+    const history = await server.inject({
+      method: "GET",
+      url: `/api/admin/custom-api-routes/${route.id}/history`,
+    });
+    await server.inject({
+      method: "PUT",
+      payload: {
+        active: false,
+        definition: echoWorkflowDefinition("/echo"),
+        method: "POST",
+        name: "Echo workflow",
+        path: "/echo",
+        version: 1,
+      },
+      url: `/api/admin/workflows/${workflowId}`,
+    });
+    const inactiveRoutes = await server.inject({ method: "GET", url: "/api/admin/custom-api-routes" });
+    const inactiveRoute = inactiveRoutes.json().routes.find((item: { id: string }) => item.id === route.id);
+    const deleted = await server.inject({ method: "DELETE", url: `/api/admin/custom-api-routes/${route.id}` });
+
+    expect(routes.statusCode).toBe(200);
+    expect(route).toMatchObject({
+      active: true,
+      groupName: "Workflows",
+      method: "POST",
+      name: "Echo workflow",
+      path: "/api/custom/echo",
+      permissionKey: "workflow.echo.post",
+    });
+    expect(saved.statusCode).toBe(200);
+    expect(saved.json().permissions).toMatchObject([
+      { allowed: true, customApiRouteId: route.id, roleId: publicRole.id },
+    ]);
+    expect(history.json().events).toMatchObject([
+      { actorEmail: "admin", allowed: true, customApiRouteId: route.id, roleId: publicRole.id },
+    ]);
+    expect(inactiveRoute).toMatchObject({ active: false, permissionKey: "workflow.echo.post" });
+    expect(deleted.json()).toEqual({ ok: true, deleted: true });
+  });
+
   it("runs workflow tests through admin API without public custom permission", async () => {
     const server = createServer({ adminAuth: "disabled", database: openMigratedSqliteAdapter() });
     const created = await server.inject({

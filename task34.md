@@ -536,7 +536,7 @@ Each task uses this structure:
 #### T3436 - Integrate Workflow APIs With Custom API Permission UI
 
 - Version: `v0.13.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Show workflow-created custom APIs cleanly in Settings > Custom API Permissions.
 - Persona: Access-control admin; manage code custom APIs and workflow APIs in one place.
 - Success Criteria: Workflow APIs have group/label, permission history, search/filter, and inactive cleanup behavior.

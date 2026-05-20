@@ -224,11 +224,21 @@ function CustomApiGrid(props: {
       {props.routes.map((route) => {
         const draft = props.routeDrafts[route.id] ?? { groupName: route.groupName, name: route.name };
         const events = props.history[route.id];
+        const sourceLabel = isWorkflowRoute(route) ? "Workflow API" : "Code custom API";
         return (
           <fieldset className={route.active ? "permission-card" : "permission-card is-muted"} key={route.id}>
-            <legend>{route.name}</legend>
+            <legend>
+              {route.name}
+              <span className={isWorkflowRoute(route) ? "custom-api-source-badge is-workflow" : "custom-api-source-badge"}>
+                {sourceLabel}
+              </span>
+            </legend>
             <code>{route.method} {route.path}</code>
-            <p className="permission-help">{route.groupName} group · {route.permissionKey}</p>
+            <p className="permission-help">
+              {route.groupName} group · {route.permissionKey} · {isWorkflowRoute(route)
+                ? "Uses the same Custom API permission rules as code routes."
+                : "Discovered from custom route code."}
+            </p>
             <div className="custom-api-route-editor">
               <label>Label
                 <input
@@ -317,6 +327,10 @@ function sortRoutes(routes: CustomApiRouteRecord[]): CustomApiRouteRecord[] {
 
 function isAllowed(permissions: CustomApiPermissionRecord[], customApiRouteId: string): boolean {
   return Boolean(permissions.find((item) => item.customApiRouteId === customApiRouteId)?.allowed);
+}
+
+function isWorkflowRoute(route: CustomApiRouteRecord): boolean {
+  return route.permissionKey.startsWith("workflow.");
 }
 
 function filterRoutes(routes: CustomApiRouteRecord[], search: string, statusFilter: string): CustomApiRouteRecord[] {
