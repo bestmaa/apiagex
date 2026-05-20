@@ -322,7 +322,7 @@ Each task uses this structure:
 #### T3420 - Implement Return Response Node
 
 - Version: `v0.10.9`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a final return node that shapes HTTP status and response body.
 - Persona: API contract engineer; make workflow API output predictable.
 - Success Criteria: Return node can use templates from request and step outputs and set status code.

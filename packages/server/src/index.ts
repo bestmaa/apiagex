@@ -49,6 +49,9 @@ export {
   evaluateBranchCondition,
   executeWorkflowBranchNode,
 } from "./workflow-branch-node.js";
+export {
+  executeWorkflowReturnResponseNode,
+} from "./workflow-return-node.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";
