@@ -363,7 +363,7 @@ Each task uses this structure:
 #### T3423 - Enforce Custom API Permissions On Workflow Routes
 
 - Version: `v0.11.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Ensure workflow APIs use the existing Custom API Permissions system.
 - Persona: Security engineer; keep workflow APIs blocked by default.
 - Success Criteria: Calls without allowed public/token role are blocked; allowed public/token calls pass.

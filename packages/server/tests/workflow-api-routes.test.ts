@@ -1,4 +1,5 @@
 import {
+  createApiToken,
   createRole,
   createWorkflow,
   getCustomApiRouteByMethodPath,
@@ -7,6 +8,7 @@ import {
 } from "@apiagex/database";
 import { describe, expect, it } from "vitest";
 import { createServer } from "../src/app.js";
+import { bootstrapOwner, loginOwner } from "../src/owner-bootstrap.js";
 
 describe("workflow API routes", () => {
   it("registers active workflow routes under /api/custom", async () => {
@@ -93,6 +95,64 @@ describe("workflow API routes", () => {
     expect(workflow.statusCode).toBe(201);
     expect(code.statusCode).toBe(200);
     expect(code.json()).toEqual({ ok: true, source: "code" });
+  });
+
+  it("blocks workflow routes by default and allows API tokens with custom API permission", async () => {
+    const database = openMigratedSqliteAdapter();
+    const role = await createRole(database, { description: "Workflow client", name: "workflow-client" });
+    const token = await createApiToken(database, { roleId: role.id });
+    await createWorkflow(database, {
+      active: true,
+      definition: echoWorkflowDefinition(),
+      method: "POST",
+      name: "Echo workflow",
+      path: "/echo",
+      version: 1,
+    });
+    const server = createServer({ adminAuth: "disabled", database });
+    await server.ready();
+    const route = await getCustomApiRouteByMethodPath(database, "POST", "/api/custom/echo");
+    if (!route) throw new Error("WORKFLOW_ROUTE_NOT_SYNCED");
+
+    const blocked = await server.inject({ method: "POST", payload: { message: "hello" }, url: "/api/custom/echo" });
+    await setCustomApiPermission(database, { allowed: true, customApiRouteId: route.id, roleId: role.id });
+    const allowed = await server.inject({
+      headers: { authorization: `Bearer ${token.token}` },
+      method: "POST",
+      payload: { message: "hello" },
+      url: "/api/custom/echo",
+    });
+
+    expect(blocked.statusCode).toBe(403);
+    expect(blocked.json()).toEqual({ ok: false, error: "CUSTOM_API_PERMISSION_DENIED" });
+    expect(allowed.statusCode).toBe(201);
+    expect(allowed.json()).toEqual({ message: "hello", ok: true });
+  });
+
+  it("does not let owner admin sessions bypass workflow API permissions", async () => {
+    const database = openMigratedSqliteAdapter();
+    await bootstrapOwner(database, { email: "owner@example.com", password: "password123" });
+    const login = await loginOwner(database, { email: "owner@example.com", password: "password123" });
+    await createWorkflow(database, {
+      active: true,
+      definition: echoWorkflowDefinition(),
+      method: "POST",
+      name: "Echo workflow",
+      path: "/echo",
+      version: 1,
+    });
+    const server = createServer({ database });
+    await server.ready();
+
+    const response = await server.inject({
+      headers: { "x-apiagex-admin-token": login.token },
+      method: "POST",
+      payload: { message: "hello" },
+      url: "/api/custom/echo",
+    });
+
+    expect(response.statusCode).toBe(403);
+    expect(response.json()).toEqual({ ok: false, error: "CUSTOM_API_PERMISSION_DENIED" });
   });
 });
 
