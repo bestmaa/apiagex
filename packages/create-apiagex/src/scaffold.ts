@@ -248,6 +248,8 @@ curl -X POST http://127.0.0.1:4000/api/custom/orders/status \\
 
 Blocked workflow calls return CUSTOM_API_PERMISSION_DENIED. Wrong or revoked tokens return API_TOKEN_INVALID. Inactive workflows are not mounted.
 
+Register template: Settings > Workflows can create an inactive POST /api/custom/auth/register starter. Create a users content schema with email, passwordHash, and status fields first. The template validates password but does not store it; replace PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING with real server-side hashing before production.
+
 ## Type generation
 
 English: In TypeScript projects, run npm run types after creating or changing schemas. It writes src/apiagex-types.ts so RegisterApiagexCustomRoutes automatically gets schema slug and field autocomplete.

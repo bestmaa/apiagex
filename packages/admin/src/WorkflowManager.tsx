@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Edit3, Plus, RefreshCw, Save, Search, X } from "lucide-react";
+import { Copy, Edit3, Plus, RefreshCw, Save, Search, UserPlus, X } from "lucide-react";
 import { createWorkflow, listSchemas, listWorkflowRuns, listWorkflows, testWorkflow, updateWorkflow } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
@@ -95,6 +95,20 @@ export function WorkflowManager() {
     setFormOpen(true);
   }
 
+  async function createRegisterTemplate() {
+    const draft = registerUserWorkflowTemplate();
+    const result = await createWorkflow(draft);
+    if (!result.ok || !result.workflow) {
+      setStatus(result.error ?? "Register template create failed");
+      return;
+    }
+    setWorkflows((current) => sortWorkflows([...current, result.workflow as WorkflowRecord]));
+    setFormOpen(false);
+    setEditingWorkflowId(null);
+    setForm(emptyWorkflowForm());
+    setStatus("Created register user template. Review schema fields and password hashing before activation.");
+  }
+
   function openEditForm(workflow: WorkflowRecord) {
     setEditingWorkflowId(workflow.id);
     setForm({
@@ -150,6 +164,10 @@ export function WorkflowManager() {
           <button type="button" onClick={openCreateForm}>
             <Plus aria-hidden="true" size={16} />
             Create workflow
+          </button>
+          <button type="button" onClick={() => void createRegisterTemplate()}>
+            <UserPlus aria-hidden="true" size={16} />
+            Create register template
           </button>
           <button type="button" onClick={() => void loadWorkflows()}>
             <RefreshCw aria-hidden="true" size={16} />
@@ -808,6 +826,116 @@ function emptyWorkflowForm(): WorkflowFormDraft {
     name: "",
     path: "",
     steps: [defaultStep("returnResponse")],
+  };
+}
+
+function registerUserWorkflowTemplate(): WorkflowDraft {
+  const path = "/auth/register";
+  const method = "POST";
+  return {
+    active: false,
+    definition: registerUserWorkflowDefinition(method, path),
+    description: "Starter public registration API. Requires a users schema with email, passwordHash, and status fields. Replace the placeholder password hashing before production.",
+    method,
+    name: "Register user template",
+    path,
+    version: 1,
+  };
+}
+
+function registerUserWorkflowDefinition(method: string, path: string): Record<string, unknown> {
+  return {
+    edges: [
+      { from: "start", id: "edge-start-validate-email", to: "validate-email" },
+      { from: "validate-email", id: "edge-validate-email-validate-password", to: "validate-password" },
+      { from: "validate-password", id: "edge-validate-password-check-existing-user", to: "check-existing-user" },
+      { from: "check-existing-user", id: "edge-check-existing-user-duplicate-branch", to: "duplicate-branch" },
+      { from: "duplicate-branch", id: "edge-duplicate-branch-return-user-exists", to: "return-user-exists" },
+      { from: "duplicate-branch", id: "edge-duplicate-branch-create-inactive-user", to: "create-inactive-user" },
+      { from: "create-inactive-user", id: "edge-create-inactive-user-return-created", to: "return-created" },
+    ],
+    nodes: [
+      { config: {}, id: "start", type: "routeTrigger" },
+      {
+        config: {
+          fields: {
+            email: { required: true, type: "email" },
+          },
+        },
+        id: "validate-email",
+        type: "validateBody",
+      },
+      {
+        config: {
+          fields: {
+            password: { minLength: 8, required: true, type: "string" },
+          },
+        },
+        id: "validate-password",
+        type: "validateBody",
+      },
+      {
+        config: {
+          filters: [{ field: "email", operator: "eq", value: "{{body.email}}" }],
+          limit: 1,
+          schema: "users",
+        },
+        id: "check-existing-user",
+        type: "queryEntries",
+      },
+      {
+        config: {
+          condition: {
+            left: "{{steps.check-existing-user.total}}",
+            operator: "gt",
+            right: 0,
+          },
+          elseNodeId: "create-inactive-user",
+          thenNodeId: "return-user-exists",
+        },
+        id: "duplicate-branch",
+        type: "branch",
+      },
+      {
+        config: {
+          data: {
+            email: "{{body.email}}",
+            passwordHash: "PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING",
+            status: "inactive",
+          },
+          schema: "users",
+        },
+        id: "create-inactive-user",
+        type: "createEntry",
+      },
+      {
+        config: {
+          body: {
+            message: "Registration saved. Replace passwordHash placeholder before production.",
+            ok: true,
+            status: "inactive",
+            userId: "{{steps.create-inactive-user.entry.id}}",
+          },
+          status: 201,
+        },
+        id: "return-created",
+        type: "returnResponse",
+      },
+      {
+        config: {
+          body: {
+            error: "USER_ALREADY_EXISTS",
+            ok: false,
+          },
+          status: 409,
+        },
+        id: "return-user-exists",
+        type: "returnResponse",
+      },
+    ],
+    route: { method, path },
+    startNodeId: "start",
+    version: 1,
   };
 }
 

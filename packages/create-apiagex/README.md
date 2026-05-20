@@ -72,6 +72,8 @@ curl -X POST http://127.0.0.1:4000/api/custom/orders/status \
 
 Blocked workflow calls return `CUSTOM_API_PERMISSION_DENIED`. Wrong or revoked tokens return `API_TOKEN_INVALID`. Inactive workflows are not mounted.
 
+Register template: Settings / Workflows can create an inactive `POST /api/custom/auth/register` starter. Create a `users` content schema with `email`, `passwordHash`, and `status` fields first. The template validates `password` but does not store it; replace `PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING` with real server-side hashing before production.
+
 For TypeScript projects, run this after creating or changing schemas in Admin UI:
 
 ```bash
@@ -185,6 +187,8 @@ curl -X POST http://127.0.0.1:4000/api/custom/orders/status \
 ```
 
 Blocked workflow calls `CUSTOM_API_PERMISSION_DENIED` return karte hain. Wrong ya revoked tokens `API_TOKEN_INVALID` return karte hain. Inactive workflows mounted nahi hote.
+
+Register template: Settings / Workflows inactive `POST /api/custom/auth/register` starter bana sakta hai. Pehle `email`, `passwordHash`, aur `status` fields wala `users` content schema banao. Template `password` validate karta hai lekin store nahi karta; production se pehle `PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING` ko real server-side hashing se replace karo.
 
 TypeScript projects me Admin UI se schema create/change karne ke baad ye chalao:
 

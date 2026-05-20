@@ -108,6 +108,7 @@ describe("create-apiagex CLI", () => {
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("REALTIME_SESSION_INVALID");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("many-to-many");
     await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("Workflow APIs");
+    await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("Register template");
     await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("Authorization: Bearer API_TOKEN");
     await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("Webhooks and Realtime");
   });

@@ -178,6 +178,77 @@ describe("WorkflowManager", () => {
     expect(container.textContent).toContain("Created workflow");
   });
 
+  it("creates the register user template without storing plain passwords", async () => {
+    vi.mocked(createWorkflow).mockResolvedValueOnce({
+      ok: true,
+      workflow: workflow({ id: "workflow_register", name: "Register user template", path: "/auth/register" }),
+    });
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create register template");
+      await flushPromises();
+    });
+
+    const draft = vi.mocked(createWorkflow).mock.calls[0]?.[0];
+    expect(draft).toMatchObject({
+      active: false,
+      method: "POST",
+      name: "Register user template",
+      path: "/auth/register",
+    });
+    expect(draft?.description).toContain("Replace the placeholder password hashing");
+    expect(draft?.definition).toEqual(expect.objectContaining({
+      edges: expect.arrayContaining([
+        expect.objectContaining({ from: "duplicate-branch", to: "return-user-exists" }),
+        expect.objectContaining({ from: "duplicate-branch", to: "create-inactive-user" }),
+      ]),
+      nodes: expect.arrayContaining([
+        expect.objectContaining({
+          config: {
+            fields: {
+              email: { required: true, type: "email" },
+            },
+          },
+          id: "validate-email",
+          type: "validateBody",
+        }),
+        expect.objectContaining({
+          config: {
+            fields: {
+              password: { minLength: 8, required: true, type: "string" },
+            },
+          },
+          id: "validate-password",
+          type: "validateBody",
+        }),
+        expect.objectContaining({
+          config: {
+            filters: [{ field: "email", operator: "eq", value: "{{body.email}}" }],
+            limit: 1,
+            schema: "users",
+          },
+          id: "check-existing-user",
+          type: "queryEntries",
+        }),
+        expect.objectContaining({
+          config: {
+            data: {
+              email: "{{body.email}}",
+              passwordHash: "PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING",
+              status: "inactive",
+            },
+            schema: "users",
+          },
+          id: "create-inactive-user",
+          type: "createEntry",
+        }),
+      ]),
+    }));
+    expect(JSON.stringify(draft?.definition)).not.toContain("{{body.password}}");
+    expect(container.textContent).toContain("Created register user template");
+  });
+
   it("creates a workflow with ordered query and return steps", async () => {
     const { container } = await renderWorkflowManagerLoaded();
 

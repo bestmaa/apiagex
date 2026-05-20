@@ -646,6 +646,15 @@ Initial templates:
 
 Auth templates must not recommend plain password storage or fake OAuth verification.
 
+Register user template status:
+
+- Admin UI can create an inactive `POST /api/custom/auth/register` starter.
+- It validates `email` and `password`.
+- It checks the `users` content schema for an existing email before create.
+- It creates an inactive user entry with `email`, `passwordHash`, and `status`.
+- It does not store `{{body.password}}`; `passwordHash` is a placeholder until real server-side hashing is added.
+- Production use requires replacing `PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING` with a real hash flow.
+
 ### Hinglish
 
 Templates tab add karne chahiye jab storage, runtime, permissions, aur Admin UI basics stable ho jaye.
@@ -659,6 +668,15 @@ Initial templates:
 - Report API
 
 Auth templates plain password storage ya fake OAuth verification recommend nahi kar sakte.
+
+Register user template status:
+
+- Admin UI inactive `POST /api/custom/auth/register` starter bana sakta hai.
+- Ye `email` aur `password` validate karta hai.
+- Ye create se pehle `users` content schema me existing email check karta hai.
+- Ye `email`, `passwordHash`, aur `status` ke saath inactive user entry banata hai.
+- Ye `{{body.password}}` store nahi karta; real server-side hashing add hone tak `passwordHash` placeholder hai.
+- Production use ke liye `PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING` ko real hash flow se replace karna zaruri hai.
 
 ## Non Goals For MVP
 

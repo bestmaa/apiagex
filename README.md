@@ -73,6 +73,8 @@ curl -X POST http://127.0.0.1:4000/api/custom/orders/status \
 
 If no Custom API permission is allowed, the workflow route returns `403 CUSTOM_API_PERMISSION_DENIED`. If the workflow is inactive, the mounted route is not callable.
 
+The Workflows screen includes a `Create register template` starter. It creates an inactive `POST /api/custom/auth/register` workflow that validates `email` and `password`, checks the `users` content schema for an existing email, creates an inactive user entry, and returns `201` or `409`. Before using it, create a `users` content schema with `email`, `passwordHash`, and `status` fields. The template never stores `{{body.password}}`; it writes `PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING`, so replace that placeholder with real server-side hashing before any production use.
+
 Planned next layer: Workflow API Builder will let admins create safe custom APIs from Admin UI using saved workflow definitions before the graph editor is added. Scope and safety rules are documented in [docs/workflow-builder-scope.md](./docs/workflow-builder-scope.md).
 
 ## Open Source License

@@ -141,6 +141,10 @@ export const docPage = {
         "Token curl: token role allowed nahi hai to 403 CUSTOM_API_PERMISSION_DENIED milega; token wrong ya revoked hai to API_TOKEN_INVALID milega.",
         "Inactive workflow routes are not callable. Active workflow routes remain blocked until public or a token role is allowed.",
         "Inactive workflow routes callable nahi hote. Active workflow routes tab tak blocked rehte hain jab tak public ya token role allow nahi hota.",
+        "Register template: Settings > Workflows can create an inactive POST /api/custom/auth/register starter that validates email/password, checks the users schema, creates an inactive user entry, and returns 201 or 409.",
+        "Register template: Settings > Workflows inactive POST /api/custom/auth/register starter bana sakta hai jo email/password validate karta hai, users schema check karta hai, inactive user entry banata hai, aur 201 ya 409 return karta hai.",
+        "Register template safety: create a users schema with email, passwordHash, and status fields first. The template does not store body.password; it writes PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING until real server-side hashing is added.",
+        "Register template safety: pehle email, passwordHash, aur status fields wala users schema banao. Template body.password store nahi karta; real server-side hashing add hone tak PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING likhta hai.",
       ],
     },
     {
@@ -275,6 +279,10 @@ export const readmePage = {
         "Token workflow call: workflow route ko content API role ke liye allow karo, us role ka API token banao, aur Authorization: Bearer API_TOKEN bhejo.",
         "Blocked workflow calls return CUSTOM_API_PERMISSION_DENIED; inactive workflows are not mounted.",
         "Blocked workflow calls CUSTOM_API_PERMISSION_DENIED return karte hain; inactive workflows mounted nahi hote.",
+        "Register starter: Settings > Workflows has Create register template for an inactive /api/custom/auth/register flow using a users content schema.",
+        "Register starter: Settings > Workflows me Create register template hai jo users content schema ke saath inactive /api/custom/auth/register flow banata hai.",
+        "Password warning: the register template validates password but does not store it; replace PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING with real hashing before production.",
+        "Password warning: register template password validate karta hai lekin store nahi karta; production se pehle PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING ko real hashing se replace karo.",
       ],
     },
     {

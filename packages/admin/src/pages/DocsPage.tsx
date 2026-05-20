@@ -259,6 +259,11 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
   -d '{"orderId":"ord_123","status":"ready"}'`}</code></pre>
           <p>Blocked routes return <code>CUSTOM_API_PERMISSION_DENIED</code>; wrong or revoked tokens return <code>API_TOKEN_INVALID</code>.</p>
         </article>
+        <article className="api-row">
+          <strong>Register user template</strong>
+          <p><code>Create register template</code> creates an inactive <code>POST /api/custom/auth/register</code> starter. Create a <code>users</code> content schema with <code>email</code>, <code>passwordHash</code>, and <code>status</code> fields before testing it.</p>
+          <p>The template validates <code>password</code> but does not store <code>{`{{body.password}}`}</code>. It writes <code>PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING</code> until you add real server-side hashing.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

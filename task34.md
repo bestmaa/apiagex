@@ -562,7 +562,7 @@ Each task uses this structure:
 #### T3438 - Add Register User Workflow Template
 
 - Version: `v0.13.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a template for public user registration using content entries.
 - Persona: App starter builder; help users create common auth-like API.
 - Success Criteria: Template creates a workflow with validate email/password, check existing user, create inactive user, and return response.
