@@ -45,6 +45,10 @@ export {
 export {
   executeWorkflowDeleteEntryNode,
 } from "./workflow-delete-entry-node.js";
+export {
+  evaluateBranchCondition,
+  executeWorkflowBranchNode,
+} from "./workflow-branch-node.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";

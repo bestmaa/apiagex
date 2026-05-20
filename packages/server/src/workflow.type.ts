@@ -187,7 +187,7 @@ export type WorkflowNodeConfigByType = {
 };
 
 export type WorkflowNodeOutputByType = {
-  branch: { matched: boolean };
+  branch: { matched: boolean; nextNodeId: WorkflowNodeId };
   createEntry: { entry: WorkflowJsonValue };
   deleteEntry: { deleted: boolean; entryId: string };
   getEntry: { entry: WorkflowJsonValue | null };

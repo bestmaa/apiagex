@@ -309,7 +309,7 @@ Each task uses this structure:
 #### T3419 - Implement If Else Node
 
 - Version: `v0.10.8`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add simple branching based on equality, existence, boolean, and comparison conditions.
 - Persona: Workflow logic engineer; support “if user exists return error else create” flow.
 - Success Criteria: Branching controls next node path and supports clear test cases.
