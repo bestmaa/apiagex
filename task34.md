@@ -151,7 +151,7 @@ Each task uses this structure:
 #### T3407 - Build Workflow Repository
 
 - Version: `v0.9.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add CRUD repository functions for workflow definitions.
 - Persona: Backend repository engineer; keep persistence isolated and testable.
 - Success Criteria: Create, list, get, update, delete, activate/deactivate functions exist with tests.

@@ -113,6 +113,17 @@ export {
   updateCustomApiRouteMetadata,
 } from "./custom-api-repository.js";
 export {
+  activateWorkflow,
+  createWorkflow,
+  deactivateWorkflow,
+  deleteWorkflow,
+  getWorkflowById,
+  getWorkflowByMethodPath,
+  listWorkflows,
+  setWorkflowActive,
+  updateWorkflow,
+} from "./workflow-repository.js";
+export {
   createUser,
   getAdminUserById,
   getUserById,
@@ -219,6 +230,12 @@ export type {
   SyncCustomApiRouteInput,
   UpdateCustomApiRouteMetadataInput,
 } from "./custom-api-repository.type.js";
+export type {
+  CreateWorkflowInput,
+  UpdateWorkflowInput,
+  WorkflowDefinitionJson,
+  WorkflowRecord,
+} from "./workflow-repository.type.js";
 export type { CreateUserInput, UserRecord } from "./user-repository.type.js";
 export type {
   CreateFieldInput,
