@@ -11,7 +11,7 @@ import type { WorkflowDraft, WorkflowRecord, WorkflowRunRecord, WorkflowTestRunR
 
 type WorkflowStatusFilter = "active" | "all" | "inactive";
 type WorkflowViewMode = "graph" | "list";
-type WorkflowStepType = "createEntry" | "queryEntries" | "returnResponse" | "updateEntry" | "validateBody";
+type WorkflowStepType = "createEntry" | "httpRequest" | "queryEntries" | "returnResponse" | "updateEntry" | "validateBody";
 type WorkflowFormDraft = {
   active: boolean;
   description: string;
@@ -27,12 +27,20 @@ type WorkflowStepDraft = {
   fieldName: string;
   fieldRequired: boolean;
   fieldType: string;
+  headersJson: string;
+  httpMethod: string;
   id: string;
   limit: number;
+  outputKey: string;
+  queryJson: string;
+  responseBodyMode: string;
   schema: string;
   search: string;
+  successStatus: string;
   status: number;
+  timeoutMs: number;
   type: WorkflowStepType;
+  url: string;
 };
 type WorkflowGraphNodeData = {
   config: Record<string, unknown>;
@@ -55,6 +63,7 @@ const workflowStepTypes: WorkflowStepType[] = [
   "queryEntries",
   "createEntry",
   "updateEntry",
+  "httpRequest",
   "returnResponse",
 ];
 const workflowGraphNodeTypes = {
@@ -1004,6 +1013,7 @@ function WorkflowStepEditor({
             <option value="queryEntries">Query entries</option>
             <option value="createEntry">Create entry</option>
             <option value="updateEntry">Update entry</option>
+            <option value="httpRequest">HTTP request</option>
             <option value="returnResponse">Return response</option>
           </select>
         </label>
@@ -1137,6 +1147,45 @@ function WorkflowStepFields({
         />
         <label>Data JSON
           <textarea value={step.dataJson} onChange={(event) => onChange({ ...step, dataJson: event.target.value })} />
+        </label>
+      </div>
+    );
+  }
+  if (step.type === "httpRequest") {
+    return (
+      <div className="workflow-step-fields">
+        <label>Method
+          <select value={step.httpMethod} onChange={(event) => onChange({ ...step, httpMethod: event.target.value })}>
+            {["GET", "POST", "PUT", "PATCH", "DELETE"].map((method) => <option key={method} value={method}>{method}</option>)}
+          </select>
+        </label>
+        <label>Allowed URL
+          <input value={step.url} placeholder="https://api.provider.test/messages" onChange={(event) => onChange({ ...step, url: event.target.value })} />
+        </label>
+        <label>Headers JSON
+          <textarea value={step.headersJson} onChange={(event) => onChange({ ...step, headersJson: event.target.value })} />
+        </label>
+        <label>Query JSON
+          <textarea value={step.queryJson} onChange={(event) => onChange({ ...step, queryJson: event.target.value })} />
+        </label>
+        <label>Body JSON
+          <textarea value={step.body} onChange={(event) => onChange({ ...step, body: event.target.value })} />
+        </label>
+        <label>Timeout ms
+          <input min={1000} max={15000} type="number" value={step.timeoutMs} onChange={(event) => onChange({ ...step, timeoutMs: Number(event.target.value) })} />
+        </label>
+        <label>Success status
+          <input value={step.successStatus} placeholder="200,201,202" onChange={(event) => onChange({ ...step, successStatus: event.target.value })} />
+        </label>
+        <label>Response body
+          <select value={step.responseBodyMode} onChange={(event) => onChange({ ...step, responseBodyMode: event.target.value })}>
+            <option value="json">JSON</option>
+            <option value="text">Text</option>
+            <option value="none">None</option>
+          </select>
+        </label>
+        <label>Output variable
+          <input value={step.outputKey} placeholder="providerResult" onChange={(event) => onChange({ ...step, outputKey: event.target.value })} />
         </label>
       </div>
     );
@@ -1455,6 +1504,14 @@ function defaultGraphNodeConfig(type: string): Record<string, unknown> {
   if (type === "createEntry") return { data: {}, schema: "" };
   if (type === "updateEntry") return { data: {}, entryId: "{{body.id}}" };
   if (type === "deleteEntry") return { entryId: "{{body.id}}" };
+  if (type === "httpRequest") return {
+    headers: {},
+    method: "POST",
+    responseBodyMode: "json",
+    successStatus: [200, 201, 202],
+    timeoutMs: 5000,
+    url: "https://api.provider.test/path",
+  };
   if (type === "branch") return { left: "{{body.value}}", operator: "exists" };
   if (type === "setVariable") return { values: {} };
   if (type === "returnResponse") return { body: { ok: true }, status: 200 };
@@ -1495,6 +1552,7 @@ function graphEdgeFromWorkflowEdge(edge: Record<string, unknown>, index: number)
 
 function graphConfigSummary(config: unknown): string {
   if (!isRecord(config)) return "No config";
+  if (typeof config.url === "string") return `url: ${config.url}`;
   if (typeof config.schema === "string") return `schema: ${config.schema}`;
   if (typeof config.status === "number") return `status: ${config.status}`;
   if (isRecord(config.fields)) return `${Object.keys(config.fields).length} field rule(s)`;
@@ -1508,6 +1566,7 @@ function graphNodeValidation(type: string, config: unknown): { state: WorkflowGr
     "createEntry",
     "deleteEntry",
     "getEntry",
+    "httpRequest",
     "queryEntries",
     "returnResponse",
     "routeTrigger",
@@ -1520,6 +1579,9 @@ function graphNodeValidation(type: string, config: unknown): { state: WorkflowGr
   if (["createEntry", "queryEntries"].includes(type)
     && (typeof config.schema !== "string" || !config.schema.trim())) {
     return { state: "error", text: "Schema missing" };
+  }
+  if (type === "httpRequest" && (typeof config.url !== "string" || !config.url.trim())) {
+    return { state: "error", text: "URL missing" };
   }
   if (type === "returnResponse" && typeof config.status !== "number") {
     return { state: "warning", text: "Status default needed" };
@@ -1548,6 +1610,7 @@ function nodeLabel(type: string): string {
   if (type === "createEntry") return "Create entry";
   if (type === "updateEntry") return "Update entry";
   if (type === "deleteEntry") return "Delete entry";
+  if (type === "httpRequest") return "HTTP request";
   if (type === "branch") return "Branch";
   if (type === "setVariable") return "Set variable";
   if (type === "returnResponse") return "Return response";
@@ -1957,6 +2020,20 @@ function validateStepConfig(step: WorkflowStepDraft, stepNumber: number): void {
     parseJsonObject(step.dataJson, `Invalid workflow: step ${stepNumber} data must be a JSON object.`);
     return;
   }
+  if (step.type === "httpRequest") {
+    if (!["DELETE", "GET", "PATCH", "POST", "PUT"].includes(step.httpMethod.toUpperCase())) {
+      throw new Error(`Invalid workflow: step ${stepNumber} HTTP method is not supported.`);
+    }
+    if (!step.url.trim()) throw new Error(`Invalid workflow: step ${stepNumber} needs an HTTP URL.`);
+    parseJsonObject(step.headersJson, `Invalid workflow: step ${stepNumber} headers must be a JSON object.`);
+    parseJsonObject(step.queryJson, `Invalid workflow: step ${stepNumber} query must be a JSON object.`);
+    parseJsonValue(step.body, `Invalid workflow: step ${stepNumber} body must be valid JSON.`);
+    if (!Number.isInteger(step.timeoutMs) || step.timeoutMs < 1000 || step.timeoutMs > 15000) {
+      throw new Error(`Invalid workflow: step ${stepNumber} timeout must be between 1000 and 15000.`);
+    }
+    parseSuccessStatus(step.successStatus, `Invalid workflow: step ${stepNumber} success status must be HTTP status codes.`);
+    return;
+  }
   if (!Number.isInteger(step.status) || step.status < 100 || step.status > 599) {
     throw new Error(`Invalid workflow: step ${stepNumber} status must be between 100 and 599.`);
   }
@@ -2014,6 +2091,19 @@ function configFromStep(step: WorkflowStepDraft): Record<string, unknown> {
     return {
       data: parseJsonObject(step.dataJson, "Invalid workflow: data must be a JSON object."),
       entryId: expressionFromText(step.entryId),
+    };
+  }
+  if (step.type === "httpRequest") {
+    return {
+      body: parseJsonValue(step.body, "Invalid workflow: HTTP body must be valid JSON."),
+      headers: parseJsonObject(step.headersJson, "Invalid workflow: HTTP headers must be a JSON object."),
+      method: step.httpMethod.toUpperCase(),
+      ...(step.outputKey.trim() ? { outputKey: step.outputKey.trim() } : {}),
+      query: parseJsonObject(step.queryJson, "Invalid workflow: HTTP query must be a JSON object."),
+      responseBodyMode: step.responseBodyMode,
+      successStatus: parseSuccessStatus(step.successStatus, "Invalid workflow: success status must be HTTP status codes."),
+      timeoutMs: step.timeoutMs,
+      url: step.url.trim(),
     };
   }
   return {
@@ -2080,6 +2170,21 @@ function stepFromNode(node: unknown): WorkflowStepDraft | null {
       id,
     };
   }
+  if (node.type === "httpRequest") {
+    return {
+      ...base,
+      body: typeof config.body === "undefined" ? base.body : jsonText(config.body),
+      headersJson: jsonText(isRecord(config.headers) ? config.headers : {}),
+      httpMethod: typeof config.method === "string" ? config.method : base.httpMethod,
+      id,
+      outputKey: typeof config.outputKey === "string" ? config.outputKey : "",
+      queryJson: jsonText(isRecord(config.query) ? config.query : {}),
+      responseBodyMode: typeof config.responseBodyMode === "string" ? config.responseBodyMode : base.responseBodyMode,
+      successStatus: Array.isArray(config.successStatus) ? config.successStatus.join(",") : base.successStatus,
+      timeoutMs: typeof config.timeoutMs === "number" ? config.timeoutMs : base.timeoutMs,
+      url: typeof config.url === "string" ? config.url : "",
+    };
+  }
   return {
     ...base,
     body: typeof config.body === "undefined" ? base.body : jsonText(config.body),
@@ -2097,12 +2202,20 @@ function defaultStep(type: WorkflowStepType): WorkflowStepDraft {
     fieldName: "",
     fieldRequired: true,
     fieldType: "string",
+    headersJson: jsonText({}),
+    httpMethod: "POST",
     id,
     limit: 20,
+    outputKey: "",
+    queryJson: jsonText({}),
+    responseBodyMode: "json",
     schema: "",
     search: "",
+    successStatus: "200,201,202",
     status: 200,
+    timeoutMs: 5000,
     type,
+    url: "",
   };
 }
 
@@ -2118,6 +2231,7 @@ function stepLabel(type: WorkflowStepType): string {
   if (type === "queryEntries") return "Query entries";
   if (type === "createEntry") return "Create entry";
   if (type === "updateEntry") return "Update entry";
+  if (type === "httpRequest") return "HTTP request";
   return "Return response";
 }
 
@@ -2126,6 +2240,7 @@ function stepIdPrefix(type: WorkflowStepType): string {
   if (type === "queryEntries") return "query";
   if (type === "createEntry") return "create";
   if (type === "updateEntry") return "update";
+  if (type === "httpRequest") return "http";
   return "return";
 }
 
@@ -2137,6 +2252,15 @@ function parseJsonObject(text: string, errorMessage: string): Record<string, unk
   const value = parseJsonValue(text, errorMessage);
   if (!isRecord(value)) throw new Error(errorMessage);
   return value;
+}
+
+function parseSuccessStatus(text: string, errorMessage: string): number[] {
+  const tokens = text.split(",").map((item) => item.trim()).filter(Boolean);
+  const statuses = tokens.map((item) => Number(item));
+  if (statuses.length === 0 || statuses.some((status) => !Number.isInteger(status) || status < 100 || status > 599)) {
+    throw new Error(errorMessage);
+  }
+  return statuses;
 }
 
 function safeJsonObject(text: string): Record<string, unknown> {

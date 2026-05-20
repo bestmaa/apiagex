@@ -381,3 +381,18 @@ Minimum tests before implementation:
 10. Add mocked provider tests and browser test.
 
 Do not implement provider calls before URL safety and secret redaction are in place.
+
+## v0.15.2 Implementation Checkpoint
+
+The first implementation supports the `httpRequest` workflow node with:
+
+- `method`, `url`, `headers`, `query`, `body`, `timeoutMs`, `retry`, `successStatus`, `responseBodyMode`, and `outputKey`.
+- Host allowlisting from `APIAGEX_WORKFLOW_HTTP_ALLOWED_HOSTS`.
+- HTTPS-only URLs by default.
+- Private-network and metadata-address blocking after DNS resolution.
+- Redirect blocking.
+- Env-backed secret references such as `secret:provider.apiKey`, resolved from `APIAGEX_SECRET_PROVIDER_APIKEY`.
+- Redaction of resolved secrets and sensitive response keys before saving step output.
+- Mockable fetch and hostname resolver for provider tests.
+
+Database-backed encrypted secrets and Admin UI secret management remain planned in `docs/workflow-secret-store-plan.md`.

@@ -89,6 +89,8 @@ Workflow provider secrets are planned in [docs/workflow-secret-store-plan.md](./
 
 External HTTP provider calls for workflow nodes are planned in [docs/workflow-http-request-node-plan.md](./docs/workflow-http-request-node-plan.md). The HTTP node requires a URL allowlist, SSRF/private-network guards, bounded timeout/retry, secret references, and redacted history before implementation.
 
+Workflow `httpRequest` nodes are available for safe provider calls. Set `APIAGEX_WORKFLOW_HTTP_ALLOWED_HOSTS=api.provider.test,api.stripe.com` before activating workflows that call external URLs. Secret references such as `secret:provider.apiKey` resolve from env names like `APIAGEX_SECRET_PROVIDER_APIKEY` and are redacted from workflow output.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

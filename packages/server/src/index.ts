@@ -52,6 +52,9 @@ export {
   executeWorkflowBranchNode,
 } from "./workflow-branch-node.js";
 export {
+  executeWorkflowHttpRequestNode,
+} from "./workflow-http-request-node.js";
+export {
   executeWorkflowReturnResponseNode,
 } from "./workflow-return-node.js";
 export {
@@ -120,6 +123,11 @@ export type {
   WorkflowExecutorOptions,
 } from "./workflow-executor.js";
 export type {
+  WorkflowHttpRequestFetch,
+  WorkflowHttpRequestOptions,
+  WorkflowHttpResponse,
+} from "./workflow-http-request-node.js";
+export type {
   WorkflowRuntimeLimitOptions,
   WorkflowRuntimeLimits,
 } from "./workflow-runtime-limits.js";
@@ -155,6 +163,9 @@ export type {
   WorkflowEntryFilter,
   WorkflowFieldFilterOperator,
   WorkflowGetEntryConfig,
+  WorkflowHttpRequestBodyMode,
+  WorkflowHttpRequestConfig,
+  WorkflowHttpRequestRetryConfig,
   WorkflowHttpMethod,
   WorkflowJsonPrimitive,
   WorkflowJsonValue,

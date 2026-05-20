@@ -23,6 +23,16 @@ export type WorkflowExpressionValue =
   | { [key: string]: WorkflowExpressionValue };
 
 export type WorkflowErrorCode =
+  | "HTTP_PRIVATE_NETWORK_BLOCKED"
+  | "HTTP_REDIRECT_NOT_ALLOWED"
+  | "HTTP_REQUEST_FAILED"
+  | "HTTP_REQUEST_TIMEOUT"
+  | "HTTP_RESPONSE_JSON_INVALID"
+  | "HTTP_RESPONSE_TOO_LARGE"
+  | "HTTP_SECRET_NOT_FOUND"
+  | "HTTP_STATUS_NOT_ALLOWED"
+  | "HTTP_TEMPLATE_VALUE_MISSING"
+  | "HTTP_URL_NOT_ALLOWED"
   | "WORKFLOW_BAD_ROUTE_CONFIG"
   | "WORKFLOW_DEFINITION_INVALID"
   | "WORKFLOW_ENTRY_NOT_FOUND"
@@ -69,6 +79,7 @@ export type WorkflowNodeType =
   | "createEntry"
   | "deleteEntry"
   | "getEntry"
+  | "httpRequest"
   | "queryEntries"
   | "routeTrigger"
   | "returnResponse"
@@ -169,6 +180,26 @@ export type WorkflowSetVariableConfig = {
   values: Record<string, WorkflowExpressionValue>;
 };
 
+export type WorkflowHttpRequestBodyMode = "json" | "none" | "text";
+
+export type WorkflowHttpRequestRetryConfig = {
+  attempts?: number;
+  backoffMs?: number;
+};
+
+export type WorkflowHttpRequestConfig = {
+  body?: WorkflowExpressionValue;
+  headers?: Record<string, WorkflowExpressionValue>;
+  method: WorkflowHttpMethod;
+  outputKey?: string;
+  query?: Record<string, WorkflowExpressionValue>;
+  responseBodyMode?: WorkflowHttpRequestBodyMode;
+  retry?: WorkflowHttpRequestRetryConfig;
+  successStatus?: number[];
+  timeoutMs?: number;
+  url: string;
+};
+
 export type WorkflowReturnResponseConfig = {
   body: WorkflowExpressionValue;
   headers?: Record<string, string>;
@@ -180,6 +211,7 @@ export type WorkflowNodeConfigByType = {
   createEntry: WorkflowCreateEntryConfig;
   deleteEntry: WorkflowDeleteEntryConfig;
   getEntry: WorkflowGetEntryConfig;
+  httpRequest: WorkflowHttpRequestConfig;
   queryEntries: WorkflowQueryEntriesConfig;
   routeTrigger: WorkflowRouteTriggerConfig;
   returnResponse: WorkflowReturnResponseConfig;
@@ -193,6 +225,12 @@ export type WorkflowNodeOutputByType = {
   createEntry: { entry: WorkflowJsonValue };
   deleteEntry: { deleted: boolean; entryId: string };
   getEntry: { entry: WorkflowJsonValue | null };
+  httpRequest: {
+    attempts: number;
+    body: WorkflowJsonValue;
+    headers: Record<string, string>;
+    status: number;
+  };
   queryEntries: { entries: WorkflowJsonValue[]; limit: number; offset: number; total: number };
   routeTrigger: {
     body: WorkflowJsonValue;

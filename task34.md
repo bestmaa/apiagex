@@ -735,7 +735,7 @@ Each task uses this structure:
 #### T3451 - Implement HTTP Request Node
 
 - Version: `v0.15.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add safe external HTTP request node.
 - Persona: Integration engineer; support OTP/email/payment provider calls.
 - Success Criteria: Node supports method, URL, headers, body, timeout, status checks, and output mapping.

@@ -106,5 +106,6 @@ function workflowErrorStatus(code: string): number {
   if (code === "WORKFLOW_ENTRY_NOT_FOUND" || code === "WORKFLOW_NOT_FOUND" || code === "WORKFLOW_SCHEMA_NOT_FOUND") return 404;
   if (code === "WORKFLOW_DEFINITION_INVALID") return 422;
   if (code === "WORKFLOW_LIMIT_EXCEEDED") return 422;
+  if (code.startsWith("HTTP_")) return code === "HTTP_URL_NOT_ALLOWED" || code === "HTTP_TEMPLATE_VALUE_MISSING" ? 400 : 502;
   return 500;
 }

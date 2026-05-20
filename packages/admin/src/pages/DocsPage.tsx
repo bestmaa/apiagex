@@ -303,7 +303,7 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
         <article className="api-row">
           <strong>HTTP request node plan</strong>
           <p>The planned HTTP node supports external provider calls with method, allowed URL, headers, query/body templates, timeout, retry, success status, and response mapping.</p>
-          <p>Read <code>docs/workflow-http-request-node-plan.md</code> before implementation. Unrestricted URLs are not allowed; hosts need an allowlist, private-network targets are blocked, and secret references must be redacted from history.</p>
+          <p>Read <code>docs/workflow-http-request-node-plan.md</code> before changing provider behavior. Unrestricted URLs are not allowed; hosts need <code>APIAGEX_WORKFLOW_HTTP_ALLOWED_HOSTS</code>, private-network targets are blocked, and <code>secret:provider.apiKey</code> resolves from env such as <code>APIAGEX_SECRET_PROVIDER_APIKEY</code>.</p>
         </article>
       </section>
 

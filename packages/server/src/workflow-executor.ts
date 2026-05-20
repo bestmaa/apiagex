@@ -5,6 +5,7 @@ import { executeWorkflowBranchNode } from "./workflow-branch-node.js";
 import { executeWorkflowCreateEntryNode } from "./workflow-create-entry-node.js";
 import { executeWorkflowDeleteEntryNode } from "./workflow-delete-entry-node.js";
 import { executeWorkflowGetEntryNode } from "./workflow-get-entry-node.js";
+import { executeWorkflowHttpRequestNode, type WorkflowHttpRequestOptions } from "./workflow-http-request-node.js";
 import type {
   WorkflowNodeExecutionFailure,
   WorkflowNodeExecutionResult,
@@ -30,7 +31,9 @@ import type {
   WorkflowNodeOutputByType,
 } from "./workflow.type.js";
 
-export type WorkflowExecutorOptions = WorkflowRuntimeLimitOptions;
+export type WorkflowExecutorOptions = WorkflowRuntimeLimitOptions & {
+  httpRequest?: WorkflowHttpRequestOptions;
+};
 
 export type WorkflowExecutionSuccess = {
   context: WorkflowExecutionContext;
@@ -70,7 +73,7 @@ export async function executeWorkflowDefinition(
       return workflowExecutionFailure(context, executedNodeIds, currentNodeId, "WORKFLOW_DEFINITION_INVALID", `Workflow node '${currentNodeId}' was not found.`);
     }
     executedNodeIds.push(node.id);
-    const result = await executeWorkflowNode(db, context, node, limits);
+    const result = await executeWorkflowNode(db, context, node, limits, options.httpRequest);
     if (!result.ok) return { ...result, context, executedNodeIds };
     const postNodeTimeoutFailure = workflowTimeoutFailure(context, executedNodeIds, node.id, startedAtMs, limits);
     if (postNodeTimeoutFailure) return postNodeTimeoutFailure;
@@ -102,6 +105,7 @@ async function executeWorkflowNode(
   context: WorkflowExecutionContext,
   node: AnyWorkflowNodeDefinition,
   limits: WorkflowRuntimeLimits,
+  httpRequestOptions: WorkflowHttpRequestOptions = {},
 ): Promise<WorkflowNodeExecutionResult> {
   if (node.type === "routeTrigger") return executeRouteTriggerNode(context, node);
   if (node.type === "validateBody") return executeWorkflowValidateBodyNode(context, node);
@@ -110,6 +114,7 @@ async function executeWorkflowNode(
   if (node.type === "createEntry") return executeWorkflowCreateEntryNode(db, context, node);
   if (node.type === "updateEntry") return executeWorkflowUpdateEntryNode(db, context, node);
   if (node.type === "deleteEntry") return executeWorkflowDeleteEntryNode(db, context, node);
+  if (node.type === "httpRequest") return executeWorkflowHttpRequestNode(context, node, httpRequestOptions);
   if (node.type === "branch") return executeWorkflowBranchNode(context, node);
   if (node.type === "setVariable") return executeSetVariableNode(context, node);
   if (node.type === "returnResponse") return executeWorkflowReturnResponseNode(context, node);

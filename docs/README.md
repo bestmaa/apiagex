@@ -81,6 +81,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Workflow secret store planning `docs/workflow-secret-store-plan.md` me documented hai.
 - Workflow HTTP request node planning is documented in `docs/workflow-http-request-node-plan.md`.
 - Workflow HTTP request node planning `docs/workflow-http-request-node-plan.md` me documented hai.
+- Workflow HTTP request nodes can call allowlisted external providers with env-backed `secret:namespace.key` references.
+- Workflow HTTP request nodes allowlisted external providers ko env-backed `secret:namespace.key` references ke saath call kar sakte hain.
 
 ## Owner Bootstrap And Login
 

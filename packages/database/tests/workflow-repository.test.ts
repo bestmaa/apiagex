@@ -227,6 +227,38 @@ describe("workflow repository", () => {
     ]));
   });
 
+  it("accepts a configured HTTP request workflow node", () => {
+    const issues = validateWorkflowDraft({
+      definition: {
+        edges: [
+          { from: "start", id: "edge-start-http", to: "call-provider" },
+          { from: "call-provider", id: "edge-http-return", to: "return-ok" },
+        ],
+        nodes: [
+          { config: {}, id: "start", type: "routeTrigger" },
+          {
+            config: {
+              headers: { authorization: "Bearer secret:provider.apiKey" },
+              method: "POST",
+              successStatus: [200, 202],
+              timeoutMs: 5000,
+              url: "https://api.provider.test/messages",
+            },
+            id: "call-provider",
+            type: "httpRequest",
+          },
+          { config: { body: { ok: true }, status: 200 }, id: "return-ok", type: "returnResponse" },
+        ],
+        startNodeId: "start",
+        version: 1,
+      },
+      method: "POST",
+      path: "/provider/send",
+    });
+
+    expect(issues).toEqual([]);
+  });
+
   it("updates workflow metadata and keeps method/path unique", async () => {
     const db = openMigratedSqliteAdapter();
     const first = await createWorkflow(db, {

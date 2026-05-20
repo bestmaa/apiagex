@@ -307,6 +307,8 @@ export const readmePage = {
         "Secret values env-backed ya encrypted secret storage me rahenge aur workflow history, tests, webhooks, realtime events, aur logs se redact honge.",
         "HTTP node plan: docs/workflow-http-request-node-plan.md requires method, URL allowlist, SSRF guard, headers, body templates, timeout, retry, and secret references.",
         "HTTP node plan: docs/workflow-http-request-node-plan.md method, URL allowlist, SSRF guard, headers, body templates, timeout, retry, aur secret references require karta hai.",
+        "Implemented HTTP request nodes use APIAGEX_WORKFLOW_HTTP_ALLOWED_HOSTS for host allowlisting and env-backed secret references like APIAGEX_SECRET_PROVIDER_APIKEY.",
+        "Implemented HTTP request nodes host allowlisting ke liye APIAGEX_WORKFLOW_HTTP_ALLOWED_HOSTS aur env-backed secrets jaise APIAGEX_SECRET_PROVIDER_APIKEY use karte hain.",
       ],
     },
     {

@@ -24,6 +24,7 @@ const allowedNodeTypes = new Set([
   "createEntry",
   "deleteEntry",
   "getEntry",
+  "httpRequest",
   "queryEntries",
   "routeTrigger",
   "returnResponse",
@@ -116,6 +117,9 @@ function validateNodeConfig(
   if (nodeType === "getEntry" && !Object.hasOwn(config, "entryId")) {
     issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "getEntry requires entryId.", nodeId });
   }
+  if (nodeType === "httpRequest") {
+    validateHttpRequestConfig(nodeId, config, issues);
+  }
   if (nodeType === "createEntry" && (!isNonEmptyString(config.schema) || !isRecord(config.data))) {
     issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "createEntry requires schema and data.", nodeId });
   }
@@ -133,6 +137,33 @@ function validateNodeConfig(
   }
   if (nodeType === "returnResponse" && (typeof config.status !== "number" || !Object.hasOwn(config, "body"))) {
     issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "returnResponse requires status and body.", nodeId });
+  }
+}
+
+function validateHttpRequestConfig(
+  nodeId: string,
+  config: Record<string, unknown>,
+  issues: WorkflowValidationIssue[],
+): void {
+  const method = typeof config.method === "string" ? config.method.toUpperCase() : "";
+  if (!allowedMethods.has(method) || !isNonEmptyString(config.url)) {
+    issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "httpRequest requires method and url.", nodeId });
+  }
+  if (typeof config.url === "string" && /^{{.*}}$/.test(config.url.trim())) {
+    issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "httpRequest url host cannot be fully dynamic.", nodeId });
+  }
+  if (Object.hasOwn(config, "headers") && !isRecord(config.headers)) {
+    issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "httpRequest headers must be an object.", nodeId });
+  }
+  if (Object.hasOwn(config, "query") && !isRecord(config.query)) {
+    issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "httpRequest query must be an object.", nodeId });
+  }
+  const timeoutMs = config.timeoutMs;
+  if (Object.hasOwn(config, "timeoutMs") && (typeof timeoutMs !== "number" || !Number.isInteger(timeoutMs) || timeoutMs < 1000 || timeoutMs > 15000)) {
+    issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "httpRequest timeoutMs must be between 1000 and 15000.", nodeId });
+  }
+  if (Object.hasOwn(config, "successStatus") && (!Array.isArray(config.successStatus) || !config.successStatus.every(isHttpStatus))) {
+    issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "httpRequest successStatus must be an array of HTTP status codes.", nodeId });
   }
 }
 
@@ -179,4 +210,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function isHttpStatus(value: unknown): boolean {
+  return Number.isInteger(value) && typeof value === "number" && value >= 100 && value <= 599;
 }

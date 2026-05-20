@@ -614,6 +614,43 @@ describe("WorkflowManager", () => {
     });
   });
 
+  it("creates a workflow with an HTTP request step", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create workflow");
+      await flushPromises();
+    });
+    setInputValue(inputByPlaceholder(container, "Pay order"), "Send provider request");
+    setInputValue(inputByPlaceholder(container, "/orders/pay"), "/provider/send");
+    await addWorkflowStep(container, "httpRequest");
+    setInputValue(inputByPlaceholder(container, "https://api.provider.test/messages"), "https://api.provider.test/messages");
+    setInputValue(inputByPlaceholder(container, "providerResult"), "provider");
+
+    await act(async () => {
+      clickButton(container, "Save workflow");
+      await flushPromises();
+    });
+
+    expect(vi.mocked(createWorkflow).mock.calls[0]?.[0].definition).toMatchObject({
+      nodes: [
+        { id: "start", type: "routeTrigger" },
+        {
+          config: {
+            method: "POST",
+            outputKey: "provider",
+            responseBodyMode: "json",
+            successStatus: [200, 201, 202],
+            timeoutMs: 5000,
+            url: "https://api.provider.test/messages",
+          },
+          type: "httpRequest",
+        },
+        { type: "returnResponse" },
+      ],
+    });
+  });
+
   it("uses schema and field pickers without hiding the slug inputs", async () => {
     const { container } = await renderWorkflowManagerLoaded();
 
