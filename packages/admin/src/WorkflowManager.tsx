@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Copy, Edit3, Plus, RefreshCw, Save, Search, X } from "lucide-react";
-import { createWorkflow, listSchemas, listWorkflows, updateWorkflow } from "./api";
+import { createWorkflow, listSchemas, listWorkflows, testWorkflow, updateWorkflow } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
-import type { WorkflowDraft, WorkflowRecord } from "./workflow.type";
+import type { WorkflowDraft, WorkflowRecord, WorkflowTestRunResult } from "./workflow.type";
 
 type WorkflowStatusFilter = "active" | "all" | "inactive";
 type WorkflowStepType = "createEntry" | "queryEntries" | "returnResponse" | "updateEntry" | "validateBody";
@@ -168,6 +168,7 @@ export function WorkflowManager() {
           onChange={setForm}
           schemas={schemas}
           onSave={() => void saveWorkflowBasics()}
+          workflowId={editingWorkflowId}
         />
       ) : null}
       <div className="entry-table-toolbar">
@@ -254,6 +255,7 @@ function WorkflowBasicsForm({
   onChange,
   schemas,
   onSave,
+  workflowId,
 }: {
   draft: WorkflowFormDraft;
   mode: "create" | "edit";
@@ -261,6 +263,7 @@ function WorkflowBasicsForm({
   onChange: (draft: WorkflowFormDraft) => void;
   schemas: SchemaRecord[];
   onSave: () => void;
+  workflowId: string | null;
 }) {
   return (
     <section aria-labelledby="workflow-form-title" className="settings-panel workflow-basics-form">
@@ -319,6 +322,85 @@ function WorkflowBasicsForm({
         <Save aria-hidden="true" size={16} />
         Save workflow
       </button>
+      {mode === "edit" && workflowId ? <WorkflowTestPanel workflowId={workflowId} /> : null}
+    </section>
+  );
+}
+
+function WorkflowTestPanel({ workflowId }: { workflowId: string }) {
+  const [bodyJson, setBodyJson] = useState(jsonText({ message: "hello" }));
+  const [headersJson, setHeadersJson] = useState(jsonText({}));
+  const [paramsJson, setParamsJson] = useState(jsonText({}));
+  const [queryJson, setQueryJson] = useState(jsonText({}));
+  const [result, setResult] = useState<WorkflowTestRunResult | null>(null);
+  const [status, setStatus] = useState("Workflow test ready");
+
+  async function runTest() {
+    let body: unknown;
+    let headers: Record<string, unknown>;
+    let params: Record<string, unknown>;
+    let query: Record<string, unknown>;
+    try {
+      body = parseJsonValue(bodyJson, "Invalid test request: body must be valid JSON.");
+      headers = parseJsonObject(headersJson, "Invalid test request: headers must be a JSON object.");
+      params = parseJsonObject(paramsJson, "Invalid test request: params must be a JSON object.");
+      query = parseJsonObject(queryJson, "Invalid test request: query must be a JSON object.");
+    } catch (error) {
+      setResult(null);
+      setStatus(error instanceof Error ? error.message : "Invalid test request");
+      return;
+    }
+    setStatus("Running workflow test");
+    const response = await testWorkflow(workflowId, { body, headers, params, query });
+    if (!response.ok || !response.result) {
+      setResult(null);
+      setStatus(response.error ?? "Workflow test failed");
+      return;
+    }
+    setResult(response.result);
+    setStatus(response.result.ok ? "Workflow test passed" : "Workflow test returned an error");
+  }
+
+  return (
+    <section aria-labelledby="workflow-test-title" className="workflow-test-panel">
+      <div className="entry-table-meta">
+        <div>
+          <h3 id="workflow-test-title">Test run</h3>
+          <span>Admin-only preview request</span>
+        </div>
+        <button type="button" onClick={() => void runTest()}>Run test</button>
+      </div>
+      <div className="workflow-test-grid">
+        <label>Body JSON
+          <textarea value={bodyJson} onChange={(event) => setBodyJson(event.target.value)} />
+        </label>
+        <label>Query JSON
+          <textarea value={queryJson} onChange={(event) => setQueryJson(event.target.value)} />
+        </label>
+        <label>Params JSON
+          <textarea value={paramsJson} onChange={(event) => setParamsJson(event.target.value)} />
+        </label>
+        <label>Headers JSON
+          <textarea value={headersJson} onChange={(event) => setHeadersJson(event.target.value)} />
+        </label>
+      </div>
+      {result ? (
+        <div className="workflow-test-output">
+          <div>
+            <h4>Response</h4>
+            <pre>{jsonText(result.response)}</pre>
+          </div>
+          <div>
+            <h4>Step outputs</h4>
+            <pre>{jsonText(result.steps)}</pre>
+          </div>
+          <div>
+            <h4>Error</h4>
+            <pre>{jsonText(result.error)}</pre>
+          </div>
+        </div>
+      ) : null}
+      <StatusToast title="Workflow test status">{status}</StatusToast>
     </section>
   );
 }

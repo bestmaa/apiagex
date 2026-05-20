@@ -495,7 +495,7 @@ Each task uses this structure:
 #### T3433 - Add Workflow Test Run Panel
 
 - Version: `v0.12.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Let admins run a workflow test from Admin UI with sample params/query/body.
 - Persona: API builder; test before exposing clients.
 - Success Criteria: Test panel shows request input, response output, step outputs, and errors.

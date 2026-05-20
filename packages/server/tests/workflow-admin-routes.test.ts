@@ -103,6 +103,61 @@ describe("workflow admin routes", () => {
     expect(await getCustomApiRouteByMethodPath(database, "POST", "/api/custom/echo"))
       .toMatchObject({ active: true, permissionKey: "workflow.echo.post" });
   });
+
+  it("runs workflow tests through admin API without public custom permission", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openMigratedSqliteAdapter() });
+    const created = await server.inject({
+      method: "POST",
+      payload: {
+        active: false,
+        definition: echoWorkflowDefinition("/echo"),
+        method: "POST",
+        name: "Echo workflow",
+        path: "/echo",
+        version: 1,
+      },
+      url: "/api/admin/workflows",
+    });
+    const workflowId = created.json().workflow.id;
+
+    const response = await server.inject({
+      method: "POST",
+      payload: {
+        body: { message: "preview" },
+        headers: { "x-preview": "yes" },
+        params: { id: "123" },
+        query: { debug: true },
+      },
+      url: `/api/admin/workflows/${workflowId}/test-run`,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      ok: true,
+      result: {
+        error: null,
+        executedNodeIds: ["start", "return-echo"],
+        ok: true,
+        response: {
+          body: { ok: true },
+          status: 200,
+        },
+        steps: {
+          start: {
+            body: { message: "preview" },
+            headers: { "x-preview": "yes" },
+            params: { id: "123" },
+            query: { debug: true },
+          },
+        },
+      },
+      workflow: {
+        active: false,
+        method: "POST",
+        path: "/echo",
+      },
+    });
+  });
 });
 
 function echoWorkflowDefinition(path: string) {

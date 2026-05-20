@@ -30,7 +30,13 @@ import type {
   ApiDocsSettingsResponse,
 } from "./settings.type";
 import type { UserListResponse, UserMutationResponse } from "./user.type";
-import type { WorkflowDraft, WorkflowListResponse, WorkflowMutationResponse } from "./workflow.type";
+import type {
+  WorkflowDraft,
+  WorkflowListResponse,
+  WorkflowMutationResponse,
+  WorkflowTestRunDraft,
+  WorkflowTestRunResponse,
+} from "./workflow.type";
 import type {
   SchemaDraft,
   SchemaDeleteResponse,
@@ -358,6 +364,14 @@ export async function createWorkflow(input: WorkflowDraft): Promise<WorkflowMuta
 export async function updateWorkflow(workflowId: string, input: WorkflowDraft): Promise<WorkflowMutationResponse> {
   return adminJson<WorkflowMutationResponse>(`/api/admin/workflows/${workflowId}`, {
     method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function testWorkflow(workflowId: string, input: WorkflowTestRunDraft): Promise<WorkflowTestRunResponse> {
+  return adminJson<WorkflowTestRunResponse>(`/api/admin/workflows/${workflowId}/test-run`, {
+    method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
   });

@@ -351,6 +351,46 @@ code {
   grid-column: 1 / -1;
 }
 
+.workflow-test-panel {
+  border-top: 1px solid var(--admin-color-border-soft);
+  display: grid;
+  gap: var(--admin-space-4);
+  padding-top: var(--admin-space-4);
+}
+
+.workflow-test-panel h3,
+.workflow-test-panel h4 {
+  margin: 0;
+}
+
+.workflow-test-grid,
+.workflow-test-output {
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workflow-test-grid textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.workflow-test-output > div {
+  background: var(--admin-color-surface-muted);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-3);
+}
+
+.workflow-test-output pre {
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
 .custom-api-history h3 {
   font-size: var(--admin-font-sm);
   margin: 0;
@@ -2291,6 +2331,8 @@ code {
   .workflow-form-grid,
   .workflow-step-fields,
   .workflow-step-identity,
+  .workflow-test-grid,
+  .workflow-test-output,
   .schema-basics-grid,
   .schema-field-badge-row,
   .schema-inventory-row,

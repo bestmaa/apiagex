@@ -23,3 +23,10 @@ export type UpdateWorkflowBody = {
   path?: string;
   version?: number;
 };
+
+export type TestWorkflowBody = {
+  body?: unknown;
+  headers?: Record<string, unknown>;
+  params?: Record<string, unknown>;
+  query?: Record<string, unknown>;
+};

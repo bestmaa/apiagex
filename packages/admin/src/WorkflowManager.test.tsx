@@ -2,7 +2,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createWorkflow, listSchemas, listWorkflows, updateWorkflow } from "./api";
+import { createWorkflow, listSchemas, listWorkflows, testWorkflow, updateWorkflow } from "./api";
 import { WorkflowManager } from "./WorkflowManager";
 import type { SchemaRecord } from "./schema.type";
 import type { WorkflowRecord } from "./workflow.type";
@@ -11,6 +11,7 @@ vi.mock("./api", () => ({
   createWorkflow: vi.fn(),
   listSchemas: vi.fn(),
   listWorkflows: vi.fn(),
+  testWorkflow: vi.fn(),
   updateWorkflow: vi.fn(),
 }));
 
@@ -20,6 +21,16 @@ describe("WorkflowManager", () => {
   beforeEach(() => {
     vi.mocked(listSchemas).mockResolvedValue({ ok: true, schemas: [schema()] });
     vi.mocked(listWorkflows).mockResolvedValue({ ok: true, workflows: [workflow(), workflow({ active: false, name: "Archive order", path: "/orders/archive" })] });
+    vi.mocked(testWorkflow).mockResolvedValue({
+      ok: true,
+      result: {
+        error: null,
+        executedNodeIds: ["start", "return-echo"],
+        ok: true,
+        response: { body: { ok: true }, headers: {}, status: 200 },
+        steps: { "return-echo": { body: { ok: true } }, start: { body: { message: "hello" } } },
+      },
+    });
     vi.mocked(createWorkflow).mockResolvedValue({ ok: true, workflow: workflow({ id: "workflow_created", name: "Created workflow", path: "/created" }) });
     vi.mocked(updateWorkflow).mockResolvedValue({ ok: true, workflow: workflow({ id: "workflow_pay", name: "Pay order updated", path: "/orders/pay-now" }) });
   });
@@ -251,6 +262,29 @@ describe("WorkflowManager", () => {
     }));
     expect(createWorkflow).not.toHaveBeenCalled();
     expect(container.textContent).toContain("Pay order updated");
+  });
+
+  it("runs a workflow test from the edit panel", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Edit");
+      await flushPromises();
+    });
+    await act(async () => {
+      clickButton(container, "Run test");
+      await flushPromises();
+    });
+
+    expect(testWorkflow).toHaveBeenCalledWith("workflow_pay", {
+      body: { message: "hello" },
+      headers: {},
+      params: {},
+      query: {},
+    });
+    expect(container.textContent).toContain("Workflow test passed");
+    expect(container.textContent).toContain("Step outputs");
+    expect(container.textContent).toContain("return-echo");
   });
 });
 

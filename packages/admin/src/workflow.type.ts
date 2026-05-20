@@ -40,3 +40,30 @@ export type WorkflowDraft = {
   path: string;
   version: number;
 };
+
+export type WorkflowTestRunDraft = {
+  body?: unknown;
+  headers?: Record<string, unknown>;
+  params?: Record<string, unknown>;
+  query?: Record<string, unknown>;
+};
+
+export type WorkflowTestRunResult = {
+  error: Record<string, unknown> | null;
+  executedNodeIds: string[];
+  ok: boolean;
+  response: Record<string, unknown>;
+  steps: Record<string, unknown>;
+};
+
+export type WorkflowTestRunResponse = {
+  error?: string;
+  ok: boolean;
+  result?: WorkflowTestRunResult;
+  workflow?: {
+    active: boolean;
+    id: string;
+    method: string;
+    path: string;
+  };
+};
