@@ -2,10 +2,13 @@ import type { FastifyInstance, FastifyReply } from "fastify";
 import {
   listCustomApiRoutes,
   listSchemas,
+  listWorkflows,
+  workflowCustomApiRouteInput,
   type ApiagexDatabase,
   type CustomApiRouteRecord,
   type FieldRecord,
   type SchemaRecord,
+  type WorkflowRecord,
 } from "@apiagex/database";
 import { getApiDocsSettings } from "./api-docs-settings.js";
 
@@ -78,6 +81,7 @@ export function registerOpenApiRoutes(server: FastifyInstance, database: Apiagex
 export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<OpenApiDocument> {
   const schemas = await listSchemas(database);
   const customApiRoutes = await listCustomApiRoutes(database);
+  const workflows = await listWorkflows(database);
   const components = contentSchemaComponents(schemas);
   const settings = await getApiDocsSettings(database);
   return {
@@ -95,37 +99,45 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
       ...(settings.contentEnabled
         ? [{ name: "Custom APIs", description: "Project custom APIs discovered from code and mounted under /api/custom." }]
         : []),
-      ...(settings.adminEnabled ? [
-      { name: "Admin Auth", description: "Owner setup, login, and session checks for the control plane." },
-      { name: "Admin Schemas", description: "Control-plane schema builder APIs." },
-      { name: "Admin Entries", description: "Control-plane content entry management APIs." },
-      { name: "Admin Roles", description: "Control-plane roles, content roles, permissions, and tokens." },
-      { name: "Admin Users", description: "Content API users and control admin users." },
-      { name: "Admin Settings", description: "Control-plane settings including Swagger/OpenAPI visibility." },
-      { name: "Admin Webhooks", description: "Signed content change hook configuration and delivery logs." },
-      { name: "Admin Realtime", description: "Realtime WebSocket configuration and session-token APIs." },
-      ] : []),
+      ...(settings.contentEnabled
+        ? [{ name: "Workflow APIs", description: "No-code workflow APIs mounted under /api/custom." }]
+        : []),
+      ...(settings.adminEnabled
+        ? [
+            { name: "Admin Auth", description: "Owner setup, login, and session checks for the control plane." },
+            { name: "Admin Schemas", description: "Control-plane schema builder APIs." },
+            { name: "Admin Entries", description: "Control-plane content entry management APIs." },
+            { name: "Admin Roles", description: "Control-plane roles, content roles, permissions, and tokens." },
+            { name: "Admin Users", description: "Content API users and control admin users." },
+            { name: "Admin Settings", description: "Control-plane settings including Swagger/OpenAPI visibility." },
+            { name: "Admin Webhooks", description: "Signed content change hook configuration and delivery logs." },
+            { name: "Admin Realtime", description: "Realtime WebSocket configuration and session-token APIs." },
+          ]
+        : []),
       { name: "System", description: "Service health and OpenAPI endpoints." },
     ],
-    paths: {
-      "/api": {
-        get: {
-          tags: ["System"],
-          summary: "API root",
-          responses: okResponse({ type: "object" }),
+    paths: mergeOpenApiPaths(
+      {
+        "/api": {
+          get: {
+            tags: ["System"],
+            summary: "API root",
+            responses: okResponse({ type: "object" }),
+          },
+        },
+        "/api/health": {
+          get: {
+            tags: ["System"],
+            summary: "Health check",
+            responses: okResponse({ type: "object" }),
+          },
         },
       },
-      "/api/health": {
-        get: {
-          tags: ["System"],
-          summary: "Health check",
-          responses: okResponse({ type: "object" }),
-        },
-      },
-      ...(settings.adminEnabled ? adminPaths() : {}),
-      ...(settings.contentEnabled ? Object.fromEntries(schemas.flatMap((schema) => contentPaths(schema))) : {}),
-      ...(settings.contentEnabled ? customApiPaths(customApiRoutes) : {}),
-    },
+      ...(settings.adminEnabled ? [adminPaths()] : []),
+      ...(settings.contentEnabled ? [Object.fromEntries(schemas.flatMap((schema) => contentPaths(schema)))] : []),
+      ...(settings.contentEnabled ? [customApiPaths(customApiRoutes)] : []),
+      ...(settings.contentEnabled ? [workflowApiPaths(workflows)] : []),
+    ),
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -156,9 +168,22 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
   };
 }
 
+function mergeOpenApiPaths(...pathMaps: Array<Record<string, OpenApiSchema>>): Record<string, OpenApiSchema> {
+  const merged: Record<string, OpenApiSchema> = {};
+  for (const pathMap of pathMaps) {
+    for (const [path, operations] of Object.entries(pathMap)) {
+      merged[path] = {
+        ...(merged[path] ?? {}),
+        ...operations,
+      };
+    }
+  }
+  return merged;
+}
+
 function customApiPaths(routes: CustomApiRouteRecord[]): Record<string, OpenApiSchema> {
   const paths: Record<string, OpenApiSchema> = {};
-  for (const route of routes.filter((item) => item.active)) {
+  for (const route of routes.filter((item) => item.active && !item.permissionKey.startsWith("workflow."))) {
     const method = route.method.toLowerCase();
     if (!["delete", "get", "head", "patch", "post", "put"].includes(method)) continue;
     const path = openApiPath(route.path);
@@ -175,6 +200,54 @@ function customApiPaths(routes: CustomApiRouteRecord[]): Record<string, OpenApiS
     };
     const parameters = pathParametersFromRoute(path);
     if (parameters.length > 0) operation.parameters = parameters;
+    paths[path] = {
+      ...(paths[path] ?? {}),
+      [method]: operation,
+    };
+  }
+  return paths;
+}
+
+function workflowApiPaths(workflows: WorkflowRecord[]): Record<string, OpenApiSchema> {
+  const paths: Record<string, OpenApiSchema> = {};
+  for (const workflow of workflows.filter((item) => item.active)) {
+    const route = workflowCustomApiRouteInput(workflow);
+    const method = route.method.toLowerCase();
+    if (!["delete", "get", "head", "patch", "post", "put"].includes(method)) continue;
+    const path = openApiPath(route.path);
+    const operation: OpenApiSchema = {
+      tags: ["Workflow APIs", "Workflows"],
+      summary: workflow.name,
+      description: [
+        `Workflow route: ${route.method} ${route.path}.`,
+        `Permission key: ${route.permissionKey}.`,
+        "Requires this custom API permission for an API role, or public permission for no-token access.",
+      ].join(" "),
+      security: apiTokenSecurity(),
+      responses: okResponse({
+        additionalProperties: true,
+        description: "Response body returned by the workflow return node.",
+        type: "object",
+      }),
+      "x-apiagex-workflow-id": workflow.id,
+      "x-apiagex-workflow-version": workflow.version,
+    };
+    const parameters = pathParametersFromRoute(path);
+    if (parameters.length > 0) operation.parameters = parameters;
+    if (["patch", "post", "put"].includes(method)) {
+      operation.requestBody = {
+        required: false,
+        content: {
+          "application/json": {
+            schema: {
+              additionalProperties: true,
+              description: "JSON body available to workflow nodes as request.body.",
+              type: "object",
+            },
+          },
+        },
+      };
+    }
     paths[path] = {
       ...(paths[path] ?? {}),
       [method]: operation,

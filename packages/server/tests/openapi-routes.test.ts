@@ -1,4 +1,4 @@
-import { openSqliteDatabase } from "@apiagex/database";
+import { openMigratedSqliteAdapter, openSqliteDatabase } from "@apiagex/database";
 import { describe, expect, it } from "vitest";
 import { createServer } from "../src/app.js";
 
@@ -92,6 +92,55 @@ describe("OpenAPI and Swagger routes", () => {
     ]);
   });
 
+  it("includes active workflow APIs in content OpenAPI docs", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openMigratedSqliteAdapter() });
+    await enableApiDocs(server, { adminEnabled: false, contentEnabled: true });
+    const active = await server.inject({
+      method: "POST",
+      payload: {
+        active: true,
+        definition: echoWorkflowDefinition("/orders/:entryId/pay"),
+        method: "POST",
+        name: "Pay order",
+        path: "/orders/:entryId/pay",
+        version: 1,
+      },
+      url: "/api/admin/workflows",
+    });
+    await server.inject({
+      method: "POST",
+      payload: {
+        active: false,
+        definition: echoWorkflowDefinition("/orders/archive"),
+        method: "POST",
+        name: "Archive order",
+        path: "/orders/archive",
+        version: 1,
+      },
+      url: "/api/admin/workflows",
+    });
+
+    const response = await server.inject({ method: "GET", url: "/api/openapi.json" });
+    const spec = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(spec.paths["/api/custom/orders/{entryId}/pay"].post).toMatchObject({
+      summary: "Pay order",
+      tags: ["Workflow APIs", "Workflows"],
+      "x-apiagex-workflow-id": active.json().workflow.id,
+      "x-apiagex-workflow-version": 1,
+    });
+    expect(spec.paths["/api/custom/orders/{entryId}/pay"].post.description).toContain("Permission key: workflow.orders.entryid.pay.post.");
+    expect(spec.paths["/api/custom/orders/{entryId}/pay"].post.requestBody.content["application/json"].schema).toMatchObject({
+      type: "object",
+      additionalProperties: true,
+    });
+    expect(spec.paths["/api/custom/orders/{entryId}/pay"].post.parameters).toMatchObject([
+      { in: "path", name: "entryId", required: true },
+    ]);
+    expect(spec.paths["/api/custom/orders/archive"]).toBeUndefined();
+  });
+
   it("hides custom APIs when content docs are disabled", async () => {
     const server = createServer({
       adminAuth: "disabled",
@@ -167,4 +216,24 @@ async function enableApiDocs(
     url: "/api/admin/settings/api-docs",
     payload,
   });
+}
+
+function echoWorkflowDefinition(path: string) {
+  return {
+    edges: [{ from: "start", id: "edge-start-return", to: "return-echo" }],
+    nodes: [
+      { config: {}, id: "start", type: "routeTrigger" },
+      {
+        config: {
+          body: { ok: true },
+          status: 200,
+        },
+        id: "return-echo",
+        type: "returnResponse",
+      },
+    ],
+    route: { method: "POST", path },
+    startNodeId: "start",
+    version: 1,
+  };
 }

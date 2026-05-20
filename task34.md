@@ -389,7 +389,7 @@ Each task uses this structure:
 #### T3425 - Add Workflow OpenAPI Output
 
 - Version: `v0.11.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Show active workflow APIs in Swagger/OpenAPI with method, path, summary, request hints, and response hints.
 - Persona: Developer experience engineer; make no-code APIs discoverable.
 - Success Criteria: `/api/openapi.json` includes workflow routes when content docs are enabled.
