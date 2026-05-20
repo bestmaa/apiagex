@@ -205,7 +205,7 @@ Each task uses this structure:
 #### T3411 - Build Workflow Execution Context
 
 - Version: `v0.10.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Create execution context shape for request body, params, query, headers, vars, step outputs, and response.
 - Persona: Runtime engineer; create a clean base for all nodes.
 - Success Criteria: Context type and helper functions exist with unit tests.

@@ -14,6 +14,13 @@ export { bootstrapOwner, getOwnerStatus, loginOwner } from "./owner-bootstrap.js
 export { renderRuntimeHelp, runRuntimeCli, startApiagex, startApiagexServer } from "./runtime.js";
 export { ensureLocalServerPaths, resolveLocalServerConfig } from "./server-config.js";
 export { generateApiagexTypes, renderApiagexTypes } from "./typegen.js";
+export {
+  createWorkflowExecutionContext,
+  sanitizeWorkflowHeaders,
+  setWorkflowResponse,
+  setWorkflowStepOutput,
+  setWorkflowVariable,
+} from "./workflow-context.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";
@@ -50,6 +57,12 @@ export type {
   OwnerLoginResult,
   OwnerStatusResult,
 } from "./owner-bootstrap.type.js";
+export type {
+  WorkflowExecutionContext,
+  WorkflowExecutionContextInput,
+  WorkflowRequestHeaders,
+  WorkflowResponseDraft,
+} from "./workflow-context.js";
 export type {
   AnyWorkflowNodeDefinition,
   WorkflowDefinition,
