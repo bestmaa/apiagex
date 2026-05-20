@@ -22,6 +22,7 @@ export const MVP_TABLES = [
   "custom_api_routes",
   "custom_api_permissions",
   "custom_api_permission_events",
+  "workflows",
 ] as const;
 
 export const MVP_FOUNDATION_SQL = `
@@ -216,5 +217,19 @@ CREATE TABLE IF NOT EXISTS custom_api_permission_events (
   actor_id TEXT NOT NULL,
   actor_email TEXT NOT NULL,
   created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS workflows (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  method TEXT NOT NULL,
+  path TEXT NOT NULL,
+  active INTEGER NOT NULL DEFAULT 0,
+  definition_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  last_run_at TEXT,
+  version INTEGER NOT NULL,
+  UNIQUE(method, path)
 );
 `;

@@ -138,7 +138,7 @@ Each task uses this structure:
 #### T3406 - Add Workflow Database Tables
 
 - Version: `v0.9.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add workflow storage tables for SQLite, PostgreSQL, and MySQL.
 - Persona: Database engineer; keep provider support consistent.
 - Success Criteria: Tables store workflow id, name, method, path, active, definition JSON, createdAt, updatedAt, lastRunAt, and version.

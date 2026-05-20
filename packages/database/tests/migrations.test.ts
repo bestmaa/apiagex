@@ -111,6 +111,29 @@ describe("MVP database foundation", () => {
     expect(eventColumns.map((column) => column.name)).toContain("actor_email");
   });
 
+  it("adds workflow storage for visual API builder definitions", () => {
+    const db = openSqliteDatabase();
+
+    migrateMvpDatabase(db);
+
+    expect(listMvpTables(db)).toContain("workflows");
+    const columns = db.prepare("PRAGMA table_info(workflows)").all() as Array<{ name: string }>;
+    expect(columns.map((column) => column.name)).toEqual([
+      "id",
+      "name",
+      "method",
+      "path",
+      "active",
+      "definition_json",
+      "created_at",
+      "updated_at",
+      "last_run_at",
+      "version",
+    ]);
+    const indexes = db.prepare("PRAGMA index_list(workflows)").all() as Array<{ unique: number }>;
+    expect(indexes.some((index) => index.unique === 1)).toBe(true);
+  });
+
   it("seeds existing admin role permissions during additive migration", () => {
     const db = openSqliteDatabase();
     const now = new Date().toISOString();
