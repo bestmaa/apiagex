@@ -344,6 +344,72 @@ Practical create-entry mapping:
 }
 ```
 
+## Error Model
+
+### English
+
+Workflow APIs must return stable error codes so client apps can handle failures without reading raw messages. Runtime errors must not expose stack traces.
+
+| Code | HTTP status | When it happens |
+| --- | --- | --- |
+| `WORKFLOW_BAD_ROUTE_CONFIG` | `400` | Method/path is invalid or does not normalize under `/api/custom` |
+| `WORKFLOW_DEFINITION_INVALID` | `422` | Saved workflow JSON has broken nodes, edges, or required config |
+| `WORKFLOW_VALIDATION_FAILED` | `400` | Request body/query/params fail a `validateBody` or validation node |
+| `WORKFLOW_SCHEMA_NOT_FOUND` | `404` | A node references a schema slug that does not exist |
+| `WORKFLOW_ENTRY_NOT_FOUND` | `404` | A get/update/delete node cannot find the target entry |
+| `WORKFLOW_FORBIDDEN` | `403` | Token or role is not allowed to call the workflow route |
+| `WORKFLOW_NODE_FAILED` | `500` | A node fails after validation passed |
+| `WORKFLOW_NOT_FOUND` | `404` | No active workflow route matches the request |
+
+Standard error response:
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "WORKFLOW_VALIDATION_FAILED",
+    "message": "Request body did not pass workflow validation.",
+    "nodeId": "validate-register-body",
+    "workflowId": "register-user",
+    "details": {
+      "field": "email"
+    }
+  }
+}
+```
+
+### Hinglish
+
+Workflow APIs stable error codes return karenge taki client apps raw message parse kiye bina failure handle kar saken. Runtime errors stack trace expose nahi karenge.
+
+| Code | HTTP status | Kab hota hai |
+| --- | --- | --- |
+| `WORKFLOW_BAD_ROUTE_CONFIG` | `400` | Method/path invalid ho ya `/api/custom` ke under normalize na ho |
+| `WORKFLOW_DEFINITION_INVALID` | `422` | Saved workflow JSON me broken nodes, edges, ya required config missing ho |
+| `WORKFLOW_VALIDATION_FAILED` | `400` | Request body/query/params validation node me fail ho |
+| `WORKFLOW_SCHEMA_NOT_FOUND` | `404` | Node kisi missing schema slug ko reference kare |
+| `WORKFLOW_ENTRY_NOT_FOUND` | `404` | Get/update/delete node target entry nahi dhoond paye |
+| `WORKFLOW_FORBIDDEN` | `403` | Token ya role workflow route call karne ke liye allowed na ho |
+| `WORKFLOW_NODE_FAILED` | `500` | Validation pass hone ke baad node fail ho |
+| `WORKFLOW_NOT_FOUND` | `404` | Request ke liye active workflow route na mile |
+
+Standard error response:
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "WORKFLOW_VALIDATION_FAILED",
+    "message": "Request body did not pass workflow validation.",
+    "nodeId": "validate-register-body",
+    "workflowId": "register-user",
+    "details": {
+      "field": "email"
+    }
+  }
+}
+```
+
 ## Storage Model
 
 ### English

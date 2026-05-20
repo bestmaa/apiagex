@@ -22,6 +22,42 @@ export type WorkflowExpressionValue =
   | WorkflowExpressionValue[]
   | { [key: string]: WorkflowExpressionValue };
 
+export type WorkflowErrorCode =
+  | "WORKFLOW_BAD_ROUTE_CONFIG"
+  | "WORKFLOW_DEFINITION_INVALID"
+  | "WORKFLOW_ENTRY_NOT_FOUND"
+  | "WORKFLOW_FORBIDDEN"
+  | "WORKFLOW_NODE_FAILED"
+  | "WORKFLOW_NOT_FOUND"
+  | "WORKFLOW_SCHEMA_NOT_FOUND"
+  | "WORKFLOW_VALIDATION_FAILED";
+
+export type WorkflowErrorHttpStatus = 400 | 403 | 404 | 422 | 500;
+
+export type WorkflowErrorStatusByCode = {
+  WORKFLOW_BAD_ROUTE_CONFIG: 400;
+  WORKFLOW_DEFINITION_INVALID: 422;
+  WORKFLOW_ENTRY_NOT_FOUND: 404;
+  WORKFLOW_FORBIDDEN: 403;
+  WORKFLOW_NODE_FAILED: 500;
+  WORKFLOW_NOT_FOUND: 404;
+  WORKFLOW_SCHEMA_NOT_FOUND: 404;
+  WORKFLOW_VALIDATION_FAILED: 400;
+};
+
+export type WorkflowErrorDetails = Record<string, WorkflowJsonValue>;
+
+export type WorkflowErrorResponse = {
+  error: {
+    code: WorkflowErrorCode;
+    details?: WorkflowErrorDetails;
+    message: string;
+    nodeId?: WorkflowNodeId;
+    workflowId?: string;
+  };
+  ok: false;
+};
+
 export type WorkflowNodeId = string;
 
 export type WorkflowEdgeId = string;

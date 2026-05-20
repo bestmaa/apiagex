@@ -123,7 +123,7 @@ Each task uses this structure:
 #### T3405 - Define Workflow Error Model
 
 - Version: `v0.9.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Define stable workflow error codes for validation, missing schema, missing entry, permission denied, node failure, and bad route config.
 - Persona: API reliability engineer; make workflow failures predictable.
 - Success Criteria: Error code list exists and each error maps to an HTTP status.
