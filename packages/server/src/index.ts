@@ -11,6 +11,7 @@ export { createServer } from "./app.js";
 export { createCustomRouteContext } from "./custom-routes.js";
 export { registerProjectCustomRoutes } from "./custom-api-routes.js";
 export { registerWorkflowRoutes } from "./workflow-api-routes.js";
+export { registerWorkflowAdminRoutes } from "./workflow-admin-routes.js";
 export { bootstrapOwner, getOwnerStatus, loginOwner } from "./owner-bootstrap.js";
 export { renderRuntimeHelp, runRuntimeCli, startApiagex, startApiagexServer } from "./runtime.js";
 export { ensureLocalServerPaths, resolveLocalServerConfig } from "./server-config.js";
@@ -112,6 +113,11 @@ export type {
   WorkflowExecutionSuccess,
   WorkflowExecutorOptions,
 } from "./workflow-executor.js";
+export type {
+  CreateWorkflowBody,
+  UpdateWorkflowBody,
+  WorkflowParams,
+} from "./workflow-admin-routes.type.js";
 export type {
   AnyWorkflowNodeDefinition,
   WorkflowDefinition,

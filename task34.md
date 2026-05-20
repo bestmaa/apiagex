@@ -376,7 +376,7 @@ Each task uses this structure:
 #### T3424 - Add Workflow Admin APIs
 
 - Version: `v0.11.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Expose admin endpoints to list/create/read/update/delete workflows.
 - Persona: Admin API engineer; power the Admin UI builder.
 - Success Criteria: Admin APIs exist under `/api/admin/workflows` and require admin auth.

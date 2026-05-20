@@ -31,6 +31,7 @@ import { registerOpenApiRoutes } from "./openapi-routes.js";
 import { registerProjectCustomRoutes } from "./custom-api-routes.js";
 import { registerCustomApiAdminRoutes } from "./custom-api-admin-routes.js";
 import { registerWorkflowRoutes } from "./workflow-api-routes.js";
+import { registerWorkflowAdminRoutes } from "./workflow-admin-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -52,6 +53,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   registerWebhookRoutes(server, database, webhookOptions);
   registerRealtimeRoutes(server, database, realtimeBroker);
   registerCustomApiAdminRoutes(server, database);
+  registerWorkflowAdminRoutes(server, database);
   registerOpenApiRoutes(server, database);
   if (options.customRoutes) {
     registerProjectCustomRoutes(server, database, options.customRoutes);
