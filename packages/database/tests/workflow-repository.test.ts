@@ -69,6 +69,36 @@ describe("workflow repository", () => {
     expect(await listWorkflows(db)).toHaveLength(1);
   });
 
+  it("stores workflow create and update audit actors without tokens", async () => {
+    const db = openMigratedSqliteAdapter();
+    const workflow = await createWorkflow(db, {
+      createdBy: {
+        email: "owner@example.com",
+        id: "owner_user",
+      },
+      definition: registerDefinition,
+      method: "POST",
+      name: "Register user",
+      path: "/register",
+      version: 1,
+    });
+
+    expect(workflow.createdBy).toEqual({ email: "owner@example.com", id: "owner_user" });
+    expect(workflow.updatedBy).toEqual({ email: "owner@example.com", id: "owner_user" });
+
+    const updated = await updateWorkflow(db, workflow.id, {
+      name: "Register account",
+      updatedBy: {
+        email: "admin@example.com",
+        id: "admin_user",
+      },
+    });
+
+    expect(updated.createdBy).toEqual({ email: "owner@example.com", id: "owner_user" });
+    expect(updated.updatedBy).toEqual({ email: "admin@example.com", id: "admin_user" });
+    expect(JSON.stringify(updated)).not.toContain("token");
+  });
+
   it("rejects duplicate workflow method and path combinations", async () => {
     const db = openMigratedSqliteAdapter();
 

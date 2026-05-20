@@ -3,14 +3,27 @@ import type { ApiagexDatabase } from "./database-adapter.type.js";
 import type {
   CreateWorkflowInput,
   UpdateWorkflowInput,
+  WorkflowAuditActor,
   WorkflowDefinitionJson,
   WorkflowRecord,
 } from "./workflow-repository.type.js";
 import { assertValidWorkflowDraft } from "./workflow-validation.js";
 
-type WorkflowRow = Omit<WorkflowRecord, "active" | "definition"> & {
+type WorkflowRow = {
   active: number;
+  createdAt: string;
+  createdByEmail: string | null;
+  createdById: string | null;
   definitionJson: string;
+  id: string;
+  lastRunAt: string | null;
+  method: string;
+  name: string;
+  path: string;
+  updatedAt: string;
+  updatedByEmail: string | null;
+  updatedById: string | null;
+  version: number;
 };
 
 export async function createWorkflow(
@@ -22,8 +35,9 @@ export async function createWorkflow(
   await assertWorkflowRouteUnique(db, draft.method, draft.path);
   const id = randomUUID();
   const now = new Date().toISOString();
+  const createdBy = normalizeActor(input.createdBy);
   await db.prepare(
-    "INSERT INTO workflows (id, name, method, path, active, definition_json, created_at, updated_at, last_run_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO workflows (id, name, method, path, active, definition_json, created_at, updated_at, created_by_id, created_by_email, updated_by_id, updated_by_email, last_run_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
   ).run(
     id,
     draft.name,
@@ -33,6 +47,10 @@ export async function createWorkflow(
     JSON.stringify(draft.definition),
     now,
     now,
+    createdBy?.id ?? null,
+    createdBy?.email ?? null,
+    createdBy?.id ?? null,
+    createdBy?.email ?? null,
     null,
     draft.version,
   );
@@ -82,8 +100,9 @@ export async function updateWorkflow(
   });
   assertValidWorkflowDraft(next);
   await assertWorkflowRouteUnique(db, next.method, next.path, id);
+  const updatedBy = normalizeActor(input.updatedBy) ?? existing.updatedBy;
   await db.prepare(
-    "UPDATE workflows SET name = ?, method = ?, path = ?, active = ?, definition_json = ?, updated_at = ?, version = ? WHERE id = ?",
+    "UPDATE workflows SET name = ?, method = ?, path = ?, active = ?, definition_json = ?, updated_at = ?, updated_by_id = ?, updated_by_email = ?, version = ? WHERE id = ?",
   ).run(
     next.name,
     next.method,
@@ -91,28 +110,40 @@ export async function updateWorkflow(
     next.active ? 1 : 0,
     JSON.stringify(next.definition),
     new Date().toISOString(),
+    updatedBy?.id ?? null,
+    updatedBy?.email ?? null,
     next.version,
     id,
   );
   return requireWorkflow(db, id);
 }
 
-export async function activateWorkflow(db: ApiagexDatabase, id: string): Promise<WorkflowRecord> {
-  return setWorkflowActive(db, id, true);
+export async function activateWorkflow(
+  db: ApiagexDatabase,
+  id: string,
+  actor?: WorkflowAuditActor,
+): Promise<WorkflowRecord> {
+  return setWorkflowActive(db, id, true, actor);
 }
 
-export async function deactivateWorkflow(db: ApiagexDatabase, id: string): Promise<WorkflowRecord> {
-  return setWorkflowActive(db, id, false);
+export async function deactivateWorkflow(
+  db: ApiagexDatabase,
+  id: string,
+  actor?: WorkflowAuditActor,
+): Promise<WorkflowRecord> {
+  return setWorkflowActive(db, id, false, actor);
 }
 
 export async function setWorkflowActive(
   db: ApiagexDatabase,
   id: string,
   active: boolean,
+  actor?: WorkflowAuditActor,
 ): Promise<WorkflowRecord> {
   if (!(await getWorkflowById(db, id))) throw new Error("WORKFLOW_NOT_FOUND");
-  await db.prepare("UPDATE workflows SET active = ?, updated_at = ? WHERE id = ?")
-    .run(active ? 1 : 0, new Date().toISOString(), id);
+  const updatedBy = normalizeActor(actor);
+  await db.prepare("UPDATE workflows SET active = ?, updated_at = ?, updated_by_id = COALESCE(?, updated_by_id), updated_by_email = COALESCE(?, updated_by_email) WHERE id = ?")
+    .run(active ? 1 : 0, new Date().toISOString(), updatedBy?.id ?? null, updatedBy?.email ?? null, id);
   return requireWorkflow(db, id);
 }
 
@@ -170,6 +201,7 @@ function rowToWorkflow(row: WorkflowRow): WorkflowRecord {
   return {
     active: Boolean(row.active),
     createdAt: row.createdAt,
+    createdBy: rowToActor(row.createdById, row.createdByEmail),
     definition: parseWorkflowDefinition(row.definitionJson),
     id: row.id,
     lastRunAt: row.lastRunAt,
@@ -177,6 +209,7 @@ function rowToWorkflow(row: WorkflowRow): WorkflowRecord {
     name: row.name,
     path: row.path,
     updatedAt: row.updatedAt,
+    updatedBy: rowToActor(row.updatedById, row.updatedByEmail),
     version: row.version,
   };
 }
@@ -190,5 +223,17 @@ function parseWorkflowDefinition(definitionJson: string): WorkflowDefinitionJson
 }
 
 function workflowSelectSql(suffix: string): string {
-  return `SELECT id, name, method, path, active, definition_json as definitionJson, created_at as createdAt, updated_at as updatedAt, last_run_at as lastRunAt, version FROM workflows ${suffix}`;
+  return `SELECT id, name, method, path, active, definition_json as definitionJson, created_at as createdAt, updated_at as updatedAt, created_by_id as createdById, created_by_email as createdByEmail, updated_by_id as updatedById, updated_by_email as updatedByEmail, last_run_at as lastRunAt, version FROM workflows ${suffix}`;
+}
+
+function normalizeActor(actor: WorkflowAuditActor | undefined): WorkflowAuditActor | undefined {
+  if (!actor) return undefined;
+  const id = actor.id.trim();
+  const email = actor.email.trim();
+  if (!id || !email) throw new Error("WORKFLOW_AUDIT_ACTOR_INVALID");
+  return { email, id };
+}
+
+function rowToActor(id: string | null, email: string | null): WorkflowAuditActor | null {
+  return id && email ? { email, id } : null;
 }

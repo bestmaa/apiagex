@@ -21,6 +21,7 @@ describe("provider migration SQL", () => {
     expect(sql).toContain("REFERENCES schemas(id) ON DELETE CASCADE");
     expect(sql).toContain("CREATE TABLE IF NOT EXISTS workflows");
     expect(sql).toContain("definition_json TEXT NOT NULL");
+    expect(sql).toContain("created_by_email TEXT");
     expect(sql).not.toContain("AUTOINCREMENT");
   });
 
@@ -33,6 +34,7 @@ describe("provider migration SQL", () => {
     expect(sql).toContain("payload_json LONGTEXT NOT NULL");
     expect(sql).toContain("CREATE TABLE IF NOT EXISTS workflows");
     expect(sql).toContain("definition_json LONGTEXT NOT NULL");
+    expect(sql).toContain("created_by_email VARCHAR(191)");
     expect(sql).toContain("FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE");
     expect(sql).not.toContain("AUTOINCREMENT");
   });

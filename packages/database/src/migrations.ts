@@ -228,6 +228,10 @@ CREATE TABLE IF NOT EXISTS workflows (
   definition_json TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
+  created_by_id TEXT,
+  created_by_email TEXT,
+  updated_by_id TEXT,
+  updated_by_email TEXT,
   last_run_at TEXT,
   version INTEGER NOT NULL,
   UNIQUE(method, path)

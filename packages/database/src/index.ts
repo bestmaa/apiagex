@@ -242,6 +242,7 @@ export type {
 export type {
   CreateWorkflowInput,
   UpdateWorkflowInput,
+  WorkflowAuditActor,
   WorkflowDefinitionJson,
   WorkflowRecord,
 } from "./workflow-repository.type.js";

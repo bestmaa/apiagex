@@ -190,7 +190,7 @@ Each task uses this structure:
 #### T3410 - Add Workflow Audit Metadata
 
 - Version: `v0.9.9`
-- Status: `pending`
+- Status: `completed`
 - Goal: Track created/updated actor metadata for workflows.
 - Persona: Admin audit engineer; support future “who changed this workflow” display.
 - Success Criteria: Workflow records store createdBy/updatedBy fields where admin auth context is available.

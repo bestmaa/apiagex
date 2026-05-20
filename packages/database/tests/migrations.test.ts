@@ -127,6 +127,10 @@ describe("MVP database foundation", () => {
       "definition_json",
       "created_at",
       "updated_at",
+      "created_by_id",
+      "created_by_email",
+      "updated_by_id",
+      "updated_by_email",
       "last_run_at",
       "version",
     ]);
