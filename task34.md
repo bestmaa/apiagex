@@ -84,7 +84,7 @@ Each task uses this structure:
 #### T3402 - Define Workflow JSON Contract
 
 - Version: `v0.9.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Create shared TypeScript types for workflow definitions.
 - Persona: API contract designer; make saved workflows stable across Admin UI, runtime, docs, and tests.
 - Success Criteria: Types define workflow id, name, method, path, active flag, nodes, edges or ordered steps, node ids, and version field.

@@ -50,3 +50,18 @@ export type {
   OwnerLoginResult,
   OwnerStatusResult,
 } from "./owner-bootstrap.type.js";
+export type {
+  WorkflowDefinition,
+  WorkflowDefinitionVersion,
+  WorkflowDraft,
+  WorkflowEdgeDefinition,
+  WorkflowEdgeId,
+  WorkflowHttpMethod,
+  WorkflowJsonPrimitive,
+  WorkflowJsonValue,
+  WorkflowNodeDefinition,
+  WorkflowNodeId,
+  WorkflowNodePosition,
+  WorkflowRecord,
+  WorkflowRouteDefinition,
+} from "./workflow.type.js";

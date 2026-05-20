@@ -188,6 +188,114 @@ Workflows database me validated JSON definitions ke roop me metadata ke saath st
 
 Runtime active workflows load karega aur `/api/custom` ke under register karega.
 
+## Workflow JSON Contract
+
+### English
+
+The initial saved workflow contract should use versioned JSON:
+
+```json
+{
+  "version": 1,
+  "route": {
+    "method": "POST",
+    "path": "/register"
+  },
+  "startNodeId": "validate-body",
+  "nodes": [
+    {
+      "id": "validate-body",
+      "type": "validateBody",
+      "label": "Validate request",
+      "config": {
+        "required": ["email", "password"]
+      },
+      "position": { "x": 0, "y": 0 }
+    },
+    {
+      "id": "return-created",
+      "type": "returnResponse",
+      "label": "Return created",
+      "config": {
+        "status": 201,
+        "body": { "ok": true }
+      },
+      "position": { "x": 320, "y": 0 }
+    }
+  ],
+  "edges": [
+    {
+      "id": "validate-to-return",
+      "from": "validate-body",
+      "to": "return-created"
+    }
+  ]
+}
+```
+
+Rules:
+
+- `version` starts at `1` so future migrations can transform workflow JSON safely.
+- `route.method` supports `GET`, `POST`, `PUT`, `PATCH`, and `DELETE`.
+- `route.path` is the admin-entered custom route path and must mount under `/api/custom`.
+- `startNodeId` points to the first executable node.
+- Every node must have a stable `id`, `type`, and JSON-safe `config`.
+- `edges` connect node ids and prepare the contract for the later graph editor.
+- `position` is optional and only for Admin UI graph layout.
+
+### Hinglish
+
+Initial saved workflow contract versioned JSON use karega:
+
+```json
+{
+  "version": 1,
+  "route": {
+    "method": "POST",
+    "path": "/register"
+  },
+  "startNodeId": "validate-body",
+  "nodes": [
+    {
+      "id": "validate-body",
+      "type": "validateBody",
+      "label": "Validate request",
+      "config": {
+        "required": ["email", "password"]
+      },
+      "position": { "x": 0, "y": 0 }
+    },
+    {
+      "id": "return-created",
+      "type": "returnResponse",
+      "label": "Return created",
+      "config": {
+        "status": 201,
+        "body": { "ok": true }
+      },
+      "position": { "x": 320, "y": 0 }
+    }
+  ],
+  "edges": [
+    {
+      "id": "validate-to-return",
+      "from": "validate-body",
+      "to": "return-created"
+    }
+  ]
+}
+```
+
+Rules:
+
+- `version` `1` se start hoga taaki future me workflow JSON safely migrate ho sake.
+- `route.method` `GET`, `POST`, `PUT`, `PATCH`, aur `DELETE` support karega.
+- `route.path` admin-entered custom route path hai aur `/api/custom` ke under mount hona chahiye.
+- `startNodeId` first executable node ko point karta hai.
+- Har node ka stable `id`, `type`, aur JSON-safe `config` hoga.
+- `edges` node ids connect karte hain aur later graph editor ke liye contract ready rakhte hain.
+- `position` optional hai aur sirf Admin UI graph layout ke liye hai.
+
 ## Admin UI Plan
 
 ### English
