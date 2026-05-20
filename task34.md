@@ -270,7 +270,7 @@ Each task uses this structure:
 #### T3416 - Implement Entry Create Node
 
 - Version: `v0.10.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Create content entries from workflow data mapping.
 - Persona: Business API engineer; support register/order/create ticket flows.
 - Success Criteria: Node maps body/params/query/template values into `{ data }` and creates a valid entry.

@@ -1,4 +1,4 @@
-import type { EntryRecord } from "@apiagex/database";
+import type { EntryData, EntryRecord } from "@apiagex/database";
 import type { WorkflowJsonValue } from "./workflow.type.js";
 
 export function entryToWorkflowJson(entry: EntryRecord): WorkflowJsonValue {
@@ -20,4 +20,9 @@ export function toWorkflowJsonValue(value: unknown): WorkflowJsonValue {
     return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, toWorkflowJsonValue(item)]));
   }
   return null;
+}
+
+export function workflowJsonObjectToEntryData(value: WorkflowJsonValue): EntryData {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, item])) as EntryData;
 }
