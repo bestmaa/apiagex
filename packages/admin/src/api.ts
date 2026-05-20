@@ -30,6 +30,7 @@ import type {
   ApiDocsSettingsResponse,
 } from "./settings.type";
 import type { UserListResponse, UserMutationResponse } from "./user.type";
+import type { WorkflowListResponse } from "./workflow.type";
 import type {
   SchemaDraft,
   SchemaDeleteResponse,
@@ -340,6 +341,10 @@ export async function saveApiDocsSettings(input: { adminEnabled: boolean; conten
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
   });
+}
+
+export async function listWorkflows(): Promise<WorkflowListResponse> {
+  return adminJson<WorkflowListResponse>("/api/admin/workflows");
 }
 
 export async function adminJson<TResult>(path: string, init: RequestInit = {}): Promise<TResult> {

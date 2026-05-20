@@ -443,7 +443,7 @@ Each task uses this structure:
 #### T3429 - Build Workflow List Page
 
 - Version: `v0.12.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Show saved workflows with name, method, path, active status, updated time, and quick actions.
 - Persona: Admin operator; manage workflows like APIs.
 - Success Criteria: List shows loading, empty, success, error, active/inactive filter, and search.

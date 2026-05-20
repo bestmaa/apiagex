@@ -1,17 +1,27 @@
 // @vitest-environment jsdom
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { listWorkflows } from "../api";
 import { SettingsPage } from "./SettingsPage";
+
+vi.mock("../api", () => ({
+  listWorkflows: vi.fn(),
+}));
 
 const roots: Array<{ container: HTMLDivElement; root: Root }> = [];
 
 describe("SettingsPage", () => {
+  beforeEach(() => {
+    vi.mocked(listWorkflows).mockResolvedValue({ ok: true, workflows: [] });
+  });
+
   afterEach(() => {
     for (const { container, root } of roots.splice(0)) {
       root.unmount();
       container.remove();
     }
+    vi.clearAllMocks();
   });
 
   it("renders the workflow settings page shell", async () => {
@@ -19,7 +29,7 @@ describe("SettingsPage", () => {
 
     expect(container.textContent).toContain("Workflows");
     expect(container.textContent).toContain("/api/custom");
-    expect(container.textContent).toContain("No workflow builder yet");
+    expect(container.textContent).toContain("Workflow list");
   });
 });
 
@@ -30,6 +40,12 @@ async function renderSettingsPage(): Promise<HTMLDivElement> {
   document.body.appendChild(container);
   await act(async () => {
     root.render(<SettingsPage route="settings/workflows" />);
+    await flushPromises();
   });
   return container;
+}
+
+async function flushPromises(): Promise<void> {
+  await Promise.resolve();
+  await Promise.resolve();
 }

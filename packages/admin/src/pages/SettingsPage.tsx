@@ -8,6 +8,7 @@ import { SettingsApiDocs } from "./SettingsApiDocs";
 import { SettingsAdminRoles } from "./SettingsAdminRoles";
 import { WebhookManager } from "../WebhookManager";
 import { RealtimeManager } from "../RealtimeManager";
+import { WorkflowManager } from "../WorkflowManager";
 
 export function SettingsPage({ route }: { route: AdminRoute }) {
   if (route === "settings/admin-roles") return <SettingsAdminRoles />;
@@ -132,11 +133,8 @@ function SettingsWorkflows() {
   return (
     <section aria-labelledby="settings-workflow-title" className="settings-route-panel">
       <h2 id="settings-workflow-title">Workflows</h2>
-      <p>Create no-code custom APIs under <code>/api/custom</code>. Workflow list and form tools will appear here.</p>
-      <div className="empty-state">
-        <strong>No workflow builder yet</strong>
-        <span>Backend workflow APIs are available. The Admin UI builder starts from this Settings page.</span>
-      </div>
+      <p>Create no-code custom APIs under <code>/api/custom</code>.</p>
+      <WorkflowManager />
     </section>
   );
 }
