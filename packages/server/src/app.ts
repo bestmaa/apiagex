@@ -30,6 +30,7 @@ import { registerRealtimeRoutes } from "./realtime-routes.js";
 import { registerOpenApiRoutes } from "./openapi-routes.js";
 import { registerProjectCustomRoutes } from "./custom-api-routes.js";
 import { registerCustomApiAdminRoutes } from "./custom-api-admin-routes.js";
+import { registerWorkflowRoutes } from "./workflow-api-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -55,6 +56,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   if (options.customRoutes) {
     registerProjectCustomRoutes(server, database, options.customRoutes);
   }
+  registerWorkflowRoutes(server, database);
 
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,

@@ -350,7 +350,7 @@ Each task uses this structure:
 #### T3422 - Register Workflow Routes At Server Start
 
 - Version: `v0.11.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Register active workflow APIs as Fastify routes under `/api/custom`.
 - Persona: Server engineer; make saved workflows callable as APIs.
 - Success Criteria: Active workflow `POST /register` becomes callable at `POST /api/custom/register`.

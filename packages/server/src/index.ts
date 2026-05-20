@@ -10,6 +10,7 @@ export { readDocsPage, resolveDocsUiAsset } from "./docs-ui.js";
 export { createServer } from "./app.js";
 export { createCustomRouteContext } from "./custom-routes.js";
 export { registerProjectCustomRoutes } from "./custom-api-routes.js";
+export { registerWorkflowRoutes } from "./workflow-api-routes.js";
 export { bootstrapOwner, getOwnerStatus, loginOwner } from "./owner-bootstrap.js";
 export { renderRuntimeHelp, runRuntimeCli, startApiagex, startApiagexServer } from "./runtime.js";
 export { ensureLocalServerPaths, resolveLocalServerConfig } from "./server-config.js";

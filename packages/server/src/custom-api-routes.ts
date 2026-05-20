@@ -61,7 +61,7 @@ function scopedCustomRouteApp(server: FastifyInstance): FastifyInstance {
   }) as FastifyInstance;
 }
 
-async function authorizeCustomApi(
+export async function authorizeCustomApi(
   database: ApiagexDatabase,
   request: FastifyRequest,
   reply: FastifyReply,
