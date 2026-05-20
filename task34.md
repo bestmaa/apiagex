@@ -681,7 +681,7 @@ Each task uses this structure:
 #### T3447 - Add Graph Auto Layout
 
 - Version: `v0.14.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a simple auto-layout action for readable workflow graphs.
 - Persona: Admin UX engineer; keep graphs from becoming messy.
 - Success Criteria: Button arranges nodes in a predictable left-to-right or top-to-bottom flow.

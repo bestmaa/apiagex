@@ -498,6 +498,11 @@ function WorkflowGraphShell({
     setGraphStatus(`Removed ${selectedNode.id}. Save graph to persist.`);
   }
 
+  function autoLayoutGraph() {
+    setNodes((currentNodes) => layoutWorkflowGraphNodes(currentNodes, edges));
+    setGraphStatus("Graph layout updated. Save graph to persist positions.");
+  }
+
   async function saveGraph() {
     let nextNodes = nodes;
     if (selectedNode) {
@@ -583,6 +588,10 @@ function WorkflowGraphShell({
         <button type="button" onClick={deleteSelectedGraphItem}>
           <Trash2 aria-hidden="true" size={16} />
           Delete selected
+        </button>
+        <button type="button" onClick={autoLayoutGraph}>
+          <RefreshCw aria-hidden="true" size={16} />
+          Auto-layout
         </button>
         <button type="button" onClick={() => void saveGraph()}>
           <Save aria-hidden="true" size={16} />
@@ -1325,6 +1334,42 @@ function validateWorkflowGraph(nodes: WorkflowGraphNode[], edges: WorkflowGraphE
     if (edges.some((edge) => edge.source === node.id)) errors.push(`${node.id} cannot have outgoing edges.`);
   }
   return errors;
+}
+
+function layoutWorkflowGraphNodes(nodes: WorkflowGraphNode[], edges: WorkflowGraphEdge[]): WorkflowGraphNode[] {
+  const depths = workflowGraphDepths(nodes, edges);
+  const rowsByDepth = new Map<number, number>();
+  return nodes.map((node, index) => {
+    const depth = depths.get(node.id) ?? index;
+    const row = rowsByDepth.get(depth) ?? 0;
+    rowsByDepth.set(depth, row + 1);
+    return {
+      ...node,
+      position: {
+        x: 64 + (depth * 260),
+        y: 96 + (row * 170),
+      },
+    };
+  });
+}
+
+function workflowGraphDepths(nodes: WorkflowGraphNode[], edges: WorkflowGraphEdge[]): Map<string, number> {
+  const nodeIds = new Set(nodes.map((node) => node.id));
+  const startNode = nodes.find((node) => node.data.workflowType === "routeTrigger") ?? nodes[0];
+  const depths = new Map<string, number>();
+  if (!startNode) return depths;
+  const queue: Array<{ depth: number; id: string }> = [{ depth: 0, id: startNode.id }];
+  while (queue.length) {
+    const current = queue.shift();
+    if (!current || !nodeIds.has(current.id)) continue;
+    const existingDepth = depths.get(current.id);
+    if (existingDepth !== undefined && existingDepth <= current.depth) continue;
+    depths.set(current.id, current.depth);
+    for (const edge of edges.filter((item) => item.source === current.id)) {
+      queue.push({ depth: current.depth + 1, id: edge.target });
+    }
+  }
+  return depths;
 }
 
 function uniqueNodeId(nodes: WorkflowGraphNode[], type: string): string {

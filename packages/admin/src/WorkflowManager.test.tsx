@@ -254,6 +254,48 @@ describe("WorkflowManager", () => {
     expect(updateWorkflow).not.toHaveBeenCalled();
   });
 
+  it("saves auto-layout positions without changing graph semantics", async () => {
+    vi.mocked(listWorkflows).mockResolvedValueOnce({
+      ok: true,
+      workflows: [workflow({
+        definition: {
+          edges: [{ from: "start", id: "edge-start-return-ok", to: "return-ok" }],
+          nodes: [
+            { config: {}, id: "start", position: { x: 900, y: 900 }, type: "routeTrigger" },
+            { config: { body: { ok: true }, status: 200 }, id: "return-ok", position: { x: 10, y: 10 }, type: "returnResponse" },
+          ],
+          route: { method: "POST", path: "/orders/pay" },
+          startNodeId: "start",
+          version: 1,
+        },
+      })],
+    });
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Graph");
+      await flushPromises();
+    });
+    await act(async () => {
+      clickButton(container, "Auto-layout");
+      await flushPromises();
+    });
+    await act(async () => {
+      clickButton(container, "Save graph");
+      await flushPromises();
+    });
+
+    expect(updateWorkflow).toHaveBeenCalledWith("workflow_pay", expect.objectContaining({
+      definition: expect.objectContaining({
+        edges: [{ from: "start", id: "edge-start-return-ok", to: "return-ok" }],
+        nodes: expect.arrayContaining([
+          expect.objectContaining({ id: "start", position: { x: 64, y: 96 } }),
+          expect.objectContaining({ id: "return-ok", position: { x: 324, y: 96 } }),
+        ]),
+      }),
+    }));
+  });
+
   it("explains activation behavior in the workflow form", async () => {
     const { container } = await renderWorkflowManagerLoaded();
 
