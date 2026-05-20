@@ -310,6 +310,11 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <p>Register and login workflows need dedicated password nodes before production use. The plan requires Argon2id or a reviewed fallback, per-password salts, safe verification, redaction, and migration guidance.</p>
           <p><code>hashPassword</code> and <code>verifyPassword</code> currently use Node <code>crypto.scrypt</code> with per-password salts and timing-safe verify. Read <code>docs/workflow-password-node-plan.md</code> before using auth templates that accept <code>{`{{body.password}}`}</code>.</p>
         </article>
+        <article className="api-row">
+          <strong>Issue-token node plan</strong>
+          <p>Login, OTP, and Google workflows need a client token node before production use. Workflow-issued tokens are app-user tokens, not Admin UI owner sessions.</p>
+          <p>Read <code>docs/workflow-issue-token-node-plan.md</code> for opaque token storage, expiry, role binding, revocation, and Content/API permission integration.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

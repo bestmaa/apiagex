@@ -774,7 +774,7 @@ Each task uses this structure:
 #### T3454 - Add Issue Token Node Plan
 
 - Version: `v0.15.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Plan how workflow APIs can issue client tokens/sessions for app users.
 - Persona: Auth platform architect; avoid mixing Admin UI owner sessions and content API tokens incorrectly.
 - Success Criteria: Plan explains token type, expiry, user binding, role binding, revocation, and docs.

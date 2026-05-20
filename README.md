@@ -95,6 +95,8 @@ Password hashing and verification workflow nodes are planned in [docs/workflow-p
 
 Workflow `hashPassword` and `verifyPassword` nodes are available using Node `crypto.scrypt`. They generate per-password salts, verify with timing-safe derived-key comparison, and output only hash/match metadata, not the plain password.
 
+Workflow client token issuing is planned in [docs/workflow-issue-token-node-plan.md](./docs/workflow-issue-token-node-plan.md). The plan keeps workflow-issued app-user tokens separate from Admin UI owner sessions and binds them to Content/API roles with expiry and revocation.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

@@ -313,6 +313,8 @@ export const readmePage = {
         "Password node plan: docs/workflow-password-node-plan.md Argon2id ya reviewed fallback hashing, per-password salts, safe verify, redaction, aur migration guidance require karta hai.",
         "Implemented password nodes use Node crypto.scrypt with per-password salts and timing-safe verify; plain passwords are not returned in node output.",
         "Implemented password nodes Node crypto.scrypt, per-password salts, aur timing-safe verify use karte hain; plain passwords node output me return nahi hote.",
+        "Issue-token plan: docs/workflow-issue-token-node-plan.md keeps app-user tokens separate from Admin owner sessions and binds them to Content/API roles.",
+        "Issue-token plan: docs/workflow-issue-token-node-plan.md app-user tokens ko Admin owner sessions se alag rakhta hai aur Content/API roles se bind karta hai.",
       ],
     },
     {
