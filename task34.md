@@ -748,7 +748,7 @@ Each task uses this structure:
 #### T3452 - Add Hash Password Node Plan
 
 - Version: `v0.15.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Plan password hashing support for register/login templates.
 - Persona: Auth security engineer; avoid insecure user auth templates.
 - Success Criteria: Plan defines hashing algorithm, verify behavior, salt, migration risk, and output shape.

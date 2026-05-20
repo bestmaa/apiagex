@@ -26,6 +26,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Google login workflow template plan: [google-login-workflow-template-plan.md](./google-login-workflow-template-plan.md)
 - Workflow secret store plan: [workflow-secret-store-plan.md](./workflow-secret-store-plan.md)
 - Workflow HTTP request node plan: [workflow-http-request-node-plan.md](./workflow-http-request-node-plan.md)
+- Workflow password node plan: [workflow-password-node-plan.md](./workflow-password-node-plan.md)
 
 ## Implemented Now
 
@@ -83,6 +84,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Workflow HTTP request node planning `docs/workflow-http-request-node-plan.md` me documented hai.
 - Workflow HTTP request nodes can call allowlisted external providers with env-backed `secret:namespace.key` references.
 - Workflow HTTP request nodes allowlisted external providers ko env-backed `secret:namespace.key` references ke saath call kar sakte hain.
+- Workflow password node planning is documented in `docs/workflow-password-node-plan.md`.
+- Workflow password node planning `docs/workflow-password-node-plan.md` me documented hai.
 
 ## Owner Bootstrap And Login
 

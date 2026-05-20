@@ -91,6 +91,8 @@ External HTTP provider calls for workflow nodes are planned in [docs/workflow-ht
 
 Workflow `httpRequest` nodes are available for safe provider calls. Set `APIAGEX_WORKFLOW_HTTP_ALLOWED_HOSTS=api.provider.test,api.stripe.com` before activating workflows that call external URLs. Secret references such as `secret:provider.apiKey` resolve from env names like `APIAGEX_SECRET_PROVIDER_APIKEY` and are redacted from workflow output.
 
+Password hashing and verification workflow nodes are planned in [docs/workflow-password-node-plan.md](./docs/workflow-password-node-plan.md). The plan requires Argon2id or a reviewed password-hashing fallback, per-password salts, safe verify behavior, redaction, and migration guidance before auth templates are production-ready.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

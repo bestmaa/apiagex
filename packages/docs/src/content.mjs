@@ -309,6 +309,8 @@ export const readmePage = {
         "HTTP node plan: docs/workflow-http-request-node-plan.md method, URL allowlist, SSRF guard, headers, body templates, timeout, retry, aur secret references require karta hai.",
         "Implemented HTTP request nodes use APIAGEX_WORKFLOW_HTTP_ALLOWED_HOSTS for host allowlisting and env-backed secret references like APIAGEX_SECRET_PROVIDER_APIKEY.",
         "Implemented HTTP request nodes host allowlisting ke liye APIAGEX_WORKFLOW_HTTP_ALLOWED_HOSTS aur env-backed secrets jaise APIAGEX_SECRET_PROVIDER_APIKEY use karte hain.",
+        "Password node plan: docs/workflow-password-node-plan.md requires Argon2id or reviewed fallback hashing, per-password salts, safe verify, redaction, and migration guidance.",
+        "Password node plan: docs/workflow-password-node-plan.md Argon2id ya reviewed fallback hashing, per-password salts, safe verify, redaction, aur migration guidance require karta hai.",
       ],
     },
     {

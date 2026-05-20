@@ -305,6 +305,11 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <p>The planned HTTP node supports external provider calls with method, allowed URL, headers, query/body templates, timeout, retry, success status, and response mapping.</p>
           <p>Read <code>docs/workflow-http-request-node-plan.md</code> before changing provider behavior. Unrestricted URLs are not allowed; hosts need <code>APIAGEX_WORKFLOW_HTTP_ALLOWED_HOSTS</code>, private-network targets are blocked, and <code>secret:provider.apiKey</code> resolves from env such as <code>APIAGEX_SECRET_PROVIDER_APIKEY</code>.</p>
         </article>
+        <article className="api-row">
+          <strong>Password node plan</strong>
+          <p>Register and login workflows need dedicated password nodes before production use. The plan requires Argon2id or a reviewed fallback, per-password salts, safe verification, redaction, and migration guidance.</p>
+          <p>Read <code>docs/workflow-password-node-plan.md</code> before implementing or using auth templates that accept <code>{`{{body.password}}`}</code>.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />
