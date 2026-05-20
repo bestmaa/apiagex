@@ -128,6 +128,11 @@ export {
   validateWorkflowDraft,
 } from "./workflow-validation.js";
 export {
+  syncWorkflowCustomApiRoutes,
+  workflowCustomApiRouteInput,
+  workflowPermissionKey,
+} from "./workflow-route-registry.js";
+export {
   createUser,
   getAdminUserById,
   getUserById,

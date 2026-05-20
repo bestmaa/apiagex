@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   activateWorkflow,
+  canRoleAccessCustomApi,
   createWorkflow,
+  createRole,
   deactivateWorkflow,
   deleteWorkflow,
   getWorkflowById,
   getWorkflowByMethodPath,
+  listCustomApiRoutes,
   listWorkflows,
   openMigratedSqliteAdapter,
+  syncWorkflowCustomApiRoutes,
   updateWorkflow,
   validateWorkflowDraft,
 } from "../src/index.js";
@@ -181,5 +185,40 @@ describe("workflow repository", () => {
     expect(await deleteWorkflow(db, workflow.id)).toBe(true);
     expect(await deleteWorkflow(db, workflow.id)).toBe(false);
     expect(await getWorkflowById(db, workflow.id)).toBeUndefined();
+  });
+
+  it("syncs active workflow APIs into custom API permissions blocked by default", async () => {
+    const db = openMigratedSqliteAdapter();
+    const role = await createRole(db, {
+      description: "Reader",
+      name: "reader",
+    });
+    const workflow = await createWorkflow(db, {
+      active: true,
+      definition: registerDefinition,
+      method: "POST",
+      name: "Register user",
+      path: "/register",
+      version: 1,
+    });
+
+    const synced = await syncWorkflowCustomApiRoutes(db);
+
+    expect(synced).toHaveLength(1);
+    expect(synced[0]).toMatchObject({
+      active: true,
+      groupName: "Workflows",
+      method: "POST",
+      name: "Register user",
+      path: "/api/custom/register",
+      permissionKey: "workflow.register.post",
+    });
+    expect(await canRoleAccessCustomApi(db, role.id, synced[0]?.id ?? "")).toBe(false);
+
+    await deactivateWorkflow(db, workflow.id);
+    await syncWorkflowCustomApiRoutes(db);
+
+    const routes = await listCustomApiRoutes(db);
+    expect(routes.find((route) => route.permissionKey === "workflow.register.post")?.active).toBe(false);
   });
 });

@@ -177,7 +177,7 @@ Each task uses this structure:
 #### T3409 - Add Workflow Route Registry Sync
 
 - Version: `v0.9.8`
-- Status: `pending`
+- Status: `completed`
 - Goal: Sync active workflow APIs into the existing custom API route registry.
 - Persona: Access-control engineer; make workflow APIs visible in Custom API Permissions automatically.
 - Success Criteria: Active workflow route appears in `custom_api_routes`; inactive workflow route becomes inactive after sync.
