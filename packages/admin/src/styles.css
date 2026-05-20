@@ -355,6 +355,78 @@ code {
   margin: 0;
 }
 
+.workflow-view-tabs {
+  align-self: end;
+  background: var(--admin-color-surface-muted);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-sm);
+  display: inline-flex;
+  gap: var(--admin-space-1);
+  padding: var(--admin-space-1);
+}
+
+.workflow-view-tabs button {
+  background: transparent;
+  border: 0;
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text-muted);
+  min-height: 34px;
+  padding: 0 var(--admin-space-3);
+}
+
+.workflow-view-tabs button.is-selected {
+  background: var(--admin-color-surface);
+  box-shadow: var(--admin-shadow-sm);
+  color: var(--admin-color-text);
+}
+
+.workflow-graph-shell {
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  display: grid;
+  gap: var(--admin-space-4);
+  padding: var(--admin-space-4);
+}
+
+.workflow-graph-shell .entry-table-meta label {
+  min-width: min(420px, 100%);
+}
+
+.workflow-graph-route {
+  align-items: center;
+  background: var(--admin-color-surface-muted);
+  border-left: var(--admin-space-1) solid var(--admin-color-primary);
+  border-radius: var(--admin-radius-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-3);
+}
+
+.workflow-graph-route span {
+  color: var(--admin-color-text-muted);
+}
+
+.workflow-graph-canvas {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--admin-color-surface-muted) 72%, transparent), var(--admin-color-surface));
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  height: clamp(360px, 52vh, 620px);
+  min-height: 360px;
+  overflow: hidden;
+}
+
+.workflow-graph-canvas .react-flow__node-default {
+  border-color: var(--admin-color-border);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-color-text);
+  font-weight: 700;
+  min-width: 150px;
+  text-align: left;
+  white-space: pre-line;
+}
+
 .workflow-step-editor {
   border-top: 1px solid var(--admin-color-border-soft);
   display: grid;
@@ -2437,6 +2509,7 @@ code {
   .workflow-form-grid,
   .workflow-step-fields,
   .workflow-step-identity,
+  .workflow-graph-route,
   .workflow-history-row,
   .workflow-test-grid,
   .workflow-test-output,

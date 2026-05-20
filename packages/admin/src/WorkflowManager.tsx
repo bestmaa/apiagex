@@ -1,3 +1,6 @@
+import { Background, Controls, MiniMap, ReactFlow } from "@xyflow/react";
+import type { Edge, Node } from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import { useEffect, useMemo, useState } from "react";
 import { Copy, Edit3, Plus, RefreshCw, Save, Search, UserPlus, X } from "lucide-react";
 import { createWorkflow, listSchemas, listWorkflowRuns, listWorkflows, testWorkflow, updateWorkflow } from "./api";
@@ -7,6 +10,7 @@ import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
 import type { WorkflowDraft, WorkflowRecord, WorkflowRunRecord, WorkflowTestRunResult } from "./workflow.type";
 
 type WorkflowStatusFilter = "active" | "all" | "inactive";
+type WorkflowViewMode = "graph" | "list";
 type WorkflowStepType = "createEntry" | "queryEntries" | "returnResponse" | "updateEntry" | "validateBody";
 type WorkflowFormDraft = {
   active: boolean;
@@ -30,6 +34,13 @@ type WorkflowStepDraft = {
   status: number;
   type: WorkflowStepType;
 };
+type WorkflowGraphNodeData = {
+  configSummary: string;
+  label: string;
+  workflowType: string;
+};
+type WorkflowGraphNode = Node<WorkflowGraphNodeData>;
+type WorkflowGraphEdge = Edge;
 
 const workflowStepTypes: WorkflowStepType[] = [
   "validateBody",
@@ -48,6 +59,8 @@ export function WorkflowManager() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("Workflow list loading");
   const [statusFilter, setStatusFilter] = useState<WorkflowStatusFilter>("all");
+  const [viewMode, setViewMode] = useState<WorkflowViewMode>("list");
+  const [graphWorkflowId, setGraphWorkflowId] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
@@ -55,6 +68,16 @@ export function WorkflowManager() {
     void loadWorkflows();
     void loadSchemaMetadata();
   }, []);
+
+  useEffect(() => {
+    if (workflows.length === 0) {
+      if (graphWorkflowId) setGraphWorkflowId("");
+      return;
+    }
+    if (!graphWorkflowId || !workflows.some((workflow) => workflow.id === graphWorkflowId)) {
+      setGraphWorkflowId(workflows[0]?.id ?? "");
+    }
+  }, [graphWorkflowId, workflows]);
 
   async function loadWorkflows() {
     setLoading(true);
@@ -244,6 +267,26 @@ export function WorkflowManager() {
             <option value="inactive">Inactive</option>
           </select>
         </label>
+        <div aria-label="Workflow view mode" className="workflow-view-tabs" role="tablist">
+          <button
+            aria-selected={viewMode === "list"}
+            className={viewMode === "list" ? "is-selected" : ""}
+            role="tab"
+            type="button"
+            onClick={() => setViewMode("list")}
+          >
+            List
+          </button>
+          <button
+            aria-selected={viewMode === "graph"}
+            className={viewMode === "graph" ? "is-selected" : ""}
+            role="tab"
+            type="button"
+            onClick={() => setViewMode("graph")}
+          >
+            Graph
+          </button>
+        </div>
       </div>
       {loading ? <StateMessage title="Loading workflows" variant="loading">Fetching saved workflows.</StateMessage> : null}
       {!loading && loadError ? (
@@ -255,7 +298,14 @@ export function WorkflowManager() {
       {!loading && !loadError && workflows.length > 0 && filteredWorkflows.length === 0 ? (
         <StateMessage title="No matching workflows" variant="empty">Change the search or status filter.</StateMessage>
       ) : null}
-      {!loading && !loadError && filteredWorkflows.length > 0 ? (
+      {!loading && !loadError && workflows.length > 0 && viewMode === "graph" ? (
+        <WorkflowGraphShell
+          onSelectWorkflow={setGraphWorkflowId}
+          selectedWorkflowId={graphWorkflowId}
+          workflows={workflows}
+        />
+      ) : null}
+      {!loading && !loadError && filteredWorkflows.length > 0 && viewMode === "list" ? (
         <div className="entry-table-scroll">
           <table className="entry-table">
             <thead>
@@ -303,6 +353,69 @@ export function WorkflowManager() {
         </div>
       ) : null}
       <StatusToast title="Workflow status">{status}</StatusToast>
+    </section>
+  );
+}
+
+function WorkflowGraphShell({
+  onSelectWorkflow,
+  selectedWorkflowId,
+  workflows,
+}: {
+  onSelectWorkflow: (workflowId: string) => void;
+  selectedWorkflowId: string;
+  workflows: WorkflowRecord[];
+}) {
+  const selectedWorkflow = workflows.find((workflow) => workflow.id === selectedWorkflowId) ?? workflows[0] ?? null;
+  const graph = useMemo(
+    () => selectedWorkflow ? workflowGraphFromDefinition(selectedWorkflow) : { edges: [], nodes: [] },
+    [selectedWorkflow],
+  );
+
+  if (!selectedWorkflow) {
+    return <StateMessage title="No workflow graph" variant="empty">Create a workflow to preview the graph.</StateMessage>;
+  }
+
+  return (
+    <section aria-labelledby="workflow-graph-title" className="workflow-graph-shell">
+      <div className="entry-table-meta">
+        <div>
+          <h3 id="workflow-graph-title">Graph preview</h3>
+          <span>Read-only workflow canvas</span>
+        </div>
+        <label>Workflow
+          <select value={selectedWorkflow.id} onChange={(event) => onSelectWorkflow(event.target.value)}>
+            {workflows.map((workflow) => (
+              <option key={workflow.id} value={workflow.id}>
+                {workflow.name} - {workflow.method} {mountedWorkflowPath(workflow.path)}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div className="workflow-graph-route">
+        <strong>{selectedWorkflow.name}</strong>
+        <code>{selectedWorkflow.method} {mountedWorkflowPath(selectedWorkflow.path)}</code>
+        <span>{selectedWorkflow.active ? "Active route" : "Inactive draft"}</span>
+      </div>
+      <div className="workflow-graph-canvas" aria-label={`${selectedWorkflow.name} workflow graph`}>
+        <ReactFlow
+          colorMode="light"
+          edges={graph.edges}
+          elementsSelectable={false}
+          fitView
+          fitViewOptions={{ padding: 0.2 }}
+          minZoom={0.2}
+          nodes={graph.nodes}
+          nodesConnectable={false}
+          nodesDraggable={false}
+          proOptions={{ hideAttribution: true }}
+        >
+          <Background gap={18} />
+          <MiniMap pannable zoomable />
+          <Controls showInteractive={false} />
+        </ReactFlow>
+      </div>
     </section>
   );
 }
@@ -835,6 +948,99 @@ function sortWorkflows(workflows: WorkflowRecord[]): WorkflowRecord[] {
     if (left.active !== right.active) return left.active ? -1 : 1;
     return right.updatedAt.localeCompare(left.updatedAt) || left.name.localeCompare(right.name);
   });
+}
+
+function workflowGraphFromDefinition(workflow: WorkflowRecord): { edges: WorkflowGraphEdge[]; nodes: WorkflowGraphNode[] } {
+  const rawNodes = Array.isArray(workflow.definition.nodes) ? workflow.definition.nodes : [];
+  const nodes = rawNodes
+    .filter(isRecord)
+    .map((node, index) => graphNodeFromWorkflowNode(node, index));
+  const fallbackNodes = nodes.length ? nodes : [graphNodeFromWorkflowNode({
+    config: {},
+    id: "start",
+    type: "routeTrigger",
+  }, 0)];
+  const rawEdges = Array.isArray(workflow.definition.edges) ? workflow.definition.edges : [];
+  const edges = rawEdges
+    .filter(isRecord)
+    .map((edge, index) => graphEdgeFromWorkflowEdge(edge, index))
+    .filter((edge): edge is WorkflowGraphEdge => Boolean(edge));
+  return {
+    edges,
+    nodes: fallbackNodes,
+  };
+}
+
+function graphNodeFromWorkflowNode(node: Record<string, unknown>, index: number): WorkflowGraphNode {
+  const id = typeof node.id === "string" && node.id.trim() ? node.id : `node-${index + 1}`;
+  const workflowType = typeof node.type === "string" && node.type.trim() ? node.type : "unknown";
+  const position = graphNodePosition(node, index);
+  return {
+    data: {
+      configSummary: graphConfigSummary(node.config),
+      label: `${nodeLabel(workflowType)}\n${id}`,
+      workflowType,
+    },
+    draggable: false,
+    id,
+    position,
+    type: "default",
+  };
+}
+
+function graphNodePosition(node: Record<string, unknown>, index: number): { x: number; y: number } {
+  if (isRecord(node.position)
+    && typeof node.position.x === "number"
+    && typeof node.position.y === "number"
+    && Number.isFinite(node.position.x)
+    && Number.isFinite(node.position.y)) {
+    return {
+      x: node.position.x,
+      y: node.position.y,
+    };
+  }
+  return {
+    x: 48 + (index * 230),
+    y: index % 2 === 0 ? 92 : 210,
+  };
+}
+
+function graphEdgeFromWorkflowEdge(edge: Record<string, unknown>, index: number): WorkflowGraphEdge | null {
+  const source = typeof edge.from === "string" ? edge.from : typeof edge.source === "string" ? edge.source : "";
+  const target = typeof edge.to === "string" ? edge.to : typeof edge.target === "string" ? edge.target : "";
+  if (!source || !target) return null;
+  return {
+    animated: false,
+    id: typeof edge.id === "string" && edge.id.trim() ? edge.id : `edge-${source}-${target}-${index}`,
+    label: typeof edge.sourceHandle === "string" ? edge.sourceHandle : undefined,
+    source,
+    sourceHandle: typeof edge.sourceHandle === "string" ? edge.sourceHandle : undefined,
+    target,
+    targetHandle: typeof edge.targetHandle === "string" ? edge.targetHandle : undefined,
+  };
+}
+
+function graphConfigSummary(config: unknown): string {
+  if (!isRecord(config)) return "No config";
+  if (typeof config.schema === "string") return `schema: ${config.schema}`;
+  if (typeof config.status === "number") return `status: ${config.status}`;
+  if (isRecord(config.fields)) return `${Object.keys(config.fields).length} field rule(s)`;
+  if (Object.keys(config).length === 0) return "No config";
+  return `${Object.keys(config).length} config value(s)`;
+}
+
+function nodeLabel(type: string): string {
+  if (type === "routeTrigger") return "Route trigger";
+  if (type === "validateBody") return "Validate body";
+  if (type === "queryEntries") return "Query entries";
+  if (type === "getEntry") return "Get entry";
+  if (type === "createEntry") return "Create entry";
+  if (type === "updateEntry") return "Update entry";
+  if (type === "deleteEntry") return "Delete entry";
+  if (type === "branch") return "Branch";
+  if (type === "setVariable") return "Set variable";
+  if (type === "returnResponse") return "Return response";
+  return type;
 }
 
 function sortSchemas(schemas: SchemaRecord[]): SchemaRecord[] {

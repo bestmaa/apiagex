@@ -642,7 +642,7 @@ Each task uses this structure:
 #### T3444 - Add React Flow Dependency And Shell
 
 - Version: `v0.14.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add graph editor shell with canvas, toolbar, minimap/controls if appropriate, and empty state.
 - Persona: Frontend engineer; start visual builder without breaking form builder.
 - Success Criteria: Graph editor route/tab renders and can load existing workflow nodes read-only.

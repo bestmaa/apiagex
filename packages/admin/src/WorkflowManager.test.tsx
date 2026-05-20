@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act } from "react";
+import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createWorkflow, listSchemas, listWorkflowRuns, listWorkflows, testWorkflow, updateWorkflow } from "./api";
@@ -14,6 +14,18 @@ vi.mock("./api", () => ({
   listWorkflows: vi.fn(),
   testWorkflow: vi.fn(),
   updateWorkflow: vi.fn(),
+}));
+
+vi.mock("@xyflow/react", () => ({
+  Background: () => createElement("div", { "data-testid": "graph-background" }),
+  Controls: () => createElement("div", { "data-testid": "graph-controls" }),
+  MiniMap: () => createElement("div", { "data-testid": "graph-minimap" }),
+  ReactFlow: ({ children, edges, nodes }: { children: unknown; edges: Array<{ id: string }>; nodes: Array<{ data: { label: string } }> }) => createElement(
+    "div",
+    { "data-edge-count": edges.length, "data-node-count": nodes.length, "data-testid": "react-flow" },
+    nodes.map((node) => createElement("div", { key: node.data.label }, node.data.label)),
+    children,
+  ),
 }));
 
 const roots: Array<{ container: HTMLDivElement; root: Root }> = [];
@@ -107,6 +119,38 @@ describe("WorkflowManager", () => {
     });
     expect(container.textContent).toContain("Pay order");
     expect(container.textContent).not.toContain("Archive order");
+  });
+
+  it("renders a read-only graph view for workflow definitions", async () => {
+    vi.mocked(listWorkflows).mockResolvedValueOnce({
+      ok: true,
+      workflows: [workflow({
+        definition: {
+          edges: [{ from: "start", id: "edge-start-return-ok", to: "return-ok" }],
+          nodes: [
+            { config: {}, id: "start", type: "routeTrigger" },
+            { config: { body: { ok: true }, status: 200 }, id: "return-ok", type: "returnResponse" },
+          ],
+          route: { method: "POST", path: "/orders/pay" },
+          startNodeId: "start",
+          version: 1,
+        },
+      })],
+    });
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Graph");
+      await flushPromises();
+    });
+
+    expect(container.textContent).toContain("Graph preview");
+    expect(container.textContent).toContain("Read-only workflow canvas");
+    expect(container.textContent).toContain("Route trigger");
+    expect(container.textContent).toContain("Return response");
+    const graph = container.querySelector<HTMLElement>("[data-testid='react-flow']");
+    expect(graph?.dataset.nodeCount).toBe("2");
+    expect(graph?.dataset.edgeCount).toBe("1");
   });
 
   it("explains activation behavior in the workflow form", async () => {
