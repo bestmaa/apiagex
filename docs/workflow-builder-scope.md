@@ -252,11 +252,47 @@ Workflow values should use a safe template syntax:
 {{body.email}}
 {{params.entryId}}
 {{query.search}}
+{{headers.x-request-id}}
 {{steps.findUser.entries.0.id}}
 {{vars.total}}
 ```
 
-Allowed roots should be limited to request data, step outputs, and workflow variables. The MVP must not use `eval`, `new Function`, or arbitrary JavaScript execution.
+Allowed roots are intentionally small:
+
+| Root | Meaning | Example |
+| --- | --- | --- |
+| `body` | parsed request body | `{{body.email}}` |
+| `params` | route params from the custom API path | `{{params.orderId}}` |
+| `query` | query-string values | `{{query.search}}` |
+| `headers` | request headers | `{{headers.authorization}}` |
+| `steps` | previous node outputs by node id | `{{steps.findUser.entries.0.id}}` |
+| `vars` | values set by `setVariable` nodes | `{{vars.total}}` |
+
+Safe literals are still valid values: strings, numbers, booleans, null, arrays, and objects. A field can therefore use a fixed literal like `"active"`, a number like `50`, or an expression like `"{{body.status}}"`.
+
+Expression rules:
+
+- Expressions use double curly braces and dot paths only.
+- Paths do not run JavaScript and do not call functions.
+- Array indexes are numeric path segments, for example `{{steps.findUser.entries.0.id}}`.
+- Missing values should resolve as a workflow validation/runtime error in later runtime tasks, not as arbitrary JS behavior.
+- The MVP must not use `eval`, `new Function`, or arbitrary JavaScript execution.
+
+Practical create-entry mapping:
+
+```json
+{
+  "type": "createEntry",
+  "config": {
+    "schema": "orders",
+    "data": {
+      "customerEmail": "{{body.email}}",
+      "status": "pending",
+      "source": "{{headers.x-source}}"
+    }
+  }
+}
+```
 
 ### Hinglish
 
@@ -266,11 +302,47 @@ Workflow values safe template syntax use karenge:
 {{body.email}}
 {{params.entryId}}
 {{query.search}}
+{{headers.x-request-id}}
 {{steps.findUser.entries.0.id}}
 {{vars.total}}
 ```
 
-Allowed roots sirf request data, step outputs, aur workflow variables tak limited hone chahiye. MVP me `eval`, `new Function`, ya arbitrary JavaScript execution nahi hoga.
+Allowed roots chhote aur safe rahenge:
+
+| Root | Meaning | Example |
+| --- | --- | --- |
+| `body` | parsed request body | `{{body.email}}` |
+| `params` | custom API path ke route params | `{{params.orderId}}` |
+| `query` | query-string values | `{{query.search}}` |
+| `headers` | request headers | `{{headers.authorization}}` |
+| `steps` | previous node outputs by node id | `{{steps.findUser.entries.0.id}}` |
+| `vars` | `setVariable` node se set values | `{{vars.total}}` |
+
+Safe literals bhi valid rahenge: strings, numbers, booleans, null, arrays, aur objects. Isliye field fixed literal `"active"`, number `50`, ya expression `"{{body.status}}"` use kar sakta hai.
+
+Expression rules:
+
+- Expressions double curly braces aur dot paths use karenge.
+- Paths JavaScript run nahi karenge aur functions call nahi karenge.
+- Array indexes numeric path segment honge, jaise `{{steps.findUser.entries.0.id}}`.
+- Missing values later runtime tasks me workflow validation/runtime error banenge, arbitrary JS behavior nahi.
+- MVP me `eval`, `new Function`, ya arbitrary JavaScript execution nahi hoga.
+
+Practical create-entry mapping:
+
+```json
+{
+  "type": "createEntry",
+  "config": {
+    "schema": "orders",
+    "data": {
+      "customerEmail": "{{body.email}}",
+      "status": "pending",
+      "source": "{{headers.x-source}}"
+    }
+  }
+}
+```
 
 ## Storage Model
 

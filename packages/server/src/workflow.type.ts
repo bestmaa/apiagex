@@ -9,6 +9,19 @@ export type WorkflowJsonValue =
   | WorkflowJsonValue[]
   | { [key: string]: WorkflowJsonValue };
 
+export type WorkflowExpressionRoot = "body" | "headers" | "params" | "query" | "steps" | "vars";
+
+export type WorkflowExpressionPath = WorkflowExpressionRoot | `${WorkflowExpressionRoot}.${string}`;
+
+export type WorkflowExpressionTemplate = `{{${WorkflowExpressionPath}}}`;
+
+export type WorkflowExpressionPrimitive = WorkflowJsonPrimitive | WorkflowExpressionTemplate;
+
+export type WorkflowExpressionValue =
+  | WorkflowExpressionPrimitive
+  | WorkflowExpressionValue[]
+  | { [key: string]: WorkflowExpressionValue };
+
 export type WorkflowNodeId = string;
 
 export type WorkflowEdgeId = string;
@@ -71,7 +84,7 @@ export type WorkflowRouteTriggerConfig = Record<string, never>;
 export type WorkflowEntryFilter = {
   field: string;
   operator: WorkflowFieldFilterOperator;
-  value?: WorkflowJsonValue;
+  value?: WorkflowExpressionValue;
 };
 
 export type WorkflowQueryEntriesConfig = {
@@ -79,14 +92,14 @@ export type WorkflowQueryEntriesConfig = {
   limit?: number;
   offset?: number;
   schema: string;
-  search?: WorkflowJsonValue;
+  search?: WorkflowExpressionValue;
 };
 
 export type WorkflowGetEntryConfig = {
-  entryId: WorkflowJsonValue;
+  entryId: WorkflowExpressionValue;
 };
 
-export type WorkflowEntryDataMapping = Record<string, WorkflowJsonValue>;
+export type WorkflowEntryDataMapping = Record<string, WorkflowExpressionValue>;
 
 export type WorkflowCreateEntryConfig = {
   data: WorkflowEntryDataMapping;
@@ -103,9 +116,9 @@ export type WorkflowDeleteEntryConfig = {
 };
 
 export type WorkflowBranchCondition = {
-  left: WorkflowJsonValue;
+  left: WorkflowExpressionValue;
   operator: WorkflowBranchOperator;
-  right?: WorkflowJsonValue;
+  right?: WorkflowExpressionValue;
 };
 
 export type WorkflowBranchConfig = {
@@ -115,11 +128,11 @@ export type WorkflowBranchConfig = {
 };
 
 export type WorkflowSetVariableConfig = {
-  values: Record<string, WorkflowJsonValue>;
+  values: Record<string, WorkflowExpressionValue>;
 };
 
 export type WorkflowReturnResponseConfig = {
-  body: WorkflowJsonValue;
+  body: WorkflowExpressionValue;
   headers?: Record<string, string>;
   status: number;
 };

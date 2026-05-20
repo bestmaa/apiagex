@@ -110,7 +110,7 @@ Each task uses this structure:
 #### T3404 - Define Workflow Expression Syntax
 
 - Version: `v0.9.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Define a small safe expression/template syntax for values like `{{body.email}}`, `{{steps.findUser.entry.id}}`, and `{{vars.total}}`.
 - Persona: Runtime safety engineer; make expressions useful without running unsafe code.
 - Success Criteria: Docs and types describe allowed roots: `body`, `params`, `query`, `headers`, `steps`, `vars`, and safe literals.
