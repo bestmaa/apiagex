@@ -295,6 +295,10 @@ export const readmePage = {
         "Order status template: Settings > Workflows inactive POST /api/custom/orders/status starter bana sakta hai jo orderId/status validate karta hai, order entry update karta hai, aur invalid transitions block karta hai.",
         "Order status transitions: pending can move to preparing or cancelled, preparing can move to ready or cancelled, ready can move to completed, and invalid transitions return ORDER_STATUS_TRANSITION_INVALID.",
         "Order status transitions: pending se preparing ya cancelled, preparing se ready ya cancelled, ready se completed allowed hai, aur invalid transitions ORDER_STATUS_TRANSITION_INVALID return karte hain.",
+        "Report template: Settings > Workflows can create an inactive read-only GET /api/custom/reports/orders starter that queries the orders schema with limit 50 and returns total plus entries.",
+        "Report template: Settings > Workflows inactive read-only GET /api/custom/reports/orders starter bana sakta hai jo orders schema ko limit 50 ke saath query karta hai aur total plus entries return karta hai.",
+        "Report limits: keep MVP report templates bounded; large reports must respect workflow runtime query limits.",
+        "Report limits: MVP report templates bounded rakho; large reports ko workflow runtime query limits respect karna hoga.",
       ],
     },
     {

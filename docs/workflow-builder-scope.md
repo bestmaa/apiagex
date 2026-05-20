@@ -677,6 +677,14 @@ Order status template status:
 - It returns `ORDER_STATUS_TRANSITION_INVALID` for invalid transitions.
 - It uses normal content entry update behavior, so existing webhook and realtime settings can emit events for the orders schema.
 
+Report template status:
+
+- Admin UI can create an inactive read-only `GET /api/custom/reports/orders` starter.
+- It queries the `orders` schema with `limit: 50` and `offset: 0`.
+- It returns `ok`, `total`, `limit`, `offset`, and `entries`.
+- It does not include write nodes.
+- Large report work must stay inside workflow runtime query limits.
+
 ### Hinglish
 
 Templates tab add karne chahiye jab storage, runtime, permissions, aur Admin UI basics stable ho jaye.
@@ -721,6 +729,14 @@ Order status template status:
 - Ye `pending -> preparing`, `pending -> cancelled`, `preparing -> ready`, `preparing -> cancelled`, aur `ready -> completed` allow karta hai.
 - Invalid transitions par `ORDER_STATUS_TRANSITION_INVALID` return karta hai.
 - Ye normal content entry update behavior use karta hai, isliye existing webhook aur realtime settings orders schema ke liye events emit kar sakte hain.
+
+Report template status:
+
+- Admin UI inactive read-only `GET /api/custom/reports/orders` starter bana sakta hai.
+- Ye `orders` schema ko `limit: 50` aur `offset: 0` ke saath query karta hai.
+- Ye `ok`, `total`, `limit`, `offset`, aur `entries` return karta hai.
+- Isme write nodes nahi hote.
+- Large report work ko workflow runtime query limits ke andar rehna hoga.
 
 ## Non Goals For MVP
 

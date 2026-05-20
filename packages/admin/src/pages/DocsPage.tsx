@@ -279,6 +279,17 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <p><code>Create order status template</code> creates an inactive <code>POST /api/custom/orders/status</code> starter. It validates <code>orderId</code> and <code>status</code>, updates the order entry, and returns the updated order.</p>
           <p>Allowed transitions are <code>pending -&gt; preparing</code>, <code>pending -&gt; cancelled</code>, <code>preparing -&gt; ready</code>, <code>preparing -&gt; cancelled</code>, and <code>ready -&gt; completed</code>. Invalid transitions return <code>ORDER_STATUS_TRANSITION_INVALID</code>.</p>
         </article>
+        <article className="api-row">
+          <strong>Report template</strong>
+          <p><code>Create report template</code> creates an inactive read-only <code>GET /api/custom/reports/orders</code> starter. It queries the <code>orders</code> schema with <code>limit: 50</code>.</p>
+          <pre><code>{`{
+  "ok": true,
+  "total": 12,
+  "limit": 50,
+  "offset": 0,
+  "entries": []
+}`}</code></pre>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

@@ -314,6 +314,53 @@ describe("WorkflowManager", () => {
     expect(container.textContent).toContain("Created order status template");
   });
 
+  it("creates the read-only report template with a bounded query", async () => {
+    vi.mocked(createWorkflow).mockResolvedValueOnce({
+      ok: true,
+      workflow: workflow({ id: "workflow_report", method: "GET", name: "Orders report template", path: "/reports/orders" }),
+    });
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create report template");
+      await flushPromises();
+    });
+
+    const draft = vi.mocked(createWorkflow).mock.calls[0]?.[0];
+    expect(draft).toMatchObject({
+      active: false,
+      method: "GET",
+      name: "Orders report template",
+      path: "/reports/orders",
+    });
+    expect(draft?.definition).toEqual(expect.objectContaining({
+      nodes: expect.arrayContaining([
+        expect.objectContaining({
+          config: { limit: 50, offset: 0, schema: "orders" },
+          id: "query-orders",
+          type: "queryEntries",
+        }),
+        expect.objectContaining({
+          config: {
+            body: {
+              entries: "{{steps.query-orders.entries}}",
+              limit: "{{steps.query-orders.limit}}",
+              ok: true,
+              offset: "{{steps.query-orders.offset}}",
+              total: "{{steps.query-orders.total}}",
+            },
+            status: 200,
+          },
+          id: "return-report",
+          type: "returnResponse",
+        }),
+      ]),
+    }));
+    expect(JSON.stringify(draft?.definition)).not.toContain("createEntry");
+    expect(JSON.stringify(draft?.definition)).not.toContain("updateEntry");
+    expect(container.textContent).toContain("Created report template");
+  });
+
   it("creates a workflow with ordered query and return steps", async () => {
     const { container } = await renderWorkflowManagerLoaded();
 

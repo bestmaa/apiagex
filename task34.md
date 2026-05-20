@@ -614,7 +614,7 @@ Each task uses this structure:
 #### T3442 - Add Report Workflow Template
 
 - Version: `v0.13.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add a read-only report API template for aggregating content entries.
 - Persona: Operations dashboard builder; generate custom reports without writing code.
 - Success Criteria: Template queries entries and returns summarized counts or filtered lists.

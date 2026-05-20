@@ -123,6 +123,20 @@ export function WorkflowManager() {
     setStatus("Created order status template. Review transition rules before activation.");
   }
 
+  async function createReportTemplate() {
+    const draft = reportWorkflowTemplate();
+    const result = await createWorkflow(draft);
+    if (!result.ok || !result.workflow) {
+      setStatus(result.error ?? "Report template create failed");
+      return;
+    }
+    setWorkflows((current) => sortWorkflows([...current, result.workflow as WorkflowRecord]));
+    setFormOpen(false);
+    setEditingWorkflowId(null);
+    setForm(emptyWorkflowForm());
+    setStatus("Created report template. Keep limits small before activation.");
+  }
+
   function openEditForm(workflow: WorkflowRecord) {
     setEditingWorkflowId(workflow.id);
     setForm({
@@ -186,6 +200,10 @@ export function WorkflowManager() {
           <button type="button" onClick={() => void createOrderStatusTemplate()}>
             <Plus aria-hidden="true" size={16} />
             Create order status template
+          </button>
+          <button type="button" onClick={() => void createReportTemplate()}>
+            <Plus aria-hidden="true" size={16} />
+            Create report template
           </button>
           <button type="button" onClick={() => void loadWorkflows()}>
             <RefreshCw aria-hidden="true" size={16} />
@@ -1096,6 +1114,58 @@ function orderBranch(
     },
     id,
     type: "branch",
+  };
+}
+
+function reportWorkflowTemplate(): WorkflowDraft {
+  const path = "/reports/orders";
+  const method = "GET";
+  return {
+    active: false,
+    definition: reportWorkflowDefinition(method, path),
+    description: "Read-only report API starter. Queries the orders schema with limit 50 and returns total plus the first page of entries.",
+    method,
+    name: "Orders report template",
+    path,
+    version: 1,
+  };
+}
+
+function reportWorkflowDefinition(method: string, path: string): Record<string, unknown> {
+  return {
+    edges: [
+      { from: "start", id: "edge-start-query-orders", to: "query-orders" },
+      { from: "query-orders", id: "edge-query-orders-return-report", to: "return-report" },
+    ],
+    nodes: [
+      { config: {}, id: "start", type: "routeTrigger" },
+      {
+        config: {
+          limit: 50,
+          offset: 0,
+          schema: "orders",
+        },
+        id: "query-orders",
+        type: "queryEntries",
+      },
+      {
+        config: {
+          body: {
+            entries: "{{steps.query-orders.entries}}",
+            limit: "{{steps.query-orders.limit}}",
+            ok: true,
+            offset: "{{steps.query-orders.offset}}",
+            total: "{{steps.query-orders.total}}",
+          },
+          status: 200,
+        },
+        id: "return-report",
+        type: "returnResponse",
+      },
+    ],
+    route: { method, path },
+    startNodeId: "start",
+    version: 1,
   };
 }
 

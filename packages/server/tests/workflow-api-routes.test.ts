@@ -251,6 +251,37 @@ describe("workflow API routes", () => {
       requestedStatus: "completed",
     });
   });
+
+  it("runs the report workflow as a bounded read-only query", async () => {
+    const database = openMigratedSqliteAdapter();
+    const publicRole = await createRole(database, { description: "Public", name: "public" });
+    const orderSchema = await createSchema(database, {
+      fields: [{ name: "Status", required: true, slug: "status", type: "text" }],
+      name: "Orders",
+      slug: "orders",
+    });
+    await createEntry(database, { data: { status: "pending" }, schemaId: orderSchema.id });
+    await createEntry(database, { data: { status: "ready" }, schemaId: orderSchema.id });
+    await createWorkflow(database, {
+      active: true,
+      definition: reportWorkflowDefinition(),
+      method: "GET",
+      name: "Orders report template",
+      path: "/reports/orders",
+      version: 1,
+    });
+    const server = createServer({ adminAuth: "disabled", database });
+    await server.ready();
+    const route = await getCustomApiRouteByMethodPath(database, "GET", "/api/custom/reports/orders");
+    if (!route) throw new Error("WORKFLOW_ROUTE_NOT_SYNCED");
+    await setCustomApiPermission(database, { allowed: true, customApiRouteId: route.id, roleId: publicRole.id });
+
+    const response = await server.inject({ method: "GET", url: "/api/custom/reports/orders" });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({ limit: 50, offset: 0, ok: true, total: 2 });
+    expect(response.json().entries).toHaveLength(2);
+  });
 });
 
 function echoWorkflowDefinition() {
@@ -363,5 +394,35 @@ function orderBranch(id: string, left: string, right: string, thenNodeId: string
     config: { condition: { left, operator: "eq", right }, elseNodeId, thenNodeId },
     id,
     type: "branch",
+  };
+}
+
+function reportWorkflowDefinition() {
+  return {
+    edges: [
+      { from: "start", id: "edge-start-query-orders", to: "query-orders" },
+      { from: "query-orders", id: "edge-query-orders-return-report", to: "return-report" },
+    ],
+    nodes: [
+      { config: {}, id: "start", type: "routeTrigger" },
+      { config: { limit: 50, offset: 0, schema: "orders" }, id: "query-orders", type: "queryEntries" },
+      {
+        config: {
+          body: {
+            entries: "{{steps.query-orders.entries}}",
+            limit: "{{steps.query-orders.limit}}",
+            ok: true,
+            offset: "{{steps.query-orders.offset}}",
+            total: "{{steps.query-orders.total}}",
+          },
+          status: 200,
+        },
+        id: "return-report",
+        type: "returnResponse",
+      },
+    ],
+    route: { method: "GET", path: "/reports/orders" },
+    startNodeId: "start",
+    version: 1,
   };
 }
