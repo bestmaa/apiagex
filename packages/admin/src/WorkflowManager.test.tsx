@@ -33,12 +33,13 @@ vi.mock("@xyflow/react", () => ({
     nodeTypes,
   }: {
     children: unknown;
-    edges: Array<{ id: string }>;
+    edges: Array<{ id: string; label?: string }>;
     nodes: Array<{ data: { configSummary: string; label: string; stateText: string }; id: string; type?: string }>;
     nodeTypes?: Record<string, (props: { data: { configSummary: string; label: string; stateText: string }; selected: boolean }) => unknown>;
   }) => createElement(
     "div",
     { "data-edge-count": edges.length, "data-node-count": nodes.length, "data-testid": "react-flow" },
+    edges.map((edge) => edge.label ? createElement("span", { key: edge.id }, edge.label) : null),
     nodes.map((node, index) => {
       const NodeComponent = node.type ? nodeTypes?.[node.type] : undefined;
       if (NodeComponent) {
@@ -251,7 +252,38 @@ describe("WorkflowManager", () => {
     });
 
     expect(container.textContent).toContain("Graph save blocked");
+    expect(container.textContent).toContain("Schema missing");
     expect(updateWorkflow).not.toHaveBeenCalled();
+  });
+
+  it("shows duplicate graph path validation on edges", async () => {
+    vi.mocked(listWorkflows).mockResolvedValueOnce({
+      ok: true,
+      workflows: [workflow({
+        definition: {
+          edges: [
+            { from: "start", id: "edge-start-return-one", to: "return-one" },
+            { from: "start", id: "edge-start-return-two", to: "return-two" },
+          ],
+          nodes: [
+            { config: {}, id: "start", type: "routeTrigger" },
+            { config: { body: { ok: true }, status: 200 }, id: "return-one", type: "returnResponse" },
+            { config: { body: { ok: true }, status: 200 }, id: "return-two", type: "returnResponse" },
+          ],
+          route: { method: "POST", path: "/orders/pay" },
+          startNodeId: "start",
+          version: 1,
+        },
+      })],
+    });
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Graph");
+      await flushPromises();
+    });
+
+    expect(container.textContent).toContain("duplicate outgoing path from start");
   });
 
   it("saves auto-layout positions without changing graph semantics", async () => {

@@ -694,7 +694,7 @@ Each task uses this structure:
 #### T3448 - Add Graph Validation Overlay
 
 - Version: `v0.14.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Surface validation errors directly on graph nodes and edges.
 - Persona: Builder support engineer; help users fix broken workflows.
 - Success Criteria: Missing config, missing return node, disconnected branch, and duplicate path errors are visible in graph UI.

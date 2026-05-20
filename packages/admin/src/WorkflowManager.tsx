@@ -44,6 +44,11 @@ type WorkflowGraphNodeData = {
 };
 type WorkflowGraphNode = Node<WorkflowGraphNodeData, "workflow">;
 type WorkflowGraphEdge = Edge;
+type WorkflowGraphValidation = {
+  edgeErrors: Map<string, string>;
+  errors: string[];
+  nodeErrors: Map<string, string>;
+};
 
 const workflowStepTypes: WorkflowStepType[] = [
   "validateBody",
@@ -405,8 +410,21 @@ function WorkflowGraphShell({
     setGraphStatus("Graph loaded");
   }, [initialGraph.edges, initialGraph.nodes, setEdges, setNodes]);
 
+  const graphValidation = useMemo(() => validateWorkflowGraphDetailed(nodes, edges), [edges, nodes]);
+  const graphErrors = graphValidation.errors;
+  const displayNodes = useMemo(
+    () => nodes.map((node) => graphValidation.nodeErrors.has(node.id)
+      ? graphNodeWithState(node, "error", graphValidation.nodeErrors.get(node.id) ?? "Invalid")
+      : node),
+    [graphValidation.nodeErrors, nodes],
+  );
+  const displayEdges = useMemo(
+    () => edges.map((edge) => graphValidation.edgeErrors.has(edge.id)
+      ? { ...edge, className: "is-error", label: graphValidation.edgeErrors.get(edge.id) }
+      : edge),
+    [edges, graphValidation.edgeErrors],
+  );
   const selectedNode = nodes.find((node) => node.id === selectedNodeId) ?? null;
-  const graphErrors = useMemo(() => validateWorkflowGraph(nodes, edges), [edges, nodes]);
 
   if (!selectedWorkflow) {
     return <StateMessage title="No workflow graph" variant="empty">Create a workflow to preview the graph.</StateMessage>;
@@ -607,11 +625,11 @@ function WorkflowGraphShell({
         <div className="workflow-graph-canvas" aria-label={`${selectedWorkflow.name} workflow graph`}>
           <ReactFlow
             colorMode="light"
-            edges={edges}
+            edges={displayEdges}
             fitView
             fitViewOptions={{ padding: 0.2 }}
             minZoom={0.2}
-            nodes={nodes}
+            nodes={displayNodes}
             nodeTypes={workflowGraphNodeTypes}
             proOptions={{ hideAttribution: true }}
             onConnect={onConnect}
@@ -1279,6 +1297,21 @@ function graphNodeWithConfig(
   };
 }
 
+function graphNodeWithState(
+  node: WorkflowGraphNode,
+  state: WorkflowGraphNodeData["state"],
+  stateText: string,
+): WorkflowGraphNode {
+  return {
+    ...node,
+    data: {
+      ...node.data,
+      state,
+      stateText,
+    },
+  };
+}
+
 function workflowDefinitionFromGraph(
   workflow: WorkflowRecord,
   nodes: WorkflowGraphNode[],
@@ -1306,34 +1339,67 @@ function workflowDefinitionFromGraph(
 }
 
 function validateWorkflowGraph(nodes: WorkflowGraphNode[], edges: WorkflowGraphEdge[]): string[] {
+  return validateWorkflowGraphDetailed(nodes, edges).errors;
+}
+
+function validateWorkflowGraphDetailed(nodes: WorkflowGraphNode[], edges: WorkflowGraphEdge[]): WorkflowGraphValidation {
   const errors: string[] = [];
+  const edgeErrors = new Map<string, string>();
+  const nodeErrors = new Map<string, string>();
+  const addNodeError = (nodeId: string, message: string) => {
+    errors.push(message);
+    nodeErrors.set(nodeId, message.replace(`${nodeId}: `, ""));
+  };
+  const addEdgeError = (edgeId: string, message: string) => {
+    errors.push(message);
+    edgeErrors.set(edgeId, message.replace(`${edgeId}: `, ""));
+  };
   const nodeIds = new Set<string>();
   for (const node of nodes) {
     if (nodeIds.has(node.id)) errors.push(`Duplicate node id ${node.id}.`);
     nodeIds.add(node.id);
-    if (node.data.state === "error") errors.push(`${node.id}: ${node.data.stateText}.`);
+    if (node.data.state === "error") addNodeError(node.id, `${node.id}: ${node.data.stateText}.`);
   }
   const triggerNodes = nodes.filter((node) => node.data.workflowType === "routeTrigger");
   if (triggerNodes.length !== 1) errors.push("Graph needs exactly one route trigger.");
   if (!nodes.some((node) => node.data.workflowType === "returnResponse")) errors.push("Graph needs at least one return response.");
   for (const edge of edges) {
-    if (!nodeIds.has(edge.source)) errors.push(`Edge ${edge.id} source node is missing.`);
-    if (!nodeIds.has(edge.target)) errors.push(`Edge ${edge.id} target node is missing.`);
+    if (!nodeIds.has(edge.source)) addEdgeError(edge.id, `${edge.id}: source node is missing.`);
+    if (!nodeIds.has(edge.target)) addEdgeError(edge.id, `${edge.id}: target node is missing.`);
   }
   const edgeIds = new Set<string>();
   for (const edge of edges) {
     if (edgeIds.has(edge.id)) errors.push(`Duplicate edge id ${edge.id}.`);
     edgeIds.add(edge.id);
   }
+  const sourcePaths = new Map<string, string>();
+  for (const edge of edges) {
+    const pathKey = `${edge.source}:${edge.sourceHandle ?? "next"}`;
+    const existingEdgeId = sourcePaths.get(pathKey);
+    if (existingEdgeId) {
+      addEdgeError(edge.id, `${edge.id}: duplicate outgoing path from ${edge.source}.`);
+      addEdgeError(existingEdgeId, `${existingEdgeId}: duplicate outgoing path from ${edge.source}.`);
+    }
+    sourcePaths.set(pathKey, edge.id);
+  }
   for (const node of nodes) {
     if (node.data.workflowType === "routeTrigger") continue;
-    if (!edges.some((edge) => edge.target === node.id)) errors.push(`${node.id} needs an incoming edge.`);
+    if (!edges.some((edge) => edge.target === node.id)) addNodeError(node.id, `${node.id} needs an incoming edge.`);
   }
   for (const node of nodes) {
-    if (node.data.workflowType !== "returnResponse") continue;
-    if (edges.some((edge) => edge.source === node.id)) errors.push(`${node.id} cannot have outgoing edges.`);
+    if (node.data.workflowType === "returnResponse") {
+      for (const edge of edges.filter((item) => item.source === node.id)) {
+        addNodeError(node.id, `${node.id} cannot have outgoing edges.`);
+        addEdgeError(edge.id, `${edge.id}: return response cannot connect to another node.`);
+      }
+    }
+    if (node.data.workflowType === "branch") {
+      const branchHandles = new Set(edges.filter((edge) => edge.source === node.id).map((edge) => edge.sourceHandle ?? ""));
+      if (!branchHandles.has("then")) addNodeError(node.id, `${node.id} needs a then path.`);
+      if (!branchHandles.has("else")) addNodeError(node.id, `${node.id} needs an else path.`);
+    }
   }
-  return errors;
+  return { edgeErrors, errors, nodeErrors };
 }
 
 function layoutWorkflowGraphNodes(nodes: WorkflowGraphNode[], edges: WorkflowGraphEdge[]): WorkflowGraphNode[] {

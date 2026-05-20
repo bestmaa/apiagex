@@ -434,6 +434,16 @@ code {
   overflow: hidden;
 }
 
+.workflow-graph-canvas .react-flow__edge.is-error path {
+  stroke: var(--admin-color-warning-border);
+  stroke-width: 2.5;
+}
+
+.workflow-graph-canvas .react-flow__edge.is-error .react-flow__edge-text {
+  fill: var(--admin-color-warning-text);
+  font-weight: 700;
+}
+
 .workflow-graph-inspector {
   align-self: stretch;
   background: var(--admin-color-surface-muted);
