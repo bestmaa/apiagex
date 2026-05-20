@@ -248,6 +248,17 @@ CREATE TABLE IF NOT EXISTS workflows (
   version INTEGER NOT NULL,
   UNIQUE(method, path)
 );
+
+CREATE TABLE IF NOT EXISTS workflow_runs (
+  id TEXT PRIMARY KEY,
+  workflow_id TEXT NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+  status TEXT NOT NULL,
+  status_code INTEGER,
+  duration_ms INTEGER NOT NULL,
+  error_code TEXT,
+  request_json TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
 `;
 
 export const MYSQL_FOUNDATION_SQL = `
@@ -271,4 +282,5 @@ CREATE TABLE IF NOT EXISTS custom_api_routes (id VARCHAR(191) PRIMARY KEY, metho
 CREATE TABLE IF NOT EXISTS custom_api_permissions (id VARCHAR(191) PRIMARY KEY, role_id VARCHAR(191) NOT NULL, custom_api_route_id VARCHAR(191) NOT NULL, allowed TINYINT(1) NOT NULL DEFAULT 0, UNIQUE(role_id, custom_api_route_id), CONSTRAINT fk_custom_api_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE, CONSTRAINT fk_custom_api_permissions_route FOREIGN KEY (custom_api_route_id) REFERENCES custom_api_routes(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS custom_api_permission_events (id VARCHAR(191) PRIMARY KEY, role_id VARCHAR(191) NOT NULL, custom_api_route_id VARCHAR(191) NOT NULL, allowed TINYINT(1) NOT NULL DEFAULT 0, actor_id VARCHAR(191) NOT NULL, actor_email VARCHAR(191) NOT NULL, created_at TEXT NOT NULL, CONSTRAINT fk_custom_api_permission_events_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE, CONSTRAINT fk_custom_api_permission_events_route FOREIGN KEY (custom_api_route_id) REFERENCES custom_api_routes(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS workflows (id VARCHAR(191) PRIMARY KEY, name VARCHAR(191) NOT NULL, method VARCHAR(16) NOT NULL, path VARCHAR(512) NOT NULL, active TINYINT(1) NOT NULL DEFAULT 0, definition_json LONGTEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, created_by_id VARCHAR(191), created_by_email VARCHAR(191), updated_by_id VARCHAR(191), updated_by_email VARCHAR(191), last_run_at TEXT, version INTEGER NOT NULL, UNIQUE(method, path)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS workflow_runs (id VARCHAR(191) PRIMARY KEY, workflow_id VARCHAR(191) NOT NULL, status VARCHAR(32) NOT NULL, status_code INTEGER, duration_ms INTEGER NOT NULL, error_code VARCHAR(191), request_json LONGTEXT NOT NULL, created_at TEXT NOT NULL, CONSTRAINT fk_workflow_runs_workflow FOREIGN KEY (workflow_id) REFERENCES workflows(id) ON DELETE CASCADE) ENGINE=InnoDB;
 `;

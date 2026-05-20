@@ -23,6 +23,7 @@ export const MVP_TABLES = [
   "custom_api_permissions",
   "custom_api_permission_events",
   "workflows",
+  "workflow_runs",
 ] as const;
 
 export const MVP_FOUNDATION_SQL = `
@@ -235,5 +236,16 @@ CREATE TABLE IF NOT EXISTS workflows (
   last_run_at TEXT,
   version INTEGER NOT NULL,
   UNIQUE(method, path)
+);
+
+CREATE TABLE IF NOT EXISTS workflow_runs (
+  id TEXT PRIMARY KEY,
+  workflow_id TEXT NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+  status TEXT NOT NULL,
+  status_code INTEGER,
+  duration_ms INTEGER NOT NULL,
+  error_code TEXT,
+  request_json TEXT NOT NULL,
+  created_at TEXT NOT NULL
 );
 `;

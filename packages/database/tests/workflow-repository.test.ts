@@ -9,8 +9,10 @@ import {
   getWorkflowById,
   getWorkflowByMethodPath,
   listCustomApiRoutes,
+  listWorkflowRuns,
   listWorkflows,
   openMigratedSqliteAdapter,
+  recordWorkflowRun,
   syncWorkflowCustomApiRoutes,
   updateWorkflow,
   validateWorkflowDraft,
@@ -97,6 +99,65 @@ describe("workflow repository", () => {
     expect(updated.createdBy).toEqual({ email: "owner@example.com", id: "owner_user" });
     expect(updated.updatedBy).toEqual({ email: "admin@example.com", id: "admin_user" });
     expect(JSON.stringify(updated)).not.toContain("token");
+  });
+
+  it("records workflow run history with redacted request metadata", async () => {
+    const db = openMigratedSqliteAdapter();
+    const workflow = await createWorkflow(db, {
+      active: true,
+      definition: registerDefinition,
+      method: "POST",
+      name: "Register user",
+      path: "/register",
+      version: 1,
+    });
+
+    const run = await recordWorkflowRun(db, {
+      durationMs: 12.6,
+      request: {
+        body: { password: "not stored" },
+        headers: {
+          authorization: "Bearer secret",
+          "content-type": "application/json",
+          "x-apiagex-api-token": "api_secret",
+          "x-otp-code": "123456",
+        },
+        method: "POST",
+        params: { userId: "user_1" },
+        path: "/api/custom/register",
+        query: { invite: "abc" },
+      },
+      status: "error",
+      statusCode: 422,
+      errorCode: "WORKFLOW_VALIDATION_FAILED",
+      workflowId: workflow.id,
+    });
+    const runs = await listWorkflowRuns(db, workflow.id);
+    const updatedWorkflow = await getWorkflowById(db, workflow.id);
+
+    expect(run.durationMs).toBe(13);
+    expect(runs).toHaveLength(1);
+    expect(runs[0]).toMatchObject({
+      errorCode: "WORKFLOW_VALIDATION_FAILED",
+      status: "error",
+      statusCode: 422,
+      workflowId: workflow.id,
+    });
+    expect(runs[0]?.request).toEqual({
+      headers: {
+        authorization: "[redacted]",
+        "content-type": "application/json",
+        "x-apiagex-api-token": "[redacted]",
+        "x-otp-code": "[redacted]",
+      },
+      method: "POST",
+      params: { userId: "user_1" },
+      path: "/api/custom/register",
+      query: { invite: "abc" },
+    });
+    expect(JSON.stringify(runs[0])).not.toContain("not stored");
+    expect(JSON.stringify(runs[0])).not.toContain("api_secret");
+    expect(updatedWorkflow?.lastRunAt).toBe(run.createdAt);
   });
 
   it("rejects duplicate workflow method and path combinations", async () => {

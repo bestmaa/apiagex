@@ -124,6 +124,11 @@ export {
   updateWorkflow,
 } from "./workflow-repository.js";
 export {
+  listWorkflowRuns,
+  recordWorkflowRun,
+  sanitizeWorkflowRunRequest,
+} from "./workflow-run-repository.js";
+export {
   assertValidWorkflowDraft,
   validateWorkflowDraft,
 } from "./workflow-validation.js";
@@ -246,6 +251,13 @@ export type {
   WorkflowDefinitionJson,
   WorkflowRecord,
 } from "./workflow-repository.type.js";
+export type {
+  RecordWorkflowRunInput,
+  WorkflowRunRecord,
+  WorkflowRunRequestInput,
+  WorkflowRunRequestMetadata,
+  WorkflowRunStatus,
+} from "./workflow-run-repository.type.js";
 export type {
   ValidateWorkflowDraftInput,
   WorkflowValidationIssue,

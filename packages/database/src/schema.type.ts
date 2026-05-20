@@ -18,6 +18,7 @@ export type MvpTableName =
   | "custom_api_permissions"
   | "custom_api_permission_events"
   | "workflows"
+  | "workflow_runs"
   | "migrations";
 
 export type MigrationRecord = {

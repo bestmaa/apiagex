@@ -1,5 +1,6 @@
 import {
   listWorkflows,
+  recordWorkflowRun,
   syncWorkflowCustomApiRoutes,
   type ApiagexDatabase,
 } from "@apiagex/database";
@@ -21,6 +22,7 @@ export function registerWorkflowRoutes(server: FastifyInstance, database: Apiage
         url: localWorkflowPath(workflow.path),
         preHandler: (request, reply) => authorizeCustomApi(database, request, reply),
         handler: async (request, reply) => {
+          const startedAt = Date.now();
           const context = createWorkflowExecutionContext({
             body: (request.body ?? null) as WorkflowJsonValue,
             headers: request.headers,
@@ -32,9 +34,40 @@ export function registerWorkflowRoutes(server: FastifyInstance, database: Apiage
             context,
             workflow.definition as unknown as WorkflowDefinition,
           );
-          if (!result.ok) return reply.code(workflowErrorStatus(result.error.code)).send({ ok: false, error: result.error });
+          if (!result.ok) {
+            const statusCode = workflowErrorStatus(result.error.code);
+            await recordWorkflowRunSafely(database, {
+              durationMs: Date.now() - startedAt,
+              errorCode: result.error.code,
+              request: {
+                headers: request.headers,
+                method: workflow.method,
+                params: request.params as Record<string, unknown>,
+                path: routePath(workflow.path),
+                query: request.query as Record<string, unknown>,
+              },
+              status: "error",
+              statusCode,
+              workflowId: workflow.id,
+            });
+            return reply.code(statusCode).send({ ok: false, error: result.error });
+          }
+          const statusCode = result.response.status ?? 200;
+          await recordWorkflowRunSafely(database, {
+            durationMs: Date.now() - startedAt,
+            request: {
+              headers: request.headers,
+              method: workflow.method,
+              params: request.params as Record<string, unknown>,
+              path: routePath(workflow.path),
+              query: request.query as Record<string, unknown>,
+            },
+            status: "success",
+            statusCode,
+            workflowId: workflow.id,
+          });
           return reply
-            .code(result.response.status ?? 200)
+            .code(statusCode)
             .headers(result.response.headers)
             .send(result.response.body ?? { ok: true });
         },
@@ -43,11 +76,28 @@ export function registerWorkflowRoutes(server: FastifyInstance, database: Apiage
   }, { prefix: customApiPrefix });
 }
 
+async function recordWorkflowRunSafely(
+  database: ApiagexDatabase,
+  input: Parameters<typeof recordWorkflowRun>[1],
+): Promise<void> {
+  try {
+    await recordWorkflowRun(database, input);
+  } catch {
+    // Workflow history must not change API responses.
+  }
+}
+
 function localWorkflowPath(path: string): string {
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   if (cleanPath === customApiPrefix) return "/";
   if (cleanPath.startsWith(`${customApiPrefix}/`)) return cleanPath.slice(customApiPrefix.length);
   return cleanPath;
+}
+
+function routePath(path: string): string {
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  if (cleanPath.startsWith(`${customApiPrefix}/`)) return cleanPath;
+  return `${customApiPrefix}${cleanPath}`;
 }
 
 function workflowErrorStatus(code: string): number {

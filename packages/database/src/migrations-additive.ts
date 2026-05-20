@@ -81,4 +81,5 @@ export const MVP_ADDITIVE_MIGRATIONS_SQL = [
   "ALTER TABLE workflows ADD COLUMN created_by_email TEXT",
   "ALTER TABLE workflows ADD COLUMN updated_by_id TEXT",
   "ALTER TABLE workflows ADD COLUMN updated_by_email TEXT",
+  `CREATE TABLE IF NOT EXISTS workflow_runs (id TEXT PRIMARY KEY, workflow_id TEXT NOT NULL REFERENCES workflows(id) ON DELETE CASCADE, status TEXT NOT NULL, status_code INTEGER, duration_ms INTEGER NOT NULL, error_code TEXT, request_json TEXT NOT NULL, created_at TEXT NOT NULL)`,
 ] as const;

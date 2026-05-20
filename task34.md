@@ -402,7 +402,7 @@ Each task uses this structure:
 #### T3426 - Add Workflow Execution History
 
 - Version: `v0.11.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Store recent workflow run history for debugging.
 - Persona: Operator; help admins see if a workflow ran and why it failed.
 - Success Criteria: History records workflow id, status, statusCode, duration, error code, createdAt, and limited request metadata.
