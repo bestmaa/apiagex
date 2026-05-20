@@ -6,6 +6,7 @@ import type {
   WorkflowDefinitionJson,
   WorkflowRecord,
 } from "./workflow-repository.type.js";
+import { assertValidWorkflowDraft } from "./workflow-validation.js";
 
 type WorkflowRow = Omit<WorkflowRecord, "active" | "definition"> & {
   active: number;
@@ -17,6 +18,7 @@ export async function createWorkflow(
   input: CreateWorkflowInput,
 ): Promise<WorkflowRecord> {
   const draft = normalizeWorkflowInput(input);
+  assertValidWorkflowDraft(draft);
   await assertWorkflowRouteUnique(db, draft.method, draft.path);
   const id = randomUUID();
   const now = new Date().toISOString();
@@ -78,6 +80,7 @@ export async function updateWorkflow(
     path: input.path ?? existing.path,
     version: input.version ?? existing.version,
   });
+  assertValidWorkflowDraft(next);
   await assertWorkflowRouteUnique(db, next.method, next.path, id);
   await db.prepare(
     "UPDATE workflows SET name = ?, method = ?, path = ?, active = ?, definition_json = ?, updated_at = ?, version = ? WHERE id = ?",

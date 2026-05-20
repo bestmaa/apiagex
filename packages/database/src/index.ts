@@ -124,6 +124,10 @@ export {
   updateWorkflow,
 } from "./workflow-repository.js";
 export {
+  assertValidWorkflowDraft,
+  validateWorkflowDraft,
+} from "./workflow-validation.js";
+export {
   createUser,
   getAdminUserById,
   getUserById,
@@ -236,6 +240,10 @@ export type {
   WorkflowDefinitionJson,
   WorkflowRecord,
 } from "./workflow-repository.type.js";
+export type {
+  ValidateWorkflowDraftInput,
+  WorkflowValidationIssue,
+} from "./workflow-validation.js";
 export type { CreateUserInput, UserRecord } from "./user-repository.type.js";
 export type {
   CreateFieldInput,

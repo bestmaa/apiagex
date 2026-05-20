@@ -164,7 +164,7 @@ Each task uses this structure:
 #### T3408 - Add Workflow Definition Validation
 
 - Version: `v0.9.7`
-- Status: `pending`
+- Status: `completed`
 - Goal: Validate workflow definitions before save.
 - Persona: Validation engineer; reject broken workflow configs early.
 - Success Criteria: Invalid method, path, duplicate node ids, unknown node type, missing required config, and disconnected return node are rejected.

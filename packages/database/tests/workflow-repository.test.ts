@@ -9,15 +9,30 @@ import {
   listWorkflows,
   openMigratedSqliteAdapter,
   updateWorkflow,
+  validateWorkflowDraft,
 } from "../src/index.js";
 
 const registerDefinition = {
-  edges: [],
+  edges: [
+    {
+      from: "start",
+      id: "edge-start-return",
+      to: "return-created",
+    },
+  ],
   nodes: [
     {
       config: {},
       id: "start",
       type: "routeTrigger",
+    },
+    {
+      config: {
+        body: { ok: true },
+        status: 201,
+      },
+      id: "return-created",
+      type: "returnResponse",
     },
   ],
   route: {
@@ -68,6 +83,53 @@ describe("workflow repository", () => {
       path: "register",
       version: 1,
     })).rejects.toThrow("WORKFLOW_ROUTE_CONFLICT");
+  });
+
+  it("rejects invalid workflow definitions before save", async () => {
+    const db = openMigratedSqliteAdapter();
+    const invalidDefinition = {
+      ...registerDefinition,
+      nodes: [
+        {
+          config: {},
+          id: "start",
+          type: "unknownNode",
+        },
+      ],
+    };
+
+    await expect(createWorkflow(db, {
+      definition: invalidDefinition,
+      method: "POST",
+      name: "Invalid workflow",
+      path: "/invalid",
+      version: 1,
+    })).rejects.toThrow("WORKFLOW_NODE_TYPE_UNKNOWN");
+    expect(await listWorkflows(db)).toHaveLength(0);
+  });
+
+  it("reports validation issues for bad route, duplicate nodes, missing config, and disconnected return", () => {
+    const issues = validateWorkflowDraft({
+      definition: {
+        edges: [],
+        nodes: [
+          { config: {}, id: "same", type: "queryEntries" },
+          { config: {}, id: "same", type: "notSupported" },
+        ],
+        startNodeId: "same",
+        version: 1,
+      },
+      method: "TRACE",
+      path: "http://bad/path",
+    });
+
+    expect(issues.map((issue) => issue.code)).toEqual(expect.arrayContaining([
+      "WORKFLOW_BAD_ROUTE_CONFIG",
+      "WORKFLOW_NODE_CONFIG_INVALID",
+      "WORKFLOW_NODE_DUPLICATE",
+      "WORKFLOW_NODE_DISCONNECTED",
+      "WORKFLOW_NODE_TYPE_UNKNOWN",
+    ]));
   });
 
   it("updates workflow metadata and keeps method/path unique", async () => {
