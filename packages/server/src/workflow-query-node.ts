@@ -21,6 +21,7 @@ export async function executeWorkflowQueryEntriesNode(
   db: ApiagexDatabase,
   context: WorkflowExecutionContext,
   node: WorkflowNodeDefinition<"queryEntries">,
+  options: { maxLimit?: number } = {},
 ): Promise<WorkflowNodeExecutionResult<QueryEntriesOutput>> {
   try {
     const schema = await getSchemaBySlug(db, node.config.schema);
@@ -31,7 +32,7 @@ export async function executeWorkflowQueryEntriesNode(
       : String(resolveWorkflowTemplateValue(node.config.search, context) ?? "").trim();
     const filters = resolveFilters(node.config.filters ?? [], context);
     const offset = Math.max(0, Math.floor(node.config.offset ?? 0));
-    const limit = clampLimit(node.config.limit);
+    const limit = clampLimit(node.config.limit, options.maxLimit);
     const allEntries = await listEntries(db, schema.id);
     const filtered = allEntries
       .filter((entry) => matchesSearch(entry, search))
@@ -90,9 +91,10 @@ function compareValues(left: unknown, right: unknown): number {
   return String(left ?? "").localeCompare(String(right ?? ""));
 }
 
-function clampLimit(value: number | undefined): number {
-  if (value === undefined || !Number.isFinite(value)) return 50;
-  return Math.min(100, Math.max(1, Math.floor(value)));
+function clampLimit(value: number | undefined, maxLimit = 100): number {
+  const safeMax = Math.max(1, Math.floor(maxLimit));
+  if (value === undefined || !Number.isFinite(value)) return Math.min(50, safeMax);
+  return Math.min(safeMax, Math.max(1, Math.floor(value)));
 }
 
 function workflowQueryFailure(

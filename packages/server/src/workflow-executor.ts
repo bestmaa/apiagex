@@ -12,6 +12,13 @@ import type {
 } from "./workflow-node-result.type.js";
 import { executeWorkflowQueryEntriesNode } from "./workflow-query-node.js";
 import { executeWorkflowReturnResponseNode } from "./workflow-return-node.js";
+import {
+  resolveWorkflowRuntimeLimits,
+  workflowResponseBytes,
+  workflowTimedOut,
+  type WorkflowRuntimeLimitOptions,
+  type WorkflowRuntimeLimits,
+} from "./workflow-runtime-limits.js";
 import { resolveWorkflowTemplateValue } from "./workflow-template.js";
 import { executeWorkflowUpdateEntryNode } from "./workflow-update-entry-node.js";
 import { executeWorkflowValidateBodyNode } from "./workflow-validate-body-node.js";
@@ -23,9 +30,7 @@ import type {
   WorkflowNodeOutputByType,
 } from "./workflow.type.js";
 
-export type WorkflowExecutorOptions = {
-  maxNodeExecutions?: number;
-};
+export type WorkflowExecutorOptions = WorkflowRuntimeLimitOptions;
 
 export type WorkflowExecutionSuccess = {
   context: WorkflowExecutionContext;
@@ -47,24 +52,39 @@ export async function executeWorkflowDefinition(
   definition: WorkflowDefinition,
   options: WorkflowExecutorOptions = {},
 ): Promise<WorkflowExecutionResult> {
-  const maxNodeExecutions = options.maxNodeExecutions ?? 100;
+  const limits = resolveWorkflowRuntimeLimits(options);
+  const startedAtMs = Date.now();
   const nodeById = new Map(definition.nodes.map((node) => [node.id, node]));
   const nextByNodeId = new Map(definition.edges.map((edge) => [edge.from, edge.to]));
   const executedNodeIds: string[] = [];
   let currentNodeId: string | undefined = definition.startNodeId;
 
   for (let count = 0; currentNodeId; count += 1) {
-    if (count >= maxNodeExecutions) {
-      return workflowExecutionFailure(context, executedNodeIds, currentNodeId, "WORKFLOW_NODE_FAILED", "Workflow node execution limit exceeded.");
+    const timeoutFailure = workflowTimeoutFailure(context, executedNodeIds, currentNodeId, startedAtMs, limits);
+    if (timeoutFailure) return timeoutFailure;
+    if (count >= limits.maxNodeExecutions) {
+      return workflowExecutionFailure(context, executedNodeIds, currentNodeId, "WORKFLOW_LIMIT_EXCEEDED", `Workflow node execution limit exceeded (${limits.maxNodeExecutions}).`);
     }
     const node = nodeById.get(currentNodeId);
     if (!node) {
       return workflowExecutionFailure(context, executedNodeIds, currentNodeId, "WORKFLOW_DEFINITION_INVALID", `Workflow node '${currentNodeId}' was not found.`);
     }
     executedNodeIds.push(node.id);
-    const result = await executeWorkflowNode(db, context, node);
+    const result = await executeWorkflowNode(db, context, node, limits);
     if (!result.ok) return { ...result, context, executedNodeIds };
+    const postNodeTimeoutFailure = workflowTimeoutFailure(context, executedNodeIds, node.id, startedAtMs, limits);
+    if (postNodeTimeoutFailure) return postNodeTimeoutFailure;
     if (node.type === "returnResponse") {
+      const responseBytes = workflowResponseBytes(context.response.body);
+      if (responseBytes > limits.maxResponseBytes) {
+        return workflowExecutionFailure(
+          context,
+          executedNodeIds,
+          node.id,
+          "WORKFLOW_LIMIT_EXCEEDED",
+          `Workflow response size limit exceeded (${responseBytes}/${limits.maxResponseBytes} bytes).`,
+        );
+      }
       return { context, executedNodeIds, ok: true, response: context.response };
     }
     if (node.type === "branch") {
@@ -81,10 +101,11 @@ async function executeWorkflowNode(
   db: ApiagexDatabase,
   context: WorkflowExecutionContext,
   node: AnyWorkflowNodeDefinition,
+  limits: WorkflowRuntimeLimits,
 ): Promise<WorkflowNodeExecutionResult> {
   if (node.type === "routeTrigger") return executeRouteTriggerNode(context, node);
   if (node.type === "validateBody") return executeWorkflowValidateBodyNode(context, node);
-  if (node.type === "queryEntries") return executeWorkflowQueryEntriesNode(db, context, node);
+  if (node.type === "queryEntries") return executeWorkflowQueryEntriesNode(db, context, node, { maxLimit: limits.maxQueryLimit });
   if (node.type === "getEntry") return executeWorkflowGetEntryNode(db, context, node);
   if (node.type === "createEntry") return executeWorkflowCreateEntryNode(db, context, node);
   if (node.type === "updateEntry") return executeWorkflowUpdateEntryNode(db, context, node);
@@ -94,6 +115,23 @@ async function executeWorkflowNode(
   if (node.type === "returnResponse") return executeWorkflowReturnResponseNode(context, node);
   const unexpected = node as { id: string; type: string };
   return workflowExecutionFailure(context, [], unexpected.id, "WORKFLOW_DEFINITION_INVALID", `Workflow node type '${unexpected.type}' is not supported.`);
+}
+
+function workflowTimeoutFailure(
+  context: WorkflowExecutionContext,
+  executedNodeIds: string[],
+  nodeId: string,
+  startedAtMs: number,
+  limits: WorkflowRuntimeLimits,
+): WorkflowExecutionFailure | undefined {
+  if (!workflowTimedOut(startedAtMs, limits.timeoutMs)) return undefined;
+  return workflowExecutionFailure(
+    context,
+    executedNodeIds,
+    nodeId,
+    "WORKFLOW_LIMIT_EXCEEDED",
+    `Workflow timeout exceeded (${limits.timeoutMs}ms).`,
+  );
 }
 
 function executeRouteTriggerNode(

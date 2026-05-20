@@ -96,6 +96,53 @@ describe("workflow executor", () => {
       expect(result.executedNodeIds).toEqual(["start", "start"]);
     }
   });
+
+  it("fails clearly when workflow timeout is exceeded", async () => {
+    const db = openMigratedSqliteAdapter();
+    const context = createWorkflowExecutionContext();
+
+    const result = await executeWorkflowDefinition(db, context, simpleReturnWorkflowDefinition(), { timeoutMs: 0 });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.code).toBe("WORKFLOW_LIMIT_EXCEEDED");
+      expect(result.error.message).toContain("timeout exceeded");
+      expect(result.executedNodeIds).toEqual([]);
+    }
+  });
+
+  it("fails clearly when response size limit is exceeded", async () => {
+    const db = openMigratedSqliteAdapter();
+    const context = createWorkflowExecutionContext();
+
+    const result = await executeWorkflowDefinition(db, context, simpleReturnWorkflowDefinition("x".repeat(100)), {
+      maxResponseBytes: 20,
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.code).toBe("WORKFLOW_LIMIT_EXCEEDED");
+      expect(result.error.message).toContain("response size limit exceeded");
+      expect(result.executedNodeIds).toEqual(["start", "return-ok"]);
+    }
+  });
+
+  it("caps query node limit with runtime query limit", async () => {
+    const db = openMigratedSqliteAdapter();
+    const schema = await createUsersSchema(db);
+    await createEntry(db, { schemaId: schema.id, data: { email: "a@example.com", password: "password123" } });
+    await createEntry(db, { schemaId: schema.id, data: { email: "b@example.com", password: "password123" } });
+    await createEntry(db, { schemaId: schema.id, data: { email: "c@example.com", password: "password123" } });
+    const context = createWorkflowExecutionContext();
+
+    const result = await executeWorkflowDefinition(db, context, queryLimitWorkflowDefinition(), { maxQueryLimit: 2 });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.context.steps["find-users"]).toMatchObject({ limit: 2, total: 3 });
+      expect((result.context.steps["find-users"] as { entries: unknown[] }).entries).toHaveLength(2);
+    }
+  });
 });
 
 function registerWorkflowDefinition(): WorkflowDefinition {
@@ -182,4 +229,55 @@ function createUsersSchema(db: ReturnType<typeof openMigratedSqliteAdapter>) {
     name: "Users",
     slug: "users",
   });
+}
+
+function simpleReturnWorkflowDefinition(message = "ok"): WorkflowDefinition {
+  return {
+    edges: [{ from: "start", id: "edge-start-return", to: "return-ok" }],
+    nodes: [
+      { config: {}, id: "start", type: "routeTrigger" },
+      {
+        config: {
+          body: { message },
+          status: 200,
+        },
+        id: "return-ok",
+        type: "returnResponse",
+      },
+    ],
+    route: { method: "GET", path: "/simple" },
+    startNodeId: "start",
+    version: 1,
+  };
+}
+
+function queryLimitWorkflowDefinition(): WorkflowDefinition {
+  return {
+    edges: [
+      { from: "start", id: "edge-start-query", to: "find-users" },
+      { from: "find-users", id: "edge-query-return", to: "return-ok" },
+    ],
+    nodes: [
+      { config: {}, id: "start", type: "routeTrigger" },
+      {
+        config: {
+          limit: 10,
+          schema: "users",
+        },
+        id: "find-users",
+        type: "queryEntries",
+      },
+      {
+        config: {
+          body: { ok: true },
+          status: 200,
+        },
+        id: "return-ok",
+        type: "returnResponse",
+      },
+    ],
+    route: { method: "GET", path: "/users" },
+    startNodeId: "start",
+    version: 1,
+  };
 }

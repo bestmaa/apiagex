@@ -57,6 +57,12 @@ export {
 export {
   executeWorkflowDefinition,
 } from "./workflow-executor.js";
+export {
+  defaultWorkflowRuntimeLimits,
+  resolveWorkflowRuntimeLimits,
+  workflowResponseBytes,
+  workflowTimedOut,
+} from "./workflow-runtime-limits.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";
@@ -113,6 +119,10 @@ export type {
   WorkflowExecutionSuccess,
   WorkflowExecutorOptions,
 } from "./workflow-executor.js";
+export type {
+  WorkflowRuntimeLimitOptions,
+  WorkflowRuntimeLimits,
+} from "./workflow-runtime-limits.js";
 export type {
   CreateWorkflowBody,
   UpdateWorkflowBody,

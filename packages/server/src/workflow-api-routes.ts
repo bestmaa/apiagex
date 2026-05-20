@@ -105,5 +105,6 @@ function workflowErrorStatus(code: string): number {
   if (code === "WORKFLOW_FORBIDDEN") return 403;
   if (code === "WORKFLOW_ENTRY_NOT_FOUND" || code === "WORKFLOW_NOT_FOUND" || code === "WORKFLOW_SCHEMA_NOT_FOUND") return 404;
   if (code === "WORKFLOW_DEFINITION_INVALID") return 422;
+  if (code === "WORKFLOW_LIMIT_EXCEEDED") return 422;
   return 500;
 }

@@ -415,7 +415,7 @@ Each task uses this structure:
 #### T3427 - Add Workflow Runtime Limits
 
 - Version: `v0.11.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add runtime limits for max steps, timeout, response size, and query limit.
 - Persona: Platform safety engineer; keep bad workflows from hurting the server.
 - Success Criteria: Limits are documented, configurable internally, and tested.
