@@ -52,6 +52,9 @@ export {
 export {
   executeWorkflowReturnResponseNode,
 } from "./workflow-return-node.js";
+export {
+  executeWorkflowDefinition,
+} from "./workflow-executor.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";
@@ -102,6 +105,12 @@ export type {
   WorkflowNodeExecutionResult,
   WorkflowNodeExecutionSuccess,
 } from "./workflow-node-result.type.js";
+export type {
+  WorkflowExecutionFailure,
+  WorkflowExecutionResult,
+  WorkflowExecutionSuccess,
+  WorkflowExecutorOptions,
+} from "./workflow-executor.js";
 export type {
   AnyWorkflowNodeDefinition,
   WorkflowDefinition,

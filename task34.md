@@ -335,7 +335,7 @@ Each task uses this structure:
 #### T3421 - Build Ordered Workflow Executor
 
 - Version: `v0.11.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Execute workflow nodes in ordered/edge-defined sequence.
 - Persona: Runtime engineer; connect individual nodes into a full workflow.
 - Success Criteria: Executor runs happy path, branch path, node failure path, and return path with tests.
