@@ -55,6 +55,10 @@ export {
   executeWorkflowHttpRequestNode,
 } from "./workflow-http-request-node.js";
 export {
+  executeWorkflowHashPasswordNode,
+  executeWorkflowVerifyPasswordNode,
+} from "./workflow-password-node.js";
+export {
   executeWorkflowReturnResponseNode,
 } from "./workflow-return-node.js";
 export {
@@ -167,6 +171,7 @@ export type {
   WorkflowHttpRequestConfig,
   WorkflowHttpRequestRetryConfig,
   WorkflowHttpMethod,
+  WorkflowHashPasswordConfig,
   WorkflowJsonPrimitive,
   WorkflowJsonValue,
   WorkflowNodeConfigByType,
@@ -185,4 +190,5 @@ export type {
   WorkflowUpdateEntryConfig,
   WorkflowValidateBodyConfig,
   WorkflowValidationFieldType,
+  WorkflowVerifyPasswordConfig,
 } from "./workflow.type.js";

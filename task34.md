@@ -761,7 +761,7 @@ Each task uses this structure:
 #### T3453 - Implement Hash And Verify Password Nodes
 
 - Version: `v0.15.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add password hash and verify nodes for workflows.
 - Persona: Auth implementation engineer; enable secure register/login workflows.
 - Success Criteria: Hash node stores safe hash; verify node compares password to hash; tests cover success/failure.

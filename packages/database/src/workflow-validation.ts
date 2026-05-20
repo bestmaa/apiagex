@@ -24,6 +24,7 @@ const allowedNodeTypes = new Set([
   "createEntry",
   "deleteEntry",
   "getEntry",
+  "hashPassword",
   "httpRequest",
   "queryEntries",
   "routeTrigger",
@@ -31,6 +32,7 @@ const allowedNodeTypes = new Set([
   "setVariable",
   "updateEntry",
   "validateBody",
+  "verifyPassword",
 ]);
 
 export function validateWorkflowDraft(input: ValidateWorkflowDraftInput): WorkflowValidationIssue[] {
@@ -119,6 +121,12 @@ function validateNodeConfig(
   }
   if (nodeType === "httpRequest") {
     validateHttpRequestConfig(nodeId, config, issues);
+  }
+  if (nodeType === "hashPassword" && !Object.hasOwn(config, "password")) {
+    issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "hashPassword requires password.", nodeId });
+  }
+  if (nodeType === "verifyPassword" && (!Object.hasOwn(config, "password") || !Object.hasOwn(config, "hash"))) {
+    issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "verifyPassword requires password and hash.", nodeId });
   }
   if (nodeType === "createEntry" && (!isNonEmptyString(config.schema) || !isRecord(config.data))) {
     issues.push({ code: "WORKFLOW_NODE_CONFIG_INVALID", message: "createEntry requires schema and data.", nodeId });

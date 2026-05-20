@@ -259,6 +259,37 @@ describe("workflow repository", () => {
     expect(issues).toEqual([]);
   });
 
+  it("accepts configured password workflow nodes", () => {
+    const issues = validateWorkflowDraft({
+      definition: {
+        edges: [
+          { from: "start", id: "edge-start-hash", to: "hash-password" },
+          { from: "hash-password", id: "edge-hash-verify", to: "verify-password" },
+          { from: "verify-password", id: "edge-verify-return", to: "return-ok" },
+        ],
+        nodes: [
+          { config: {}, id: "start", type: "routeTrigger" },
+          { config: { password: "{{body.password}}" }, id: "hash-password", type: "hashPassword" },
+          {
+            config: {
+              hash: "{{steps.find-user.entries.0.data.passwordHash}}",
+              password: "{{body.password}}",
+            },
+            id: "verify-password",
+            type: "verifyPassword",
+          },
+          { config: { body: { ok: true }, status: 200 }, id: "return-ok", type: "returnResponse" },
+        ],
+        startNodeId: "start",
+        version: 1,
+      },
+      method: "POST",
+      path: "/auth/check",
+    });
+
+    expect(issues).toEqual([]);
+  });
+
   it("updates workflow metadata and keeps method/path unique", async () => {
     const db = openMigratedSqliteAdapter();
     const first = await createWorkflow(db, {

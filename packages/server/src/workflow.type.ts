@@ -33,6 +33,12 @@ export type WorkflowErrorCode =
   | "HTTP_STATUS_NOT_ALLOWED"
   | "HTTP_TEMPLATE_VALUE_MISSING"
   | "HTTP_URL_NOT_ALLOWED"
+  | "PASSWORD_HASH_FAILED"
+  | "PASSWORD_HASH_UNSUPPORTED"
+  | "PASSWORD_INPUT_MISSING"
+  | "PASSWORD_INPUT_TOO_SHORT"
+  | "PASSWORD_VERIFY_FAILED"
+  | "PASSWORD_VERIFY_INVALID_HASH"
   | "WORKFLOW_BAD_ROUTE_CONFIG"
   | "WORKFLOW_DEFINITION_INVALID"
   | "WORKFLOW_ENTRY_NOT_FOUND"
@@ -79,13 +85,15 @@ export type WorkflowNodeType =
   | "createEntry"
   | "deleteEntry"
   | "getEntry"
+  | "hashPassword"
   | "httpRequest"
   | "queryEntries"
   | "routeTrigger"
   | "returnResponse"
   | "setVariable"
   | "updateEntry"
-  | "validateBody";
+  | "validateBody"
+  | "verifyPassword";
 
 export type WorkflowNodeFailureBehavior = "continue" | "stop";
 
@@ -180,6 +188,18 @@ export type WorkflowSetVariableConfig = {
   values: Record<string, WorkflowExpressionValue>;
 };
 
+export type WorkflowHashPasswordConfig = {
+  minLength?: number;
+  outputKey?: string;
+  password: WorkflowExpressionValue;
+};
+
+export type WorkflowVerifyPasswordConfig = {
+  hash: WorkflowExpressionValue;
+  outputKey?: string;
+  password: WorkflowExpressionValue;
+};
+
 export type WorkflowHttpRequestBodyMode = "json" | "none" | "text";
 
 export type WorkflowHttpRequestRetryConfig = {
@@ -211,6 +231,7 @@ export type WorkflowNodeConfigByType = {
   createEntry: WorkflowCreateEntryConfig;
   deleteEntry: WorkflowDeleteEntryConfig;
   getEntry: WorkflowGetEntryConfig;
+  hashPassword: WorkflowHashPasswordConfig;
   httpRequest: WorkflowHttpRequestConfig;
   queryEntries: WorkflowQueryEntriesConfig;
   routeTrigger: WorkflowRouteTriggerConfig;
@@ -218,6 +239,7 @@ export type WorkflowNodeConfigByType = {
   setVariable: WorkflowSetVariableConfig;
   updateEntry: WorkflowUpdateEntryConfig;
   validateBody: WorkflowValidateBodyConfig;
+  verifyPassword: WorkflowVerifyPasswordConfig;
 };
 
 export type WorkflowNodeOutputByType = {
@@ -225,6 +247,7 @@ export type WorkflowNodeOutputByType = {
   createEntry: { entry: WorkflowJsonValue };
   deleteEntry: { deleted: boolean; entryId: string };
   getEntry: { entry: WorkflowJsonValue | null };
+  hashPassword: { algorithm: "scrypt"; hash: string; needsRehash: boolean };
   httpRequest: {
     attempts: number;
     body: WorkflowJsonValue;
@@ -242,6 +265,7 @@ export type WorkflowNodeOutputByType = {
   setVariable: { values: Record<string, WorkflowJsonValue> };
   updateEntry: { entry: WorkflowJsonValue };
   validateBody: { valid: boolean };
+  verifyPassword: { matched: boolean; needsRehash: boolean };
 };
 
 export type WorkflowRouteDefinition = {

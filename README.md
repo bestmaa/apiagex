@@ -93,6 +93,8 @@ Workflow `httpRequest` nodes are available for safe provider calls. Set `APIAGEX
 
 Password hashing and verification workflow nodes are planned in [docs/workflow-password-node-plan.md](./docs/workflow-password-node-plan.md). The plan requires Argon2id or a reviewed password-hashing fallback, per-password salts, safe verify behavior, redaction, and migration guidance before auth templates are production-ready.
 
+Workflow `hashPassword` and `verifyPassword` nodes are available using Node `crypto.scrypt`. They generate per-password salts, verify with timing-safe derived-key comparison, and output only hash/match metadata, not the plain password.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

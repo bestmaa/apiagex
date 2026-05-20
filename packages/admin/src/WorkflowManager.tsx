@@ -11,7 +11,7 @@ import type { WorkflowDraft, WorkflowRecord, WorkflowRunRecord, WorkflowTestRunR
 
 type WorkflowStatusFilter = "active" | "all" | "inactive";
 type WorkflowViewMode = "graph" | "list";
-type WorkflowStepType = "createEntry" | "httpRequest" | "queryEntries" | "returnResponse" | "updateEntry" | "validateBody";
+type WorkflowStepType = "createEntry" | "hashPassword" | "httpRequest" | "queryEntries" | "returnResponse" | "updateEntry" | "validateBody" | "verifyPassword";
 type WorkflowFormDraft = {
   active: boolean;
   description: string;
@@ -31,6 +31,8 @@ type WorkflowStepDraft = {
   httpMethod: string;
   id: string;
   limit: number;
+  password: string;
+  passwordHash: string;
   outputKey: string;
   queryJson: string;
   responseBodyMode: string;
@@ -64,6 +66,8 @@ const workflowStepTypes: WorkflowStepType[] = [
   "createEntry",
   "updateEntry",
   "httpRequest",
+  "hashPassword",
+  "verifyPassword",
   "returnResponse",
 ];
 const workflowGraphNodeTypes = {
@@ -1014,6 +1018,8 @@ function WorkflowStepEditor({
             <option value="createEntry">Create entry</option>
             <option value="updateEntry">Update entry</option>
             <option value="httpRequest">HTTP request</option>
+            <option value="hashPassword">Hash password</option>
+            <option value="verifyPassword">Verify password</option>
             <option value="returnResponse">Return response</option>
           </select>
         </label>
@@ -1186,6 +1192,23 @@ function WorkflowStepFields({
         </label>
         <label>Output variable
           <input value={step.outputKey} placeholder="providerResult" onChange={(event) => onChange({ ...step, outputKey: event.target.value })} />
+        </label>
+      </div>
+    );
+  }
+  if (step.type === "hashPassword" || step.type === "verifyPassword") {
+    return (
+      <div className="workflow-step-fields">
+        <label>Password value
+          <input value={step.password} placeholder="{{body.password}}" onChange={(event) => onChange({ ...step, password: event.target.value })} />
+        </label>
+        {step.type === "verifyPassword" ? (
+          <label>Stored hash
+            <input value={step.passwordHash} placeholder="{{steps.find-user.entries.0.data.passwordHash}}" onChange={(event) => onChange({ ...step, passwordHash: event.target.value })} />
+          </label>
+        ) : null}
+        <label>Output variable
+          <input value={step.outputKey} placeholder={step.type === "hashPassword" ? "passwordHash" : "passwordMatched"} onChange={(event) => onChange({ ...step, outputKey: event.target.value })} />
         </label>
       </div>
     );
@@ -1504,6 +1527,12 @@ function defaultGraphNodeConfig(type: string): Record<string, unknown> {
   if (type === "createEntry") return { data: {}, schema: "" };
   if (type === "updateEntry") return { data: {}, entryId: "{{body.id}}" };
   if (type === "deleteEntry") return { entryId: "{{body.id}}" };
+  if (type === "hashPassword") return { outputKey: "passwordHash", password: "{{body.password}}" };
+  if (type === "verifyPassword") return {
+    hash: "{{steps.find-user.entries.0.data.passwordHash}}",
+    outputKey: "passwordMatched",
+    password: "{{body.password}}",
+  };
   if (type === "httpRequest") return {
     headers: {},
     method: "POST",
@@ -1566,6 +1595,7 @@ function graphNodeValidation(type: string, config: unknown): { state: WorkflowGr
     "createEntry",
     "deleteEntry",
     "getEntry",
+    "hashPassword",
     "httpRequest",
     "queryEntries",
     "returnResponse",
@@ -1573,6 +1603,7 @@ function graphNodeValidation(type: string, config: unknown): { state: WorkflowGr
     "setVariable",
     "updateEntry",
     "validateBody",
+    "verifyPassword",
   ]);
   if (!knownTypes.has(type)) return { state: "error", text: "Unsupported node" };
   if (!isRecord(config)) return { state: "warning", text: "Config not readable" };
@@ -1582,6 +1613,13 @@ function graphNodeValidation(type: string, config: unknown): { state: WorkflowGr
   }
   if (type === "httpRequest" && (typeof config.url !== "string" || !config.url.trim())) {
     return { state: "error", text: "URL missing" };
+  }
+  if (["hashPassword", "verifyPassword"].includes(type)
+    && (typeof config.password !== "string" || !config.password.trim())) {
+    return { state: "error", text: "Password input missing" };
+  }
+  if (type === "verifyPassword" && typeof config.hash !== "string") {
+    return { state: "error", text: "Hash input missing" };
   }
   if (type === "returnResponse" && typeof config.status !== "number") {
     return { state: "warning", text: "Status default needed" };
@@ -1611,6 +1649,8 @@ function nodeLabel(type: string): string {
   if (type === "updateEntry") return "Update entry";
   if (type === "deleteEntry") return "Delete entry";
   if (type === "httpRequest") return "HTTP request";
+  if (type === "hashPassword") return "Hash password";
+  if (type === "verifyPassword") return "Verify password";
   if (type === "branch") return "Branch";
   if (type === "setVariable") return "Set variable";
   if (type === "returnResponse") return "Return response";
@@ -2034,6 +2074,16 @@ function validateStepConfig(step: WorkflowStepDraft, stepNumber: number): void {
     parseSuccessStatus(step.successStatus, `Invalid workflow: step ${stepNumber} success status must be HTTP status codes.`);
     return;
   }
+  if (step.type === "hashPassword") {
+    if (!step.password.trim()) throw new Error(`Invalid workflow: step ${stepNumber} needs a password value.`);
+    return;
+  }
+  if (step.type === "verifyPassword") {
+    if (!step.password.trim() || !step.passwordHash.trim()) {
+      throw new Error(`Invalid workflow: step ${stepNumber} needs password and hash values.`);
+    }
+    return;
+  }
   if (!Number.isInteger(step.status) || step.status < 100 || step.status > 599) {
     throw new Error(`Invalid workflow: step ${stepNumber} status must be between 100 and 599.`);
   }
@@ -2104,6 +2154,19 @@ function configFromStep(step: WorkflowStepDraft): Record<string, unknown> {
       successStatus: parseSuccessStatus(step.successStatus, "Invalid workflow: success status must be HTTP status codes."),
       timeoutMs: step.timeoutMs,
       url: step.url.trim(),
+    };
+  }
+  if (step.type === "hashPassword") {
+    return {
+      ...(step.outputKey.trim() ? { outputKey: step.outputKey.trim() } : {}),
+      password: expressionFromText(step.password),
+    };
+  }
+  if (step.type === "verifyPassword") {
+    return {
+      hash: expressionFromText(step.passwordHash),
+      ...(step.outputKey.trim() ? { outputKey: step.outputKey.trim() } : {}),
+      password: expressionFromText(step.password),
     };
   }
   return {
@@ -2185,6 +2248,23 @@ function stepFromNode(node: unknown): WorkflowStepDraft | null {
       url: typeof config.url === "string" ? config.url : "",
     };
   }
+  if (node.type === "hashPassword") {
+    return {
+      ...base,
+      id,
+      outputKey: typeof config.outputKey === "string" ? config.outputKey : "",
+      password: typeof config.password === "undefined" ? base.password : textFromExpression(config.password),
+    };
+  }
+  if (node.type === "verifyPassword") {
+    return {
+      ...base,
+      id,
+      outputKey: typeof config.outputKey === "string" ? config.outputKey : "",
+      password: typeof config.password === "undefined" ? base.password : textFromExpression(config.password),
+      passwordHash: typeof config.hash === "undefined" ? base.passwordHash : textFromExpression(config.hash),
+    };
+  }
   return {
     ...base,
     body: typeof config.body === "undefined" ? base.body : jsonText(config.body),
@@ -2206,6 +2286,8 @@ function defaultStep(type: WorkflowStepType): WorkflowStepDraft {
     httpMethod: "POST",
     id,
     limit: 20,
+    password: "{{body.password}}",
+    passwordHash: "{{steps.find-user.entries.0.data.passwordHash}}",
     outputKey: "",
     queryJson: jsonText({}),
     responseBodyMode: "json",
@@ -2232,6 +2314,8 @@ function stepLabel(type: WorkflowStepType): string {
   if (type === "createEntry") return "Create entry";
   if (type === "updateEntry") return "Update entry";
   if (type === "httpRequest") return "HTTP request";
+  if (type === "hashPassword") return "Hash password";
+  if (type === "verifyPassword") return "Verify password";
   return "Return response";
 }
 
@@ -2241,6 +2325,8 @@ function stepIdPrefix(type: WorkflowStepType): string {
   if (type === "createEntry") return "create";
   if (type === "updateEntry") return "update";
   if (type === "httpRequest") return "http";
+  if (type === "hashPassword") return "hash";
+  if (type === "verifyPassword") return "verify";
   return "return";
 }
 
@@ -2283,6 +2369,7 @@ function parseJsonValue(text: string, errorMessage: string): unknown {
 function expressionFromText(text: string): unknown {
   const trimmed = text.trim();
   if (!trimmed) return "";
+  if (/^{{[^}]+}}$/.test(trimmed)) return trimmed;
   if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
     return parseJsonValue(trimmed, "Invalid workflow: expression must be valid JSON.");
   }

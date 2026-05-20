@@ -651,6 +651,39 @@ describe("WorkflowManager", () => {
     });
   });
 
+  it("creates a workflow with password hash and verify steps", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create workflow");
+      await flushPromises();
+    });
+    setInputValue(inputByPlaceholder(container, "Pay order"), "Check password");
+    setInputValue(inputByPlaceholder(container, "/orders/pay"), "/auth/check");
+    await addWorkflowStep(container, "hashPassword");
+    await addWorkflowStep(container, "verifyPassword");
+
+    await act(async () => {
+      clickButton(container, "Save workflow");
+      await flushPromises();
+    });
+
+    expect(vi.mocked(createWorkflow).mock.calls[0]?.[0].definition).toMatchObject({
+      nodes: [
+        { id: "start", type: "routeTrigger" },
+        { config: { password: "{{body.password}}" }, type: "hashPassword" },
+        {
+          config: {
+            hash: "{{steps.find-user.entries.0.data.passwordHash}}",
+            password: "{{body.password}}",
+          },
+          type: "verifyPassword",
+        },
+        { type: "returnResponse" },
+      ],
+    });
+  });
+
   it("uses schema and field pickers without hiding the slug inputs", async () => {
     const { container } = await renderWorkflowManagerLoaded();
 

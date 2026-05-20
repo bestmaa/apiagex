@@ -345,3 +345,17 @@ Minimum tests:
 9. Add security-focused tests.
 
 Do not ship user registration/login templates as production-ready until password hashing and token issuing are both implemented.
+
+## v0.15.4 Implementation Checkpoint
+
+The first implementation uses Node `crypto.scrypt` as the reviewed built-in fallback. It supports:
+
+- `hashPassword` node with `password`, optional `minLength`, and optional `outputKey`.
+- `verifyPassword` node with `password`, `hash`, and optional `outputKey`.
+- Unique random salt per hash.
+- Encoded `scrypt$...` hash string containing parameters, salt, and derived key.
+- Timing-safe derived-key comparison during verify.
+- `needsRehash` output when stored scrypt parameters differ from current policy.
+- Controlled failures for short passwords and malformed hashes.
+
+Argon2id remains the preferred future algorithm if a native dependency is accepted after package review. Token issuing is still planned separately, so register/login templates still need the issue-token work before production use.

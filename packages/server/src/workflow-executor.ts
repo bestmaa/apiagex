@@ -6,6 +6,7 @@ import { executeWorkflowCreateEntryNode } from "./workflow-create-entry-node.js"
 import { executeWorkflowDeleteEntryNode } from "./workflow-delete-entry-node.js";
 import { executeWorkflowGetEntryNode } from "./workflow-get-entry-node.js";
 import { executeWorkflowHttpRequestNode, type WorkflowHttpRequestOptions } from "./workflow-http-request-node.js";
+import { executeWorkflowHashPasswordNode, executeWorkflowVerifyPasswordNode } from "./workflow-password-node.js";
 import type {
   WorkflowNodeExecutionFailure,
   WorkflowNodeExecutionResult,
@@ -115,6 +116,8 @@ async function executeWorkflowNode(
   if (node.type === "updateEntry") return executeWorkflowUpdateEntryNode(db, context, node);
   if (node.type === "deleteEntry") return executeWorkflowDeleteEntryNode(db, context, node);
   if (node.type === "httpRequest") return executeWorkflowHttpRequestNode(context, node, httpRequestOptions);
+  if (node.type === "hashPassword") return executeWorkflowHashPasswordNode(context, node);
+  if (node.type === "verifyPassword") return executeWorkflowVerifyPasswordNode(context, node);
   if (node.type === "branch") return executeWorkflowBranchNode(context, node);
   if (node.type === "setVariable") return executeSetVariableNode(context, node);
   if (node.type === "returnResponse") return executeWorkflowReturnResponseNode(context, node);

@@ -308,7 +308,7 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
         <article className="api-row">
           <strong>Password node plan</strong>
           <p>Register and login workflows need dedicated password nodes before production use. The plan requires Argon2id or a reviewed fallback, per-password salts, safe verification, redaction, and migration guidance.</p>
-          <p>Read <code>docs/workflow-password-node-plan.md</code> before implementing or using auth templates that accept <code>{`{{body.password}}`}</code>.</p>
+          <p><code>hashPassword</code> and <code>verifyPassword</code> currently use Node <code>crypto.scrypt</code> with per-password salts and timing-safe verify. Read <code>docs/workflow-password-node-plan.md</code> before using auth templates that accept <code>{`{{body.password}}`}</code>.</p>
         </article>
       </section>
 

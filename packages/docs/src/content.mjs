@@ -311,6 +311,8 @@ export const readmePage = {
         "Implemented HTTP request nodes host allowlisting ke liye APIAGEX_WORKFLOW_HTTP_ALLOWED_HOSTS aur env-backed secrets jaise APIAGEX_SECRET_PROVIDER_APIKEY use karte hain.",
         "Password node plan: docs/workflow-password-node-plan.md requires Argon2id or reviewed fallback hashing, per-password salts, safe verify, redaction, and migration guidance.",
         "Password node plan: docs/workflow-password-node-plan.md Argon2id ya reviewed fallback hashing, per-password salts, safe verify, redaction, aur migration guidance require karta hai.",
+        "Implemented password nodes use Node crypto.scrypt with per-password salts and timing-safe verify; plain passwords are not returned in node output.",
+        "Implemented password nodes Node crypto.scrypt, per-password salts, aur timing-safe verify use karte hain; plain passwords node output me return nahi hote.",
       ],
     },
     {
