@@ -283,7 +283,7 @@ Each task uses this structure:
 #### T3417 - Implement Entry Update Node
 
 - Version: `v0.10.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Update an entry by id from workflow data mapping.
 - Persona: Workflow API engineer; support order status, approval, and profile update flows.
 - Success Criteria: Node updates valid entries, merges or replaces according to documented rule, and exposes updated entry.
