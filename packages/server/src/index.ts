@@ -27,6 +27,9 @@ export {
   resolveWorkflowTemplateValue,
   WorkflowTemplateError,
 } from "./workflow-template.js";
+export {
+  executeWorkflowValidateBodyNode,
+} from "./workflow-validate-body-node.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";
@@ -72,6 +75,11 @@ export type {
 export type {
   WorkflowTemplateResolution,
 } from "./workflow-template.js";
+export type {
+  WorkflowNodeExecutionFailure,
+  WorkflowNodeExecutionResult,
+  WorkflowNodeExecutionSuccess,
+} from "./workflow-node-result.type.js";
 export type {
   AnyWorkflowNodeDefinition,
   WorkflowDefinition,

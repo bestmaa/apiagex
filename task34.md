@@ -231,7 +231,7 @@ Each task uses this structure:
 #### T3413 - Implement Validate Body Node
 
 - Version: `v0.10.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add runtime support for required fields, simple type checks, email checks, min/max length, and enum validation.
 - Persona: API validation engineer; make common register/login validation possible.
 - Success Criteria: Validate node passes valid payloads and returns configured error response for invalid payloads.
