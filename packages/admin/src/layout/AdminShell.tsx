@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { BookOpen, Database, FileText, Home, Menu, Network, Settings, Users, X } from "lucide-react";
+import { BookOpen, Database, FileText, GitBranch, Home, Menu, Network, Settings, Users, X } from "lucide-react";
 import { activeNavRoute, isRouteActive, isSettingsRoute, settingsSubnavItems } from "../app-route";
 import type { AdminNavItem, AdminRoute } from "../app-route.type";
 import type { OwnerSession } from "../session.type";
@@ -24,6 +24,7 @@ const navIcons = {
   "settings/api-docs": Settings,
   "settings/webhooks": Settings,
   "settings/realtime": Settings,
+  "settings/workflows": GitBranch,
   users: Users,
   "docs/webhooks": BookOpen,
   "docs/realtime": BookOpen,
@@ -44,6 +45,7 @@ const pageDescriptions = {
   "settings/api-docs": "Control Swagger/OpenAPI visibility.",
   "settings/webhooks": "Manage signed hooks for content API changes.",
   "settings/realtime": "Enable WebSocket events for generated content APIs.",
+  "settings/workflows": "Build no-code custom APIs with safe workflow steps.",
   users: "Invite users and assign exactly one API role.",
   "docs/webhooks": "Verify signed webhook requests in receiver apps.",
   "docs/realtime": "Build live clients with realtime WebSocket events.",

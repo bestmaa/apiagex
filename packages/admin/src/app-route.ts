@@ -41,6 +41,11 @@ export const settingsSubnavItems: AdminSubnavItem[] = [
     label: "Realtime API",
     route: "settings/realtime",
   },
+  {
+    description: "Build no-code custom APIs.",
+    label: "Workflows",
+    route: "settings/workflows",
+  },
 ];
 
 const standaloneRoutes: AdminRoute[] = [

@@ -11,6 +11,7 @@ describe("admin route helpers", () => {
     expect(readAdminRoute("#settings/api-docs")).toBe("settings/api-docs");
     expect(readAdminRoute("#settings/webhooks")).toBe("settings/webhooks");
     expect(readAdminRoute("#settings/realtime")).toBe("settings/realtime");
+    expect(readAdminRoute("#settings/workflows")).toBe("settings/workflows");
     expect(readAdminRoute("#docs/webhooks")).toBe("docs/webhooks");
     expect(readAdminRoute("#docs/realtime")).toBe("docs/realtime");
     expect(readAdminRoute("#roles")).toBe("settings/content-roles");
@@ -25,6 +26,7 @@ describe("admin route helpers", () => {
     expect(activeNavRoute("settings/api-tokens")).toBe("settings");
     expect(activeNavRoute("settings/api-docs")).toBe("settings");
     expect(activeNavRoute("settings/webhooks")).toBe("settings");
+    expect(activeNavRoute("settings/workflows")).toBe("settings");
     expect(isSettingsRoute("settings/content-roles")).toBe(true);
     expect(settingsSubnavItems.map((item) => item.label)).toEqual([
       "Admin Roles",
@@ -35,6 +37,7 @@ describe("admin route helpers", () => {
       "API Docs",
       "Webhooks",
       "Realtime API",
+      "Workflows",
     ]);
   });
 

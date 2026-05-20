@@ -1,4 +1,4 @@
-import { FileJson, KeyRound, Radio, Route, Send, Shield, SlidersHorizontal, Ticket } from "lucide-react";
+import { FileJson, GitBranch, KeyRound, Radio, Route, Send, Shield, SlidersHorizontal, Ticket } from "lucide-react";
 import { ApiPermissionManager } from "../ApiPermissionManager";
 import { CustomApiPermissionManager } from "../CustomApiPermissionManager";
 import { RoleManager } from "../RoleManager";
@@ -18,6 +18,7 @@ export function SettingsPage({ route }: { route: AdminRoute }) {
   if (route === "settings/api-docs") return <SettingsApiDocs />;
   if (route === "settings/webhooks") return <SettingsWebhooks />;
   if (route === "settings/realtime") return <SettingsRealtime />;
+  if (route === "settings/workflows") return <SettingsWorkflows />;
   return <SettingsOverview />;
 }
 
@@ -66,6 +67,11 @@ function SettingsOverview() {
           <Radio aria-hidden="true" size={20} />
           <strong>Realtime API</strong>
           <span>WebSocket events for live client screens.</span>
+        </a>
+        <a className="settings-option" href="#settings/workflows">
+          <GitBranch aria-hidden="true" size={20} />
+          <strong>Workflows</strong>
+          <span>Build no-code custom APIs with safe workflow steps.</span>
         </a>
       </div>
     </section>
@@ -118,6 +124,19 @@ function SettingsRealtime() {
       <h2 id="settings-realtime-title">Realtime API</h2>
       <p>Turn on live WebSocket events per generated content API.</p>
       <RealtimeManager />
+    </section>
+  );
+}
+
+function SettingsWorkflows() {
+  return (
+    <section aria-labelledby="settings-workflow-title" className="settings-route-panel">
+      <h2 id="settings-workflow-title">Workflows</h2>
+      <p>Create no-code custom APIs under <code>/api/custom</code>. Workflow list and form tools will appear here.</p>
+      <div className="empty-state">
+        <strong>No workflow builder yet</strong>
+        <span>Backend workflow APIs are available. The Admin UI builder starts from this Settings page.</span>
+      </div>
     </section>
   );
 }

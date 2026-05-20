@@ -13,6 +13,7 @@ export type AdminRoute =
   | "settings/api-docs"
   | "settings/webhooks"
   | "settings/realtime"
+  | "settings/workflows"
   | "docs/webhooks"
   | "docs/realtime"
   | "docs";

@@ -430,7 +430,7 @@ Each task uses this structure:
 #### T3428 - Add Workflow Settings Submenu
 
 - Version: `v0.12.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add Settings > Workflows navigation in Admin UI.
 - Persona: Admin UI engineer; make workflow builder discoverable.
 - Success Criteria: Settings submenu and page route exist with empty state.
