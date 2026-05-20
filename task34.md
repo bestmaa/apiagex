@@ -815,7 +815,7 @@ Each task uses this structure:
 #### T3457 - Add Provider E2E Workflow Tests
 
 - Version: `v0.16.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Verify workflow storage and execution on SQLite, PostgreSQL, and MySQL.
 - Persona: Database QA engineer; keep provider support real.
 - Success Criteria: Provider E2E covers workflow tables, CRUD, and a simple create/query workflow.
