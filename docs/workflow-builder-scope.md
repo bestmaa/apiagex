@@ -122,6 +122,126 @@ Pehle workflow runtime me chhota aur safe node set hona chahiye:
 
 Later nodes me HTTP request, email/SMS, hash password, verify password, issue app token, webhook emit, aur realtime emit aa sakte hain.
 
+## MVP Node Contracts
+
+### English
+
+Each MVP node has a typed input config, predictable output, and default failure behavior:
+
+| Node type | Input config | Output | Failure behavior |
+| --- | --- | --- | --- |
+| `routeTrigger` | no local config; workflow route owns method/path | `{ body, params, query, headers }` | workflow validation fails when trigger is missing |
+| `validateBody` | field rules with required/type/email/length/enum | `{ valid }` | stops workflow on invalid input unless configured to continue |
+| `queryEntries` | schema slug, search, limit, offset, filters | `{ entries, total, limit, offset }` | fails on missing schema or bad query config |
+| `getEntry` | entry id | `{ entry }` | returns null or configured not-found behavior later |
+| `createEntry` | schema slug and data mapping | `{ entry }` | fails on schema validation errors |
+| `updateEntry` | entry id and data mapping | `{ entry }` | fails on missing entry or schema validation errors |
+| `deleteEntry` | entry id | `{ deleted, entryId }` | fails on missing id or delete guard errors |
+| `branch` | left value, operator, optional right value, then node, else node | `{ matched }` | fails on invalid condition config |
+| `setVariable` | key/value map | `{ values }` | fails on invalid variable names later |
+| `returnResponse` | status, headers, body | `{ status, body }` | final response node; workflow validation fails when missing |
+
+Practical register example:
+
+```json
+{
+  "id": "start",
+  "type": "routeTrigger",
+  "label": "POST /api/custom/auth/register",
+  "config": {}
+}
+```
+
+```json
+{
+  "id": "validate-register-body",
+  "type": "validateBody",
+  "label": "Validate register body",
+  "config": {
+    "fields": {
+      "email": { "type": "email", "required": true },
+      "password": { "type": "string", "required": true, "minLength": 8 }
+    }
+  }
+}
+```
+
+Practical query example:
+
+```json
+{
+  "id": "find-user",
+  "type": "queryEntries",
+  "label": "Find user by email",
+  "config": {
+    "schema": "users",
+    "limit": 1,
+    "filters": [
+      { "field": "email", "operator": "eq", "value": "{{body.email}}" }
+    ]
+  }
+}
+```
+
+### Hinglish
+
+Har MVP node ka typed input config, predictable output, aur default failure behavior hoga:
+
+| Node type | Input config | Output | Failure behavior |
+| --- | --- | --- | --- |
+| `routeTrigger` | local config nahi; workflow route me method/path hota hai | `{ body, params, query, headers }` | trigger missing ho to workflow validation fail |
+| `validateBody` | required/type/email/length/enum field rules | `{ valid }` | invalid input par workflow stop, jab tak continue configure na ho |
+| `queryEntries` | schema slug, search, limit, offset, filters | `{ entries, total, limit, offset }` | missing schema ya bad query config par fail |
+| `getEntry` | entry id | `{ entry }` | entry missing ho to null ya later configured not-found behavior |
+| `createEntry` | schema slug aur data mapping | `{ entry }` | schema validation error par fail |
+| `updateEntry` | entry id aur data mapping | `{ entry }` | missing entry ya schema validation error par fail |
+| `deleteEntry` | entry id | `{ deleted, entryId }` | missing id ya delete guard error par fail |
+| `branch` | left value, operator, optional right value, then node, else node | `{ matched }` | invalid condition config par fail |
+| `setVariable` | key/value map | `{ values }` | invalid variable names par later fail |
+| `returnResponse` | status, headers, body | `{ status, body }` | final response node; missing ho to workflow validation fail |
+
+Practical register example:
+
+```json
+{
+  "id": "start",
+  "type": "routeTrigger",
+  "label": "POST /api/custom/auth/register",
+  "config": {}
+}
+```
+
+```json
+{
+  "id": "validate-register-body",
+  "type": "validateBody",
+  "label": "Validate register body",
+  "config": {
+    "fields": {
+      "email": { "type": "email", "required": true },
+      "password": { "type": "string", "required": true, "minLength": 8 }
+    }
+  }
+}
+```
+
+Practical query example:
+
+```json
+{
+  "id": "find-user",
+  "type": "queryEntries",
+  "label": "Find user by email",
+  "config": {
+    "schema": "users",
+    "limit": 1,
+    "filters": [
+      { "field": "email", "operator": "eq", "value": "{{body.email}}" }
+    ]
+  }
+}
+```
+
 ## Expression Model
 
 ### English

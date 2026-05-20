@@ -97,7 +97,7 @@ Each task uses this structure:
 #### T3403 - Define Supported MVP Node Types
 
 - Version: `v0.9.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Define MVP nodes: route trigger, validate body, query entries, get entry, create entry, update entry, delete entry, if/else, return response, and set variable.
 - Persona: Workflow runtime designer; avoid vague nodes that cannot be tested.
 - Success Criteria: Each node type has typed input config, output contract, failure behavior, and practical example.
