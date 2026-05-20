@@ -81,6 +81,7 @@ describe("WorkflowManager", () => {
     expect(container.textContent).toContain("POST");
     expect(container.textContent).toContain("/api/custom/orders/pay");
     expect(container.textContent).toContain("Active");
+    expect(container.textContent).toContain("Needs Custom API permission");
   });
 
   it("supports search and active/inactive filters", async () => {
@@ -106,6 +107,28 @@ describe("WorkflowManager", () => {
     });
     expect(container.textContent).toContain("Pay order");
     expect(container.textContent).not.toContain("Archive order");
+  });
+
+  it("explains activation behavior in the workflow form", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create workflow");
+      await flushPromises();
+    });
+    expect(container.textContent).toContain("Route is kept private while inactive");
+    expect(container.textContent).toContain("returns 404");
+
+    const active = [...container.querySelectorAll<HTMLInputElement>("input[type='checkbox']")]
+      .find((input) => input.closest("label")?.textContent?.includes("Active"));
+    if (!active) throw new Error("ACTIVE_CHECKBOX_NOT_FOUND");
+    await act(async () => {
+      active.click();
+      await flushPromises();
+    });
+
+    expect(container.textContent).toContain("Route will be callable after permission allow");
+    expect(container.textContent).toContain("Custom API Permissions");
   });
 
   it("shows empty and error states", async () => {

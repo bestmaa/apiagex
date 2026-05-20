@@ -223,7 +223,12 @@ export function WorkflowManager() {
                   </th>
                   <td><code>{workflow.method}</code></td>
                   <td><code>{mountedWorkflowPath(workflow.path)}</code></td>
-                  <td><span className={workflow.active ? "status-pill is-active" : "status-pill"}>{workflow.active ? "Active" : "Inactive"}</span></td>
+                  <td>
+                    <div className="workflow-activation-cell">
+                      <span className={workflow.active ? "status-pill is-active" : "status-pill"}>{workflow.active ? "Active" : "Inactive"}</span>
+                      <small>{workflow.active ? "Needs Custom API permission" : "Not callable"}</small>
+                    </div>
+                  </td>
                   <td>{formatDate(workflow.updatedAt)}</td>
                   <td>
                     <div className="entry-table-actions">
@@ -312,6 +317,7 @@ function WorkflowBasicsForm({
           Active
         </label>
       </div>
+      <ActivationGuide active={draft.active} />
       <WorkflowStepEditor
         onChange={(steps) => onChange({ ...draft, steps })}
         schemas={schemas}
@@ -329,6 +335,19 @@ function WorkflowBasicsForm({
         </>
       ) : null}
     </section>
+  );
+}
+
+function ActivationGuide({ active }: { active: boolean }) {
+  return (
+    <div className={active ? "workflow-activation-guide is-active" : "workflow-activation-guide"}>
+      <strong>{active ? "Route will be callable after permission allow" : "Route is kept private while inactive"}</strong>
+      <p>
+        {active
+          ? "Active publishes the /api/custom route, but clients still need public or token permission in Custom API Permissions."
+          : "Inactive workflows stay saved for editing and testing, but the /api/custom route returns 404."}
+      </p>
+    </div>
   );
 }
 

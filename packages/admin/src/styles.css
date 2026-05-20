@@ -303,6 +303,33 @@ code {
   resize: vertical;
 }
 
+.workflow-activation-cell {
+  display: grid;
+  gap: var(--admin-space-2);
+}
+
+.workflow-activation-cell small {
+  color: var(--admin-color-text-muted);
+}
+
+.workflow-activation-guide {
+  background: var(--admin-color-surface-muted);
+  border-left: var(--admin-space-1) solid var(--admin-color-warning-border);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-2);
+  padding: var(--admin-space-3);
+}
+
+.workflow-activation-guide.is-active {
+  border-left-color: var(--admin-color-primary);
+}
+
+.workflow-activation-guide p {
+  color: var(--admin-color-text-muted);
+  margin: 0;
+}
+
 .workflow-step-editor {
   border-top: 1px solid var(--admin-color-border-soft);
   display: grid;

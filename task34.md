@@ -521,7 +521,7 @@ Each task uses this structure:
 #### T3435 - Add Workflow Activation UX
 
 - Version: `v0.12.7`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make active/inactive behavior clear in Admin UI.
 - Persona: Admin operator; avoid accidentally exposing unfinished APIs.
 - Success Criteria: Inactive workflows are not callable, active workflows require custom permission, UI explains both states.

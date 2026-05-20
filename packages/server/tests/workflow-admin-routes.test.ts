@@ -1,5 +1,7 @@
 import {
+  createRole,
   getCustomApiRouteByMethodPath,
+  listCustomApiPermissions,
   openMigratedSqliteAdapter,
   recordWorkflowRun,
 } from "@apiagex/database";
@@ -103,6 +105,29 @@ describe("workflow admin routes", () => {
 
     expect(await getCustomApiRouteByMethodPath(database, "POST", "/api/custom/echo"))
       .toMatchObject({ active: true, permissionKey: "workflow.echo.post" });
+  });
+
+  it("does not auto-open public custom permission when workflow is activated", async () => {
+    const database = openMigratedSqliteAdapter();
+    const publicRole = await createRole(database, { description: "Public", name: "public" });
+    const server = createServer({ adminAuth: "disabled", database });
+
+    await server.inject({
+      method: "POST",
+      payload: {
+        active: true,
+        definition: echoWorkflowDefinition("/echo"),
+        method: "POST",
+        name: "Echo workflow",
+        path: "/echo",
+        version: 1,
+      },
+      url: "/api/admin/workflows",
+    });
+    const route = await getCustomApiRouteByMethodPath(database, "POST", "/api/custom/echo");
+    if (!route) throw new Error("WORKFLOW_ROUTE_NOT_SYNCED");
+
+    expect(await listCustomApiPermissions(database, publicRole.id)).toEqual([]);
   });
 
   it("runs workflow tests through admin API without public custom permission", async () => {
