@@ -151,6 +151,8 @@ export const docPage = {
         "Browser check: docs/workflow-builder-browser-check.md owner login, schema, entries, workflow create, test run, activation, permission allow, token variant, aur API call cover karta hai.",
         "Import/export plan: docs/workflow-import-export-plan.md covers versioning, validation, secret exclusion, compatibility, and inactive-by-default imports.",
         "Import/export plan: docs/workflow-import-export-plan.md versioning, validation, secret exclusion, compatibility, aur inactive-by-default imports cover karta hai.",
+        "Release checkpoint: docs/workflow-builder-release-checkpoint.md lists the manual API flow, browser check, provider E2E, release gate, npm dry-runs, and publish rules.",
+        "Release checkpoint: docs/workflow-builder-release-checkpoint.md manual API flow, browser check, provider E2E, release gate, npm dry-runs, aur publish rules list karta hai.",
       ],
     },
     {
@@ -323,6 +325,8 @@ export const readmePage = {
         "Issue-token plan: docs/workflow-issue-token-node-plan.md app-user tokens ko Admin owner sessions se alag rakhta hai aur Content/API roles se bind karta hai.",
         "Practical guide: docs/workflow-builder-practical-guide.md shows schema creation, workflow steps, test run, permission allow, token creation, and curl calls.",
         "Practical guide: docs/workflow-builder-practical-guide.md schema creation, workflow steps, test run, permission allow, token creation, aur curl calls dikhata hai.",
+        "Release checkpoint: docs/workflow-builder-release-checkpoint.md is the first Workflow Builder milestone gate before publish.",
+        "Release checkpoint: docs/workflow-builder-release-checkpoint.md publish se pehle first Workflow Builder milestone gate hai.",
       ],
     },
     {

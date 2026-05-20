@@ -31,6 +31,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Workflow builder practical guide: [workflow-builder-practical-guide.md](./workflow-builder-practical-guide.md)
 - Workflow builder browser check: [workflow-builder-browser-check.md](./workflow-builder-browser-check.md)
 - Workflow import/export plan: [workflow-import-export-plan.md](./workflow-import-export-plan.md)
+- Workflow builder release checkpoint: [workflow-builder-release-checkpoint.md](./workflow-builder-release-checkpoint.md)
 
 ## Implemented Now
 
@@ -98,6 +99,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Workflow builder browser check `docs/workflow-builder-browser-check.md` me documented hai.
 - Workflow import/export planning is documented in `docs/workflow-import-export-plan.md`.
 - Workflow import/export planning `docs/workflow-import-export-plan.md` me documented hai.
+- Workflow builder release checkpoint is documented in `docs/workflow-builder-release-checkpoint.md`.
+- Workflow builder release checkpoint `docs/workflow-builder-release-checkpoint.md` me documented hai.
 
 ## Owner Bootstrap And Login
 

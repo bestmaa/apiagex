@@ -45,6 +45,39 @@ describe("workflow API routes", () => {
     expect(response.json()).toEqual({ message: "hello", ok: true });
   });
 
+  it("serves workflows created after server startup", async () => {
+    const database = openMigratedSqliteAdapter();
+    const publicRole = await createRole(database, { description: "Public", name: "public" });
+    const server = createServer({ adminAuth: "disabled", database });
+    await server.ready();
+
+    const createResponse = await server.inject({
+      method: "POST",
+      payload: {
+        active: true,
+        definition: echoWorkflowDefinition(),
+        method: "POST",
+        name: "Runtime echo workflow",
+        path: "/echo",
+        version: 1,
+      },
+      url: "/api/admin/workflows",
+    });
+    const route = await getCustomApiRouteByMethodPath(database, "POST", "/api/custom/echo");
+    if (!route) throw new Error("WORKFLOW_ROUTE_NOT_SYNCED");
+    await setCustomApiPermission(database, { allowed: true, customApiRouteId: route.id, roleId: publicRole.id });
+
+    const response = await server.inject({
+      method: "POST",
+      payload: { message: "hello" },
+      url: "/api/custom/echo",
+    });
+
+    expect(createResponse.statusCode).toBe(201);
+    expect(response.statusCode).toBe(201);
+    expect(response.json()).toEqual({ message: "hello", ok: true });
+  });
+
   it("does not register inactive workflow routes", async () => {
     const database = openMigratedSqliteAdapter();
     await createWorkflow(database, {

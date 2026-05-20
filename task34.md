@@ -841,7 +841,7 @@ Each task uses this structure:
 #### T3459 - Stabilize Workflow Builder Release
 
 - Version: `v0.17.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Run final release hardening for the first Workflow Builder milestone.
 - Persona: Release engineer; verify before publish.
 - Success Criteria: Standard verification, smoke, browser checks, provider checks, docs, and manual API flow all pass.

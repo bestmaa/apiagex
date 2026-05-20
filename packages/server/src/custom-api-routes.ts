@@ -118,7 +118,9 @@ function customApiRouteInput(method: string, path: string): SyncCustomApiRouteIn
 }
 
 function routeUrl(request: FastifyRequest): string {
-  return (request as { routeOptions?: { url?: string } }).routeOptions?.url ?? request.url.split("?")[0] ?? "/";
+  const routePattern = (request as { routeOptions?: { url?: string } }).routeOptions?.url;
+  if (routePattern && !routePattern.includes("*")) return routePattern;
+  return request.url.split("?")[0] ?? "/";
 }
 
 function fullCustomApiPath(path: string): string {

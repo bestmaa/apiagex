@@ -327,6 +327,10 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <strong>Workflow import/export plan</strong>
           <p>Read <code>docs/workflow-import-export-plan.md</code> for planned template/backup sharing. Exports must include workflow JSON and dependency references only; secret values stay out of export files.</p>
         </article>
+        <article className="api-row">
+          <strong>Workflow release checkpoint</strong>
+          <p>Read <code>docs/workflow-builder-release-checkpoint.md</code> before publishing. It lists the manual API flow, browser check, provider E2E, release gate, npm dry-runs, and publish decision rules.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

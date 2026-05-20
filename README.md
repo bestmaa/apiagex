@@ -103,6 +103,8 @@ Workflow Builder browser verification is documented in [docs/workflow-builder-br
 
 Workflow import/export is planned in [docs/workflow-import-export-plan.md](./docs/workflow-import-export-plan.md). Exports must include workflow JSON and dependency references only; secret values are excluded.
 
+Workflow Builder release hardening is tracked in [docs/workflow-builder-release-checkpoint.md](./docs/workflow-builder-release-checkpoint.md). It lists the manual API flow, browser check, provider E2E, release gate, npm dry-runs, and publish decision rules.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

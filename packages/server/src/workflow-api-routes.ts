@@ -1,10 +1,10 @@
 import {
-  listWorkflows,
+  getWorkflowByMethodPath,
   recordWorkflowRun,
   syncWorkflowCustomApiRoutes,
   type ApiagexDatabase,
 } from "@apiagex/database";
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { authorizeCustomApi } from "./custom-api-routes.js";
 import { createWorkflowExecutionContext } from "./workflow-context.js";
 import { executeWorkflowDefinition } from "./workflow-executor.js";
@@ -15,65 +15,70 @@ const customApiPrefix = "/api/custom";
 export function registerWorkflowRoutes(server: FastifyInstance, database: ApiagexDatabase): void {
   server.register(async (workflowServer) => {
     await syncWorkflowCustomApiRoutes(database);
-    const activeWorkflows = (await listWorkflows(database)).filter((workflow) => workflow.active);
-    for (const workflow of activeWorkflows) {
-      workflowServer.route({
-        method: workflow.method,
-        url: localWorkflowPath(workflow.path),
-        preHandler: (request, reply) => authorizeCustomApi(database, request, reply),
-        handler: async (request, reply) => {
-          const startedAt = Date.now();
-          const context = createWorkflowExecutionContext({
-            body: (request.body ?? null) as WorkflowJsonValue,
-            headers: request.headers,
-            params: request.params as Record<string, string>,
-            query: request.query as Record<string, WorkflowJsonValue>,
-          });
-          const result = await executeWorkflowDefinition(
-            database,
-            context,
-            workflow.definition as unknown as WorkflowDefinition,
-          );
-          if (!result.ok) {
-            const statusCode = workflowErrorStatus(result.error.code);
-            await recordWorkflowRunSafely(database, {
-              durationMs: Date.now() - startedAt,
-              errorCode: result.error.code,
-              request: {
-                headers: request.headers,
-                method: workflow.method,
-                params: request.params as Record<string, unknown>,
-                path: routePath(workflow.path),
-                query: request.query as Record<string, unknown>,
-              },
-              status: "error",
-              statusCode,
-              workflowId: workflow.id,
-            });
-            return reply.code(statusCode).send({ ok: false, error: result.error });
-          }
-          const statusCode = result.response.status ?? 200;
-          await recordWorkflowRunSafely(database, {
-            durationMs: Date.now() - startedAt,
-            request: {
-              headers: request.headers,
-              method: workflow.method,
-              params: request.params as Record<string, unknown>,
-              path: routePath(workflow.path),
-              query: request.query as Record<string, unknown>,
-            },
-            status: "success",
-            statusCode,
-            workflowId: workflow.id,
-          });
-          return reply
-            .code(statusCode)
-            .headers(result.response.headers)
-            .send(result.response.body ?? { ok: true });
-        },
-      });
-    }
+    workflowServer.all("/", (request, reply) => handleWorkflowRequest(database, request, reply));
+    workflowServer.all("/*", (request, reply) => handleWorkflowRequest(database, request, reply));
   }, { prefix: customApiPrefix });
+}
+
+async function handleWorkflowRequest(
+  database: ApiagexDatabase,
+  request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<FastifyReply | void> {
+  const method = request.method === "HEAD" ? "GET" : request.method.toUpperCase();
+  const workflow = await getWorkflowByMethodPath(database, method, requestWorkflowPath(request));
+  if (!workflow?.active) return reply.code(404).send({ ok: false, error: "WORKFLOW_NOT_FOUND" });
+  await authorizeCustomApi(database, request, reply);
+  if (reply.sent) return;
+
+  const startedAt = Date.now();
+  const context = createWorkflowExecutionContext({
+    body: (request.body ?? null) as WorkflowJsonValue,
+    headers: request.headers,
+    params: request.params as Record<string, string>,
+    query: request.query as Record<string, WorkflowJsonValue>,
+  });
+  const result = await executeWorkflowDefinition(
+    database,
+    context,
+    workflow.definition as unknown as WorkflowDefinition,
+  );
+  if (!result.ok) {
+    const statusCode = workflowErrorStatus(result.error.code);
+    await recordWorkflowRunSafely(database, {
+      durationMs: Date.now() - startedAt,
+      errorCode: result.error.code,
+      request: {
+        headers: request.headers,
+        method: workflow.method,
+        params: request.params as Record<string, unknown>,
+        path: routePath(workflow.path),
+        query: request.query as Record<string, unknown>,
+      },
+      status: "error",
+      statusCode,
+      workflowId: workflow.id,
+    });
+    return reply.code(statusCode).send({ ok: false, error: result.error });
+  }
+  const statusCode = result.response.status ?? 200;
+  await recordWorkflowRunSafely(database, {
+    durationMs: Date.now() - startedAt,
+    request: {
+      headers: request.headers,
+      method: workflow.method,
+      params: request.params as Record<string, unknown>,
+      path: routePath(workflow.path),
+      query: request.query as Record<string, unknown>,
+    },
+    status: "success",
+    statusCode,
+    workflowId: workflow.id,
+  });
+  return reply
+    .code(statusCode)
+    .headers(result.response.headers)
+    .send(result.response.body ?? { ok: true });
 }
 
 async function recordWorkflowRunSafely(
@@ -87,17 +92,17 @@ async function recordWorkflowRunSafely(
   }
 }
 
-function localWorkflowPath(path: string): string {
-  const cleanPath = path.startsWith("/") ? path : `/${path}`;
-  if (cleanPath === customApiPrefix) return "/";
-  if (cleanPath.startsWith(`${customApiPrefix}/`)) return cleanPath.slice(customApiPrefix.length);
-  return cleanPath;
-}
-
 function routePath(path: string): string {
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   if (cleanPath.startsWith(`${customApiPrefix}/`)) return cleanPath;
   return `${customApiPrefix}${cleanPath}`;
+}
+
+function requestWorkflowPath(request: FastifyRequest): string {
+  const cleanPath = request.url.split("?")[0] ?? "/";
+  if (cleanPath === customApiPrefix) return "/";
+  if (cleanPath.startsWith(`${customApiPrefix}/`)) return cleanPath.slice(customApiPrefix.length);
+  return cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
 }
 
 function workflowErrorStatus(code: string): number {
