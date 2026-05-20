@@ -21,6 +21,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Install and publish flow: [install-and-publish-flow.md](./install-and-publish-flow.md)
 - Database provider setup: [database-provider-setup.md](./database-provider-setup.md)
 - Planned Workflow API Builder scope: [workflow-builder-scope.md](./workflow-builder-scope.md)
+- Planned Workflow graph editor architecture: [workflow-graph-editor-plan.md](./workflow-graph-editor-plan.md)
 - OTP workflow template plan: [otp-workflow-template-plan.md](./otp-workflow-template-plan.md)
 - Google login workflow template plan: [google-login-workflow-template-plan.md](./google-login-workflow-template-plan.md)
 

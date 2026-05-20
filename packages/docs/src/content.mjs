@@ -299,6 +299,8 @@ export const readmePage = {
         "Report template: Settings > Workflows inactive read-only GET /api/custom/reports/orders starter bana sakta hai jo orders schema ko limit 50 ke saath query karta hai aur total plus entries return karta hai.",
         "Report limits: keep MVP report templates bounded; large reports must respect workflow runtime query limits.",
         "Report limits: MVP report templates bounded rakho; large reports ko workflow runtime query limits respect karna hoga.",
+        "Graph editor plan: docs/workflow-graph-editor-plan.md chooses React Flow and keeps the visual graph as a projection of validated workflow JSON.",
+        "Graph editor plan: docs/workflow-graph-editor-plan.md React Flow choose karta hai aur visual graph ko validated workflow JSON ka projection rakhta hai.",
       ],
     },
     {

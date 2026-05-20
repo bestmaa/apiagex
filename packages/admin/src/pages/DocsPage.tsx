@@ -290,6 +290,11 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
   "entries": []
 }`}</code></pre>
         </article>
+        <article className="api-row">
+          <strong>Graph editor plan</strong>
+          <p>The planned graph editor uses React Flow only as a visual editor for the validated workflow JSON contract. Runtime behavior must still be expressible as supported workflow nodes and edges.</p>
+          <p>Read <code>docs/workflow-graph-editor-plan.md</code> before implementing canvas features, node handles, graph validation, or JSON conversion helpers.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

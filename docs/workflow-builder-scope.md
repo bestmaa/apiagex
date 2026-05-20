@@ -577,6 +577,8 @@ Build Admin UI in two stages:
 
 The form builder should come first because it is easier to test and safer for the runtime contract.
 
+The graph editor architecture is tracked in [workflow-graph-editor-plan.md](./workflow-graph-editor-plan.md). The graph editor must stay a visual projection of the workflow JSON contract; it cannot add behavior the executor cannot run.
+
 ### Hinglish
 
 Admin UI do stages me banana chahiye:

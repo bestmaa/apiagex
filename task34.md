@@ -629,7 +629,7 @@ Each task uses this structure:
 #### T3443 - Choose Graph Editor Library And Data Model
 
 - Version: `v0.14.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Decide graph editor implementation, likely React Flow, and map graph nodes/edges to workflow JSON.
 - Persona: Frontend architect; keep visual editing compatible with runtime.
 - Success Criteria: Architecture note defines graph node UI, handles, edge rules, layout, and conversion to executable workflow.

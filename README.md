@@ -75,7 +75,7 @@ If no Custom API permission is allowed, the workflow route returns `403 CUSTOM_A
 
 The Workflows screen includes a `Create register template` starter. It creates an inactive `POST /api/custom/auth/register` workflow that validates `email` and `password`, checks the `users` content schema for an existing email, creates an inactive user entry, and returns `201` or `409`. Before using it, create a `users` content schema with `email`, `passwordHash`, and `status` fields. The template never stores `{{body.password}}`; it writes `PASSWORD_HASH_PLACEHOLDER_REPLACE_WITH_SERVER_SIDE_HASHING`, so replace that placeholder with real server-side hashing before any production use.
 
-Planned next layer: Workflow API Builder will let admins create safe custom APIs from Admin UI using saved workflow definitions before the graph editor is added. Scope and safety rules are documented in [docs/workflow-builder-scope.md](./docs/workflow-builder-scope.md).
+Planned next layer: Workflow API Builder will let admins create safe custom APIs from Admin UI using saved workflow definitions before the graph editor is added. Scope and safety rules are documented in [docs/workflow-builder-scope.md](./docs/workflow-builder-scope.md). The planned React Flow graph editor architecture is documented in [docs/workflow-graph-editor-plan.md](./docs/workflow-graph-editor-plan.md).
 
 OTP login workflow requirements are planned in [docs/otp-workflow-template-plan.md](./docs/otp-workflow-template-plan.md). The plan requires hashed OTP storage, expiry, retry/rate limits, provider configuration, and secure token issuance before any OTP template is implemented.
 
