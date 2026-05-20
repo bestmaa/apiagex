@@ -6,13 +6,37 @@ import { StatusToast } from "./components/StatusToast";
 import type { WorkflowDraft, WorkflowRecord } from "./workflow.type";
 
 type WorkflowStatusFilter = "active" | "all" | "inactive";
+type WorkflowStepType = "createEntry" | "queryEntries" | "returnResponse" | "updateEntry" | "validateBody";
 type WorkflowFormDraft = {
   active: boolean;
   description: string;
   method: string;
   name: string;
   path: string;
+  steps: WorkflowStepDraft[];
 };
+type WorkflowStepDraft = {
+  body: string;
+  dataJson: string;
+  entryId: string;
+  fieldName: string;
+  fieldRequired: boolean;
+  fieldType: string;
+  id: string;
+  limit: number;
+  schema: string;
+  search: string;
+  status: number;
+  type: WorkflowStepType;
+};
+
+const workflowStepTypes: WorkflowStepType[] = [
+  "validateBody",
+  "queryEntries",
+  "createEntry",
+  "updateEntry",
+  "returnResponse",
+];
 
 export function WorkflowManager() {
   const [workflows, setWorkflows] = useState<WorkflowRecord[]>([]);
@@ -71,13 +95,20 @@ export function WorkflowManager() {
       method: workflow.method,
       name: workflow.name,
       path: workflow.path,
+      steps: stepsFromDefinition(workflow.definition),
     });
     setFormOpen(true);
   }
 
   async function saveWorkflowBasics() {
     const workflow = workflows.find((item) => item.id === editingWorkflowId);
-    const draft = workflowDraftFromForm(form, workflow);
+    let draft: WorkflowDraft;
+    try {
+      draft = workflowDraftFromForm(form, workflow);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Invalid workflow");
+      return;
+    }
     const result = editingWorkflowId
       ? await updateWorkflow(editingWorkflowId, draft)
       : await createWorkflow(draft);
@@ -267,12 +298,180 @@ function WorkflowBasicsForm({
           Active
         </label>
       </div>
+      <WorkflowStepEditor
+        onChange={(steps) => onChange({ ...draft, steps })}
+        steps={draft.steps}
+      />
       <p className="helper-text">Mounted route: <code>{mountedWorkflowPath(draft.path)}</code></p>
       <button type="button" onClick={onSave}>
         <Save aria-hidden="true" size={16} />
         Save workflow
       </button>
     </section>
+  );
+}
+
+function WorkflowStepEditor({
+  onChange,
+  steps,
+}: {
+  onChange: (steps: WorkflowStepDraft[]) => void;
+  steps: WorkflowStepDraft[];
+}) {
+  function addStep(type: WorkflowStepType) {
+    const nextStep = defaultStep(type);
+    if (type !== "returnResponse" && steps.at(-1)?.type === "returnResponse") {
+      onChange([...steps.slice(0, -1), nextStep, steps[steps.length - 1] as WorkflowStepDraft]);
+      return;
+    }
+    onChange([...steps, nextStep]);
+  }
+
+  function updateStep(index: number, nextStep: WorkflowStepDraft) {
+    onChange(steps.map((step, stepIndex) => stepIndex === index ? nextStep : step));
+  }
+
+  function removeStep(index: number) {
+    if (steps.length <= 1) return;
+    onChange(steps.filter((_, stepIndex) => stepIndex !== index));
+  }
+
+  function moveStep(index: number, direction: -1 | 1) {
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= steps.length) return;
+    const nextSteps = [...steps];
+    const [step] = nextSteps.splice(index, 1);
+    if (!step) return;
+    nextSteps.splice(nextIndex, 0, step);
+    onChange(nextSteps);
+  }
+
+  return (
+    <section aria-labelledby="workflow-step-editor-title" className="workflow-step-editor">
+      <div className="entry-table-meta">
+        <div>
+          <h3 id="workflow-step-editor-title">Steps</h3>
+          <span>{steps.length} ordered steps</span>
+        </div>
+        <label>Add step
+          <select
+            value=""
+            onChange={(event) => {
+              if (event.target.value) addStep(event.target.value as WorkflowStepType);
+              event.target.value = "";
+            }}
+          >
+            <option value="">Select step</option>
+            <option value="validateBody">Validate body</option>
+            <option value="queryEntries">Query entries</option>
+            <option value="createEntry">Create entry</option>
+            <option value="updateEntry">Update entry</option>
+            <option value="returnResponse">Return response</option>
+          </select>
+        </label>
+      </div>
+      <div className="workflow-step-list">
+        {steps.map((step, index) => (
+          <fieldset className="workflow-step-card" key={`${step.id}-${index}`}>
+            <legend>{index + 1}. {stepLabel(step.type)}</legend>
+            <div className="workflow-step-identity">
+              <label>Step id
+                <input value={step.id} onChange={(event) => updateStep(index, { ...step, id: event.target.value })} />
+              </label>
+              <label>Type
+                <select value={step.type} onChange={(event) => updateStep(index, convertStepType(step, event.target.value as WorkflowStepType))}>
+                  {workflowStepTypes.map((type) => (
+                    <option key={type} value={type}>{stepLabel(type)}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <WorkflowStepFields step={step} onChange={(nextStep) => updateStep(index, nextStep)} />
+            <div className="entry-table-actions">
+              <button disabled={index === 0} type="button" onClick={() => moveStep(index, -1)}>Move up</button>
+              <button disabled={index === steps.length - 1} type="button" onClick={() => moveStep(index, 1)}>Move down</button>
+              <button disabled={steps.length <= 1} type="button" onClick={() => removeStep(index)}>Remove</button>
+            </div>
+          </fieldset>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function WorkflowStepFields({
+  onChange,
+  step,
+}: {
+  onChange: (step: WorkflowStepDraft) => void;
+  step: WorkflowStepDraft;
+}) {
+  if (step.type === "validateBody") {
+    return (
+      <div className="workflow-step-fields">
+        <label>Field name
+          <input value={step.fieldName} placeholder="email" onChange={(event) => onChange({ ...step, fieldName: event.target.value })} />
+        </label>
+        <label>Field type
+          <select value={step.fieldType} onChange={(event) => onChange({ ...step, fieldType: event.target.value })}>
+            {["string", "email", "number", "boolean", "array", "object"].map((type) => <option key={type} value={type}>{type}</option>)}
+          </select>
+        </label>
+        <label className="checkbox-row">
+          <input checked={step.fieldRequired} type="checkbox" onChange={(event) => onChange({ ...step, fieldRequired: event.target.checked })} />
+          Required
+        </label>
+      </div>
+    );
+  }
+  if (step.type === "queryEntries") {
+    return (
+      <div className="workflow-step-fields">
+        <label>Schema slug
+          <input value={step.schema} placeholder="orders" onChange={(event) => onChange({ ...step, schema: event.target.value })} />
+        </label>
+        <label>Search
+          <input value={step.search} placeholder="{{body.email}}" onChange={(event) => onChange({ ...step, search: event.target.value })} />
+        </label>
+        <label>Limit
+          <input min={1} max={100} type="number" value={step.limit} onChange={(event) => onChange({ ...step, limit: Number(event.target.value) })} />
+        </label>
+      </div>
+    );
+  }
+  if (step.type === "createEntry") {
+    return (
+      <div className="workflow-step-fields">
+        <label>Schema slug
+          <input value={step.schema} placeholder="orders" onChange={(event) => onChange({ ...step, schema: event.target.value })} />
+        </label>
+        <label>Data JSON
+          <textarea value={step.dataJson} onChange={(event) => onChange({ ...step, dataJson: event.target.value })} />
+        </label>
+      </div>
+    );
+  }
+  if (step.type === "updateEntry") {
+    return (
+      <div className="workflow-step-fields">
+        <label>Entry id
+          <input value={step.entryId} placeholder="{{body.id}}" onChange={(event) => onChange({ ...step, entryId: event.target.value })} />
+        </label>
+        <label>Data JSON
+          <textarea value={step.dataJson} onChange={(event) => onChange({ ...step, dataJson: event.target.value })} />
+        </label>
+      </div>
+    );
+  }
+  return (
+    <div className="workflow-step-fields">
+      <label>Status
+        <input min={100} max={599} type="number" value={step.status} onChange={(event) => onChange({ ...step, status: Number(event.target.value) })} />
+      </label>
+      <label>Body JSON
+        <textarea value={step.body} onChange={(event) => onChange({ ...step, body: event.target.value })} />
+      </label>
+    </div>
   );
 }
 
@@ -327,46 +526,22 @@ function emptyWorkflowForm(): WorkflowFormDraft {
     method: "POST",
     name: "",
     path: "",
+    steps: [defaultStep("returnResponse")],
   };
 }
 
 function workflowDraftFromForm(form: WorkflowFormDraft, existing?: WorkflowRecord): WorkflowDraft {
+  validateWorkflowForm(form);
   const path = normalizeWorkflowPath(form.path);
   const method = form.method.toUpperCase();
   return {
     active: form.active,
-    definition: definitionForBasics(method, path, existing?.definition),
+    definition: definitionFromSteps(method, path, form.steps),
     description: form.description,
     method,
-    name: form.name,
+    name: form.name.trim(),
     path,
     version: existing?.version ?? 1,
-  };
-}
-
-function definitionForBasics(method: string, path: string, existing?: Record<string, unknown>): Record<string, unknown> {
-  if (existing && Object.keys(existing).length > 0) {
-    return {
-      ...existing,
-      route: { method, path },
-    };
-  }
-  return {
-    edges: [{ from: "start", id: "edge-start-return", to: "return-ok" }],
-    nodes: [
-      { config: {}, id: "start", type: "routeTrigger" },
-      {
-        config: {
-          body: { ok: true },
-          status: 200,
-        },
-        id: "return-ok",
-        type: "returnResponse",
-      },
-    ],
-    route: { method, path },
-    startNodeId: "start",
-    version: 1,
   };
 }
 
@@ -376,4 +551,255 @@ function normalizeWorkflowPath(path: string): string {
   if (trimmed === "/api/custom") return "/";
   if (trimmed.startsWith("/api/custom/")) return trimmed.slice("/api/custom".length);
   return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+}
+
+function validateWorkflowForm(form: WorkflowFormDraft): void {
+  const method = form.method.toUpperCase();
+  if (!form.name.trim()) throw new Error("Invalid workflow: name is required.");
+  if (!["DELETE", "GET", "PATCH", "POST", "PUT"].includes(method)) {
+    throw new Error("Invalid workflow: HTTP method is not supported.");
+  }
+  if (!normalizeWorkflowPath(form.path)) throw new Error("Invalid workflow: path is required.");
+  if (form.steps.length === 0) throw new Error("Invalid workflow: add at least one step.");
+  const ids = new Set<string>();
+  form.steps.forEach((step, index) => {
+    const stepNumber = index + 1;
+    const id = step.id.trim();
+    if (!id) throw new Error(`Invalid workflow: step ${stepNumber} id is required.`);
+    if (id === "start") throw new Error(`Invalid workflow: step ${stepNumber} cannot use reserved id start.`);
+    if (ids.has(id)) throw new Error(`Invalid workflow: duplicate step id ${id}.`);
+    ids.add(id);
+    validateStepConfig(step, stepNumber);
+  });
+  if (form.steps.at(-1)?.type !== "returnResponse") {
+    throw new Error("Invalid workflow: final step must return a response.");
+  }
+}
+
+function validateStepConfig(step: WorkflowStepDraft, stepNumber: number): void {
+  if (step.type === "validateBody") {
+    if (!step.fieldName.trim()) throw new Error(`Invalid workflow: step ${stepNumber} needs a field name.`);
+    if (!["array", "boolean", "email", "number", "object", "string"].includes(step.fieldType)) {
+      throw new Error(`Invalid workflow: step ${stepNumber} has an unsupported field type.`);
+    }
+    return;
+  }
+  if (step.type === "queryEntries") {
+    if (!step.schema.trim()) throw new Error(`Invalid workflow: step ${stepNumber} needs a schema slug.`);
+    if (!Number.isInteger(step.limit) || step.limit < 1 || step.limit > 100) {
+      throw new Error(`Invalid workflow: step ${stepNumber} limit must be between 1 and 100.`);
+    }
+    return;
+  }
+  if (step.type === "createEntry") {
+    if (!step.schema.trim()) throw new Error(`Invalid workflow: step ${stepNumber} needs a schema slug.`);
+    parseJsonObject(step.dataJson, `Invalid workflow: step ${stepNumber} data must be a JSON object.`);
+    return;
+  }
+  if (step.type === "updateEntry") {
+    if (!step.entryId.trim()) throw new Error(`Invalid workflow: step ${stepNumber} needs an entry id.`);
+    parseJsonObject(step.dataJson, `Invalid workflow: step ${stepNumber} data must be a JSON object.`);
+    return;
+  }
+  if (!Number.isInteger(step.status) || step.status < 100 || step.status > 599) {
+    throw new Error(`Invalid workflow: step ${stepNumber} status must be between 100 and 599.`);
+  }
+  parseJsonValue(step.body, `Invalid workflow: step ${stepNumber} body must be valid JSON.`);
+}
+
+function definitionFromSteps(method: string, path: string, steps: WorkflowStepDraft[]): Record<string, unknown> {
+  const nodes = [
+    { config: {}, id: "start", type: "routeTrigger" },
+    ...steps.map((step) => ({
+      config: configFromStep(step),
+      id: step.id.trim(),
+      type: step.type,
+    })),
+  ];
+  const nodeIds = nodes.map((node) => node.id);
+  return {
+    edges: nodeIds.slice(0, -1).map((from, index) => ({
+      from,
+      id: `edge-${from}-${nodeIds[index + 1]}`,
+      to: nodeIds[index + 1],
+    })),
+    nodes,
+    route: { method, path },
+    startNodeId: "start",
+    version: 1,
+  };
+}
+
+function configFromStep(step: WorkflowStepDraft): Record<string, unknown> {
+  if (step.type === "validateBody") {
+    return {
+      fields: {
+        [step.fieldName.trim()]: {
+          required: step.fieldRequired,
+          type: step.fieldType,
+        },
+      },
+    };
+  }
+  if (step.type === "queryEntries") {
+    return {
+      ...(step.search.trim() ? { search: step.search.trim() } : {}),
+      limit: step.limit,
+      schema: step.schema.trim(),
+    };
+  }
+  if (step.type === "createEntry") {
+    return {
+      data: parseJsonObject(step.dataJson, "Invalid workflow: data must be a JSON object."),
+      schema: step.schema.trim(),
+    };
+  }
+  if (step.type === "updateEntry") {
+    return {
+      data: parseJsonObject(step.dataJson, "Invalid workflow: data must be a JSON object."),
+      entryId: expressionFromText(step.entryId),
+    };
+  }
+  return {
+    body: parseJsonValue(step.body, "Invalid workflow: response body must be valid JSON."),
+    status: step.status,
+  };
+}
+
+function stepsFromDefinition(definition?: Record<string, unknown>): WorkflowStepDraft[] {
+  const nodes = Array.isArray(definition?.nodes) ? definition.nodes : [];
+  const steps = nodes
+    .map((node) => stepFromNode(node))
+    .filter((step): step is WorkflowStepDraft => Boolean(step));
+  return steps.length ? steps : [defaultStep("returnResponse")];
+}
+
+function stepFromNode(node: unknown): WorkflowStepDraft | null {
+  if (!isRecord(node) || typeof node.type !== "string" || !isWorkflowStepType(node.type)) return null;
+  const base = defaultStep(node.type);
+  const id = typeof node.id === "string" && node.id.trim() ? node.id : base.id;
+  const config = isRecord(node.config) ? node.config : {};
+  if (node.type === "validateBody") {
+    const fields = isRecord(config.fields) ? config.fields : {};
+    const [fieldName, rawRule] = Object.entries(fields)[0] ?? ["", undefined];
+    const rule = isRecord(rawRule) ? rawRule : {};
+    return {
+      ...base,
+      fieldName,
+      fieldRequired: rule.required === true,
+      fieldType: typeof rule.type === "string" ? rule.type : base.fieldType,
+      id,
+    };
+  }
+  if (node.type === "queryEntries") {
+    return {
+      ...base,
+      id,
+      limit: typeof config.limit === "number" ? config.limit : base.limit,
+      schema: typeof config.schema === "string" ? config.schema : "",
+      search: typeof config.search === "undefined" ? "" : textFromExpression(config.search),
+    };
+  }
+  if (node.type === "createEntry") {
+    return {
+      ...base,
+      dataJson: jsonText(isRecord(config.data) ? config.data : {}),
+      id,
+      schema: typeof config.schema === "string" ? config.schema : "",
+    };
+  }
+  if (node.type === "updateEntry") {
+    return {
+      ...base,
+      dataJson: jsonText(isRecord(config.data) ? config.data : {}),
+      entryId: typeof config.entryId === "undefined" ? "" : textFromExpression(config.entryId),
+      id,
+    };
+  }
+  return {
+    ...base,
+    body: typeof config.body === "undefined" ? base.body : jsonText(config.body),
+    id,
+    status: typeof config.status === "number" ? config.status : base.status,
+  };
+}
+
+function defaultStep(type: WorkflowStepType): WorkflowStepDraft {
+  const id = `${stepIdPrefix(type)}-${crypto.randomUUID().slice(0, 8)}`;
+  return {
+    body: jsonText({ ok: true }),
+    dataJson: jsonText({}),
+    entryId: "{{body.id}}",
+    fieldName: "",
+    fieldRequired: true,
+    fieldType: "string",
+    id,
+    limit: 20,
+    schema: "",
+    search: "",
+    status: 200,
+    type,
+  };
+}
+
+function convertStepType(step: WorkflowStepDraft, type: WorkflowStepType): WorkflowStepDraft {
+  return {
+    ...defaultStep(type),
+    id: step.id,
+  };
+}
+
+function stepLabel(type: WorkflowStepType): string {
+  if (type === "validateBody") return "Validate body";
+  if (type === "queryEntries") return "Query entries";
+  if (type === "createEntry") return "Create entry";
+  if (type === "updateEntry") return "Update entry";
+  return "Return response";
+}
+
+function stepIdPrefix(type: WorkflowStepType): string {
+  if (type === "validateBody") return "validate";
+  if (type === "queryEntries") return "query";
+  if (type === "createEntry") return "create";
+  if (type === "updateEntry") return "update";
+  return "return";
+}
+
+function isWorkflowStepType(type: string): type is WorkflowStepType {
+  return workflowStepTypes.includes(type as WorkflowStepType);
+}
+
+function parseJsonObject(text: string, errorMessage: string): Record<string, unknown> {
+  const value = parseJsonValue(text, errorMessage);
+  if (!isRecord(value)) throw new Error(errorMessage);
+  return value;
+}
+
+function parseJsonValue(text: string, errorMessage: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(errorMessage);
+  }
+}
+
+function expressionFromText(text: string): unknown {
+  const trimmed = text.trim();
+  if (!trimmed) return "";
+  if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
+    return parseJsonValue(trimmed, "Invalid workflow: expression must be valid JSON.");
+  }
+  return trimmed;
+}
+
+function textFromExpression(value: unknown): string {
+  return typeof value === "string" ? value : jsonText(value);
+}
+
+function jsonText(value: unknown): string {
+  return JSON.stringify(value, null, 2);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

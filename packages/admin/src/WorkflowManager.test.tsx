@@ -109,10 +109,93 @@ describe("WorkflowManager", () => {
       version: 1,
     }));
     expect(vi.mocked(createWorkflow).mock.calls[0]?.[0].definition).toMatchObject({
+      nodes: [
+        { id: "start", type: "routeTrigger" },
+        { type: "returnResponse" },
+      ],
       route: { method: "POST", path: "/created" },
       startNodeId: "start",
     });
     expect(container.textContent).toContain("Created workflow");
+  });
+
+  it("creates a workflow with ordered query and return steps", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create workflow");
+      await flushPromises();
+    });
+    setInputValue(inputByPlaceholder(container, "Pay order"), "Lookup products");
+    setInputValue(inputByPlaceholder(container, "/orders/pay"), "/products/lookup");
+    await addWorkflowStep(container, "queryEntries");
+    setInputValue(inputByPlaceholder(container, "orders"), "products");
+    setInputValue(inputByPlaceholder(container, "{{body.email}}"), "phone");
+
+    await act(async () => {
+      clickButton(container, "Save workflow");
+      await flushPromises();
+    });
+
+    const draft = vi.mocked(createWorkflow).mock.calls[0]?.[0];
+    expect(draft?.definition).toMatchObject({
+      edges: [
+        { from: "start" },
+        { to: expect.stringContaining("return") },
+      ],
+      nodes: [
+        { id: "start", type: "routeTrigger" },
+        { config: { limit: 20, schema: "products", search: "phone" }, type: "queryEntries" },
+        { config: { body: { ok: true }, status: 200 }, type: "returnResponse" },
+      ],
+      route: { method: "POST", path: "/products/lookup" },
+      startNodeId: "start",
+    });
+  });
+
+  it("supports adding, reordering, and removing workflow steps", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create workflow");
+      await flushPromises();
+    });
+    await addWorkflowStep(container, "queryEntries");
+    await addWorkflowStep(container, "createEntry");
+    expect(container.textContent).toContain("3 ordered steps");
+    expect(stepLegends(container)).toEqual(["1. Query entries", "2. Create entry", "3. Return response"]);
+
+    await act(async () => {
+      clickButton(container, "Move down");
+      await flushPromises();
+    });
+    expect(stepLegends(container)).toEqual(["1. Create entry", "2. Query entries", "3. Return response"]);
+
+    await act(async () => {
+      clickButton(container, "Remove");
+      await flushPromises();
+    });
+    expect(container.textContent).toContain("2 ordered steps");
+    expect(stepLegends(container)).toEqual(["1. Query entries", "2. Return response"]);
+  });
+
+  it("does not save invalid workflow step config", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create workflow");
+      await flushPromises();
+    });
+    setInputValue(inputByPlaceholder(container, "Pay order"), "Invalid lookup");
+    setInputValue(inputByPlaceholder(container, "/orders/pay"), "/invalid-lookup");
+    await addWorkflowStep(container, "queryEntries");
+    await act(async () => {
+      clickButton(container, "Save workflow");
+      await flushPromises();
+    });
+
+    expect(createWorkflow).not.toHaveBeenCalled();
+    expect(container.textContent).toContain("Invalid workflow: step 1 needs a schema slug.");
   });
 
   it("edits workflow basics without executing the workflow", async () => {
@@ -196,10 +279,24 @@ function setTextAreaValue(textarea: HTMLTextAreaElement, value: string): void {
   textarea.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
+function setSelectValue(select: HTMLSelectElement, value: string): void {
+  const valueSetter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")?.set;
+  valueSetter?.call(select, value);
+  select.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
 function clickButton(container: HTMLDivElement, name: string): void {
   const button = [...container.querySelectorAll("button")].find((item) => item.textContent?.includes(name));
   if (!button) throw new Error(`BUTTON_NOT_FOUND_${name}`);
   button.click();
+}
+
+async function addWorkflowStep(container: HTMLDivElement, type: string): Promise<void> {
+  const select = selectByLabel(container, "Add step");
+  await act(async () => {
+    setSelectValue(select, type);
+    await flushPromises();
+  });
 }
 
 function inputByPlaceholder(container: HTMLDivElement, placeholder: string): HTMLInputElement {
@@ -218,6 +315,18 @@ function inputByDisplayValue(container: HTMLDivElement, value: string): HTMLInpu
   const input = [...container.querySelectorAll<HTMLInputElement>("input")].find((item) => item.value === value);
   if (!input) throw new Error(`INPUT_VALUE_NOT_FOUND_${value}`);
   return input;
+}
+
+function selectByLabel(container: HTMLDivElement, labelName: string): HTMLSelectElement {
+  const label = [...container.querySelectorAll("label")].find((item) => item.textContent?.includes(labelName));
+  const select = label?.querySelector("select");
+  if (!select) throw new Error(`SELECT_NOT_FOUND_${labelName}`);
+  return select;
+}
+
+function stepLegends(container: HTMLDivElement): string[] {
+  return [...container.querySelectorAll(".workflow-step-card legend")]
+    .map((legend) => legend.textContent ?? "");
 }
 
 async function flushPromises(): Promise<void> {

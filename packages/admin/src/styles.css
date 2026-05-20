@@ -303,6 +303,54 @@ code {
   resize: vertical;
 }
 
+.workflow-step-editor {
+  border-top: 1px solid var(--admin-color-border-soft);
+  display: grid;
+  gap: var(--admin-space-4);
+  padding-top: var(--admin-space-4);
+}
+
+.workflow-step-editor h3 {
+  font-size: var(--admin-font-md);
+  margin: 0;
+}
+
+.workflow-step-list {
+  display: grid;
+  gap: var(--admin-space-3);
+}
+
+.workflow-step-card {
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-3);
+  margin: 0;
+  padding: var(--admin-space-4);
+}
+
+.workflow-step-card legend {
+  color: var(--admin-color-text);
+  font-weight: 700;
+  padding: 0 var(--admin-space-2);
+}
+
+.workflow-step-fields,
+.workflow-step-identity {
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workflow-step-fields textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.workflow-step-fields label:has(textarea) {
+  grid-column: 1 / -1;
+}
+
 .custom-api-history h3 {
   font-size: var(--admin-font-sm);
   margin: 0;
@@ -2241,6 +2289,8 @@ code {
   .webhook-row,
   .webhook-delivery-row,
   .workflow-form-grid,
+  .workflow-step-fields,
+  .workflow-step-identity,
   .schema-basics-grid,
   .schema-field-badge-row,
   .schema-inventory-row,

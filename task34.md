@@ -469,7 +469,7 @@ Each task uses this structure:
 #### T3431 - Build Simple Step Form Editor
 
 - Version: `v0.12.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Let admins add ordered nodes using forms instead of graph editor.
 - Persona: Non-coder admin; build simple flows before visual graph exists.
 - Success Criteria: Add/remove/reorder steps and edit node config for validate/query/create/update/return.
