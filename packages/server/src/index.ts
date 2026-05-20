@@ -30,6 +30,9 @@ export {
 export {
   executeWorkflowValidateBodyNode,
 } from "./workflow-validate-body-node.js";
+export {
+  executeWorkflowQueryEntriesNode,
+} from "./workflow-query-node.js";
 export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";

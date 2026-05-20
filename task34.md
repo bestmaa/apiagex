@@ -244,7 +244,7 @@ Each task uses this structure:
 #### T3414 - Implement Entry Query Node
 
 - Version: `v0.10.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Query content entries from workflow using schema slug, search, limit, offset, and simple field filters.
 - Persona: Backend workflow engineer; let workflows read content data.
 - Success Criteria: Node can query `users`, `orders`, or any schema by slug and expose result in step outputs.
