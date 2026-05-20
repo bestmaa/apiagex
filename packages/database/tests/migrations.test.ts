@@ -121,6 +121,7 @@ describe("MVP database foundation", () => {
     expect(columns.map((column) => column.name)).toEqual([
       "id",
       "name",
+      "description",
       "method",
       "path",
       "active",

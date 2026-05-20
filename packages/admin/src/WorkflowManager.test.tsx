@@ -2,12 +2,14 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { listWorkflows } from "./api";
+import { createWorkflow, listWorkflows, updateWorkflow } from "./api";
 import { WorkflowManager } from "./WorkflowManager";
 import type { WorkflowRecord } from "./workflow.type";
 
 vi.mock("./api", () => ({
+  createWorkflow: vi.fn(),
   listWorkflows: vi.fn(),
+  updateWorkflow: vi.fn(),
 }));
 
 const roots: Array<{ container: HTMLDivElement; root: Root }> = [];
@@ -15,6 +17,8 @@ const roots: Array<{ container: HTMLDivElement; root: Root }> = [];
 describe("WorkflowManager", () => {
   beforeEach(() => {
     vi.mocked(listWorkflows).mockResolvedValue({ ok: true, workflows: [workflow(), workflow({ active: false, name: "Archive order", path: "/orders/archive" })] });
+    vi.mocked(createWorkflow).mockResolvedValue({ ok: true, workflow: workflow({ id: "workflow_created", name: "Created workflow", path: "/created" }) });
+    vi.mocked(updateWorkflow).mockResolvedValue({ ok: true, workflow: workflow({ id: "workflow_pay", name: "Pay order updated", path: "/orders/pay-now" }) });
   });
 
   afterEach(() => {
@@ -80,6 +84,58 @@ describe("WorkflowManager", () => {
     const error = await renderWorkflowManagerLoaded();
     expect(error.container.textContent).toContain("Workflow list failed");
   });
+
+  it("creates a workflow with a placeholder return definition", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Create workflow");
+      await flushPromises();
+    });
+    setInputValue(inputByPlaceholder(container, "Pay order"), "Created workflow");
+    setInputValue(inputByPlaceholder(container, "/orders/pay"), "created");
+    setTextAreaValue(textareaByPlaceholder(container, "Payment workflow"), "Created from UI");
+    await act(async () => {
+      clickButton(container, "Save workflow");
+      await flushPromises();
+    });
+
+    expect(createWorkflow).toHaveBeenCalledWith(expect.objectContaining({
+      active: false,
+      description: "Created from UI",
+      method: "POST",
+      name: "Created workflow",
+      path: "/created",
+      version: 1,
+    }));
+    expect(vi.mocked(createWorkflow).mock.calls[0]?.[0].definition).toMatchObject({
+      route: { method: "POST", path: "/created" },
+      startNodeId: "start",
+    });
+    expect(container.textContent).toContain("Created workflow");
+  });
+
+  it("edits workflow basics without executing the workflow", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Edit");
+      await flushPromises();
+    });
+    setInputValue(inputByDisplayValue(container, "Pay order"), "Pay order updated");
+    setInputValue(inputByDisplayValue(container, "/orders/pay"), "/orders/pay-now");
+    await act(async () => {
+      clickButton(container, "Save workflow");
+      await flushPromises();
+    });
+
+    expect(updateWorkflow).toHaveBeenCalledWith("workflow_pay", expect.objectContaining({
+      name: "Pay order updated",
+      path: "/orders/pay-now",
+    }));
+    expect(createWorkflow).not.toHaveBeenCalled();
+    expect(container.textContent).toContain("Pay order updated");
+  });
 });
 
 function renderWorkflowManager(): { container: HTMLDivElement; root: Root } {
@@ -107,6 +163,7 @@ function workflow(overrides: Partial<WorkflowRecord> = {}): WorkflowRecord {
     createdAt: "2026-05-20T08:00:00.000Z",
     createdBy: null,
     definition: {},
+    description: "Workflow description",
     id: `workflow_${overrides.name ?? "pay"}`,
     lastRunAt: null,
     method: "POST",
@@ -130,6 +187,37 @@ function createDeferred<T>(): { promise: Promise<T>; resolve: (value: T) => void
 function setInputValue(input: HTMLInputElement, value: string): void {
   const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
   valueSetter?.call(input, value);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function setTextAreaValue(textarea: HTMLTextAreaElement, value: string): void {
+  const valueSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")?.set;
+  valueSetter?.call(textarea, value);
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function clickButton(container: HTMLDivElement, name: string): void {
+  const button = [...container.querySelectorAll("button")].find((item) => item.textContent?.includes(name));
+  if (!button) throw new Error(`BUTTON_NOT_FOUND_${name}`);
+  button.click();
+}
+
+function inputByPlaceholder(container: HTMLDivElement, placeholder: string): HTMLInputElement {
+  const input = container.querySelector<HTMLInputElement>(`input[placeholder="${placeholder}"]`);
+  if (!input) throw new Error(`INPUT_NOT_FOUND_${placeholder}`);
+  return input;
+}
+
+function textareaByPlaceholder(container: HTMLDivElement, placeholder: string): HTMLTextAreaElement {
+  const textarea = container.querySelector<HTMLTextAreaElement>(`textarea[placeholder="${placeholder}"]`);
+  if (!textarea) throw new Error(`TEXTAREA_NOT_FOUND_${placeholder}`);
+  return textarea;
+}
+
+function inputByDisplayValue(container: HTMLDivElement, value: string): HTMLInputElement {
+  const input = [...container.querySelectorAll<HTMLInputElement>("input")].find((item) => item.value === value);
+  if (!input) throw new Error(`INPUT_VALUE_NOT_FOUND_${value}`);
+  return input;
 }
 
 async function flushPromises(): Promise<void> {

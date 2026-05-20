@@ -1,14 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
-import { Copy, RefreshCw, Search } from "lucide-react";
-import { listWorkflows } from "./api";
+import { Copy, Edit3, Plus, RefreshCw, Save, Search, X } from "lucide-react";
+import { createWorkflow, listWorkflows, updateWorkflow } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
-import type { WorkflowRecord } from "./workflow.type";
+import type { WorkflowDraft, WorkflowRecord } from "./workflow.type";
 
 type WorkflowStatusFilter = "active" | "all" | "inactive";
+type WorkflowFormDraft = {
+  active: boolean;
+  description: string;
+  method: string;
+  name: string;
+  path: string;
+};
 
 export function WorkflowManager() {
   const [workflows, setWorkflows] = useState<WorkflowRecord[]>([]);
+  const [editingWorkflowId, setEditingWorkflowId] = useState<string | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [form, setForm] = useState<WorkflowFormDraft>(emptyWorkflowForm());
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("Workflow list loading");
   const [statusFilter, setStatusFilter] = useState<WorkflowStatusFilter>("all");
@@ -47,6 +57,44 @@ export function WorkflowManager() {
     }
   }
 
+  function openCreateForm() {
+    setEditingWorkflowId(null);
+    setForm(emptyWorkflowForm());
+    setFormOpen(true);
+  }
+
+  function openEditForm(workflow: WorkflowRecord) {
+    setEditingWorkflowId(workflow.id);
+    setForm({
+      active: workflow.active,
+      description: workflow.description,
+      method: workflow.method,
+      name: workflow.name,
+      path: workflow.path,
+    });
+    setFormOpen(true);
+  }
+
+  async function saveWorkflowBasics() {
+    const workflow = workflows.find((item) => item.id === editingWorkflowId);
+    const draft = workflowDraftFromForm(form, workflow);
+    const result = editingWorkflowId
+      ? await updateWorkflow(editingWorkflowId, draft)
+      : await createWorkflow(draft);
+    if (!result.ok || !result.workflow) {
+      setStatus(result.error ?? "Workflow save failed");
+      return;
+    }
+    const savedWorkflow = result.workflow;
+    setWorkflows((current) => sortWorkflows(editingWorkflowId
+      ? current.map((item) => item.id === savedWorkflow.id ? savedWorkflow : item)
+      : [...current, savedWorkflow]));
+    setStatus(editingWorkflowId ? `Updated ${savedWorkflow.name}` : `Created ${savedWorkflow.name}`);
+    setFormOpen(false);
+    setEditingWorkflowId(null);
+    setForm(emptyWorkflowForm());
+  }
+
   const filteredWorkflows = useMemo(
     () => filterWorkflows(workflows, search, statusFilter),
     [search, statusFilter, workflows],
@@ -59,11 +107,29 @@ export function WorkflowManager() {
           <h3 id="workflow-list-title">Workflow list</h3>
           <span>{filteredWorkflows.length} of {workflows.length} workflows</span>
         </div>
-        <button type="button" onClick={() => void loadWorkflows()}>
-          <RefreshCw aria-hidden="true" size={16} />
-          Refresh
-        </button>
+        <div className="entry-table-actions">
+          <button type="button" onClick={openCreateForm}>
+            <Plus aria-hidden="true" size={16} />
+            Create workflow
+          </button>
+          <button type="button" onClick={() => void loadWorkflows()}>
+            <RefreshCw aria-hidden="true" size={16} />
+            Refresh
+          </button>
+        </div>
       </div>
+      {formOpen ? (
+        <WorkflowBasicsForm
+          draft={form}
+          mode={editingWorkflowId ? "edit" : "create"}
+          onCancel={() => {
+            setFormOpen(false);
+            setEditingWorkflowId(null);
+          }}
+          onChange={setForm}
+          onSave={() => void saveWorkflowBasics()}
+        />
+      ) : null}
       <div className="entry-table-toolbar">
         <label className="entry-search-field">Find workflow
           <span>
@@ -120,6 +186,10 @@ export function WorkflowManager() {
                   <td>{formatDate(workflow.updatedAt)}</td>
                   <td>
                     <div className="entry-table-actions">
+                      <button type="button" onClick={() => openEditForm(workflow)}>
+                        <Edit3 aria-hidden="true" size={16} />
+                        Edit
+                      </button>
                       <button type="button" onClick={() => void copyRoute(workflow)}>
                         <Copy aria-hidden="true" size={16} />
                         Copy route
@@ -133,6 +203,75 @@ export function WorkflowManager() {
         </div>
       ) : null}
       <StatusToast title="Workflow status">{status}</StatusToast>
+    </section>
+  );
+}
+
+function WorkflowBasicsForm({
+  draft,
+  mode,
+  onCancel,
+  onChange,
+  onSave,
+}: {
+  draft: WorkflowFormDraft;
+  mode: "create" | "edit";
+  onCancel: () => void;
+  onChange: (draft: WorkflowFormDraft) => void;
+  onSave: () => void;
+}) {
+  return (
+    <section aria-labelledby="workflow-form-title" className="settings-panel workflow-basics-form">
+      <div className="entry-table-meta">
+        <h3 id="workflow-form-title">{mode === "edit" ? "Edit workflow" : "Create workflow"}</h3>
+        <button className="button-secondary" type="button" onClick={onCancel}>
+          <X aria-hidden="true" size={16} />
+          Close
+        </button>
+      </div>
+      <div className="workflow-form-grid">
+        <label>Name
+          <input
+            value={draft.name}
+            onChange={(event) => onChange({ ...draft, name: event.target.value })}
+            placeholder="Pay order"
+          />
+        </label>
+        <label>Method
+          <select value={draft.method} onChange={(event) => onChange({ ...draft, method: event.target.value })}>
+            {["GET", "POST", "PUT", "PATCH", "DELETE"].map((method) => (
+              <option key={method} value={method}>{method}</option>
+            ))}
+          </select>
+        </label>
+        <label>Path
+          <input
+            value={draft.path}
+            onChange={(event) => onChange({ ...draft, path: event.target.value })}
+            placeholder="/orders/pay"
+          />
+        </label>
+        <label>Description
+          <textarea
+            value={draft.description}
+            onChange={(event) => onChange({ ...draft, description: event.target.value })}
+            placeholder="Payment workflow"
+          />
+        </label>
+        <label className="checkbox-row">
+          <input
+            checked={draft.active}
+            type="checkbox"
+            onChange={(event) => onChange({ ...draft, active: event.target.checked })}
+          />
+          Active
+        </label>
+      </div>
+      <p className="helper-text">Mounted route: <code>{mountedWorkflowPath(draft.path)}</code></p>
+      <button type="button" onClick={onSave}>
+        <Save aria-hidden="true" size={16} />
+        Save workflow
+      </button>
     </section>
   );
 }
@@ -179,4 +318,62 @@ function formatDate(value: string): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);
+}
+
+function emptyWorkflowForm(): WorkflowFormDraft {
+  return {
+    active: false,
+    description: "",
+    method: "POST",
+    name: "",
+    path: "",
+  };
+}
+
+function workflowDraftFromForm(form: WorkflowFormDraft, existing?: WorkflowRecord): WorkflowDraft {
+  const path = normalizeWorkflowPath(form.path);
+  const method = form.method.toUpperCase();
+  return {
+    active: form.active,
+    definition: definitionForBasics(method, path, existing?.definition),
+    description: form.description,
+    method,
+    name: form.name,
+    path,
+    version: existing?.version ?? 1,
+  };
+}
+
+function definitionForBasics(method: string, path: string, existing?: Record<string, unknown>): Record<string, unknown> {
+  if (existing && Object.keys(existing).length > 0) {
+    return {
+      ...existing,
+      route: { method, path },
+    };
+  }
+  return {
+    edges: [{ from: "start", id: "edge-start-return", to: "return-ok" }],
+    nodes: [
+      { config: {}, id: "start", type: "routeTrigger" },
+      {
+        config: {
+          body: { ok: true },
+          status: 200,
+        },
+        id: "return-ok",
+        type: "returnResponse",
+      },
+    ],
+    route: { method, path },
+    startNodeId: "start",
+    version: 1,
+  };
+}
+
+function normalizeWorkflowPath(path: string): string {
+  const trimmed = path.trim();
+  if (!trimmed) return "";
+  if (trimmed === "/api/custom") return "/";
+  if (trimmed.startsWith("/api/custom/")) return trimmed.slice("/api/custom".length);
+  return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
 }

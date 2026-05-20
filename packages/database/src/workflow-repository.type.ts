@@ -10,6 +10,7 @@ export type WorkflowRecord = {
   createdAt: string;
   createdBy: WorkflowAuditActor | null;
   definition: WorkflowDefinitionJson;
+  description: string;
   id: string;
   lastRunAt: string | null;
   method: string;
@@ -24,6 +25,7 @@ export type CreateWorkflowInput = {
   active?: boolean;
   createdBy?: WorkflowAuditActor;
   definition: WorkflowDefinitionJson;
+  description?: string;
   method: string;
   name: string;
   path: string;
@@ -33,6 +35,7 @@ export type CreateWorkflowInput = {
 export type UpdateWorkflowInput = {
   active?: boolean;
   definition?: WorkflowDefinitionJson;
+  description?: string;
   method?: string;
   name?: string;
   path?: string;

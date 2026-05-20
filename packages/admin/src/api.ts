@@ -30,7 +30,7 @@ import type {
   ApiDocsSettingsResponse,
 } from "./settings.type";
 import type { UserListResponse, UserMutationResponse } from "./user.type";
-import type { WorkflowListResponse } from "./workflow.type";
+import type { WorkflowDraft, WorkflowListResponse, WorkflowMutationResponse } from "./workflow.type";
 import type {
   SchemaDraft,
   SchemaDeleteResponse,
@@ -345,6 +345,22 @@ export async function saveApiDocsSettings(input: { adminEnabled: boolean; conten
 
 export async function listWorkflows(): Promise<WorkflowListResponse> {
   return adminJson<WorkflowListResponse>("/api/admin/workflows");
+}
+
+export async function createWorkflow(input: WorkflowDraft): Promise<WorkflowMutationResponse> {
+  return adminJson<WorkflowMutationResponse>("/api/admin/workflows", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function updateWorkflow(workflowId: string, input: WorkflowDraft): Promise<WorkflowMutationResponse> {
+  return adminJson<WorkflowMutationResponse>(`/api/admin/workflows/${workflowId}`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
 }
 
 export async function adminJson<TResult>(path: string, init: RequestInit = {}): Promise<TResult> {

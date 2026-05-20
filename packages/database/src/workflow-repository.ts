@@ -14,6 +14,7 @@ type WorkflowRow = {
   createdAt: string;
   createdByEmail: string | null;
   createdById: string | null;
+  description: string;
   definitionJson: string;
   id: string;
   lastRunAt: string | null;
@@ -37,10 +38,11 @@ export async function createWorkflow(
   const now = new Date().toISOString();
   const createdBy = normalizeActor(input.createdBy);
   await db.prepare(
-    "INSERT INTO workflows (id, name, method, path, active, definition_json, created_at, updated_at, created_by_id, created_by_email, updated_by_id, updated_by_email, last_run_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO workflows (id, name, description, method, path, active, definition_json, created_at, updated_at, created_by_id, created_by_email, updated_by_id, updated_by_email, last_run_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
   ).run(
     id,
     draft.name,
+    draft.description ?? "",
     draft.method,
     draft.path,
     draft.active ? 1 : 0,
@@ -93,6 +95,7 @@ export async function updateWorkflow(
   const next = normalizeWorkflowInput({
     active: input.active ?? existing.active,
     definition: input.definition ?? existing.definition,
+    description: input.description ?? existing.description,
     method: input.method ?? existing.method,
     name: input.name ?? existing.name,
     path: input.path ?? existing.path,
@@ -102,9 +105,10 @@ export async function updateWorkflow(
   await assertWorkflowRouteUnique(db, next.method, next.path, id);
   const updatedBy = normalizeActor(input.updatedBy) ?? existing.updatedBy;
   await db.prepare(
-    "UPDATE workflows SET name = ?, method = ?, path = ?, active = ?, definition_json = ?, updated_at = ?, updated_by_id = ?, updated_by_email = ?, version = ? WHERE id = ?",
+    "UPDATE workflows SET name = ?, description = ?, method = ?, path = ?, active = ?, definition_json = ?, updated_at = ?, updated_by_id = ?, updated_by_email = ?, version = ? WHERE id = ?",
   ).run(
     next.name,
+    next.description ?? "",
     next.method,
     next.path,
     next.active ? 1 : 0,
@@ -178,6 +182,7 @@ function normalizeWorkflowInput(input: CreateWorkflowInput): CreateWorkflowInput
   return {
     active: input.active ?? false,
     definition: input.definition,
+    description: input.description?.trim() ?? "",
     method: normalizeMethod(input.method),
     name,
     path,
@@ -203,6 +208,7 @@ function rowToWorkflow(row: WorkflowRow): WorkflowRecord {
     createdAt: row.createdAt,
     createdBy: rowToActor(row.createdById, row.createdByEmail),
     definition: parseWorkflowDefinition(row.definitionJson),
+    description: row.description,
     id: row.id,
     lastRunAt: row.lastRunAt,
     method: row.method,
@@ -223,7 +229,7 @@ function parseWorkflowDefinition(definitionJson: string): WorkflowDefinitionJson
 }
 
 function workflowSelectSql(suffix: string): string {
-  return `SELECT id, name, method, path, active, definition_json as definitionJson, created_at as createdAt, updated_at as updatedAt, created_by_id as createdById, created_by_email as createdByEmail, updated_by_id as updatedById, updated_by_email as updatedByEmail, last_run_at as lastRunAt, version FROM workflows ${suffix}`;
+  return `SELECT id, name, description, method, path, active, definition_json as definitionJson, created_at as createdAt, updated_at as updatedAt, created_by_id as createdById, created_by_email as createdByEmail, updated_by_id as updatedById, updated_by_email as updatedByEmail, last_run_at as lastRunAt, version FROM workflows ${suffix}`;
 }
 
 function normalizeActor(actor: WorkflowAuditActor | undefined): WorkflowAuditActor | undefined {

@@ -7,6 +7,7 @@ export type WorkflowParams = {
 export type CreateWorkflowBody = {
   active?: boolean;
   definition: WorkflowDefinitionJson;
+  description?: string;
   method: string;
   name: string;
   path: string;
@@ -16,6 +17,7 @@ export type CreateWorkflowBody = {
 export type UpdateWorkflowBody = {
   active?: boolean;
   definition?: WorkflowDefinitionJson;
+  description?: string;
   method?: string;
   name?: string;
   path?: string;

@@ -223,6 +223,7 @@ CREATE TABLE IF NOT EXISTS custom_api_permission_events (
 CREATE TABLE IF NOT EXISTS workflows (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
   method TEXT NOT NULL,
   path TEXT NOT NULL,
   active INTEGER NOT NULL DEFAULT 0,

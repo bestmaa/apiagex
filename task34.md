@@ -456,7 +456,7 @@ Each task uses this structure:
 #### T3430 - Build Workflow Basics Form
 
 - Version: `v0.12.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Create/edit workflow name, method, path, description, and active flag.
 - Persona: API builder; make route creation straightforward.
 - Success Criteria: Admin can create a basic workflow draft and edit metadata.

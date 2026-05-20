@@ -77,6 +77,7 @@ export const MVP_ADDITIVE_MIGRATIONS_SQL = [
   `CREATE TABLE IF NOT EXISTS custom_api_permissions (id TEXT PRIMARY KEY, role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE, custom_api_route_id TEXT NOT NULL REFERENCES custom_api_routes(id) ON DELETE CASCADE, allowed INTEGER NOT NULL DEFAULT 0, UNIQUE(role_id, custom_api_route_id))`,
   `CREATE TABLE IF NOT EXISTS custom_api_permission_events (id TEXT PRIMARY KEY, role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE, custom_api_route_id TEXT NOT NULL REFERENCES custom_api_routes(id) ON DELETE CASCADE, allowed INTEGER NOT NULL DEFAULT 0, actor_id TEXT NOT NULL, actor_email TEXT NOT NULL, created_at TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS workflows (id TEXT PRIMARY KEY, name TEXT NOT NULL, method TEXT NOT NULL, path TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 0, definition_json TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, last_run_at TEXT, version INTEGER NOT NULL, UNIQUE(method, path))`,
+  "ALTER TABLE workflows ADD COLUMN description TEXT NOT NULL DEFAULT ''",
   "ALTER TABLE workflows ADD COLUMN created_by_id TEXT",
   "ALTER TABLE workflows ADD COLUMN created_by_email TEXT",
   "ALTER TABLE workflows ADD COLUMN updated_by_id TEXT",

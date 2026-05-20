@@ -283,6 +283,26 @@ code {
   padding: var(--admin-space-4);
 }
 
+.workflow-basics-form {
+  border-left: var(--admin-space-1) solid var(--admin-color-primary);
+}
+
+.workflow-form-grid {
+  display: grid;
+  gap: var(--admin-space-4);
+  grid-template-columns: minmax(220px, 1fr) minmax(140px, 180px);
+}
+
+.workflow-form-grid label:nth-child(3),
+.workflow-form-grid label:nth-child(4) {
+  grid-column: 1 / -1;
+}
+
+.workflow-form-grid textarea {
+  min-height: 86px;
+  resize: vertical;
+}
+
 .custom-api-history h3 {
   font-size: var(--admin-font-sm);
   margin: 0;
@@ -2220,6 +2240,7 @@ code {
   .webhook-event-grid,
   .webhook-row,
   .webhook-delivery-row,
+  .workflow-form-grid,
   .schema-basics-grid,
   .schema-field-badge-row,
   .schema-inventory-row,
