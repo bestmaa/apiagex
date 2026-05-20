@@ -127,6 +127,23 @@ export const docPage = {
       ],
     },
     {
+      heading: "Workflow API Calls",
+      lines: [
+        "Workflow APIs: active workflows are mounted under /api/custom and use the same Settings > Custom API Permissions rules as code custom routes.",
+        "Workflow APIs: active workflows /api/custom ke under mount hote hain aur code custom routes jaise same Settings > Custom API Permissions rules use karte hain.",
+        "Public example setup: create an active POST workflow at /orders/status, open /adminui#settings/custom-api-permissions, select public, search workflow.orders.status.post, allow it, and save.",
+        "Public example setup: active POST workflow /orders/status banao, /adminui#settings/custom-api-permissions open karo, public select karo, workflow.orders.status.post search karo, allow karo, aur save karo.",
+        "Public curl: curl -X POST http://127.0.0.1:4000/api/custom/orders/status -H 'content-type: application/json' -d '{\"orderId\":\"ord_123\",\"status\":\"ready\"}'.",
+        "Public curl: public allowed hone par Authorization header ki zarurat nahi hoti.",
+        "Token setup: allow the same workflow route for a content API role, create a token for that role in Settings > API Tokens, then call with Authorization: Bearer API_TOKEN.",
+        "Token setup: same workflow route ko content API role ke liye allow karo, Settings > API Tokens me us role ka token banao, phir Authorization: Bearer API_TOKEN ke saath call karo.",
+        "Token curl: curl -X POST http://127.0.0.1:4000/api/custom/orders/status -H 'Authorization: Bearer API_TOKEN' -H 'content-type: application/json' -d '{\"orderId\":\"ord_123\",\"status\":\"ready\"}'.",
+        "Token curl: token role allowed nahi hai to 403 CUSTOM_API_PERMISSION_DENIED milega; token wrong ya revoked hai to API_TOKEN_INVALID milega.",
+        "Inactive workflow routes are not callable. Active workflow routes remain blocked until public or a token role is allowed.",
+        "Inactive workflow routes callable nahi hote. Active workflow routes tab tak blocked rehte hain jab tak public ya token role allow nahi hota.",
+      ],
+    },
+    {
       heading: "QA",
       lines: [
         "Admin UI redesign: /adminui uses a custom React shell with Dashboard, Schemas, Entries, APIs, Users, Settings, and Docs navigation.",
@@ -245,6 +262,19 @@ export const readmePage = {
         "RBAC allow/block examples ke liye /doc aur /readme padho.",
         "Blocked RBAC requests return API_PERMISSION_DENIED.",
         "Blocked RBAC requests API_PERMISSION_DENIED return karte hain.",
+      ],
+    },
+    {
+      heading: "Workflow APIs",
+      lines: [
+        "Workflow APIs created in Settings > Workflows are called at /api/custom/:path after activation.",
+        "Settings > Workflows me bani Workflow APIs activation ke baad /api/custom/:path par call hoti hain.",
+        "Public workflow call: allow the workflow route for the public role in Custom API Permissions, then call it without Authorization.",
+        "Public workflow call: Custom API Permissions me workflow route ko public role ke liye allow karo, phir bina Authorization call karo.",
+        "Token workflow call: allow the workflow route for a content API role, create an API token for that role, and send Authorization: Bearer API_TOKEN.",
+        "Token workflow call: workflow route ko content API role ke liye allow karo, us role ka API token banao, aur Authorization: Bearer API_TOKEN bhejo.",
+        "Blocked workflow calls return CUSTOM_API_PERMISSION_DENIED; inactive workflows are not mounted.",
+        "Blocked workflow calls CUSTOM_API_PERMISSION_DENIED return karte hain; inactive workflows mounted nahi hote.",
       ],
     },
     {

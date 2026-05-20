@@ -223,6 +223,31 @@ curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \\
 
 The Custom API Permissions screen can also rename route labels/groups, show allow/block history, and delete old inactive routes after they are removed from code.
 
+## Workflow APIs
+
+English: Workflows created in Admin UI are also custom APIs. Create an active workflow in /adminui#settings/workflows, then open /adminui#settings/custom-api-permissions and allow the workflow route for public or for a content API role.
+
+Hinglish: Admin UI me banaye gaye workflows bhi custom APIs hote hain. /adminui#settings/workflows me active workflow banao, phir /adminui#settings/custom-api-permissions me workflow route ko public ya content API role ke liye allow karo.
+
+Public workflow call:
+
+\`\`\`bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/status \\
+  -H "content-type: application/json" \\
+  -d '{"orderId":"ord_123","status":"ready"}'
+\`\`\`
+
+Token-protected workflow call:
+
+\`\`\`bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/status \\
+  -H "Authorization: Bearer API_TOKEN" \\
+  -H "content-type: application/json" \\
+  -d '{"orderId":"ord_123","status":"ready"}'
+\`\`\`
+
+Blocked workflow calls return CUSTOM_API_PERMISSION_DENIED. Wrong or revoked tokens return API_TOKEN_INVALID. Inactive workflows are not mounted.
+
 ## Type generation
 
 English: In TypeScript projects, run npm run types after creating or changing schemas. It writes src/apiagex-types.ts so RegisterApiagexCustomRoutes automatically gets schema slug and field autocomplete.

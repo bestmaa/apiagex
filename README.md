@@ -47,6 +47,32 @@ curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \
 
 The Custom API Permissions screen also supports search, route label/group rename, allow/block history, and cleanup for inactive routes removed from code.
 
+Workflow APIs created in Settings / Workflows use the same `/api/custom` mount and the same Custom API Permissions screen. Active workflows are blocked by default until `public` or a token role is allowed.
+
+Public workflow call:
+
+```bash
+# 1. Create and activate a POST workflow with path /orders/status.
+# 2. Open /adminui#settings/custom-api-permissions.
+# 3. Select public - open/no token, search workflow.orders.status.post, allow it, and save.
+curl -X POST http://127.0.0.1:4000/api/custom/orders/status \
+  -H "content-type: application/json" \
+  -d '{"orderId":"ord_123","status":"ready"}'
+```
+
+Token-protected workflow call:
+
+```bash
+# 1. Allow the workflow route for a content API role instead of public.
+# 2. Open Settings / API Tokens and create a token for that same role.
+curl -X POST http://127.0.0.1:4000/api/custom/orders/status \
+  -H "Authorization: Bearer API_TOKEN" \
+  -H "content-type: application/json" \
+  -d '{"orderId":"ord_123","status":"ready"}'
+```
+
+If no Custom API permission is allowed, the workflow route returns `403 CUSTOM_API_PERMISSION_DENIED`. If the workflow is inactive, the mounted route is not callable.
+
 Planned next layer: Workflow API Builder will let admins create safe custom APIs from Admin UI using saved workflow definitions before the graph editor is added. Scope and safety rules are documented in [docs/workflow-builder-scope.md](./docs/workflow-builder-scope.md).
 
 ## Open Source License

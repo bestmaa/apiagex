@@ -549,7 +549,7 @@ Each task uses this structure:
 #### T3437 - Add Workflow API Token Example Docs
 
 - Version: `v0.13.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Document how to call a workflow API with public permission or API token.
 - Persona: Developer educator; make the first API call easy.
 - Success Criteria: Docs include curl examples for public and token-protected workflow APIs.

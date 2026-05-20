@@ -1,4 +1,4 @@
-import { BookOpen, ClipboardList, Database, KeyRound, Network, ShieldCheck, Table2, UserRound } from "lucide-react";
+import { BookOpen, ClipboardList, Database, GitBranch, KeyRound, Network, ShieldCheck, Table2, UserRound } from "lucide-react";
 import { WebhookVerificationDocs } from "./WebhookVerificationDocs";
 import { RealtimeClientDocs } from "./RealtimeClientDocs";
 
@@ -51,6 +51,13 @@ const workflowSummaries = [
     route: "#settings/webhooks",
     routeLabel: "Configure webhooks",
     summary: "Send signed entry create, update, and delete events to external systems.",
+  },
+  {
+    icon: GitBranch,
+    title: "Workflow APIs",
+    route: "#settings/workflows",
+    routeLabel: "Build workflows",
+    summary: "Create active workflow routes, then allow public or token access from Custom API Permissions.",
   },
 ];
 
@@ -228,6 +235,30 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="admin-doc-relations" aria-labelledby="workflow-api-examples-title">
+        <div>
+          <span className="section-kicker">Workflow API calls</span>
+          <h3 id="workflow-api-examples-title">Public and token examples</h3>
+          <p>Active workflows are mounted under <code>/api/custom</code> and use Settings / Custom API Permissions. Inactive workflows are not callable.</p>
+        </div>
+        <article className="api-row">
+          <strong>Public workflow route</strong>
+          <p>Allow the route for <code>public - open/no token</code>, then call without an Authorization header.</p>
+          <pre><code>{`curl -X POST http://127.0.0.1:4000/api/custom/orders/status \\
+  -H "content-type: application/json" \\
+  -d '{"orderId":"ord_123","status":"ready"}'`}</code></pre>
+        </article>
+        <article className="api-row">
+          <strong>Token-protected workflow route</strong>
+          <p>Allow the route for a content API role, create a token for that role, then send the token with the request.</p>
+          <pre><code>{`curl -X POST http://127.0.0.1:4000/api/custom/orders/status \\
+  -H "Authorization: Bearer API_TOKEN" \\
+  -H "content-type: application/json" \\
+  -d '{"orderId":"ord_123","status":"ready"}'`}</code></pre>
+          <p>Blocked routes return <code>CUSTOM_API_PERMISSION_DENIED</code>; wrong or revoked tokens return <code>API_TOKEN_INVALID</code>.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

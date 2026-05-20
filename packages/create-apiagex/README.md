@@ -51,6 +51,27 @@ curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \
 
 The same screen can rename the route label/group, show allow/block history, and delete old inactive routes after they are removed from code.
 
+Workflow APIs created in Admin UI use the same Custom API Permissions system. Create an active workflow in `/adminui#settings/workflows`; it is mounted under `/api/custom`. Then allow its route for `public` or for a content API role in `/adminui#settings/custom-api-permissions`.
+
+Public workflow call:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/status \
+  -H "content-type: application/json" \
+  -d '{"orderId":"ord_123","status":"ready"}'
+```
+
+Token-protected workflow call:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/status \
+  -H "Authorization: Bearer API_TOKEN" \
+  -H "content-type: application/json" \
+  -d '{"orderId":"ord_123","status":"ready"}'
+```
+
+Blocked workflow calls return `CUSTOM_API_PERMISSION_DENIED`. Wrong or revoked tokens return `API_TOKEN_INVALID`. Inactive workflows are not mounted.
+
 For TypeScript projects, run this after creating or changing schemas in Admin UI:
 
 ```bash
@@ -143,6 +164,27 @@ curl -X POST http://127.0.0.1:4000/api/custom/orders/ENTRY_ID/pay \
 ```
 
 Same screen se route label/group rename, allow/block history, aur code se remove hone ke baad old inactive route delete bhi ho sakta hai.
+
+Admin UI me bani Workflow APIs same Custom API Permissions system use karti hain. `/adminui#settings/workflows` me active workflow banao; ye `/api/custom` ke under mount hota hai. Phir `/adminui#settings/custom-api-permissions` me us route ko `public` ya content API role ke liye allow karo.
+
+Public workflow call:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/status \
+  -H "content-type: application/json" \
+  -d '{"orderId":"ord_123","status":"ready"}'
+```
+
+Token-protected workflow call:
+
+```bash
+curl -X POST http://127.0.0.1:4000/api/custom/orders/status \
+  -H "Authorization: Bearer API_TOKEN" \
+  -H "content-type: application/json" \
+  -d '{"orderId":"ord_123","status":"ready"}'
+```
+
+Blocked workflow calls `CUSTOM_API_PERMISSION_DENIED` return karte hain. Wrong ya revoked tokens `API_TOKEN_INVALID` return karte hain. Inactive workflows mounted nahi hote.
 
 TypeScript projects me Admin UI se schema create/change karne ke baad ye chalao:
 
