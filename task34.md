@@ -709,7 +709,7 @@ Each task uses this structure:
 #### T3449 - Add Secret Store Plan
 
 - Version: `v0.15.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Plan secure storage for provider secrets used by workflow nodes.
 - Persona: Security architect; avoid leaking API keys.
 - Success Criteria: Plan covers encrypted-at-rest option, env-backed secrets, Admin UI secret references, and redaction.

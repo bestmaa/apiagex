@@ -301,6 +301,10 @@ export const readmePage = {
         "Report limits: MVP report templates bounded rakho; large reports ko workflow runtime query limits respect karna hoga.",
         "Graph editor plan: docs/workflow-graph-editor-plan.md chooses React Flow and keeps the visual graph as a projection of validated workflow JSON.",
         "Graph editor plan: docs/workflow-graph-editor-plan.md React Flow choose karta hai aur visual graph ko validated workflow JSON ka projection rakhta hai.",
+        "Secret store plan: docs/workflow-secret-store-plan.md requires workflow JSON to store only secret references such as secret:stripe.secretKey.",
+        "Secret store plan: docs/workflow-secret-store-plan.md workflow JSON me sirf secret:stripe.secretKey jaise references allow karta hai.",
+        "Secret values must live in env-backed or encrypted secret storage and must be redacted from workflow history, tests, webhooks, realtime events, and logs.",
+        "Secret values env-backed ya encrypted secret storage me rahenge aur workflow history, tests, webhooks, realtime events, aur logs se redact honge.",
       ],
     },
     {

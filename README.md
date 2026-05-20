@@ -85,6 +85,8 @@ The Workflows screen also includes `Create order status template`. It creates an
 
 `Create report template` creates an inactive read-only `GET /api/custom/reports/orders` workflow. It queries the `orders` schema with `limit: 50` and returns `{ ok, total, limit, offset, entries }`, so large reports stay inside runtime query limits.
 
+Workflow provider secrets are planned in [docs/workflow-secret-store-plan.md](./docs/workflow-secret-store-plan.md). Workflow JSON must store only references such as `secret:stripe.secretKey`; real API keys stay in env-backed or encrypted secret storage and are redacted from logs/history.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

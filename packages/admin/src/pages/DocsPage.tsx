@@ -295,6 +295,11 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <p>The planned graph editor uses React Flow only as a visual editor for the validated workflow JSON contract. Runtime behavior must still be expressible as supported workflow nodes and edges.</p>
           <p>Read <code>docs/workflow-graph-editor-plan.md</code> before implementing canvas features, node handles, graph validation, or JSON conversion helpers.</p>
         </article>
+        <article className="api-row">
+          <strong>Secret store plan</strong>
+          <p>Provider credentials for workflow nodes must use references such as <code>secret:stripe.secretKey</code>. Real API keys must stay in env-backed or encrypted secret storage, not workflow JSON.</p>
+          <p>Read <code>docs/workflow-secret-store-plan.md</code> before implementing HTTP, SMS, email, payment, OAuth, or any provider node that needs a secret. Test results, workflow history, webhooks, realtime events, and logs must redact resolved values.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />
