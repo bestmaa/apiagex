@@ -323,6 +323,10 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <strong>Workflow browser check</strong>
           <p>Read <code>docs/workflow-builder-browser-check.md</code> for the Playwright/browser verification covering owner login, schema and entry setup, workflow create, test run, activation, permission allow, token variant, and API call.</p>
         </article>
+        <article className="api-row">
+          <strong>Workflow import/export plan</strong>
+          <p>Read <code>docs/workflow-import-export-plan.md</code> for planned template/backup sharing. Exports must include workflow JSON and dependency references only; secret values stay out of export files.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

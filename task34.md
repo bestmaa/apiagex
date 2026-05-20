@@ -828,7 +828,7 @@ Each task uses this structure:
 #### T3458 - Add Workflow Import Export Plan
 
 - Version: `v0.16.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Plan workflow JSON import/export for templates, backups, and sharing.
 - Persona: Product platform architect; support future workflow marketplace safely.
 - Success Criteria: Plan covers versioning, validation, secrets exclusion, and compatibility.

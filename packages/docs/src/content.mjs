@@ -149,6 +149,8 @@ export const docPage = {
         "Practical guide: docs/workflow-builder-practical-guide.md current schema, workflow steps, test run, permission allow, token, aur curl flow dikhata hai.",
         "Browser check: docs/workflow-builder-browser-check.md covers owner login, schema, entries, workflow create, test run, activation, permission allow, token variant, and API call.",
         "Browser check: docs/workflow-builder-browser-check.md owner login, schema, entries, workflow create, test run, activation, permission allow, token variant, aur API call cover karta hai.",
+        "Import/export plan: docs/workflow-import-export-plan.md covers versioning, validation, secret exclusion, compatibility, and inactive-by-default imports.",
+        "Import/export plan: docs/workflow-import-export-plan.md versioning, validation, secret exclusion, compatibility, aur inactive-by-default imports cover karta hai.",
       ],
     },
     {
