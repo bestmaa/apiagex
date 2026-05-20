@@ -391,6 +391,60 @@ code {
   white-space: pre-wrap;
 }
 
+.workflow-history-panel {
+  border-top: 1px solid var(--admin-color-border-soft);
+  display: grid;
+  gap: var(--admin-space-4);
+  padding-top: var(--admin-space-4);
+}
+
+.workflow-history-panel h3 {
+  margin: 0;
+}
+
+.workflow-history-list {
+  display: grid;
+  gap: var(--admin-space-3);
+}
+
+.workflow-history-row {
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-sm);
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: minmax(140px, 0.8fr) minmax(220px, 1.4fr) minmax(120px, 0.6fr) minmax(180px, 1fr);
+  padding: var(--admin-space-3);
+}
+
+.workflow-history-row > div {
+  display: grid;
+  gap: var(--admin-space-2);
+}
+
+.workflow-history-row span {
+  color: var(--admin-color-text-muted);
+  font-size: var(--admin-font-sm);
+}
+
+.workflow-history-row details {
+  min-width: 0;
+}
+
+.workflow-history-row summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.workflow-history-row pre {
+  background: var(--admin-color-surface-muted);
+  border-radius: var(--admin-radius-sm);
+  margin: var(--admin-space-2) 0 0;
+  max-height: 180px;
+  overflow: auto;
+  padding: var(--admin-space-3);
+  white-space: pre-wrap;
+}
+
 .custom-api-history h3 {
   font-size: var(--admin-font-sm);
   margin: 0;
@@ -2331,6 +2385,7 @@ code {
   .workflow-form-grid,
   .workflow-step-fields,
   .workflow-step-identity,
+  .workflow-history-row,
   .workflow-test-grid,
   .workflow-test-output,
   .schema-basics-grid,

@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Copy, Edit3, Plus, RefreshCw, Save, Search, X } from "lucide-react";
-import { createWorkflow, listSchemas, listWorkflows, testWorkflow, updateWorkflow } from "./api";
+import { createWorkflow, listSchemas, listWorkflowRuns, listWorkflows, testWorkflow, updateWorkflow } from "./api";
 import { StateMessage } from "./components/StateMessage";
 import { StatusToast } from "./components/StatusToast";
 import type { SchemaFieldDraft, SchemaRecord } from "./schema.type";
-import type { WorkflowDraft, WorkflowRecord, WorkflowTestRunResult } from "./workflow.type";
+import type { WorkflowDraft, WorkflowRecord, WorkflowRunRecord, WorkflowTestRunResult } from "./workflow.type";
 
 type WorkflowStatusFilter = "active" | "all" | "inactive";
 type WorkflowStepType = "createEntry" | "queryEntries" | "returnResponse" | "updateEntry" | "validateBody";
@@ -322,7 +322,12 @@ function WorkflowBasicsForm({
         <Save aria-hidden="true" size={16} />
         Save workflow
       </button>
-      {mode === "edit" && workflowId ? <WorkflowTestPanel workflowId={workflowId} /> : null}
+      {mode === "edit" && workflowId ? (
+        <>
+          <WorkflowTestPanel workflowId={workflowId} />
+          <WorkflowRunHistoryPanel workflowId={workflowId} />
+        </>
+      ) : null}
     </section>
   );
 }
@@ -401,6 +406,70 @@ function WorkflowTestPanel({ workflowId }: { workflowId: string }) {
         </div>
       ) : null}
       <StatusToast title="Workflow test status">{status}</StatusToast>
+    </section>
+  );
+}
+
+function WorkflowRunHistoryPanel({ workflowId }: { workflowId: string }) {
+  const [runs, setRuns] = useState<WorkflowRunRecord[]>([]);
+  const [status, setStatus] = useState("Workflow history loading");
+
+  useEffect(() => {
+    void loadRuns();
+  }, [workflowId]);
+
+  async function loadRuns() {
+    setStatus("Workflow history loading");
+    const response = await listWorkflowRuns(workflowId, 20);
+    if (!response.ok) {
+      setRuns([]);
+      setStatus(response.error ?? "Workflow history failed");
+      return;
+    }
+    const nextRuns = response.runs ?? [];
+    setRuns(nextRuns);
+    setStatus(nextRuns.length ? "Workflow history ready" : "No workflow runs yet");
+  }
+
+  return (
+    <section aria-labelledby="workflow-history-title" className="workflow-history-panel">
+      <div className="entry-table-meta">
+        <div>
+          <h3 id="workflow-history-title">Run history</h3>
+          <span>{runs.length} recent runs</span>
+        </div>
+        <button type="button" onClick={() => void loadRuns()}>
+          <RefreshCw aria-hidden="true" size={16} />
+          Refresh history
+        </button>
+      </div>
+      {runs.length ? (
+        <div className="workflow-history-list">
+          {runs.map((run) => (
+            <article className="workflow-history-row" key={run.id}>
+              <div>
+                <strong className={run.status === "success" ? "status-pill is-active" : "status-pill"}>{run.status}</strong>
+                <span>{run.statusCode ?? "no status"} · {run.durationMs} ms</span>
+              </div>
+              <div>
+                <code>{run.request.method} {run.request.path}</code>
+                <span>{formatDate(run.createdAt)}</span>
+              </div>
+              <div>
+                <strong>Error</strong>
+                <span>{run.errorCode ?? "none"}</span>
+              </div>
+              <details>
+                <summary>Request metadata</summary>
+                <pre>{jsonText(run.request)}</pre>
+              </details>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <StateMessage title="No workflow runs yet" variant="empty">Call the workflow API to create run history.</StateMessage>
+      )}
+      <StatusToast title="Workflow history status">{status}</StatusToast>
     </section>
   );
 }

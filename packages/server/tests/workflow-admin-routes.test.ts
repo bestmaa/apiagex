@@ -1,6 +1,7 @@
 import {
   getCustomApiRouteByMethodPath,
   openMigratedSqliteAdapter,
+  recordWorkflowRun,
 } from "@apiagex/database";
 import { describe, expect, it } from "vitest";
 import { createServer } from "../src/app.js";
@@ -157,6 +158,58 @@ describe("workflow admin routes", () => {
         path: "/echo",
       },
     });
+  });
+
+  it("lists recent workflow run history with sanitized request metadata", async () => {
+    const database = openMigratedSqliteAdapter();
+    const server = createServer({ adminAuth: "disabled", database });
+    const created = await server.inject({
+      method: "POST",
+      payload: {
+        active: true,
+        definition: echoWorkflowDefinition("/echo"),
+        method: "POST",
+        name: "Echo workflow",
+        path: "/echo",
+        version: 1,
+      },
+      url: "/api/admin/workflows",
+    });
+    const workflowId = created.json().workflow.id;
+    await recordWorkflowRun(database, {
+      durationMs: 17,
+      errorCode: null,
+      request: {
+        headers: { authorization: "Bearer secret", "x-request-id": "req_123" },
+        method: "POST",
+        params: { id: "1" },
+        path: "/api/custom/echo",
+        query: { debug: true },
+      },
+      status: "success",
+      statusCode: 200,
+      workflowId,
+    });
+
+    const response = await server.inject({ method: "GET", url: `/api/admin/workflows/${workflowId}/runs?limit=5` });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().runs).toHaveLength(1);
+    expect(response.json().runs[0]).toMatchObject({
+      durationMs: 17,
+      errorCode: null,
+      request: {
+        headers: { authorization: "[redacted]", "x-request-id": "req_123" },
+        method: "POST",
+        params: { id: "1" },
+        path: "/api/custom/echo",
+        query: { debug: true },
+      },
+      status: "success",
+      statusCode: 200,
+      workflowId,
+    });
+    expect(JSON.stringify(response.json())).not.toContain("Bearer secret");
   });
 });
 

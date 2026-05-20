@@ -34,6 +34,7 @@ import type {
   WorkflowDraft,
   WorkflowListResponse,
   WorkflowMutationResponse,
+  WorkflowRunListResponse,
   WorkflowTestRunDraft,
   WorkflowTestRunResponse,
 } from "./workflow.type";
@@ -375,6 +376,10 @@ export async function testWorkflow(workflowId: string, input: WorkflowTestRunDra
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
   });
+}
+
+export async function listWorkflowRuns(workflowId: string, limit = 20): Promise<WorkflowRunListResponse> {
+  return adminJson<WorkflowRunListResponse>(`/api/admin/workflows/${workflowId}/runs?limit=${encodeURIComponent(String(limit))}`);
 }
 
 export async function adminJson<TResult>(path: string, init: RequestInit = {}): Promise<TResult> {

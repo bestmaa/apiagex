@@ -2,6 +2,7 @@ import {
   createWorkflow,
   deleteWorkflow,
   getWorkflowById,
+  listWorkflowRuns,
   listWorkflows,
   syncWorkflowCustomApiRoutes,
   updateWorkflow,
@@ -39,6 +40,18 @@ export function registerWorkflowAdminRoutes(server: FastifyInstance, database: A
     if (!workflow) return reply.code(404).send({ ok: false, error: "WORKFLOW_NOT_FOUND" });
     return { ok: true, workflow };
   });
+
+  server.get<{ Params: WorkflowParams; Querystring: { limit?: string } }>(
+    "/api/admin/workflows/:workflowId/runs",
+    async (request, reply) => {
+      const workflow = await getWorkflowById(database, request.params.workflowId);
+      if (!workflow) return reply.code(404).send({ ok: false, error: "WORKFLOW_NOT_FOUND" });
+      return {
+        ok: true,
+        runs: await listWorkflowRuns(database, workflow.id, Number(request.query.limit ?? 50)),
+      };
+    },
+  );
 
   server.post<{ Body: TestWorkflowBody; Params: WorkflowParams }>(
     "/api/admin/workflows/:workflowId/test-run",

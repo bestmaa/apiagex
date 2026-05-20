@@ -508,7 +508,7 @@ Each task uses this structure:
 #### T3434 - Add Workflow Run History UI
 
 - Version: `v0.12.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Show recent workflow executions in Admin UI.
 - Persona: Operator/debugger; understand workflow activity.
 - Success Criteria: Page shows status, route, duration, error, time, and safe request metadata.

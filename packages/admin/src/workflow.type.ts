@@ -67,3 +67,26 @@ export type WorkflowTestRunResponse = {
     path: string;
   };
 };
+
+export type WorkflowRunRecord = {
+  createdAt: string;
+  durationMs: number;
+  errorCode: string | null;
+  id: string;
+  request: {
+    headers: Record<string, string>;
+    method: string;
+    params: Record<string, unknown>;
+    path: string;
+    query: Record<string, unknown>;
+  };
+  status: "error" | "success";
+  statusCode: number | null;
+  workflowId: string;
+};
+
+export type WorkflowRunListResponse = {
+  error?: string;
+  ok: boolean;
+  runs?: WorkflowRunRecord[];
+};

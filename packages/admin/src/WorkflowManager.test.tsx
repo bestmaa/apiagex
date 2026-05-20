@@ -2,7 +2,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createWorkflow, listSchemas, listWorkflows, testWorkflow, updateWorkflow } from "./api";
+import { createWorkflow, listSchemas, listWorkflowRuns, listWorkflows, testWorkflow, updateWorkflow } from "./api";
 import { WorkflowManager } from "./WorkflowManager";
 import type { SchemaRecord } from "./schema.type";
 import type { WorkflowRecord } from "./workflow.type";
@@ -10,6 +10,7 @@ import type { WorkflowRecord } from "./workflow.type";
 vi.mock("./api", () => ({
   createWorkflow: vi.fn(),
   listSchemas: vi.fn(),
+  listWorkflowRuns: vi.fn(),
   listWorkflows: vi.fn(),
   testWorkflow: vi.fn(),
   updateWorkflow: vi.fn(),
@@ -20,6 +21,27 @@ const roots: Array<{ container: HTMLDivElement; root: Root }> = [];
 describe("WorkflowManager", () => {
   beforeEach(() => {
     vi.mocked(listSchemas).mockResolvedValue({ ok: true, schemas: [schema()] });
+    vi.mocked(listWorkflowRuns).mockResolvedValue({
+      ok: true,
+      runs: [
+        {
+          createdAt: "2026-05-20T10:00:00.000Z",
+          durationMs: 23,
+          errorCode: null,
+          id: "run_1",
+          request: {
+            headers: { authorization: "[redacted]", "x-request-id": "req_123" },
+            method: "POST",
+            params: { id: "1" },
+            path: "/api/custom/echo",
+            query: { debug: true },
+          },
+          status: "success",
+          statusCode: 201,
+          workflowId: "workflow_pay",
+        },
+      ],
+    });
     vi.mocked(listWorkflows).mockResolvedValue({ ok: true, workflows: [workflow(), workflow({ active: false, name: "Archive order", path: "/orders/archive" })] });
     vi.mocked(testWorkflow).mockResolvedValue({
       ok: true,
@@ -285,6 +307,23 @@ describe("WorkflowManager", () => {
     expect(container.textContent).toContain("Workflow test passed");
     expect(container.textContent).toContain("Step outputs");
     expect(container.textContent).toContain("return-echo");
+  });
+
+  it("shows workflow run history in the edit panel", async () => {
+    const { container } = await renderWorkflowManagerLoaded();
+
+    await act(async () => {
+      clickButton(container, "Edit");
+      await flushPromises();
+    });
+
+    expect(listWorkflowRuns).toHaveBeenCalledWith("workflow_pay", 20);
+    expect(container.textContent).toContain("Run history");
+    expect(container.textContent).toContain("/api/custom/echo");
+    expect(container.textContent).toContain("23 ms");
+    expect(container.textContent).toContain("none");
+    expect(container.textContent).toContain("[redacted]");
+    expect(container.textContent).not.toContain("Bearer secret");
   });
 });
 
