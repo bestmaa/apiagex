@@ -269,6 +269,11 @@ export function DocsPage({ focus }: { focus?: "webhooks" | "realtime" }) {
           <p>OTP login is planning-only. Read <code>docs/otp-workflow-template-plan.md</code> before implementation; it requires hashed OTP storage, expiry, retry limits, provider config, and secure token issuance.</p>
           <p>Raw OTP codes must never be stored, logged, or returned, and verify must consume the challenge before issuing a session/token.</p>
         </article>
+        <article className="api-row">
+          <strong>Google login plan</strong>
+          <p>Google login is planning-only. Read <code>docs/google-login-workflow-template-plan.md</code> before implementation; it requires server-side ID token verification, allowed domains, user lookup/create rules, and session/token handoff.</p>
+          <p>Do not trust client profile fields or decode-only JWT payloads. Verify signature, issuer, audience, expiry, subject, verified email, and optional hosted domain.</p>
+        </article>
       </section>
 
       <WebhookVerificationDocs focused={focus === "webhooks"} />

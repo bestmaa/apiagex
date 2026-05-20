@@ -588,7 +588,7 @@ Each task uses this structure:
 #### T3440 - Add Google Login Workflow Template Plan
 
 - Version: `v0.13.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Plan Google OAuth workflow template requirements.
 - Persona: OAuth integration architect; keep external login safe.
 - Success Criteria: Docs explain Google ID token verification, user lookup/create, allowed domains, and session/token handoff.

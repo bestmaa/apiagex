@@ -662,6 +662,13 @@ OTP login template status:
 - The future OTP request route should return generic responses and must not reveal whether an account exists.
 - The future OTP verify route must consume the challenge and issue a secure session/token only after successful verification.
 
+Google login template status:
+
+- Planning is documented in `docs/google-login-workflow-template-plan.md`.
+- Implementation is intentionally blocked until server-side Google ID token verification and first-party token issuance are available.
+- The future route must verify signature, issuer, audience, expiry, subject, verified email, and optional allowed domain.
+- The future route must not trust client-supplied profile fields or fake Google verification.
+
 ### Hinglish
 
 Templates tab add karne chahiye jab storage, runtime, permissions, aur Admin UI basics stable ho jaye.
@@ -691,6 +698,13 @@ OTP login template status:
 - Implementation tab tak blocked hai jab tak hashed OTP storage, expiry, retry limits, delivery provider config, aur token issuance available na ho.
 - Future OTP request route generic response dega aur account exist karta hai ya nahi ye reveal nahi karega.
 - Future OTP verify route successful verification ke baad challenge consume karega aur secure session/token issue karega.
+
+Google login template status:
+
+- Planning `docs/google-login-workflow-template-plan.md` me documented hai.
+- Implementation tab tak blocked hai jab tak server-side Google ID token verification aur first-party token issuance available na ho.
+- Future route signature, issuer, audience, expiry, subject, verified email, aur optional allowed domain verify karega.
+- Future route client-supplied profile fields trust nahi karega aur fake Google verification nahi karega.
 
 ## Non Goals For MVP
 

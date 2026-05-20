@@ -287,6 +287,10 @@ export const readmePage = {
         "OTP template plan: docs/otp-workflow-template-plan.md implementation se pehle OTP request, OTP verify, expiry, retry limits, provider config, aur token issuance needs define karta hai.",
         "OTP safety: raw OTP codes must never be stored, logged, or returned; verify must consume a valid challenge before issuing any session/token.",
         "OTP safety: raw OTP codes kabhi store, log, ya return nahi hone chahiye; verify ko session/token issue karne se pehle valid challenge consume karna hoga.",
+        "Google login plan: docs/google-login-workflow-template-plan.md defines server-side ID token verification, user lookup/create, allowed domains, and session/token handoff needs.",
+        "Google login plan: docs/google-login-workflow-template-plan.md server-side ID token verification, user lookup/create, allowed domains, aur session/token handoff needs define karta hai.",
+        "Google safety: never trust client-supplied profile fields or decode-only JWT payloads; verify signature, issuer, audience, expiry, subject, verified email, and optional hosted domain.",
+        "Google safety: client-supplied profile fields ya decode-only JWT payloads trust mat karo; signature, issuer, audience, expiry, subject, verified email, aur optional hosted domain verify karo.",
       ],
     },
     {

@@ -79,6 +79,8 @@ Planned next layer: Workflow API Builder will let admins create safe custom APIs
 
 OTP login workflow requirements are planned in [docs/otp-workflow-template-plan.md](./docs/otp-workflow-template-plan.md). The plan requires hashed OTP storage, expiry, retry/rate limits, provider configuration, and secure token issuance before any OTP template is implemented.
 
+Google login workflow requirements are planned in [docs/google-login-workflow-template-plan.md](./docs/google-login-workflow-template-plan.md). The plan requires server-side Google ID token verification, allowed-domain policy, user lookup/create rules, and first-party session/token handoff before implementation.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.
