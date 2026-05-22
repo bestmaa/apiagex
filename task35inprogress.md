@@ -1,4 +1,4 @@
-# Apiagex Task 35 Queue - Codex Project AI Integration
+# Apiagex Task 35 In Progress - Codex Project AI Integration
 
 Task 35 focuses on making Apiagex understandable and controllable inside any user project where Apiagex is installed. The immediate goal is not an Admin UI AI button. The immediate goal is: a developer opens Codex in their frontend/project repo, gives Codex a temporary Apiagex automation token, and Codex can create the needed schemas, workflow APIs, permissions, tests, and frontend calls using the installed Apiagex backend.
 
@@ -33,7 +33,7 @@ git diff --check
 
 ```text
 Apiagex task35 runner.
-Read agent.md, PROJECT_CONTEXT.md, task34.md, task35.md. Pick first task35 `Status: pending` only.
+Read agent.md, PROJECT_CONTEXT.md, task34.md, task35inprogress.md. Pick first task35 `Status: pending` only.
 Goal: make installed Apiagex projects easy for Codex to control with a temporary automation token.
 Do not build Admin UI AI prompt button until its later task.
 Use secure existing Admin APIs, strict TS, docs English+Hinglish, files <250 lines where practical.
@@ -68,7 +68,7 @@ Target user flow Hinglish:
 #### T3501 - Define Codex Project Integration Contract
 
 - Version: `v0.18.0`
-- Status: `pending`
+- Status: `in_progress`
 - Goal: Define how Codex should discover and operate Apiagex inside an installed project.
 - Persona: AI developer experience architect; make Codex successful with minimal prompting.
 - Success Criteria: Docs describe project files, environment variables, token handling, backend base URL, schema/workflow tool flow, and safety limits.
@@ -214,22 +214,9 @@ Target user flow Hinglish:
 - Verify: Plan preview/apply tests and smoke.
 - Commit: `Add AI plan apply APIs`
 
-### Phase 5: Later Native Admin UI AI Builder
+### Phase 5: Release Codex Project AI Integration
 
-#### T3512 - Plan Native Admin UI AI Builder
-
-- Version: `v0.19.1`
-- Status: `pending`
-- Goal: Park the later product feature where users prompt inside Admin UI and Apiagex builds APIs from that prompt.
-- Persona: Product planner; keep future AI UI separate from immediate Codex integration.
-- Success Criteria: Plan covers prompt box, preview/apply, model provider config, token safety, audit history, and rollback.
-- Constraints: Planning only.
-- Output: Docs only.
-- Strict Rule: Do not implement model calls in Admin UI yet.
-- Verify: Documentation review.
-- Commit: `Plan Admin UI AI builder`
-
-#### T3513 - Release Codex Project AI Integration
+#### T3512 - Release Codex Project AI Integration
 
 - Version: `v0.19.2`
 - Status: `pending`
