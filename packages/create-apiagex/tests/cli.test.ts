@@ -95,6 +95,8 @@ describe("create-apiagex CLI", () => {
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"@apiagex/server"');
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"dev": "node --env-file=.env --import tsx src/index.ts"');
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"types": "apiagex types"');
+    await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"ai": "apiagex ai"');
+    await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"mcp": "apiagex mcp"');
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"typescript"');
     await expect(readFile(join(root, "my-cms", ".env"), "utf8")).resolves.toContain("APIAGEX_SECRET=");
     await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.toContain("APIAGEX_DATABASE_PATH");
@@ -129,6 +131,8 @@ describe("create-apiagex CLI", () => {
     expect(result.stdout).toContain("Language: JavaScript");
     expect(result.stdout).toContain("Created 10 files");
     await expect(readFile(join(root, "js-cms", "package.json"), "utf8")).resolves.toContain('"dev": "node --env-file=.env src/index.js"');
+    await expect(readFile(join(root, "js-cms", "package.json"), "utf8")).resolves.toContain('"ai": "apiagex ai"');
+    await expect(readFile(join(root, "js-cms", "package.json"), "utf8")).resolves.toContain('"mcp": "apiagex mcp"');
     await expect(readFile(join(root, "js-cms", ".apiagex/codex.md"), "utf8")).resolves.toContain("Safe Workflow");
     await expect(readFile(join(root, "js-cms", "src/index.js"), "utf8")).resolves.toContain("startApiagex");
     await expect(readFile(join(root, "js-cms", "src/custom-routes.js"), "utf8")).resolves.toContain("/health");

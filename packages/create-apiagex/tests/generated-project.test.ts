@@ -16,6 +16,8 @@ describe("generated Apiagex project", () => {
     const projectDir = join(root, "generated-cms");
     const packageJson = await readFile(join(projectDir, "package.json"), "utf8");
     expect(packageJson).toContain('"dev": "node --env-file=.env src/index.js"');
+    expect(packageJson).toContain('"ai": "apiagex ai"');
+    expect(packageJson).toContain('"mcp": "apiagex mcp"');
     expect(packageJson).toContain('"@apiagex/server"');
     const entry = await readFile(join(projectDir, "src/index.js"), "utf8");
     expect(entry).toContain("startApiagex");
@@ -64,6 +66,8 @@ describe("generated Apiagex project", () => {
     expect(packageJson).toContain('"dev": "node --env-file=.env --import tsx src/index.ts"');
     expect(packageJson).toContain('"build": "tsc"');
     expect(packageJson).toContain('"types": "apiagex types"');
+    expect(packageJson).toContain('"ai": "apiagex ai"');
+    expect(packageJson).toContain('"mcp": "apiagex mcp"');
     expect(packageJson).toContain('"typescript"');
     expect(await readFile(join(projectDir, "tsconfig.json"), "utf8")).toContain('"strict": true');
     expect(await readFile(join(projectDir, "src/index.ts"), "utf8")).toContain("startApiagex");

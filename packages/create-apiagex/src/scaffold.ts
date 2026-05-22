@@ -377,16 +377,20 @@ function packageJsonFile(answers: ScaffoldAnswers): string {
             start: "node --env-file=.env dist/index.js",
             build: "tsc",
             types: "apiagex types",
+            ai: "apiagex ai",
+            mcp: "apiagex mcp",
             smoke: "apiagex smoke",
           }
         : {
             dev: "node --env-file=.env src/index.js",
             start: "node --env-file=.env src/index.js",
             build: "apiagex build",
+            ai: "apiagex ai",
+            mcp: "apiagex mcp",
             smoke: "apiagex smoke",
           },
       dependencies: {
-        "@apiagex/server": "^0.8.17",
+        "@apiagex/server": "^0.8.18",
       },
       ...(isTypeScript
         ? {

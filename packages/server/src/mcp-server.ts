@@ -55,7 +55,7 @@ export async function handleApiagexMcpJsonRpcMessage(
       result: {
         capabilities: { tools: {} },
         protocolVersion: "2024-11-05",
-        serverInfo: { name: "apiagex-mcp", version: "0.8.17" },
+        serverInfo: { name: "apiagex-mcp", version: "0.8.18" },
       },
     };
   }
