@@ -214,6 +214,8 @@ GitHub repo secret me `NPM_TOKEN` add karo. Pehle `dry_run=true` se check karo; 
 - Current stabilization audit [docs/project-stabilization-audit.md](./docs/project-stabilization-audit.md) me documented hai.
 - Strapi-style install and publish flow is documented at [docs/install-and-publish-flow.md](./docs/install-and-publish-flow.md).
 - Strapi-style install aur publish flow [docs/install-and-publish-flow.md](./docs/install-and-publish-flow.md) me documented hai.
+- Codex project integration is documented at [docs/codex-project-integration.md](./docs/codex-project-integration.md).
+- Codex project integration [docs/codex-project-integration.md](./docs/codex-project-integration.md) me documented hai.
 - Database provider setup for SQLite, PostgreSQL, and MySQL is documented at [docs/database-provider-setup.md](./docs/database-provider-setup.md).
 - SQLite, PostgreSQL, aur MySQL database provider setup [docs/database-provider-setup.md](./docs/database-provider-setup.md) me documented hai.
 - `create-apiagex` defaults to TypeScript, supports `--language js`, and TypeScript starters can run `npm run types` to generate schema slug and field autocomplete helpers.

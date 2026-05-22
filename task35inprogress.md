@@ -68,7 +68,7 @@ Target user flow Hinglish:
 #### T3501 - Define Codex Project Integration Contract
 
 - Version: `v0.18.0`
-- Status: `in_progress`
+- Status: `completed`
 - Goal: Define how Codex should discover and operate Apiagex inside an installed project.
 - Persona: AI developer experience architect; make Codex successful with minimal prompting.
 - Success Criteria: Docs describe project files, environment variables, token handling, backend base URL, schema/workflow tool flow, and safety limits.
