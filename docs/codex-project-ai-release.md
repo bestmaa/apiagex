@@ -14,9 +14,9 @@ Release target: `0.8.17`
 
 ## Verification
 
-- `npm view @apiagex/database@0.8.17 version`: not published yet.
-- `npm view @apiagex/server@0.8.17 version`: not published yet.
-- `npm view create-apiagex@0.8.17 version`: not published yet.
+- `npm view @apiagex/database@0.8.17 version`: `0.8.17`.
+- `npm view @apiagex/server@0.8.17 version`: `0.8.17`.
+- `npm view create-apiagex@0.8.17 version`: `0.8.17`.
 - `npm run check`: passed, 73 test files, 317 passed, 4 skipped.
 - `npm run smoke`: passed.
 - `npm audit --audit-level=high`: passed, 0 vulnerabilities.
@@ -26,4 +26,8 @@ Release target: `0.8.17`
 
 ## Publish
 
-The GitHub workflow publishes real npm packages from an `npm-v*` tag. Push `npm-v0.8.17` after release approval to publish `@apiagex/database`, `@apiagex/server`, and `create-apiagex`.
+Published through GitHub Actions tag `npm-v0.8.17`.
+
+- Main/dry-run workflow: success.
+- Tag/publish workflow: success.
+- Provider E2E workflow: success.
