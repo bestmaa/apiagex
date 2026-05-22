@@ -1,6 +1,7 @@
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createServer } from "./app.js";
+import { runApiagexMcpStdioServer } from "./mcp-server.js";
 import { ensureLocalServerPaths, resolveLocalServerConfig } from "./server-config.js";
 import { bootstrapOwner } from "./owner-bootstrap.js";
 import { generateApiagexTypes } from "./typegen.js";
@@ -52,6 +53,7 @@ export async function runRuntimeCli(args: string[], options: RuntimeCliOptions =
   if (command === "smoke") return smoke(options);
   if (command === "types") return generateTypes(args.slice(1), options);
   if (command === "ai") return ai(args.slice(1), options);
+  if (command === "mcp") return mcp(options);
   if (command === "build") return ok("Apiagex runtime does not need a project build. Run apiagex smoke to verify.\n");
   if (command === "dev" || command === "start") {
     const startOptions = {
@@ -75,6 +77,7 @@ Usage:
   apiagex ai context Create or refresh .apiagex/codex.md.
   apiagex ai token   Create a temporary automation token through the Admin API.
   apiagex ai doctor  Check local AI/Codex setup without printing secrets.
+  apiagex mcp       Start the Apiagex MCP server over stdio.
   apiagex build     Print build guidance for generated projects.
 
 Options:
@@ -97,6 +100,16 @@ Environment:
   APIAGEX_OWNER_EMAIL     Optional first owner bootstrap email.
   APIAGEX_OWNER_PASSWORD  Optional first owner bootstrap password. Remove after first start.
 `;
+}
+
+async function mcp(options: RuntimeCliOptions): Promise<RuntimeCliResult> {
+  const cwd = options.cwd ?? process.cwd();
+  const env = await runtimeEnv(cwd, options);
+  await runApiagexMcpStdioServer({
+    automationToken: env.APIAGEX_AUTOMATION_TOKEN,
+    baseUrl: resolveAiBaseUrl(env, undefined),
+  });
+  return ok("");
 }
 
 async function ai(args: string[], options: RuntimeCliOptions): Promise<RuntimeCliResult> {

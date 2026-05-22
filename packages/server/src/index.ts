@@ -103,6 +103,15 @@ export type {
 export {
   APIAGEX_MCP_TOOL_NAMES,
 } from "./mcp-tool-contract.type.js";
+export {
+  createApiagexMcpToolRunner,
+  handleApiagexMcpJsonRpcMessage,
+  runApiagexMcpStdioServer,
+} from "./mcp-server.js";
+export type {
+  ApiagexMcpRunnerOptions,
+  ApiagexMcpToolResult,
+} from "./mcp-server.js";
 export type {
   ApiagexMcpCreateSchemaInput,
   ApiagexMcpCreateSchemaOutput,

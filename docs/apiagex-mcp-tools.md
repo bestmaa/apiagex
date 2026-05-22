@@ -11,6 +11,18 @@ Hinglish: MCP tools Apiagex ko secure HTTP API se control karenge. Direct databa
 
 Token errors must be clear, but token values must never be printed.
 
+## Runtime Command
+
+Generated projects and installed runtime packages expose the MCP server as:
+
+```bash
+APIAGEX_BASE_URL=http://127.0.0.1:4000 \
+APIAGEX_AUTOMATION_TOKEN=agx_auto_your_temporary_token \
+apiagex mcp
+```
+
+The command speaks JSON-RPC over stdio and exposes the tools listed below. It uses only Apiagex HTTP APIs under `/api/health` and `/api/ai/*`.
+
 ## Tool Contract
 
 ### `apiagex.health`

@@ -163,7 +163,7 @@ Target user flow Hinglish:
 #### T3508 - Implement Apiagex MCP Server
 
 - Version: `v0.18.7`
-- Status: `pending`
+- Status: `completed`
 - Goal: Build an installable MCP server for Apiagex projects.
 - Persona: Integration engineer; let Codex and other AI clients call Apiagex safely.
 - Success Criteria: MCP server reads `APIAGEX_BASE_URL` and `APIAGEX_AUTOMATION_TOKEN`, exposes the defined tools, validates responses, and returns actionable errors.
