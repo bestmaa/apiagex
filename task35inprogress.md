@@ -150,7 +150,7 @@ Target user flow Hinglish:
 #### T3507 - Define Apiagex MCP Tool Contract
 
 - Version: `v0.18.6`
-- Status: `pending`
+- Status: `completed`
 - Goal: Define MCP tools Codex/AI clients can use to control Apiagex.
 - Persona: Tool API designer; expose powerful actions with predictable input/output.
 - Success Criteria: Tool contract covers health, list schemas, create schema, create workflow API, test workflow, list routes, set permission, and export summary.

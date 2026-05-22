@@ -34,6 +34,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Workflow builder release checkpoint: [workflow-builder-release-checkpoint.md](./workflow-builder-release-checkpoint.md)
 - Codex project integration: [codex-project-integration.md](./codex-project-integration.md)
 - Codex frontend workflow: [codex-frontend-workflow.md](./codex-frontend-workflow.md)
+- Apiagex MCP tools: [apiagex-mcp-tools.md](./apiagex-mcp-tools.md)
 
 ## Implemented Now
 
@@ -107,6 +108,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Codex project integration `docs/codex-project-integration.md` me documented hai.
 - Codex frontend workflow is documented in `docs/codex-frontend-workflow.md`.
 - Codex frontend workflow `docs/codex-frontend-workflow.md` me documented hai.
+- Apiagex MCP tools are documented in `docs/apiagex-mcp-tools.md`.
+- Apiagex MCP tools `docs/apiagex-mcp-tools.md` me documented hain.
 
 ## Owner Bootstrap And Login
 

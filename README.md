@@ -107,6 +107,8 @@ Workflow Builder release hardening is tracked in [docs/workflow-builder-release-
 
 Codex/AI project integration is documented in [docs/codex-project-integration.md](./docs/codex-project-integration.md). For frontend work backed by Apiagex, use [docs/codex-frontend-workflow.md](./docs/codex-frontend-workflow.md): it covers env setup, temporary token handling, prompt examples, expected AI actions, verification, and rollback.
 
+Apiagex MCP tool contracts are documented in [docs/apiagex-mcp-tools.md](./docs/apiagex-mcp-tools.md). They cover health, schemas, workflow APIs, route discovery, custom API permissions, and export summaries using `APIAGEX_BASE_URL` plus `APIAGEX_AUTOMATION_TOKEN`.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

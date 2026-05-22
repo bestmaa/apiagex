@@ -100,6 +100,35 @@ export type {
   StartedApiagexServer,
   StartServerOptions,
 } from "./runtime.type.js";
+export {
+  APIAGEX_MCP_TOOL_NAMES,
+} from "./mcp-tool-contract.type.js";
+export type {
+  ApiagexMcpCreateSchemaInput,
+  ApiagexMcpCreateSchemaOutput,
+  ApiagexMcpCreateWorkflowApiInput,
+  ApiagexMcpCreateWorkflowApiOutput,
+  ApiagexMcpExportSummaryInput,
+  ApiagexMcpExportSummaryOutput,
+  ApiagexMcpHealthInput,
+  ApiagexMcpHealthOutput,
+  ApiagexMcpListRoutesInput,
+  ApiagexMcpListRoutesOutput,
+  ApiagexMcpListSchemasInput,
+  ApiagexMcpListSchemasOutput,
+  ApiagexMcpRouteSummary,
+  ApiagexMcpSchemaFieldInput,
+  ApiagexMcpSchemaSummary,
+  ApiagexMcpSetPermissionInput,
+  ApiagexMcpSetPermissionOutput,
+  ApiagexMcpTestWorkflowInput,
+  ApiagexMcpTestWorkflowOutput,
+  ApiagexMcpToolContract,
+  ApiagexMcpToolInputByName,
+  ApiagexMcpToolName,
+  ApiagexMcpToolOutputByName,
+  ApiagexMcpWorkflowSummary,
+} from "./mcp-tool-contract.type.js";
 export type {
   OwnerBootstrapInput,
   OwnerBootstrapResult,
