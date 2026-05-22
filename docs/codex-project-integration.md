@@ -106,6 +106,12 @@ Preview risky backend changes before applying them and do not commit secrets.
 
 Hinglish: Pehle context padho, health/routes check karo, existing resources inspect karo, plan banao, validate karo, apply karo, test route call karo, phir frontend wire karo.
 
+## Generated Project Context
+
+`create-apiagex` writes `.apiagex/codex.md` into every new project. That file is safe to commit and only contains base URL guidance, environment variable names, setup workflow, example curl commands, and token handling rules. Runtime data under `.apiagex/*` remains ignored except `.apiagex/codex.md`.
+
+Hinglish: Generated project me `.apiagex/codex.md` commit-safe context hota hai. Real token nahi likhna hai; token hamesha local env me rahega.
+
 ## Future Native Admin UI AI Builder
 
 The Admin UI AI Builder is tracked separately in `task36pending.md`. This project integration is the first layer: Codex and other AI clients can work from the developer project using temporary tokens and MCP/tools.

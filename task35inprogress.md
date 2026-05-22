@@ -109,7 +109,7 @@ Target user flow Hinglish:
 #### T3504 - Generate Apiagex Codex Context Files
 
 - Version: `v0.18.3`
-- Status: `pending`
+- Status: `completed`
 - Goal: Generate Codex-readable project context when a project installs or initializes Apiagex.
 - Persona: Developer experience engineer; help Codex understand Apiagex immediately.
 - Success Criteria: Generated projects include `.apiagex/codex.md` with base URL, auth env var names, safe workflow, API examples, and "do not commit tokens" guidance.

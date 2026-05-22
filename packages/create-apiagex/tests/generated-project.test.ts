@@ -20,6 +20,10 @@ describe("generated Apiagex project", () => {
     const entry = await readFile(join(projectDir, "src/index.js"), "utf8");
     expect(entry).toContain("startApiagex");
     expect(entry).toContain("registerCustomRoutes");
+    const codexContext = await readFile(join(projectDir, ".apiagex/codex.md"), "utf8");
+    expect(codexContext).toContain("APIAGEX_BASE_URL");
+    expect(codexContext).toContain("APIAGEX_AUTOMATION_TOKEN");
+    expect(codexContext).toContain("Never write raw tokens");
     await expect(readFile(join(projectDir, "src/custom-routes.js"), "utf8")).resolves.toContain("/health");
 
     const smoke = await runRuntimeCli(["smoke"], { cwd: projectDir });

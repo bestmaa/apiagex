@@ -14,7 +14,7 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
     },
     {
       path: ".gitignore",
-      content: "node_modules\n.env\ndist\n.apiagex\n",
+      content: "node_modules\n.env\ndist\n.apiagex/*\n!.apiagex/\n!.apiagex/codex.md\n",
     },
     {
       path: ".env",
@@ -40,6 +40,10 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
         null,
         2,
       )}\n`,
+    },
+    {
+      path: ".apiagex/codex.md",
+      content: codexContextFile(answers),
     },
     {
       path: `src/index.${sourceExtension}`,
@@ -112,6 +116,7 @@ ${runCommand(answers.packageManager, "dev")}
 
 Open http://127.0.0.1:4000/adminui to create the first owner. Open /doc for API docs and /readme for the readable project summary.
 If .env contains APIAGEX_OWNER_EMAIL and APIAGEX_OWNER_PASSWORD, the first owner is created automatically on first server start. Remove APIAGEX_OWNER_PASSWORD from .env after the first successful start.
+AI assistants should read .apiagex/codex.md before creating schemas, workflows, permissions, or frontend API clients.
 
 ## Scripts
 
@@ -265,6 +270,55 @@ Practical workflow builder flow:
 English: In TypeScript projects, run npm run types after creating or changing schemas. It writes src/apiagex-types.ts so RegisterApiagexCustomRoutes automatically gets schema slug and field autocomplete.
 
 Hinglish: TypeScript project me schema create ya change karne ke baad npm run types chalao. Ye src/apiagex-types.ts banata hai jisse RegisterApiagexCustomRoutes me schema slug aur field autocomplete automatic milta hai.
+`;
+}
+
+function codexContextFile(answers: ScaffoldAnswers): string {
+  const baseUrl = `http://${answers.host}:${answers.port}`;
+  return `# Apiagex Codex Context
+
+This project uses Apiagex as the backend.
+
+## Connection
+
+- Base URL: ${baseUrl}
+- Base URL env: APIAGEX_BASE_URL
+- Automation token env: APIAGEX_AUTOMATION_TOKEN
+- Admin token env, only when creating a temporary automation token: APIAGEX_ADMIN_TOKEN
+
+Do not commit real tokens. Keep APIAGEX_AUTOMATION_TOKEN and APIAGEX_ADMIN_TOKEN in your local shell, CI secret store, or ignored .env files only.
+
+## Safe Workflow
+
+1. Read this file and inspect the frontend request.
+2. Call \`GET $APIAGEX_BASE_URL/api/health\`.
+3. Use APIAGEX_AUTOMATION_TOKEN for Apiagex setup work.
+4. Inspect existing schemas, workflows, and routes before creating new ones.
+5. Prefer additive changes: create missing schemas, workflow APIs, and permissions.
+6. Preview risky multi-resource changes before applying them.
+7. Test every created route and summarize what changed.
+
+## Useful Calls
+
+\`\`\`bash
+curl "$APIAGEX_BASE_URL/api/health"
+
+curl "$APIAGEX_BASE_URL/api/admin/automation-tokens" \\
+  -H "Authorization: Bearer $APIAGEX_ADMIN_TOKEN"
+
+curl -X POST "$APIAGEX_BASE_URL/api/admin/automation-tokens" \\
+  -H "Authorization: Bearer $APIAGEX_ADMIN_TOKEN" \\
+  -H "content-type: application/json" \\
+  -d '{"name":"Codex setup","ttlMinutes":60,"scopes":["schemas:manage","workflows:manage","permissions:manage","routes:read","plans:apply"]}'
+\`\`\`
+
+## Guardrails
+
+- Never write raw tokens into source files, docs, screenshots, git commits, or logs.
+- Do not ask for permanent owner credentials when a temporary automation token is available.
+- Do not delete schemas, entries, workflows, or permissions unless the developer explicitly asks.
+- Do not open workflow APIs to public unless the prompt or approved plan says so.
+- Do not use direct database access for project automation.
 `;
 }
 
