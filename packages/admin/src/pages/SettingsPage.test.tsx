@@ -2,14 +2,27 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createWorkflow, listSchemas, listWorkflowRuns, listWorkflows, testWorkflow, updateWorkflow } from "../api";
+import {
+  createAutomationToken,
+  createWorkflow,
+  listAutomationTokens,
+  listSchemas,
+  listWorkflowRuns,
+  listWorkflows,
+  revokeAutomationToken,
+  testWorkflow,
+  updateWorkflow,
+} from "../api";
 import { SettingsPage } from "./SettingsPage";
 
 vi.mock("../api", () => ({
+  createAutomationToken: vi.fn(),
   createWorkflow: vi.fn(),
+  listAutomationTokens: vi.fn(),
   listSchemas: vi.fn(),
   listWorkflowRuns: vi.fn(),
   listWorkflows: vi.fn(),
+  revokeAutomationToken: vi.fn(),
   testWorkflow: vi.fn(),
   updateWorkflow: vi.fn(),
 }));
@@ -19,8 +32,11 @@ const roots: Array<{ container: HTMLDivElement; root: Root }> = [];
 describe("SettingsPage", () => {
   beforeEach(() => {
     vi.mocked(listSchemas).mockResolvedValue({ ok: true, schemas: [] });
+    vi.mocked(listAutomationTokens).mockResolvedValue({ ok: true, tokens: [] });
     vi.mocked(listWorkflowRuns).mockResolvedValue({ ok: true, runs: [] });
     vi.mocked(listWorkflows).mockResolvedValue({ ok: true, workflows: [] });
+    vi.mocked(createAutomationToken).mockResolvedValue({ ok: true, token: "agx_auto_secret" });
+    vi.mocked(revokeAutomationToken).mockResolvedValue({ ok: true });
     vi.mocked(testWorkflow).mockResolvedValue({ ok: true });
     vi.mocked(createWorkflow).mockResolvedValue({ ok: true });
     vi.mocked(updateWorkflow).mockResolvedValue({ ok: true });

@@ -855,6 +855,15 @@ code {
   max-width: none;
 }
 
+.automation-token-form {
+  grid-template-columns: minmax(180px, 1fr) minmax(160px, 220px) auto;
+}
+
+.automation-scope-grid {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .role-token-secret {
   align-items: center;
   background: var(--admin-color-primary-muted);
@@ -2642,6 +2651,7 @@ code {
   .relation-guide dl,
   .role-row,
   .role-token-form,
+  .automation-scope-grid,
   .role-token-row,
   .webhook-form,
   .webhook-event-grid,

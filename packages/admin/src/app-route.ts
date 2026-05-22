@@ -27,6 +27,11 @@ export const settingsSubnavItems: AdminSubnavItem[] = [
     route: "settings/api-tokens",
   },
   {
+    description: "Create temporary Codex/MCP tokens.",
+    label: "AI Automation Tokens",
+    route: "settings/automation-tokens",
+  },
+  {
     description: "Publish Swagger/OpenAPI docs.",
     label: "API Docs",
     route: "settings/api-docs",

@@ -1,5 +1,11 @@
 import type { AuthResponse, OwnerStatusResponse } from "./session.type";
 import type {
+  AutomationTokenCreateResponse,
+  AutomationTokenListResponse,
+  AutomationTokenRevokeResponse,
+  AutomationTokenScope,
+} from "./automation-token.type";
+import type {
   EntryDeleteResponse,
   EntryData,
   EntryListQuery,
@@ -270,6 +276,28 @@ export async function createApiToken(
 
 export async function revokeApiToken(roleId: string, tokenId: string): Promise<ApiTokenRevokeResponse> {
   return adminJson<ApiTokenRevokeResponse>(`/api/admin/roles/${roleId}/tokens/${tokenId}`, {
+    method: "DELETE",
+  });
+}
+
+export async function listAutomationTokens(): Promise<AutomationTokenListResponse> {
+  return adminJson<AutomationTokenListResponse>("/api/admin/automation-tokens");
+}
+
+export async function createAutomationToken(input: {
+  name: string;
+  scopes: AutomationTokenScope[];
+  ttlMinutes: number;
+}): Promise<AutomationTokenCreateResponse> {
+  return adminJson<AutomationTokenCreateResponse>("/api/admin/automation-tokens", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function revokeAutomationToken(tokenId: string): Promise<AutomationTokenRevokeResponse> {
+  return adminJson<AutomationTokenRevokeResponse>(`/api/admin/automation-tokens/${tokenId}`, {
     method: "DELETE",
   });
 }
