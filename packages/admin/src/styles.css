@@ -864,6 +864,13 @@ code {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.project-template-panel {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-3);
+}
+
 .role-token-secret {
   align-items: center;
   background: var(--admin-color-primary-muted);

@@ -35,6 +35,7 @@ import { registerWorkflowAdminRoutes } from "./workflow-admin-routes.js";
 import { registerAutomationTokenRoutes } from "./automation-token-routes.js";
 import { registerAiAutomationRoutes } from "./ai-automation-routes.js";
 import { registerAiPlanRoutes } from "./ai-plan-routes.js";
+import { registerProjectTemplateRoutes } from "./project-template-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -53,6 +54,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   registerRoleRoutes(server, database);
   registerUserRoutes(server, database);
   registerSettingsRoutes(server, database);
+  registerProjectTemplateRoutes(server, database);
   registerAutomationTokenRoutes(server, database, {
     ...(options.projectEnvPath === undefined ? {} : { projectEnvPath: options.projectEnvPath }),
   });

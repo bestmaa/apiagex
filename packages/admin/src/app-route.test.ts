@@ -9,6 +9,7 @@ describe("admin route helpers", () => {
     expect(readAdminRoute("#settings/custom-api-permissions")).toBe("settings/custom-api-permissions");
     expect(readAdminRoute("#settings/api-tokens")).toBe("settings/api-tokens");
     expect(readAdminRoute("#settings/automation-tokens")).toBe("settings/automation-tokens");
+    expect(readAdminRoute("#settings/project-template")).toBe("settings/project-template");
     expect(readAdminRoute("#settings/api-docs")).toBe("settings/api-docs");
     expect(readAdminRoute("#settings/webhooks")).toBe("settings/webhooks");
     expect(readAdminRoute("#settings/realtime")).toBe("settings/realtime");
@@ -26,6 +27,7 @@ describe("admin route helpers", () => {
     expect(activeNavRoute("settings/custom-api-permissions")).toBe("settings");
     expect(activeNavRoute("settings/api-tokens")).toBe("settings");
     expect(activeNavRoute("settings/automation-tokens")).toBe("settings");
+    expect(activeNavRoute("settings/project-template")).toBe("settings");
     expect(activeNavRoute("settings/api-docs")).toBe("settings");
     expect(activeNavRoute("settings/webhooks")).toBe("settings");
     expect(activeNavRoute("settings/workflows")).toBe("settings");
@@ -37,6 +39,7 @@ describe("admin route helpers", () => {
       "Custom API Permissions",
       "API Tokens",
       "AI Automation Tokens",
+      "Project Template",
       "API Docs",
       "Webhooks",
       "Realtime API",

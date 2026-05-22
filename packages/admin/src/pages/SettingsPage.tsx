@@ -1,9 +1,10 @@
-import { Bot, FileJson, GitBranch, KeyRound, Radio, Route, Send, Shield, SlidersHorizontal, Ticket } from "lucide-react";
+import { Bot, FileArchive, FileJson, GitBranch, KeyRound, Radio, Route, Send, Shield, SlidersHorizontal, Ticket } from "lucide-react";
 import { ApiPermissionManager } from "../ApiPermissionManager";
 import { CustomApiPermissionManager } from "../CustomApiPermissionManager";
 import { RoleManager } from "../RoleManager";
 import type { AdminRoute } from "../app-route.type";
 import { SettingsAutomationTokens } from "./SettingsAutomationTokens";
+import { SettingsProjectTemplate } from "./SettingsProjectTemplate";
 import { SettingsApiTokens } from "./SettingsApiTokens";
 import { SettingsApiDocs } from "./SettingsApiDocs";
 import { SettingsAdminRoles } from "./SettingsAdminRoles";
@@ -18,6 +19,7 @@ export function SettingsPage({ route }: { route: AdminRoute }) {
   if (route === "settings/custom-api-permissions") return <SettingsCustomApiPermissions />;
   if (route === "settings/api-tokens") return <SettingsApiTokens />;
   if (route === "settings/automation-tokens") return <SettingsAutomationTokens />;
+  if (route === "settings/project-template") return <SettingsProjectTemplate />;
   if (route === "settings/api-docs") return <SettingsApiDocs />;
   if (route === "settings/webhooks") return <SettingsWebhooks />;
   if (route === "settings/realtime") return <SettingsRealtime />;
@@ -60,6 +62,11 @@ function SettingsOverview() {
           <Bot aria-hidden="true" size={20} />
           <strong>AI Automation Tokens</strong>
           <span>Create temporary tokens for Codex and MCP setup.</span>
+        </a>
+        <a className="settings-option" href="#settings/project-template">
+          <FileArchive aria-hidden="true" size={20} />
+          <strong>Project Template</strong>
+          <span>Export and import structure between database providers.</span>
         </a>
         <a className="settings-option" href="#settings/api-docs">
           <FileJson aria-hidden="true" size={20} />

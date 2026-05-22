@@ -5,6 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createAutomationToken,
   createWorkflow,
+  exportProjectTemplate,
+  importProjectTemplate,
   listAutomationTokens,
   listSchemas,
   listWorkflowRuns,
@@ -18,6 +20,8 @@ import { SettingsPage } from "./SettingsPage";
 vi.mock("../api", () => ({
   createAutomationToken: vi.fn(),
   createWorkflow: vi.fn(),
+  exportProjectTemplate: vi.fn(),
+  importProjectTemplate: vi.fn(),
   listAutomationTokens: vi.fn(),
   listSchemas: vi.fn(),
   listWorkflowRuns: vi.fn(),
@@ -36,6 +40,16 @@ describe("SettingsPage", () => {
     vi.mocked(listWorkflowRuns).mockResolvedValue({ ok: true, runs: [] });
     vi.mocked(listWorkflows).mockResolvedValue({ ok: true, workflows: [] });
     vi.mocked(createAutomationToken).mockResolvedValue({ ok: true, token: "agx_auto_secret" });
+    vi.mocked(exportProjectTemplate).mockResolvedValue({
+      ok: true,
+      template: {
+        exportedAt: "2026-05-22T00:00:00.000Z",
+        kind: "apiagex.project-template",
+        tables: {},
+        version: 1,
+      },
+    });
+    vi.mocked(importProjectTemplate).mockResolvedValue({ ok: true, imported: {}, skipped: {} });
     vi.mocked(revokeAutomationToken).mockResolvedValue({ ok: true });
     vi.mocked(testWorkflow).mockResolvedValue({ ok: true });
     vi.mocked(createWorkflow).mockResolvedValue({ ok: true });

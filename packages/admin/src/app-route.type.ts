@@ -11,6 +11,7 @@ export type AdminRoute =
   | "settings/custom-api-permissions"
   | "settings/api-tokens"
   | "settings/automation-tokens"
+  | "settings/project-template"
   | "settings/api-docs"
   | "settings/webhooks"
   | "settings/realtime"

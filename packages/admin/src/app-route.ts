@@ -32,6 +32,11 @@ export const settingsSubnavItems: AdminSubnavItem[] = [
     route: "settings/automation-tokens",
   },
   {
+    description: "Move structure between databases.",
+    label: "Project Template",
+    route: "settings/project-template",
+  },
+  {
     description: "Publish Swagger/OpenAPI docs.",
     label: "API Docs",
     route: "settings/api-docs",

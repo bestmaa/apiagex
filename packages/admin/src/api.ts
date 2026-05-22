@@ -6,6 +6,10 @@ import type {
   AutomationTokenScope,
 } from "./automation-token.type";
 import type {
+  ProjectTemplateExportResponse,
+  ProjectTemplateImportResponse,
+} from "./project-template.type";
+import type {
   EntryDeleteResponse,
   EntryData,
   EntryListQuery,
@@ -300,6 +304,18 @@ export async function createAutomationToken(input: {
 export async function revokeAutomationToken(tokenId: string): Promise<AutomationTokenRevokeResponse> {
   return adminJson<AutomationTokenRevokeResponse>(`/api/admin/automation-tokens/${tokenId}`, {
     method: "DELETE",
+  });
+}
+
+export async function exportProjectTemplate(): Promise<ProjectTemplateExportResponse> {
+  return adminJson<ProjectTemplateExportResponse>("/api/admin/project-template");
+}
+
+export async function importProjectTemplate(template: unknown): Promise<ProjectTemplateImportResponse> {
+  return adminJson<ProjectTemplateImportResponse>("/api/admin/project-template/import", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ template }),
   });
 }
 
