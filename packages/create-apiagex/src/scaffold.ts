@@ -126,6 +126,7 @@ ${answers.language === "ts" ? `- \`${runCommand(answers.packageManager, "types")
 - \`${runCommand(answers.packageManager, "ai context")}\`: refresh .apiagex/codex.md for Codex or another AI assistant.
 - \`${runCommand(answers.packageManager, "ai doctor")}\`: check local AI setup without printing token values.
 - \`${runCommand(answers.packageManager, "ai token")}\`: create a temporary automation token when APIAGEX_ADMIN_TOKEN is set.
+- \`${runCommand(answers.packageManager, "mcp")}\`: start the Apiagex MCP server over stdio for Codex or another MCP client.
 - \`${runCommand(answers.packageManager, "smoke")}\`: verify the runtime health route.
 - \`${runCommand(answers.packageManager, "build")}\`: ${answers.language === "ts" ? "compile TypeScript to dist." : "print runtime build guidance."}
 
@@ -164,6 +165,24 @@ Hinglish:
 5. External server notifications ke liye Webhooks aur live browser screens ke liye Realtime API use karo.
 6. Generated CRUD enough nahi ho to ${customRoutesSourcePath(answers)} me business APIs add karo.
 7. Schema change ke baad ${answers.language === "ts" ? `\`${runCommand(answers.packageManager, "types")}\`` : "`apiagex types`"} chalao, taaki slug aur field autocomplete refresh ho.
+
+## Codex and MCP
+
+English:
+
+1. Start Apiagex with \`${runCommand(answers.packageManager, "dev")}\`.
+2. Create a temporary automation token with \`apiagex ai token\` or the Admin API.
+3. Put \`APIAGEX_BASE_URL\` and \`APIAGEX_AUTOMATION_TOKEN\` in your local shell or ignored .env file.
+4. Configure your MCP client to run \`${runCommand(answers.packageManager, "mcp")}\`.
+5. Ask Codex to read \`.apiagex/codex.md\` before making backend changes.
+
+Hinglish:
+
+1. Apiagex start karo.
+2. Temporary automation token banao.
+3. \`APIAGEX_BASE_URL\` aur \`APIAGEX_AUTOMATION_TOKEN\` local env me rakho.
+4. MCP client me \`${runCommand(answers.packageManager, "mcp")}\` command do.
+5. Codex ko bolo pehle \`.apiagex/codex.md\` read kare.
 
 ## Common errors
 
@@ -322,6 +341,25 @@ curl -X POST "$APIAGEX_BASE_URL/api/admin/automation-tokens" \\
 - Do not delete schemas, entries, workflows, or permissions unless the developer explicitly asks.
 - Do not open workflow APIs to public unless the prompt or approved plan says so.
 - Do not use direct database access for project automation.
+
+## MCP Setup
+
+Use this command in MCP clients that accept a local command:
+
+\`\`\`bash
+${runCommand(answers.packageManager, "mcp")}
+\`\`\`
+
+Required environment for that MCP process:
+
+- APIAGEX_BASE_URL=${baseUrl}
+- APIAGEX_AUTOMATION_TOKEN=your temporary automation token
+
+Sample request:
+
+\`\`\`text
+Read .apiagex/codex.md and use the Apiagex MCP tools to create the schemas, workflow APIs, permissions, and frontend calls needed for this feature. Do not commit secrets.
+\`\`\`
 `;
 }
 

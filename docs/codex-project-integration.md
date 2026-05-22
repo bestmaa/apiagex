@@ -119,6 +119,7 @@ Generated projects can use these commands:
 - `apiagex ai context`: create or refresh `.apiagex/codex.md`.
 - `apiagex ai doctor`: check base URL, context file, and token env presence without printing secret values.
 - `apiagex ai token`: call `POST /api/admin/automation-tokens` with `APIAGEX_ADMIN_TOKEN` and print the new temporary token once.
+- `apiagex mcp`: start the Apiagex MCP server over stdio using `APIAGEX_BASE_URL` and `APIAGEX_AUTOMATION_TOKEN`.
 
 Hinglish: `ai context` context banata hai, `ai doctor` setup check karta hai, aur `ai token` sirf explicit command par temporary token print karta hai.
 

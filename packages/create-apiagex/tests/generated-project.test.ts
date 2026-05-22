@@ -24,6 +24,7 @@ describe("generated Apiagex project", () => {
     expect(codexContext).toContain("APIAGEX_BASE_URL");
     expect(codexContext).toContain("APIAGEX_AUTOMATION_TOKEN");
     expect(codexContext).toContain("Never write raw tokens");
+    expect(codexContext).toContain("MCP Setup");
     await expect(readFile(join(projectDir, "src/custom-routes.js"), "utf8")).resolves.toContain("/health");
 
     const smoke = await runRuntimeCli(["smoke"], { cwd: projectDir });

@@ -176,7 +176,7 @@ Target user flow Hinglish:
 #### T3509 - Add MCP Install Instructions To Generated Projects
 
 - Version: `v0.18.8`
-- Status: `pending`
+- Status: `completed`
 - Goal: Make it easy for users to connect Codex or other AI clients to Apiagex MCP.
 - Persona: Onboarding engineer; keep setup copy-paste friendly.
 - Success Criteria: Generated project docs explain MCP command, env vars, token creation, and a sample Codex request.

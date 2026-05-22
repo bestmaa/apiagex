@@ -102,6 +102,7 @@ describe("create-apiagex CLI", () => {
     await expect(readFile(join(root, "my-cms", ".apiagex/codex.md"), "utf8")).resolves.toContain("APIAGEX_AUTOMATION_TOKEN");
     await expect(readFile(join(root, "my-cms", ".apiagex/codex.md"), "utf8")).resolves.toContain("Do not commit real tokens");
     await expect(readFile(join(root, "my-cms", ".apiagex/codex.md"), "utf8")).resolves.toContain("http://127.0.0.1:4000");
+    await expect(readFile(join(root, "my-cms", ".apiagex/codex.md"), "utf8")).resolves.toContain("npm run mcp");
     await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"setupMode"');
     await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"language": "ts"');
     await expect(readFile(join(root, "my-cms", "tsconfig.json"), "utf8")).resolves.toContain('"strict": true');
@@ -110,6 +111,8 @@ describe("create-apiagex CLI", () => {
     await expect(readFile(join(root, "my-cms", "src/custom-routes.ts"), "utf8")).resolves.toContain("/orders/:entryId/pay");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("Practical flow");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("src/apiagex-types.ts");
+    await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("Codex and MCP");
+    await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("npm run mcp");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("REALTIME_SESSION_INVALID");
     await expect(readFile(join(root, "my-cms", "README.md"), "utf8")).resolves.toContain("many-to-many");
     await expect(readFile(join(root, "my-cms", "docs/README.md"), "utf8")).resolves.toContain("Workflow APIs");
