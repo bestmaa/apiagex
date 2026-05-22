@@ -36,6 +36,7 @@ describe("SettingsAutomationTokens", () => {
     vi.mocked(listAutomationTokens).mockResolvedValue({ ok: true, tokens: [] });
     vi.mocked(createAutomationToken).mockResolvedValue({
       ok: true,
+      projectEnv: { ok: true, path: "/tmp/project/.env" },
       token: "agx_auto_secret",
       tokenRecord,
     });
@@ -64,11 +65,13 @@ describe("SettingsAutomationTokens", () => {
 
     expect(createAutomationToken).toHaveBeenCalledWith({
       name: "Codex setup",
+      persistToProject: true,
       scopes: ["schemas:manage", "workflows:manage", "permissions:manage", "routes:read", "plans:apply"],
       ttlMinutes: 60,
     });
     expect(container.textContent).toContain("agx_auto_secret");
     expect(container.textContent).toContain("agx_auto_test...");
+    expect(container.textContent).toContain("saved for this project");
   });
 
   it("revokes active automation tokens", async () => {

@@ -1,4 +1,7 @@
 import { openSqliteDatabase } from "@apiagex/database";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { createServer } from "../src/app.js";
 
@@ -65,5 +68,35 @@ describe("automation token admin APIs", () => {
 
     expect(create.statusCode).toBe(200);
     expect(create.json().tokenRecord.createdByEmail).toBe("owner@apiagex.local");
+  });
+
+  it("can save the created automation token to the local project env file", async () => {
+    const tempDir = await mkdtemp(join(tmpdir(), "apiagex-token-env-"));
+    const envPath = join(tempDir, ".env");
+    try {
+      await writeFile(envPath, "APIAGEX_BASE_URL=http://127.0.0.1:4000\nAPIAGEX_AUTOMATION_TOKEN=old\n", "utf8");
+      const server = createServer({
+        adminAuth: "disabled",
+        database: openSqliteDatabase(),
+        projectEnvPath: envPath,
+      });
+
+      const create = await server.inject({
+        method: "POST",
+        url: "/api/admin/automation-tokens",
+        payload: {
+          name: "Codex setup",
+          persistToProject: true,
+          scopes: ["schemas:manage"],
+          ttlMinutes: 10,
+        },
+      });
+
+      expect(create.statusCode).toBe(200);
+      expect(create.json().projectEnv).toEqual({ ok: true, path: envPath });
+      expect(await readFile(envPath, "utf8")).toContain(`APIAGEX_AUTOMATION_TOKEN=${create.json().token}\n`);
+    } finally {
+      await rm(tempDir, { force: true, recursive: true });
+    }
   });
 });

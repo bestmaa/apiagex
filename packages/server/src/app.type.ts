@@ -22,6 +22,7 @@ export type CreateServerOptions = {
   database?: ApiagexDatabase | SqliteDatabase;
   databasePath?: string;
   customRoutes?: RegisterApiagexCustomRoutes;
+  projectEnvPath?: string;
   uploadsPath?: string;
   webhookHttpClient?: WebhookHttpClient;
 };

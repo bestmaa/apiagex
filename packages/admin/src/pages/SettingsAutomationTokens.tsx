@@ -53,6 +53,7 @@ export function SettingsAutomationTokens() {
     const scopes = data.getAll("scope").map(String) as AutomationTokenScope[];
     const result = await createAutomationToken({
       name: String(data.get("name") ?? "") || "Codex setup",
+      persistToProject: data.get("persistToProject") === "on",
       scopes,
       ttlMinutes: Number(data.get("ttlMinutes") ?? 60),
     });
@@ -64,7 +65,7 @@ export function SettingsAutomationTokens() {
     form.reset();
     restoreDefaultScopes(form);
     await loadTokens();
-    setStatus("AI automation token created");
+    setStatus(result.projectEnv?.ok ? "AI automation token created and saved for this project" : "AI automation token created");
   }
 
   async function revoke(tokenId: string) {
@@ -107,6 +108,10 @@ export function SettingsAutomationTokens() {
               </label>
             ))}
           </fieldset>
+          <label className="automation-token-persist">
+            <input name="persistToProject" type="checkbox" defaultChecked />
+            Use in this project
+          </label>
           <button type="submit">
             <Plus aria-hidden="true" size={16} />
             Generate token
@@ -130,7 +135,7 @@ export function SettingsAutomationTokens() {
           <article className={token.revokedAt ? "role-token-row is-revoked" : "role-token-row"} key={token.id}>
             <div>
               <strong>{token.name}</strong>
-              <span>{token.tokenPrefix}... · {token.scopes.map((scope) => scopeLabels[scope]).join(", ")}</span>
+              <span>{token.tokenPrefix}... - {token.scopes.map((scope) => scopeLabels[scope]).join(", ")}</span>
             </div>
             <span>{token.revokedAt ? "Revoked" : tokenState(token)}</span>
             <button disabled={Boolean(token.revokedAt)} type="button" onClick={() => void revoke(token.id)}>

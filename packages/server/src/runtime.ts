@@ -13,7 +13,7 @@ import {
 } from "@apiagex/database";
 import type { RuntimeCliOptions, RuntimeCliResult, StartedApiagexServer, StartServerOptions } from "./runtime.type.js";
 
-const runtimeVersion = "0.8.19";
+const runtimeVersion = "0.8.20";
 
 export async function startApiagex(options: StartServerOptions = {}): Promise<StartedApiagexServer | undefined> {
   return startApiagexServer(options);
@@ -24,12 +24,14 @@ export async function startApiagexServer(options: StartServerOptions = {}): Prom
   const host = options.host ?? env.HOST ?? "127.0.0.1";
   const port = options.port ?? Number(env.PORT ?? 4000);
   const config = options.config ?? resolveLocalServerConfig(env, options.cwd ?? process.cwd());
+  const cwd = options.cwd ?? process.cwd();
   await ensureLocalServerPaths(config);
   const database = await openRuntimeDatabase(config);
   if (options.initialOwner) await bootstrapInitialOwner(database, options.initialOwner);
   const server = createServer({
     ...config,
     database,
+    projectEnvPath: join(cwd, ".env"),
     ...(options.customRoutes ? { customRoutes: options.customRoutes } : {}),
   });
   try {

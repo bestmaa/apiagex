@@ -2,6 +2,7 @@ import type { AutomationTokenScope } from "@apiagex/database";
 
 export type AutomationTokenBody = {
   name?: string | undefined;
+  persistToProject?: boolean | undefined;
   scopes?: AutomationTokenScope[] | undefined;
   ttlMinutes?: number | undefined;
 };

@@ -286,6 +286,7 @@ export async function listAutomationTokens(): Promise<AutomationTokenListRespons
 
 export async function createAutomationToken(input: {
   name: string;
+  persistToProject?: boolean;
   scopes: AutomationTokenScope[];
   ttlMinutes: number;
 }): Promise<AutomationTokenCreateResponse> {

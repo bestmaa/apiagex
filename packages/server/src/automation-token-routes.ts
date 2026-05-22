@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { readFile, writeFile } from "node:fs/promises";
 import {
   createAutomationToken,
   listAutomationTokens,
@@ -8,7 +9,15 @@ import {
 import { ownerTokenFromRequest, verifyOwnerToken } from "./admin-auth.js";
 import type { AutomationTokenBody, AutomationTokenParams } from "./automation-token-routes.type.js";
 
-export function registerAutomationTokenRoutes(server: FastifyInstance, database: ApiagexDatabase): void {
+type AutomationTokenRouteOptions = {
+  projectEnvPath?: string;
+};
+
+export function registerAutomationTokenRoutes(
+  server: FastifyInstance,
+  database: ApiagexDatabase,
+  options: AutomationTokenRouteOptions = {},
+): void {
   server.get("/api/admin/automation-tokens", async () => ({
     ok: true,
     tokens: await listAutomationTokens(database),
@@ -24,6 +33,21 @@ export function registerAutomationTokenRoutes(server: FastifyInstance, database:
         createdById: actor?.id,
         createdByEmail: actor?.email,
       });
+      if (request.body.persistToProject) {
+        if (!options.projectEnvPath) {
+          return {
+            ok: true,
+            ...created,
+            projectEnv: { ok: false, error: "PROJECT_ENV_PATH_UNAVAILABLE" },
+          };
+        }
+        await saveAutomationTokenToEnv(options.projectEnvPath, created.token);
+        return {
+          ok: true,
+          ...created,
+          projectEnv: { ok: true, path: options.projectEnvPath },
+        };
+      }
       return { ok: true, ...created };
     } catch (error) {
       return sendAutomationTokenError(reply, error, 400);
@@ -52,4 +76,34 @@ async function adminActor(
 function sendAutomationTokenError(reply: FastifyReply, error: unknown, statusCode: number): FastifyReply {
   const message = error instanceof Error ? error.message : "AUTOMATION_TOKEN_REQUEST_FAILED";
   return reply.code(statusCode).send({ ok: false, error: message });
+}
+
+async function saveAutomationTokenToEnv(envPath: string, token: string): Promise<void> {
+  const previous = await readEnvFile(envPath);
+  await writeFile(envPath, upsertDotEnvValue(previous, "APIAGEX_AUTOMATION_TOKEN", token), "utf8");
+}
+
+async function readEnvFile(envPath: string): Promise<string> {
+  try {
+    return await readFile(envPath, "utf8");
+  } catch (error) {
+    if (typeof error === "object" && error && "code" in error && error.code === "ENOENT") return "";
+    throw error;
+  }
+}
+
+function upsertDotEnvValue(content: string, key: string, value: string): string {
+  const line = `${key}=${value}`;
+  const lines = content.split(/\r?\n/);
+  const existingIndex = lines.findIndex((item) => item.trimStart().startsWith(`${key}=`));
+  if (existingIndex >= 0) {
+    lines[existingIndex] = line;
+    return ensureTrailingNewline(lines.join("\n"));
+  }
+  const base = content.trimEnd();
+  return `${base}${base ? "\n" : ""}${line}\n`;
+}
+
+function ensureTrailingNewline(content: string): string {
+  return content.endsWith("\n") ? content : `${content}\n`;
 }

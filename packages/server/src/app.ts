@@ -53,7 +53,9 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   registerRoleRoutes(server, database);
   registerUserRoutes(server, database);
   registerSettingsRoutes(server, database);
-  registerAutomationTokenRoutes(server, database);
+  registerAutomationTokenRoutes(server, database, {
+    ...(options.projectEnvPath === undefined ? {} : { projectEnvPath: options.projectEnvPath }),
+  });
   registerAiAutomationRoutes(server, database);
   registerAiPlanRoutes(server, database);
   registerWebhookRoutes(server, database, webhookOptions);

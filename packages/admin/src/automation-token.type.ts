@@ -29,6 +29,11 @@ export type AutomationTokenListResponse = {
 
 export type AutomationTokenCreateResponse = {
   ok: boolean;
+  projectEnv?: {
+    ok: boolean;
+    path?: string;
+    error?: string;
+  };
   token?: string;
   tokenRecord?: AutomationTokenRecord;
   error?: string;
