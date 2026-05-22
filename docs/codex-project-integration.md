@@ -29,6 +29,27 @@ APIAGEX_AUTOMATION_TOKEN=agx_auto_example_do_not_commit
 
 Hinglish: `APIAGEX_BASE_URL` running backend par point karta hai. `APIAGEX_AUTOMATION_TOKEN` temporary AI automation token hai. Isko shell/env me rakho, committed file me nahi.
 
+## Temporary Automation Token Contract
+
+Automation tokens are for AI setup work only. They are different from content API tokens. They should be short-lived, scoped, revocable, hashed in storage, and visible only once when created.
+
+Default scopes:
+
+- `schemas:manage`: create and inspect schemas needed by a feature.
+- `workflows:manage`: create and test workflow APIs under `/api/custom`.
+- `permissions:manage`: allow a workflow route for public or a content API role.
+- `routes:read`: inspect generated custom/API routes.
+- `plans:apply`: preview/apply a validated multi-resource AI API plan.
+
+Recommended defaults:
+
+- TTL: 60 minutes.
+- Name: short purpose such as `Codex product search`.
+- Storage: SHA-256 hash plus visible token prefix only.
+- Audit: created by owner/admin, created time, expiry, last used, revoked time.
+
+Hinglish: Automation token AI setup ke liye hai, content API token se alag. Iska TTL short, scope limited, revoke support, hashed storage, aur one-time visible secret hona chahiye.
+
 ## What Codex Can Do
 
 With a valid automation token, Codex may:

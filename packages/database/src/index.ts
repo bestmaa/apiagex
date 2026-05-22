@@ -196,6 +196,16 @@ export type {
   CreatedApiToken,
   CreateApiTokenInput,
 } from "./api-token-repository.type.js";
+export {
+  AUTOMATION_TOKEN_SCOPES,
+} from "./automation-token-repository.type.js";
+export type {
+  AutomationTokenRecord,
+  AutomationTokenScope,
+  CreatedAutomationToken,
+  CreateAutomationTokenInput,
+  ResolvedAutomationToken,
+} from "./automation-token-repository.type.js";
 export type {
   CreatedRealtimeSession,
   CreateRealtimeSessionInput,

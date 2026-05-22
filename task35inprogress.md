@@ -81,7 +81,7 @@ Target user flow Hinglish:
 #### T3502 - Add Temporary Automation Token Contract
 
 - Version: `v0.18.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Define a temporary, scoped, revocable token for AI/Codex automation.
 - Persona: Security engineer; allow powerful setup work without long-lived secrets.
 - Success Criteria: Token contract includes TTL, one-time visible secret, hashed storage, scope for schema/workflow/permission management, audit metadata, and revocation.
