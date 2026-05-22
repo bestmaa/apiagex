@@ -17,6 +17,7 @@ describe("apiagex runtime CLI", () => {
     expect(result.stdout).toContain("APIAGEX_DATABASE_PATH");
     expect(result.stdout).toContain("APIAGEX_DATABASE_URL");
     expect(result.stdout).toContain("APIAGEX_OWNER_PASSWORD");
+    expect(result.stdout).toContain("apiagex ai context");
   });
 
   it("prints version", async () => {
@@ -33,6 +34,79 @@ describe("apiagex runtime CLI", () => {
     expect(result.stdout).toContain("Apiagex smoke passed");
     expect(result.stdout).toContain("/tmp/generated-apiagex");
   });
+
+  it("creates and checks Codex context without printing token values", async () => {
+    const root = await mkdtemp(join(tmpdir(), "apiagex-ai-context-"));
+
+    const context = await runRuntimeCli(["ai", "context", "--base-url", "http://127.0.0.1:4555"], {
+      cwd: root,
+    });
+    expect(context.code).toBe(0);
+    expect(context.stdout).toContain(".apiagex");
+
+    const generated = await readFile(join(root, ".apiagex/codex.md"), "utf8");
+    expect(generated).toContain("APIAGEX_AUTOMATION_TOKEN");
+    expect(generated).toContain("http://127.0.0.1:4555");
+    expect(generated).toContain("Never write raw tokens");
+
+    const doctor = await runRuntimeCli(["ai", "doctor"], {
+      cwd: root,
+      env: {
+        APIAGEX_ADMIN_TOKEN: "admin-secret",
+        APIAGEX_AUTOMATION_TOKEN: "automation-secret",
+        APIAGEX_BASE_URL: "http://127.0.0.1:4555",
+      },
+    });
+    expect(doctor.code).toBe(0);
+    expect(doctor.stdout).toContain("Context file: found");
+    expect(doctor.stdout).toContain("APIAGEX_AUTOMATION_TOKEN: set");
+    expect(doctor.stdout).not.toContain("automation-secret");
+    expect(doctor.stdout).not.toContain("admin-secret");
+  });
+
+  it("creates a temporary automation token through the AI CLI", async () => {
+    const root = await mkdtemp(join(tmpdir(), "apiagex-ai-token-"));
+    const server = await startApiagex({
+      cwd: root,
+      env: {
+        APIAGEX_DATABASE_PATH: "data/runtime.sqlite",
+        APIAGEX_UPLOADS_PATH: "uploads",
+      },
+      host: "127.0.0.1",
+      port: 0,
+      initialOwner: { email: "owner@example.com", password: "OwnerPass123!" },
+    });
+    expect(server).toBeTruthy();
+    const port = (server?.server.address() as AddressInfo).port;
+    const login = await fetch(`http://127.0.0.1:${port}/api/auth/login`, {
+      body: JSON.stringify({ email: "owner@example.com", password: "OwnerPass123!" }),
+      headers: { "content-type": "application/json" },
+      method: "POST",
+    });
+    const token = (await login.json() as { token: string }).token;
+
+    try {
+      const result = await runRuntimeCli([
+        "ai",
+        "token",
+        "--base-url",
+        `http://127.0.0.1:${port}`,
+        "--admin-token",
+        token,
+        "--ttl-minutes",
+        "5",
+        "--name",
+        "Codex test",
+      ], { cwd: root });
+
+      expect(result.code).toBe(0);
+      expect(result.stdout).toContain("export APIAGEX_AUTOMATION_TOKEN=agx_auto_");
+      expect(result.stdout).toContain("do not commit");
+      expect(result.stdout).toContain("Expires at:");
+    } finally {
+      await server?.close();
+    }
+  }, 15_000);
 
   it("returns guidance for generated project build scripts", async () => {
     const result = await runRuntimeCli(["build"]);

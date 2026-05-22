@@ -112,6 +112,16 @@ Hinglish: Pehle context padho, health/routes check karo, existing resources insp
 
 Hinglish: Generated project me `.apiagex/codex.md` commit-safe context hota hai. Real token nahi likhna hai; token hamesha local env me rahega.
 
+## Runtime AI CLI
+
+Generated projects can use these commands:
+
+- `apiagex ai context`: create or refresh `.apiagex/codex.md`.
+- `apiagex ai doctor`: check base URL, context file, and token env presence without printing secret values.
+- `apiagex ai token`: call `POST /api/admin/automation-tokens` with `APIAGEX_ADMIN_TOKEN` and print the new temporary token once.
+
+Hinglish: `ai context` context banata hai, `ai doctor` setup check karta hai, aur `ai token` sirf explicit command par temporary token print karta hai.
+
 ## Future Native Admin UI AI Builder
 
 The Admin UI AI Builder is tracked separately in `task36pending.md`. This project integration is the first layer: Codex and other AI clients can work from the developer project using temporary tokens and MCP/tools.

@@ -122,7 +122,7 @@ Target user flow Hinglish:
 #### T3505 - Add Apiagex AI Setup CLI
 
 - Version: `v0.18.4`
-- Status: `pending`
+- Status: `completed`
 - Goal: Add CLI helpers for AI/Codex setup inside user projects.
 - Persona: CLI designer; make setup a short, repeatable command.
 - Success Criteria: CLI exposes commands such as `apiagex ai context`, `apiagex ai token`, and `apiagex ai doctor`.

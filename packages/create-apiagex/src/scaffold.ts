@@ -123,6 +123,9 @@ AI assistants should read .apiagex/codex.md before creating schemas, workflows, 
 - \`${runCommand(answers.packageManager, "dev")}\`: start ${entrySourcePath(answers)} with .env.
 - \`${runCommand(answers.packageManager, "start")}\`: start ${answers.language === "ts" ? "dist/index.js" : "src/index.js"} with .env.
 ${answers.language === "ts" ? `- \`${runCommand(answers.packageManager, "types")}\`: generate src/apiagex-types.ts from Admin UI schemas.\n` : ""}
+- \`${runCommand(answers.packageManager, "ai context")}\`: refresh .apiagex/codex.md for Codex or another AI assistant.
+- \`${runCommand(answers.packageManager, "ai doctor")}\`: check local AI setup without printing token values.
+- \`${runCommand(answers.packageManager, "ai token")}\`: create a temporary automation token when APIAGEX_ADMIN_TOKEN is set.
 - \`${runCommand(answers.packageManager, "smoke")}\`: verify the runtime health route.
 - \`${runCommand(answers.packageManager, "build")}\`: ${answers.language === "ts" ? "compile TypeScript to dist." : "print runtime build guidance."}
 
