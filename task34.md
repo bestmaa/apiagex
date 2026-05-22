@@ -854,7 +854,7 @@ Each task uses this structure:
 #### T3460 - Publish Workflow Builder Release
 
 - Version: `v0.17.1`
-- Status: `pending`
+- Status: `completed`
 - Goal: Publish the Workflow Builder release to npm after CI is green.
 - Persona: Release manager; publish only verified packages.
 - Success Criteria: Version bump, release check, PR/CI green, publish workflow success, npm view confirms versions.
