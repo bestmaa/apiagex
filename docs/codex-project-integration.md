@@ -48,6 +48,12 @@ Recommended defaults:
 - Storage: SHA-256 hash plus visible token prefix only.
 - Audit: created by owner/admin, created time, expiry, last used, revoked time.
 
+Admin endpoints:
+
+- `GET /api/admin/automation-tokens`: list token metadata only.
+- `POST /api/admin/automation-tokens`: create a token with `name`, `scopes`, and `ttlMinutes`; returns the raw `token` once.
+- `DELETE /api/admin/automation-tokens/:tokenId`: revoke a token.
+
 Hinglish: Automation token AI setup ke liye hai, content API token se alag. Iska TTL short, scope limited, revoke support, hashed storage, aur one-time visible secret hona chahiye.
 
 ## What Codex Can Do

@@ -94,7 +94,7 @@ Target user flow Hinglish:
 #### T3503 - Implement Temporary Automation Tokens
 
 - Version: `v0.18.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Implement temporary automation tokens for Codex/API builder work.
 - Persona: Backend security engineer; make token flow safe and practical.
 - Success Criteria: Admin API can create/list/revoke automation tokens, stores hashed tokens, enforces TTL/scopes, and logs last use.

@@ -33,6 +33,19 @@ export const MVP_ADDITIVE_MIGRATIONS_SQL = [
     last_used_at TEXT,
     revoked_at TEXT
   )`,
+  `CREATE TABLE IF NOT EXISTS automation_tokens (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    token_hash TEXT NOT NULL UNIQUE,
+    token_prefix TEXT NOT NULL,
+    scopes_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    last_used_at TEXT,
+    revoked_at TEXT,
+    created_by_id TEXT,
+    created_by_email TEXT
+  )`,
   `CREATE TABLE IF NOT EXISTS webhooks (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,

@@ -8,6 +8,7 @@ export type MvpTableName =
   | "app_settings"
   | "admin_permissions"
   | "api_tokens"
+  | "automation_tokens"
   | "webhooks"
   | "webhook_events"
   | "webhook_deliveries"

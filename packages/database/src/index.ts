@@ -57,6 +57,12 @@ export {
   revokeApiToken,
 } from "./api-token-repository.js";
 export {
+  createAutomationToken,
+  listAutomationTokens,
+  resolveAutomationToken,
+  revokeAutomationToken,
+} from "./automation-token-repository.js";
+export {
   consumeRealtimeSession,
   createRealtimeSession,
 } from "./realtime-session-repository.js";
