@@ -204,7 +204,7 @@ Target user flow Hinglish:
 #### T3511 - Add AI Plan Preview And Apply APIs
 
 - Version: `v0.19.0`
-- Status: `pending`
+- Status: `completed`
 - Goal: Let Codex/MCP submit a plan, preview validation, then apply it safely.
 - Persona: Backend workflow engineer; avoid half-created backend state.
 - Success Criteria: Preview validates all planned schemas/workflows/permissions, apply records an audit entry, and failures are deterministic.

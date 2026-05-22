@@ -52,3 +52,12 @@ Hinglish: AI pehle plan banayega, phir preview/apply hoga. Raw secret plan me ka
 - Public access must be explicit in the plan reason.
 - Destructive operations are intentionally absent from v1.
 - Apply APIs must report skipped operations instead of overwriting existing matching resources.
+
+## Preview And Apply APIs
+
+Both endpoints require a temporary automation token with `plans:apply` scope through `x-apiagex-automation-token`.
+
+- `POST /api/ai/plans/preview`: validates the plan, rejects secret-looking fields/values, and returns operation summaries plus warnings.
+- `POST /api/ai/plans/apply`: validates the plan again, applies additive operations, records permission history, and returns applied/skipped operation IDs.
+
+Apply skips existing schema slugs or workflow method/path pairs instead of overwriting them.

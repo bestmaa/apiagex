@@ -34,6 +34,7 @@ import { registerWorkflowRoutes } from "./workflow-api-routes.js";
 import { registerWorkflowAdminRoutes } from "./workflow-admin-routes.js";
 import { registerAutomationTokenRoutes } from "./automation-token-routes.js";
 import { registerAiAutomationRoutes } from "./ai-automation-routes.js";
+import { registerAiPlanRoutes } from "./ai-plan-routes.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
@@ -54,6 +55,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   registerSettingsRoutes(server, database);
   registerAutomationTokenRoutes(server, database);
   registerAiAutomationRoutes(server, database);
+  registerAiPlanRoutes(server, database);
   registerWebhookRoutes(server, database, webhookOptions);
   registerRealtimeRoutes(server, database, realtimeBroker);
   registerCustomApiAdminRoutes(server, database);

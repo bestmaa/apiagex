@@ -141,6 +141,11 @@ export type {
 export {
   APIAGEX_AI_PLAN_VERSION,
 } from "./ai-plan.type.js";
+export {
+  applyAiPlan,
+  previewAiPlan,
+  registerAiPlanRoutes,
+} from "./ai-plan-routes.js";
 export type {
   ApiagexAiPlan,
   ApiagexAiPlanApplyResult,
