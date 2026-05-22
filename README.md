@@ -109,6 +109,8 @@ Codex/AI project integration is documented in [docs/codex-project-integration.md
 
 Apiagex MCP tool contracts are documented in [docs/apiagex-mcp-tools.md](./docs/apiagex-mcp-tools.md). They cover health, schemas, workflow APIs, route discovery, custom API permissions, and export summaries using `APIAGEX_BASE_URL` plus `APIAGEX_AUTOMATION_TOKEN`.
 
+AI-created backend changes can be represented as previewable plans. The v1 format is documented in [docs/ai-api-plan-format.md](./docs/ai-api-plan-format.md) and intentionally excludes raw secrets and destructive operations.
+
 ## Open Source License
 
 Apiagex is released under the MIT License. You can use, modify, and distribute it, but the copyright and license notice must stay with copies or substantial portions of the software.

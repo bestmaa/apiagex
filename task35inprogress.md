@@ -191,7 +191,7 @@ Target user flow Hinglish:
 #### T3510 - Add AI API Plan Format
 
 - Version: `v0.18.9`
-- Status: `pending`
+- Status: `completed`
 - Goal: Define a machine-readable plan format for AI-created Apiagex changes.
 - Persona: Safety engineer; require preview before mutation when possible.
 - Success Criteria: Plan format can describe schemas, workflows, permissions, seed data, and test calls.

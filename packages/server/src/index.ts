@@ -138,6 +138,20 @@ export type {
   ApiagexMcpToolOutputByName,
   ApiagexMcpWorkflowSummary,
 } from "./mcp-tool-contract.type.js";
+export {
+  APIAGEX_AI_PLAN_VERSION,
+} from "./ai-plan.type.js";
+export type {
+  ApiagexAiPlan,
+  ApiagexAiPlanApplyResult,
+  ApiagexAiPlanCreateSchemaOperation,
+  ApiagexAiPlanCreateWorkflowOperation,
+  ApiagexAiPlanOperation,
+  ApiagexAiPlanPreview,
+  ApiagexAiPlanSeedDataOperation,
+  ApiagexAiPlanSetPermissionOperation,
+  ApiagexAiPlanTestCall,
+} from "./ai-plan.type.js";
 export type {
   OwnerBootstrapInput,
   OwnerBootstrapResult,
