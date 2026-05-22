@@ -135,7 +135,7 @@ Target user flow Hinglish:
 #### T3506 - Add Codex Frontend Workflow Guide
 
 - Version: `v0.18.5`
-- Status: `pending`
+- Status: `completed`
 - Goal: Document the exact workflow for asking Codex to build frontend features backed by Apiagex.
 - Persona: Practical tutorial writer; reduce user prompt confusion.
 - Success Criteria: Docs include prompt examples, environment setup, token handling, expected Codex actions, verification commands, and rollback tips.

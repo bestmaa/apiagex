@@ -33,6 +33,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Workflow import/export plan: [workflow-import-export-plan.md](./workflow-import-export-plan.md)
 - Workflow builder release checkpoint: [workflow-builder-release-checkpoint.md](./workflow-builder-release-checkpoint.md)
 - Codex project integration: [codex-project-integration.md](./codex-project-integration.md)
+- Codex frontend workflow: [codex-frontend-workflow.md](./codex-frontend-workflow.md)
 
 ## Implemented Now
 
@@ -104,6 +105,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Workflow builder release checkpoint `docs/workflow-builder-release-checkpoint.md` me documented hai.
 - Codex project integration is documented in `docs/codex-project-integration.md`.
 - Codex project integration `docs/codex-project-integration.md` me documented hai.
+- Codex frontend workflow is documented in `docs/codex-frontend-workflow.md`.
+- Codex frontend workflow `docs/codex-frontend-workflow.md` me documented hai.
 
 ## Owner Bootstrap And Login
 
