@@ -219,7 +219,7 @@ Target user flow Hinglish:
 #### T3512 - Release Codex Project AI Integration
 
 - Version: `v0.19.2`
-- Status: `pending`
+- Status: `completed`
 - Goal: Stabilize and release the Codex/MCP project integration.
 - Persona: Release manager; publish only verified integration.
 - Success Criteria: Full checks pass, generated project flow works, MCP tools work, npm dry-run/publish succeeds, and docs explain the flow.

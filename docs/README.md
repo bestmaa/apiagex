@@ -36,6 +36,7 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Codex frontend workflow: [codex-frontend-workflow.md](./codex-frontend-workflow.md)
 - Apiagex MCP tools: [apiagex-mcp-tools.md](./apiagex-mcp-tools.md)
 - AI API plan format: [ai-api-plan-format.md](./ai-api-plan-format.md)
+- Codex Project AI Integration release: [codex-project-ai-release.md](./codex-project-ai-release.md)
 
 ## Implemented Now
 
@@ -113,6 +114,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - Apiagex MCP tools `docs/apiagex-mcp-tools.md` me documented hain.
 - AI API plan format is documented in `docs/ai-api-plan-format.md`.
 - AI API plan format `docs/ai-api-plan-format.md` me documented hai.
+- Codex Project AI Integration release notes are documented in `docs/codex-project-ai-release.md`.
+- Codex Project AI Integration release notes `docs/codex-project-ai-release.md` me documented hain.
 
 ## Owner Bootstrap And Login
 
