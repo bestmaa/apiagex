@@ -1224,7 +1224,7 @@ Result:
 ### T4064 - Publish Multi Tenant Preview Release
 
 - Version: `v0.9.12`
-- Status: `pending`
+- Status: `completed`
 - Goal: Publish a preview release after all multi-tenant gates pass.
 - Success Criteria: Release notes clearly mark mode as preview/beta or stable according to test coverage.
 - Output: npm packages, tag, release notes.
@@ -1234,6 +1234,14 @@ Result:
 
 Current note:
 
-- Not completed in this pass because this task requires an actual npm/GitHub release action.
-- Release gates added so far: server build passes, focused tests pass, and `npm run smoke` includes multi-tenant isolation.
-- Publish should be done only after maintainer confirms release version, runs full release check, and chooses npm/GitHub workflow publish.
+- Released `0.9.12` as a multi-tenant preview/beta.
+- Local release gate passed with `npm run release:check`.
+- Local npm dry-run passed for `@apiagex/database`, `@apiagex/server`, and `create-apiagex`.
+- GitHub Actions dry-run passed on main.
+- Pushed tag `npm-v0.9.12-beta`; GitHub Actions publish completed successfully.
+- Verified npm packages:
+  - `@apiagex/database@0.9.12`
+  - `@apiagex/server@0.9.12`
+  - `create-apiagex@0.9.12`
+- Verified npm dist-tags: `beta=0.9.12`, `latest=0.8.21`.
+- Verified GitHub prerelease: `https://github.com/bestmaa/apiagex/releases/tag/npm-v0.9.12-beta`.
