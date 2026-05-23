@@ -55,7 +55,7 @@ describe("create-apiagex CLI", () => {
 
   it("prompts for setup answers when interactive", async () => {
     const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
-    const answers = ["prompt-cms", "ts", "custom", "sqlite", "data/prompt.sqlite", "0.0.0.0", "5050", "yarn", "yes", "owner@example.com", "OwnerPass123!", "no", "yes"];
+    const answers = ["prompt-cms", "ts", "custom", "sqlite", "data/prompt.sqlite", "0.0.0.0", "5050", "yarn", "no", "yes", "owner@example.com", "OwnerPass123!", "no", "yes"];
     const result = await runCli(["--dry-run"], root, {
       interactive: true,
       prompt: async () => answers.shift() ?? "",
@@ -68,6 +68,7 @@ describe("create-apiagex CLI", () => {
     expect(result.stdout).toContain("Server: http://0.0.0.0:5050");
     expect(result.stdout).toContain("Package manager: yarn");
     expect(result.stdout).toContain("Language: TypeScript");
+    expect(result.stdout).toContain("Multi-tenant starter: no");
     expect(result.stdout).toContain("Install dependencies: yes");
     expect(result.stdout).toContain("Initialize git: no");
     expect(result.stdout).toContain("Owner setup: create from .env on first start");
@@ -100,6 +101,7 @@ describe("create-apiagex CLI", () => {
     await expect(readFile(join(root, "my-cms", "package.json"), "utf8")).resolves.toContain('"typescript"');
     await expect(readFile(join(root, "my-cms", ".env"), "utf8")).resolves.toContain("APIAGEX_SECRET=");
     await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.toContain("APIAGEX_DATABASE_PATH");
+    await expect(readFile(join(root, "my-cms", ".env.example"), "utf8")).resolves.not.toContain("APIAGEX_MULTI_TENANT=true");
     await expect(readFile(join(root, "my-cms", ".gitignore"), "utf8")).resolves.toContain("!.apiagex/codex.md");
     await expect(readFile(join(root, "my-cms", ".apiagex/codex.md"), "utf8")).resolves.toContain("APIAGEX_AUTOMATION_TOKEN");
     await expect(readFile(join(root, "my-cms", ".apiagex/codex.md"), "utf8")).resolves.toContain("Do not commit real tokens");
@@ -107,6 +109,7 @@ describe("create-apiagex CLI", () => {
     await expect(readFile(join(root, "my-cms", ".apiagex/codex.md"), "utf8")).resolves.toContain("npm run mcp");
     await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"setupMode"');
     await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"language": "ts"');
+    await expect(readFile(join(root, "my-cms", "apiagex.config.json"), "utf8")).resolves.toContain('"multiTenant": false');
     await expect(readFile(join(root, "my-cms", "tsconfig.json"), "utf8")).resolves.toContain('"strict": true');
     await expect(readFile(join(root, "my-cms", "src/index.ts"), "utf8")).resolves.toContain("startApiagex");
     await expect(readFile(join(root, "my-cms", "src/index.ts"), "utf8")).resolves.toContain("registerCustomRoutes");
@@ -189,7 +192,25 @@ describe("create-apiagex CLI", () => {
     expect(result.stdout).toContain("Database: sqlite");
     expect(result.stdout).toContain("Language: TypeScript");
     expect(result.stdout).toContain("Package manager: npm");
+    expect(result.stdout).toContain("Multi-tenant starter: no");
     expect(result.stdout).toContain("Install dependencies: no");
+  });
+
+  it("creates multi-tenant starter config when requested", async () => {
+    const root = await mkdtemp(join(tmpdir(), "create-apiagex-"));
+    const result = await runCli(["tenant-cms", "--yes", "--multi-tenant"], root);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Multi-tenant starter: yes");
+    const envExample = await readFile(join(root, "tenant-cms", ".env.example"), "utf8");
+    expect(envExample).toContain("APIAGEX_MULTI_TENANT=true");
+    expect(envExample).toContain("APIAGEX_PLATFORM_DATABASE_PROVIDER=sqlite");
+    expect(envExample).toContain("APIAGEX_PLATFORM_DATABASE_URL=.apiagex/platform.sqlite");
+    expect(envExample).toContain("APIAGEX_TENANT_SECRET_KEY=change-me-32-byte-secret");
+    expect(envExample).toContain("APIAGEX_TENANT_ROOT_DOMAIN=localhost");
+    expect(await readFile(join(root, "tenant-cms", "README.md"), "utf8")).toContain("Multi-Tenant Starter");
+    expect(await readFile(join(root, "tenant-cms", ".apiagex/codex.md"), "utf8")).toContain("Multi-tenant starter config is enabled");
+    expect(await readFile(join(root, "tenant-cms", "apiagex.config.json"), "utf8")).toContain('"multiTenant": true');
   });
 
   it("writes first owner bootstrap env when requested", async () => {

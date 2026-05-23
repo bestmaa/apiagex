@@ -15,6 +15,12 @@ describe("OpenAPI and Swagger routes", () => {
         fields: [
           { name: "Title", slug: "title", type: "text", required: true },
           { name: "Views", slug: "views", type: "number" },
+          { name: "Status", options: ["draft", "published"], slug: "status", type: "enum" },
+          { name: "Tags", options: ["new", "featured"], slug: "tags", type: "multiSelect" },
+          { name: "Email", slug: "email", type: "email" },
+          { name: "Count", slug: "count", type: "integer" },
+          { name: "Starts", slug: "starts", type: "datetime" },
+          { name: "Hero", slug: "hero", type: "image" },
         ],
       },
     });
@@ -43,9 +49,19 @@ describe("OpenAPI and Swagger routes", () => {
       required: ["title"],
       properties: {
         title: { type: "string" },
+        count: { type: "integer" },
+        email: { type: "string", format: "email" },
+        hero: { type: "string" },
+        starts: { type: "string", format: "date-time" },
+        status: { type: "string", enum: ["draft", "published"] },
+        tags: { type: "array", items: { type: "string", enum: ["new", "featured"] } },
         views: { type: "number" },
       },
     });
+    expect(spec.components.schemas.AdminFieldDraft.properties.type.enum).toContain("longText");
+    expect(spec.components.schemas.AdminFieldDraft.properties.type.enum).toContain("enum");
+    expect(spec.components.schemas.AdminFieldDraft.properties.type.enum).toContain("multiSelect");
+    expect(spec.components.schemas.AdminFieldDraft.properties.type.enum).toContain("image");
   });
 
   it("can expose only content API docs", async () => {

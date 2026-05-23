@@ -7,5 +7,13 @@ export type LocalServerConfig = {
   databaseUrl?: string;
   databasePath: string;
   databaseProvider: DatabaseProvider;
+  multiTenant?: {
+    enabled: boolean;
+    pathPrefix?: string | undefined;
+    platformDatabaseProvider: DatabaseProvider;
+    platformDatabaseUrl: string;
+    rootDomain?: string | undefined;
+    secretKeyBase64: string;
+  } | undefined;
   uploadsPath: string;
 };

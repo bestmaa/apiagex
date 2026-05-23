@@ -72,8 +72,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - `POST /api/admin/schemas` validated fields ke saath schema banata hai.
 - `GET /api/admin/schemas` lists schemas, and `/api/admin/schemas/:id` supports read, update, and delete.
 - `GET /api/admin/schemas` schemas list karta hai, aur `/api/admin/schemas/:id` read, update, delete support karta hai.
-- `/adminui` has a React schema builder form for text, long text, number, boolean, date, JSON, media, and relation fields.
-- `/adminui` me text, long text, number, boolean, date, JSON, media, aur relation fields ke liye React schema builder form hai.
+- `/adminui` has a React schema builder form for primitive validation fields, option fields, JSON, media/file/image uploads, and relation fields.
+- `/adminui` me primitive validation fields, option fields, JSON, media/file/image uploads, aur relation fields ke liye React schema builder form hai.
 - Relation fields show a target schema picker and cannot save without a valid existing schema.
 - Relation fields target schema picker dikhate hain aur valid existing schema ke bina save nahi hote.
 - Project stabilization audit is documented in `docs/project-stabilization-audit.md`.
@@ -150,14 +150,32 @@ Hinglish: Schema me name, slug, description, aur ordered fields hote hain. Relat
 ### English
 
 Use `POST /api/admin/schemas` with `name`, `slug`, optional `description`, and `fields`.
-Field types are `text`, `longText`, `number`, `boolean`, `date`, `json`, `media`, and `relation`.
+Field types are `text`, `longText`, `richText`, `password`, `email`, `url`, `number`, `integer`, `decimal`, `currency`, `boolean`, `date`, `datetime`, `time`, `enum`, `multiSelect`, `json`, `media`, `file`, `image`, and `relation`. `enum` fields use one allowed option; `multiSelect` fields store an array of allowed options.
 Use `GET /api/admin/schemas` to list, `GET /api/admin/schemas/:id` to read, `PUT /api/admin/schemas/:id` to update, and `DELETE /api/admin/schemas/:id` to remove.
 
 ### Hinglish
 
 `POST /api/admin/schemas` me `name`, `slug`, optional `description`, aur `fields` bhejo.
-Field types `text`, `longText`, `number`, `boolean`, `date`, `json`, `media`, aur `relation` hain.
+Field types `text`, `longText`, `richText`, `password`, `email`, `url`, `number`, `integer`, `decimal`, `currency`, `boolean`, `date`, `datetime`, `time`, `enum`, `multiSelect`, `json`, `media`, `file`, `image`, aur `relation` hain. `enum` ek allowed option save karta hai; `multiSelect` allowed options ka array save karta hai.
 List ke liye `GET /api/admin/schemas`, read ke liye `GET /api/admin/schemas/:id`, update ke liye `PUT /api/admin/schemas/:id`, aur delete ke liye `DELETE /api/admin/schemas/:id` use karo.
+
+## Media Uploads
+
+### English
+
+Media uses a central upload engine with schema-scoped folders. The recommended flow is creating/updating an entry with `mediaUploads` on `POST /api/admin/schemas/:schemaId/entries` or `PUT /api/admin/schemas/:schemaId/entries/:entryId`; Apiagex uploads the file under `/uploads/{schemaSlug}/{fieldSlug}/...` and saves the URL into the `media`, `file`, or `image` field.
+
+Direct upload also exists: upload files with `POST /api/admin/media` using `filename`, `contentType`, and `contentBase64`; the response returns a public `/uploads/...` URL. A schema `media` field stores URLs as strings.
+
+Project template export/import preserves schema media fields and saved media URL strings in configuration data, but it does not automatically bundle uploaded binary files into the JSON template. Move asset files separately if a fresh environment needs the same local uploads.
+
+### Hinglish
+
+Media ka engine central hai, lekin folder schema/field scoped hai. Recommended flow: entry create/update ke same call me `mediaUploads` bhejo: `POST /api/admin/schemas/:schemaId/entries` ya `PUT /api/admin/schemas/:schemaId/entries/:entryId`. Apiagex file ko `/uploads/{schemaSlug}/{fieldSlug}/...` me save karega aur media field me URL automatically store karega.
+
+Direct upload bhi available hai: `POST /api/admin/media` par `filename`, `contentType`, aur `contentBase64` bhejo; response me public `/uploads/...` URL milta hai. Schema ke `media`, `file`, ya `image` field me URL string save hota hai.
+
+Project template export/import schema ke media fields aur saved media URL strings ko preserve karta hai, lekin uploaded binary files ko JSON template me automatically bundle nahi karta. Fresh environment me wahi local uploads chahiye to asset files alag se move karni hongi.
 
 ### Example
 
@@ -177,11 +195,11 @@ List ke liye `GET /api/admin/schemas`, read ke liye `GET /api/admin/schemas/:id`
 
 ### English
 
-After owner login, `/adminui` shows a schema builder. Add schema name, slug, description, and one or more fields. The form can choose every MVP field type. Relation fields require selecting an existing schema.
+After owner login, `/adminui` shows a schema builder. Add schema name, slug, description, and one or more fields. The form can choose every current field type, including primitive validation types, option fields, upload fields, and relations. Relation fields require selecting an existing schema.
 
 ### Hinglish
 
-Owner login ke baad `/adminui` schema builder dikhata hai. Schema name, slug, description, aur ek ya jyada fields add karo. Form har MVP field type choose kar sakta hai. Relation fields ke liye existing schema select karna zaruri hai.
+Owner login ke baad `/adminui` schema builder dikhata hai. Schema name, slug, description, aur ek ya jyada fields add karo. Form har current field type choose kar sakta hai, including primitive validation, option fields, upload fields, aur relations. Relation fields ke liye existing schema select karna zaruri hai.
 
 ## Relation Rules
 
@@ -223,11 +241,11 @@ Entry create karne ke liye `POST /api/admin/schemas/:schemaId/entries` par `{ "d
 
 ### English
 
-After owner login, the Entry Manager reads schemas and renders a form from the selected schema fields. Text, long text, number, boolean, date, JSON, media, and relation fields are shown with matching inputs.
+After owner login, the Entry Manager reads schemas and renders a form from the selected schema fields. Primitive validation fields, option fields, JSON, media/file/image uploads, and relation fields are shown with matching inputs.
 
 ### Hinglish
 
-Owner login ke baad Entry Manager schemas read karta hai aur selected schema fields se form render karta hai. Text, long text, number, boolean, date, JSON, media, aur relation fields matching inputs ke saath dikhte hain.
+Owner login ke baad Entry Manager schemas read karta hai aur selected schema fields se form render karta hai. Primitive validation fields, option fields, JSON, media/file/image uploads, aur relation fields matching inputs ke saath dikhte hain.
 
 ## Dynamic Content APIs
 
@@ -470,7 +488,7 @@ Hinglish: Browser Use aur API requests ke full manual QA steps [qa-checklist.md]
 
 Apiagex MVP runs on one server with four paths: `/api`, `/adminui`, `/doc`, and `/readme`.
 The owner logs in first, creates schemas from Admin UI, adds fields, creates entries, and receives generated APIs under `/api/content/:schemaSlug`.
-Schema fields must support text, long text, number, boolean, date, JSON, media, and relation.
+Schema fields must support primitive validation fields, option fields, JSON, media/file/image uploads, and relation.
 Relations must point to an existing schema before the schema can be saved.
 The Admin UI must list every generated API, show docs/examples, create API roles, assign API permissions with checkboxes, create users, and assign one API role per user.
 Allowed users must access the API; blocked users must fail.
@@ -479,7 +497,7 @@ Allowed users must access the API; blocked users must fail.
 
 Apiagex MVP ek hi server par chalega jisme chaar path honge: `/api`, `/adminui`, `/doc`, aur `/readme`.
 Owner sabse pehle login karega, Admin UI se schema banayega, fields add karega, entries create karega, aur system `/api/content/:schemaSlug` par generated API dega.
-Schema fields me text, long text, number, boolean, date, JSON, media, aur relation support hona chahiye.
+Schema fields me primitive validation fields, option fields, JSON, media/file/image uploads, aur relation support hona chahiye.
 Relation field save hone se pehle existing schema ko point karna chahiye.
 Admin UI me har generated API ki list, docs/examples, role creation, checkbox based API permissions, user creation, aur user ko role assign karne ka flow hona chahiye.
 Allowed user API access kare; blocked user fail ho.

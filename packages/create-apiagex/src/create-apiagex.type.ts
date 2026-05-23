@@ -17,6 +17,7 @@ export type CliOptions = {
   initGit?: boolean;
   installDependencies?: boolean;
   language?: ProjectLanguage;
+  multiTenant?: boolean;
   ownerEmail?: string;
   ownerPassword?: string;
   packageManager?: PackageManager;
@@ -57,6 +58,7 @@ export type ScaffoldAnswers = {
   initGit: boolean;
   installDependencies: boolean;
   language: ProjectLanguage;
+  multiTenant: boolean;
   ownerEmail?: string;
   ownerPassword?: string;
   packageManager: PackageManager;

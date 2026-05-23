@@ -35,7 +35,12 @@ describe("Apiagex MCP server", () => {
       expect(health.ok).toBe(true);
 
       const createdSchema = parseToolText(await runTool("apiagex.create_schema", {
-        fields: [{ name: "Name", required: true, slug: "name", type: "text" }],
+        fields: [
+          { name: "Name", required: true, slug: "name", type: "text" },
+          { name: "Status", options: ["draft", "published"], slug: "status", type: "enum" },
+          { name: "Tags", options: ["new", "sale"], slug: "tags", type: "multiSelect" },
+          { name: "Support Email", slug: "support-email", type: "email" },
+        ],
         name: "Products",
         slug: "products",
       }));

@@ -50,6 +50,27 @@ describe("schema admin APIs", () => {
     expect(remove.json()).toEqual({ ok: true, deleted: true });
   });
 
+  it("creates enum schema fields with allowed options", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+
+    const response = await server.inject({
+      method: "POST",
+      url: "/api/admin/schemas",
+      payload: {
+        name: "Post",
+        slug: "post",
+        fields: [{ name: "Status", options: ["draft", "published"], slug: "status", type: "enum" }],
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().schema.fields[0]).toMatchObject({
+      options: ["draft", "published"],
+      slug: "status",
+      type: "enum",
+    });
+  });
+
   it("rejects invalid schema fields", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
 

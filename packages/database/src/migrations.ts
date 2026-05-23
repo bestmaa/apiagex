@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS fields (
   name TEXT NOT NULL,
   slug TEXT NOT NULL,
   type TEXT NOT NULL,
+  options_json TEXT,
   relation_schema_id TEXT REFERENCES schemas(id),
   relation_type TEXT,
   required INTEGER NOT NULL DEFAULT 0,

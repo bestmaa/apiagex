@@ -25,6 +25,40 @@ export {
 } from "./mysql-adapter.js";
 export type { MySqlAdapterOptions } from "./mysql-adapter.js";
 export {
+  openPlatformDatabase,
+  sqlitePathFromUrl,
+} from "./platform-database.js";
+export type { PlatformDatabaseConfig } from "./platform-database.js";
+export {
+  migratePlatformDatabase,
+  MYSQL_PLATFORM_FOUNDATION_SQL,
+  PLATFORM_MIGRATION_ID,
+  PLATFORM_TABLES,
+  platformFoundationSql,
+  POSTGRES_PLATFORM_FOUNDATION_SQL,
+  SQLITE_PLATFORM_FOUNDATION_SQL,
+} from "./platform-migrations.js";
+export type { PlatformTableName } from "./platform-migrations.js";
+export {
+  createTenant,
+  findTenant,
+  getTenantByDomain,
+  getTenantById,
+  getTenantBySlug,
+  listTenants,
+  listTenantAuditEvents,
+  recordTenantAuditEvent,
+  toSafeTenant,
+  updateTenant,
+} from "./tenant-repository.js";
+export {
+  assertTenantSecretEnvelope,
+  decryptTenantSecret,
+  encryptTenantSecret,
+  tenantSecretKeyFromBase64,
+} from "./tenant-secret.js";
+export type { TenantSecretKey } from "./tenant-secret.js";
+export {
   listMvpTables,
   migrateMvpDatabase,
   openSqliteDatabase,
@@ -292,5 +326,23 @@ export type {
   SingleRelationValue,
   UpdateSchemaInput,
 } from "./schema-repository.type.js";
+export {
+  TENANT_DATABASE_PROVIDERS,
+  TENANT_STATUSES,
+} from "./tenant-repository.type.js";
+export type {
+  CreateTenantInput,
+  ListTenantsOptions,
+  RecordTenantAuditEventInput,
+  TenantAuditEventRecord,
+  TenantDatabaseProvider,
+  TenantDomainRecord,
+  TenantEncryptedSecret,
+  TenantLookup,
+  TenantRecord,
+  TenantSafeRecord,
+  TenantStatus,
+  UpdateTenantInput,
+} from "./tenant-repository.type.js";
 export type { RelationErrorCode } from "./relation-errors.js";
 export type { SqliteDatabase } from "./sqlite.js";

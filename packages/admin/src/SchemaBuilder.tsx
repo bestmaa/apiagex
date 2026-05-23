@@ -11,8 +11,21 @@ const fieldTypes: FieldType[] = [
   "number",
   "boolean",
   "date",
+  "datetime",
+  "time",
+  "email",
+  "url",
+  "integer",
+  "decimal",
+  "currency",
+  "enum",
+  "multiSelect",
+  "password",
+  "richText",
   "json",
   "media",
+  "file",
+  "image",
   "relation",
 ];
 
@@ -129,6 +142,7 @@ export function SchemaBuilder() {
         slug: field.slug,
         type: field.type,
         required: field.required,
+        ...(field.options?.length ? { options: field.options } : {}),
         relationSchemaId: field.relationSchemaId ?? undefined,
         relationType: field.relationType ?? undefined,
       })),
@@ -341,6 +355,18 @@ function SchemaFieldRow(props: {
           ) : null}
         </div>
       ) : null}
+      {hasOptions(field.type) ? (
+        <label className="enum-options-field">Options
+          <textarea
+            onChange={(event) => onChange(index, { options: parseOptionsInput(event.target.value) })}
+            placeholder={"draft\npublished\narchived"}
+            required
+            rows={3}
+            value={(field.options ?? []).join("\n")}
+          />
+          <span className="helper-text">One option per line. Entries must use {field.type === "multiSelect" ? "one or more" : "one"} of these exact values.</span>
+        </label>
+      ) : null}
     </fieldset>
   );
 }
@@ -375,9 +401,28 @@ function RelationGuide({
 
 function fieldTypePatch(type: FieldType): Partial<SchemaFieldDraft> {
   if (type === "relation") {
-    return { relationSchemaId: "", relationType: "manyToOne", type };
+    return { options: undefined, relationSchemaId: "", relationType: "manyToOne", type };
   }
-  return { relationSchemaId: undefined, relationType: undefined, type };
+  if (hasOptions(type)) {
+    return { options: [], relationSchemaId: undefined, relationType: undefined, type };
+  }
+  return { options: undefined, relationSchemaId: undefined, relationType: undefined, type };
+}
+
+function hasOptions(type: FieldType): boolean {
+  return type === "enum" || type === "multiSelect";
+}
+
+function parseOptionsInput(value: string): string[] {
+  const seen = new Set<string>();
+  const options: string[] = [];
+  for (const option of value.split(/\r?\n|,/)) {
+    const trimmed = option.trim();
+    if (!trimmed || seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    options.push(trimmed);
+  }
+  return options;
 }
 
 function normalizeSlugInput(value: string): string {
@@ -412,6 +457,9 @@ function SchemaDetails({ schema }: { schema?: SchemaRecord }) {
                   <span className="field-badge field-badge-neutral">Target: {targetLabel(field)}</span>
                 </>
               ) : null}
+              {hasOptions(field.type) && field.options?.length ? (
+                <span className="field-badge field-badge-neutral">{field.options.length} options</span>
+              ) : null}
             </div>
           </article>
         ))}
@@ -421,7 +469,15 @@ function SchemaDetails({ schema }: { schema?: SchemaRecord }) {
 }
 
 function FieldTypeBadge({ type }: { type: FieldType }) {
-  const label = type === "longText" ? "Long text" : type === "json" ? "JSON" : type;
+  const label = type === "longText"
+    ? "Long text"
+    : type === "richText"
+      ? "Rich text"
+      : type === "multiSelect"
+        ? "Multi select"
+        : type === "json"
+          ? "JSON"
+          : type;
   return <span className={`field-badge field-badge-${type.toLowerCase()}`}>{label}</span>;
 }
 
@@ -437,7 +493,11 @@ function targetLabel(field: SchemaFieldDraft): string {
 }
 
 function cleanField(field: SchemaFieldDraft): SchemaFieldDraft {
-  return field.type === "relation"
-    ? { ...field, relationType: field.relationType ?? "manyToOne" }
-    : { ...field, relationSchemaId: undefined, relationType: undefined };
+  if (field.type === "relation") {
+    return { ...field, options: undefined, relationType: field.relationType ?? "manyToOne" };
+  }
+  if (hasOptions(field.type)) {
+    return { ...field, options: field.options ?? [], relationSchemaId: undefined, relationType: undefined };
+  }
+  return { ...field, options: undefined, relationSchemaId: undefined, relationType: undefined };
 }

@@ -1,5 +1,7 @@
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
+import { mkdirSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   migrateMvpDatabase,
   openMigratedSqliteAdapter,
@@ -36,24 +38,47 @@ import { registerAutomationTokenRoutes } from "./automation-token-routes.js";
 import { registerAiAutomationRoutes } from "./ai-automation-routes.js";
 import { registerAiPlanRoutes } from "./ai-plan-routes.js";
 import { registerProjectTemplateRoutes } from "./project-template-routes.js";
+import { registerMediaRoutes } from "./media-routes.js";
+import { buildTenantHealthDiagnostics } from "./tenant-health.js";
+import type { ApiagexTenantContext } from "./tenant-context.js";
+import { registerPlatformAdminAuthGuard } from "./platform-admin-auth.js";
+import { registerTenantContext } from "./tenant-context.js";
+import { registerTenantObservabilityHooks } from "./tenant-observability.js";
+import { createRequestScopedDatabase, currentUploadsPath, registerRequestRuntime } from "./request-runtime.js";
 
 export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const server = Fastify({ logger: false });
-  const database = resolveDatabase(options);
+  const rootDatabase = resolveDatabase(options);
+  const database = createRequestScopedDatabase(rootDatabase);
+  const uploadsPath = resolve(options.uploadsPath ?? ".apiagex/uploads");
+  mkdirSync(uploadsPath, { recursive: true });
   const realtimeBroker = createRealtimeBroker(database);
   realtimeBroker.attach(server);
   server.register(fastifyStatic, {
     prefix: "/adminui/",
     root: resolveAdminUiAsset().root,
   });
+  server.register(fastifyStatic, {
+    decorateReply: false,
+    prefix: "/uploads/",
+    root: uploadsPath,
+  });
+  if (options.multiTenant) registerTenantContext(server, options.multiTenant);
+  registerTenantObservabilityHooks(server, {
+    ...(options.tenantMetrics ? { metrics: options.tenantMetrics } : {}),
+    ...(options.tenantRateLimit ? { rateLimit: options.tenantRateLimit } : {}),
+  });
+  registerRequestRuntime(server, { database: rootDatabase, uploadsPath });
   if (options.adminAuth !== "disabled") registerAdminAuthGuard(server, database);
+  if (options.platformAdminToken) registerPlatformAdminAuthGuard(server, options.platformAdminToken);
   registerSchemaRoutes(server, database);
   const webhookOptions = options.webhookHttpClient ? { httpClient: options.webhookHttpClient } : {};
-  registerEntryRoutes(server, database, webhookOptions, realtimeBroker);
+  registerEntryRoutes(server, database, uploadsPath, webhookOptions, realtimeBroker);
   registerContentRoutes(server, database, webhookOptions, realtimeBroker);
   registerRoleRoutes(server, database);
   registerUserRoutes(server, database);
   registerSettingsRoutes(server, database);
+  registerMediaRoutes(server, uploadsPath);
   registerProjectTemplateRoutes(server, database);
   registerAutomationTokenRoutes(server, database, {
     ...(options.projectEnvPath === undefined ? {} : { projectEnvPath: options.projectEnvPath }),
@@ -73,7 +98,7 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   server.get("/api", async (): Promise<ApiRootResponse> => ({
     ok: true,
     service: "apiagex",
-    paths: ["/api", "/api/openapi.json", "/swagger", "/doc", "/readme", "/adminui"],
+    paths: ["/api", "/api/openapi.json", "/swagger", "/doc", "/readme", "/adminui", "/uploads"],
   }));
 
   server.get("/api/health", async (): Promise<HealthResponse> => ({
@@ -81,6 +106,18 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
     service: "apiagex",
     path: "/api/health",
   }));
+
+  server.get("/api/admin/health/tenant", async (request) => {
+    const tenantContext = (request as { apiagexTenant?: ApiagexTenantContext | null }).apiagexTenant;
+    return {
+      ok: true,
+      diagnostics: await buildTenantHealthDiagnostics({
+        database: tenantContext?.database ?? database,
+        tenant: tenantContext?.tenant ?? null,
+        uploadsPath: tenantContext?.uploadsPath ?? currentUploadsPath(uploadsPath),
+      }),
+    };
+  });
 
   server.get("/favicon.ico", async (_request, reply) => reply.code(204).send());
 

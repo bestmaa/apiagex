@@ -21,7 +21,10 @@ Hinglish: AI pehle plan banayega, phir preview/apply hoga. Raw secret plan me ka
         "slug": "products",
         "fields": [
           { "name": "Name", "slug": "name", "type": "text", "required": true },
-          { "name": "Price", "slug": "price", "type": "number" }
+          { "name": "Price", "slug": "price", "type": "currency" },
+          { "name": "Status", "slug": "status", "type": "enum", "options": ["draft", "published"] },
+          { "name": "Tags", "slug": "tags", "type": "multiSelect", "options": ["new", "featured"] },
+          { "name": "Hero", "slug": "hero", "type": "image" }
         ]
       }
     }
@@ -44,6 +47,12 @@ Hinglish: AI pehle plan banayega, phir preview/apply hoga. Raw secret plan me ka
 - `createWorkflowApi`: create a workflow-backed route under `/api/custom`.
 - `setPermission`: allow or block one route for one API role.
 - `seedData`: optional sample entries for a schema.
+
+## Schema Field Types
+
+AI schema plans can use `text`, `longText`, `richText`, `password`, `email`, `url`, `number`, `integer`, `decimal`, `currency`, `boolean`, `date`, `datetime`, `time`, `enum`, `multiSelect`, `json`, `media`, `file`, `image`, and `relation`.
+
+Use `options` for `enum` and `multiSelect`. Use `image` when uploaded files must be images only; use `file` or `media` when PDFs are acceptable.
 
 ## Safety Rules
 

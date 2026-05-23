@@ -30,6 +30,7 @@ export async function resolveAnswers(options: CliOptions, io: RunCliOptions = {}
   const port = options.port ?? await setupAnswer(prompt, canAsk, setupMode, "Server port", "4000");
   const appSecret = options.appSecret ?? generateSecret();
   const packageManager = options.packageManager ?? await choiceAnswer(prompt, canAsk, "Package manager", "npm", ["npm", "pnpm", "yarn"]);
+  const multiTenant = await boolAnswer(prompt, canAsk, "Enable multi-tenant starter config?", options.multiTenant, false);
   const bootstrapOwner = await boolAnswer(prompt, canAsk, "Create first owner during first server start?", options.bootstrapOwner, false);
   const ownerEmail = bootstrapOwner
     ? options.ownerEmail ?? await setupAnswer(prompt, canAsk, setupMode, "Owner email", "owner@apiagex.local")
@@ -47,6 +48,7 @@ export async function resolveAnswers(options: CliOptions, io: RunCliOptions = {}
     initGit: await boolAnswer(prompt, canAsk, "Initialize git repository?", options.initGit, true),
     installDependencies: await boolAnswer(prompt, canAsk, "Install dependencies after scaffold?", options.installDependencies, false),
     language,
+    multiTenant,
     ...(ownerEmail === undefined ? {} : { ownerEmail }),
     ...(ownerPassword === undefined ? {} : { ownerPassword }),
     packageManager,

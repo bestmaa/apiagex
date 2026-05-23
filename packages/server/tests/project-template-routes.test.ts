@@ -18,7 +18,7 @@ describe("project template admin APIs", () => {
     const sourceDb = await openMigratedSqliteAdapter();
     const source = createServer({ adminAuth: "disabled", database: sourceDb });
     const schema = await createSchema(sourceDb, {
-      fields: [{ name: "Title", required: true, slug: "title", type: "text" }],
+      fields: [{ name: "Status", options: ["draft", "published"], required: true, slug: "status", type: "enum" }],
       name: "Products",
       slug: "products",
     });
@@ -51,6 +51,7 @@ describe("project template admin APIs", () => {
     const exported = await source.inject({ method: "GET", url: "/api/admin/project-template" });
     expect(exported.statusCode).toBe(200);
     expect(exported.json().template.tables.schemas).toHaveLength(1);
+    expect(exported.json().template.tables.fields[0].options_json).toBe("[\"draft\",\"published\"]");
     expect(exported.json().template.tables.roles).toEqual([
       expect.objectContaining({ name: "store-admin" }),
     ]);
@@ -65,7 +66,7 @@ describe("project template admin APIs", () => {
 
     expect(imported.statusCode).toBe(200);
     expect(imported.json().imported.schemas).toBe(1);
-    expect((await listSchemas(targetDb)).map((item) => item.slug)).toEqual(["products"]);
+    expect((await listSchemas(targetDb))[0]?.fields[0]?.options).toEqual(["draft", "published"]);
     expect((await listRoles(targetDb)).map((item) => item.name)).toEqual(["store-admin"]);
     expect(await listRolePermissions(targetDb, role.id)).toEqual([
       expect.objectContaining({ action: "manage", allowed: true, schemaId: schema.id }),

@@ -64,6 +64,7 @@ const standaloneRoutes: AdminRoute[] = [
   "entries",
   "apis",
   "users",
+  "platform",
   "settings",
   "docs",
   "docs/webhooks",

@@ -14,7 +14,13 @@ export function isEntryPickerRelationField(field: SchemaFieldDraft): boolean {
 }
 
 export function isWideEntryField(field: SchemaFieldDraft): boolean {
-  return field.type === "longText" || field.type === "json" || field.type === "relation" || field.type === "media";
+  return (
+    field.type === "longText" ||
+    field.type === "richText" ||
+    field.type === "json" ||
+    field.type === "relation" ||
+    isUploadField(field)
+  );
 }
 
 export function relationKindLabel(field: SchemaFieldDraft): string {
@@ -79,6 +85,7 @@ export function readEntryData(
   form: FormData,
   fields: SchemaFieldDraft[],
   setStatus: (status: string) => void,
+  mediaUploadSlugs = new Set<string>(),
 ): EntryData | null {
   const data: EntryData = {};
   try {
@@ -89,9 +96,17 @@ export function readEntryData(
         if (values.length > 0 || field.required) data[field.slug] = values;
         continue;
       }
+      if (field.type === "multiSelect") {
+        const values = form.getAll(field.slug).map(String).filter(Boolean);
+        if (field.required && values.length === 0) return requiredField(field.slug, setStatus);
+        if (values.length > 0 || field.required) data[field.slug] = values;
+        continue;
+      }
       const raw = form.get(field.slug);
       if (field.type === "boolean") {
         data[field.slug] = raw === "on";
+      } else if (isUploadField(field) && mediaUploadSlugs.has(field.slug)) {
+        continue;
       } else if (field.required && (raw === null || raw === "")) {
         return requiredField(field.slug, setStatus);
       } else if (raw !== null && raw !== "") {
@@ -111,9 +126,13 @@ function requiredField(slug: string, setStatus: (status: string) => void): null 
 }
 
 function parseFieldValue(field: SchemaFieldDraft, raw: string): unknown {
-  if (field.type === "number") return Number(raw);
+  if (field.type === "number" || field.type === "integer" || field.type === "decimal" || field.type === "currency") return Number(raw);
   if (field.type === "json") return JSON.parse(raw);
   return raw;
+}
+
+export function isUploadField(field: SchemaFieldDraft): boolean {
+  return field.type === "media" || field.type === "file" || field.type === "image";
 }
 
 function isLabelValue(value: unknown): value is string | number {

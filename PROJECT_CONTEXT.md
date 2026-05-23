@@ -148,7 +148,7 @@ One server must serve exactly these primary paths:
 1. First-time owner bootstrap/login.
 2. Owner opens Admin UI.
 3. Owner creates a schema/API from a form.
-4. Schema supports text, long text, number, boolean, date, JSON, media, and relation fields.
+4. Schema supports primitive validation fields, option fields, JSON, media/file/image uploads, and relation fields.
 5. Relation design must be safe because generated APIs and UI depend on it.
 6. Created schema becomes a dynamic API.
 7. Admin UI lists all dynamic APIs.
@@ -188,7 +188,7 @@ One server must serve exactly these primary paths:
 ### Schema Builder
 
 - A schema is an API definition with name, slug, description, and fields.
-- Field types: text, long text, number, boolean, date, JSON, media, relation.
+- Field types: text, long text, rich text, password, email, URL, number, integer, decimal, currency, boolean, date, datetime, time, enum/select, multiSelect, JSON, media, file, image, relation.
 - Slugs must be unique and URL safe.
 - Relation fields reference another schema by stable schema id/slug.
 - Relations must validate target schema existence before save.

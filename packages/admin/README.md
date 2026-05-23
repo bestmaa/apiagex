@@ -16,11 +16,11 @@ The form also syncs content fields through `/api/content-types/:id/fields`.
 
 The UI also has a field-driven entries panel that loads collections from the attached left submenu and saves entries through `/api/content-types/:id/entries`.
 
-Entry widgets adapt to field types like text, number, date, boolean, rich text, and repeatable values.
+Entry widgets adapt to schema field types like text, long text, rich text, password, email, URL, number, integer, decimal, currency, date, datetime, time, boolean, enum, multiSelect, JSON, media, file, image, and relations.
 
 Relation fields can target another content type and store related entry IDs in the entries panel.
 
-The UI also includes a media library panel that uploads files through `/api/media-files` and makes uploaded file IDs available to media fields.
+Entry media controls can upload files through the schema entry save flow. `media` and `file` accept images/PDFs, while `image` accepts image files only; saved values remain `/uploads/...` URL strings.
 
 The UI also includes an admin-only audit log viewer backed by `/api/audit-logs`.
 
@@ -88,11 +88,11 @@ Form content fields ko bhi `/api/content-types/:id/fields` ke through sync karta
 
 UI me field-driven entries panel bhi hai jo attached left submenu se collections load karta hai aur `/api/content-types/:id/entries` ke through entries save karta hai.
 
-Entry widgets text, number, date, boolean, rich text, aur repeatable values ke hisaab se adapt hote hain.
+Entry widgets text, long text, rich text, password, email, URL, number, integer, decimal, currency, date, datetime, time, boolean, enum, multiSelect, JSON, media, file, image, aur relations ke hisaab se adapt hote hain.
 
 Relation fields doosre content type ko target kar sakte hain aur entries panel me related entry IDs store karte hain.
 
-UI me media library panel bhi hai jo `/api/media-files` ke through files upload karta hai aur media fields ke liye uploaded file IDs available karta hai.
+Entry media controls schema entry save flow ke through files upload kar sakte hain. `media` aur `file` images/PDFs accept karte hain, aur `image` sirf image files accept karta hai; saved values `/uploads/...` URL strings rehte hain.
 
 UI me admin-only audit log viewer bhi hai jo `/api/audit-logs` se data leta hai.
 

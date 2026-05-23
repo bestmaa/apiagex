@@ -107,6 +107,7 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
             { name: "Admin Auth", description: "Owner setup, login, and session checks for the control plane." },
             { name: "Admin Schemas", description: "Control-plane schema builder APIs." },
             { name: "Admin Entries", description: "Control-plane content entry management APIs." },
+            { name: "Admin Media", description: "Central media upload APIs." },
             { name: "Admin Roles", description: "Control-plane roles, content roles, permissions, and tokens." },
             { name: "Admin Users", description: "Content API users and control admin users." },
             { name: "Admin Settings", description: "Control-plane settings including Swagger/OpenAPI visibility." },
@@ -438,6 +439,16 @@ function adminPaths(): Record<string, OpenApiSchema> {
         summary: "Delete one admin entry",
         security: adminSecurity(),
         responses: okResponse({ $ref: "#/components/schemas/DeleteResponse" }),
+      },
+    },
+    "/api/admin/media": {
+      post: {
+        tags: ["Admin Media"],
+        summary: "Upload one media file",
+        description: "Uploads a base64 file into the central uploads folder and returns a public /uploads URL.",
+        security: adminSecurity(),
+        requestBody: requestBody("MediaUploadRequest"),
+        responses: okResponse({ $ref: "#/components/schemas/MediaUploadResponse" }),
       },
     },
     "/api/admin/roles": adminCollectionPath("Admin Roles", "content API role", "RoleDraft", "RoleListResponse", "RoleMutationResponse"),
@@ -776,7 +787,33 @@ function adminSchemaComponents(): Record<string, OpenApiSchema> {
       properties: {
         name: { type: "string", example: "Title" },
         slug: { type: "string", example: "title" },
-        type: { type: "string", enum: ["text", "number", "boolean", "date", "json", "media", "relation"] },
+        type: {
+          type: "string",
+          enum: [
+            "text",
+            "longText",
+            "number",
+            "boolean",
+            "date",
+            "datetime",
+            "time",
+            "email",
+            "url",
+            "integer",
+            "decimal",
+            "currency",
+            "enum",
+            "multiSelect",
+            "password",
+            "richText",
+            "json",
+            "media",
+            "file",
+            "image",
+            "relation",
+          ],
+        },
+        options: { type: "array", items: { type: "string" }, description: "Allowed values for enum and multiSelect fields." },
         required: { type: "boolean", example: false },
         relationSchemaId: { type: "string", nullable: true },
         relationType: { type: "string", enum: ["oneToOne", "oneToMany", "manyToOne", "manyToMany"], nullable: true },
@@ -814,7 +851,14 @@ function adminSchemaComponents(): Record<string, OpenApiSchema> {
     },
     AdminEntryMutationRequest: {
       type: "object",
-      properties: { data: { type: "object", additionalProperties: true } },
+      properties: {
+        data: { type: "object", additionalProperties: true },
+        mediaUploads: {
+          type: "object",
+          additionalProperties: { $ref: "#/components/schemas/MediaUploadRequest" },
+          description: "Optional schema-scoped media uploads keyed by media field slug. Uploaded URLs are saved into data automatically.",
+        },
+      },
       required: ["data"],
     },
     AdminEntryListResponse: {
@@ -835,6 +879,33 @@ function adminSchemaComponents(): Record<string, OpenApiSchema> {
         entry: { type: "object" },
       },
       required: ["ok", "entry"],
+    },
+    MediaUploadRequest: {
+      type: "object",
+      properties: {
+        contentBase64: { type: "string", description: "Base64 file bytes. Data URLs are also accepted." },
+        contentType: { type: "string", enum: ["application/pdf", "image/gif", "image/jpeg", "image/png", "image/webp"] },
+        filename: { type: "string", example: "hero.png" },
+      },
+      required: ["contentBase64", "contentType", "filename"],
+    },
+    MediaUploadResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        media: {
+          type: "object",
+          properties: {
+            contentType: { type: "string" },
+            filename: { type: "string" },
+            id: { type: "string" },
+            size: { type: "integer" },
+            url: { type: "string", example: "/uploads/asset.png" },
+          },
+          required: ["contentType", "filename", "id", "size", "url"],
+        },
+      },
+      required: ["ok", "media"],
     },
     RoleDraft: {
       type: "object",
@@ -987,10 +1058,21 @@ function entryDataSchema(fields: FieldRecord[]): OpenApiSchema {
 function fieldSchema(field: FieldRecord): OpenApiSchema {
   const description = `${field.name}${field.required ? " (required)" : ""}`;
   if (field.type === "number") return { type: "number", description };
+  if (field.type === "integer") return { type: "integer", description };
+  if (field.type === "decimal" || field.type === "currency") return { type: "number", description };
   if (field.type === "boolean") return { type: "boolean", description };
   if (field.type === "date") return { type: "string", format: "date", description };
+  if (field.type === "datetime") return { type: "string", format: "date-time", description };
+  if (field.type === "time") return { type: "string", pattern: "^([01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?$", description };
+  if (field.type === "email") return { type: "string", format: "email", description };
+  if (field.type === "url") return { type: "string", format: "uri", description };
+  if (field.type === "password") return { type: "string", format: "password", description };
+  if (field.type === "enum") return { type: "string", enum: field.options, description };
+  if (field.type === "multiSelect") return { type: "array", items: { type: "string", enum: field.options }, description };
   if (field.type === "json") return { description, nullable: !field.required };
-  if (field.type === "media") return { type: "string", description, example: "/uploads/example.png" };
+  if (field.type === "media" || field.type === "file" || field.type === "image") {
+    return { type: "string", description, example: "/uploads/example.png" };
+  }
   if (field.type === "relation") {
     const multi = field.relationType === "oneToMany" || field.relationType === "manyToMany";
     return multi

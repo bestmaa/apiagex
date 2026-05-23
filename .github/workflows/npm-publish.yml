@@ -24,7 +24,7 @@ on:
         type: boolean
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 concurrency:
@@ -76,7 +76,7 @@ jobs:
         shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_TAG: ${{ inputs.tag || 'latest' }}
+          NPM_TAG: ${{ inputs.tag || (contains(github.ref_name, 'beta') && 'beta' || 'latest') }}
           DRY_RUN: ${{ !startsWith(github.ref, 'refs/tags/npm-v') && (github.event_name != 'workflow_dispatch' || inputs.dry_run) }}
         run: |
           set -euo pipefail
@@ -88,3 +88,25 @@ jobs:
           npm publish -w @apiagex/database "${publish_flags[@]}"
           npm publish -w @apiagex/server "${publish_flags[@]}"
           npm publish -w create-apiagex "${publish_flags[@]}"
+
+      - name: Create GitHub release
+        if: ${{ startsWith(github.ref, 'refs/tags/npm-v') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_notes="docs/release-${GITHUB_REF_NAME#npm-v}.md"
+          release_flags=()
+          if [[ "$GITHUB_REF_NAME" == *beta* ]]; then
+            release_flags+=(--prerelease)
+            release_notes="docs/release-${GITHUB_REF_NAME#npm-v}"
+            release_notes="${release_notes%-beta}.md"
+          fi
+          if [ ! -f "$release_notes" ]; then
+            release_notes="docs/release-0.9.12.md"
+          fi
+          gh release create "$GITHUB_REF_NAME" \
+            --title "Apiagex ${GITHUB_REF_NAME#npm-v}" \
+            --notes-file "$release_notes" \
+            "${release_flags[@]}"

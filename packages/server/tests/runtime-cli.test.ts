@@ -115,6 +115,17 @@ describe("apiagex runtime CLI", () => {
     expect(result.stdout).toContain("does not need a project build");
   });
 
+  it("prints tenant provision and migration command guidance", async () => {
+    const tenant = await runRuntimeCli(["tenant"]);
+    const provision = await runRuntimeCli(["tenant", "provision"]);
+    const migrate = await runRuntimeCli(["tenant", "migrate"]);
+
+    expect(tenant.code).toBe(0);
+    expect(tenant.stdout).toContain("apiagex tenant provision");
+    expect(provision.stdout).toContain("--provider sqlite|postgres|mysql");
+    expect(migrate.stdout).toContain("--dry-run");
+  });
+
   it("generates TypeScript schema helpers from the runtime database", async () => {
     const root = await mkdtemp(join(tmpdir(), "apiagex-runtime-types-"));
     await mkdir(join(root, "data"));

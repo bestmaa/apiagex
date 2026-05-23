@@ -98,14 +98,29 @@ async function validateFieldValue(
   value: unknown,
   currentEntryId?: string,
 ): Promise<void> {
-  if (field.type === "text" || field.type === "longText" || field.type === "media") {
+  if (isStringField(field.type)) {
     assertType(field, typeof value === "string");
-  } else if (field.type === "number") {
+  } else if (field.type === "email") {
+    assertType(field, typeof value === "string" && isEmail(value));
+  } else if (field.type === "url") {
+    assertType(field, typeof value === "string" && isHttpUrl(value));
+  } else if (field.type === "number" || field.type === "decimal" || field.type === "currency") {
     assertType(field, typeof value === "number" && Number.isFinite(value));
+  } else if (field.type === "integer") {
+    assertType(field, typeof value === "number" && Number.isInteger(value));
   } else if (field.type === "boolean") {
     assertType(field, typeof value === "boolean");
   } else if (field.type === "date") {
     assertType(field, typeof value === "string" && !Number.isNaN(Date.parse(value)));
+  } else if (field.type === "datetime") {
+    assertType(field, typeof value === "string" && isDateTime(value));
+  } else if (field.type === "time") {
+    assertType(field, typeof value === "string" && isTime(value));
+  } else if (field.type === "enum") {
+    assertType(field, typeof value === "string" && field.options.includes(value));
+  } else if (field.type === "multiSelect") {
+    if (field.required && Array.isArray(value) && value.length === 0) throw new Error(`ENTRY_FIELD_REQUIRED:${field.slug}`);
+    assertType(field, Array.isArray(value) && value.every((item) => typeof item === "string" && field.options.includes(item)));
   } else if (field.type === "relation") {
     await assertRelation(db, schema, field, value, currentEntryId);
   }
@@ -145,9 +160,13 @@ async function assertMultiRelation(db: ApiagexDatabase, field: FieldRecord, valu
 function normalizeEntryData(schema: SchemaRecord, data: EntryData): EntryData {
   const normalized: EntryData = { ...data };
   for (const field of schema.fields) {
-    if (field.type !== "relation") continue;
     const value = normalized[field.slug];
     if (isMissing(value)) continue;
+    if (field.type === "multiSelect") {
+      normalized[field.slug] = Array.isArray(value) ? [...new Set(value)] : value;
+      continue;
+    }
+    if (field.type !== "relation") continue;
     const relationType = relationTypeOf(field);
     if (relationType === "oneToMany" || relationType === "manyToMany") {
       normalized[field.slug] = Array.isArray(value) ? [...new Set(value)] : value;
@@ -173,6 +192,39 @@ async function assertOneToOneAvailable(
 
 function assertType(field: FieldRecord, valid: boolean): void {
   if (!valid) throw new Error(`ENTRY_FIELD_TYPE_INVALID:${field.slug}`);
+}
+
+function isStringField(type: FieldRecord["type"]): boolean {
+  return [
+    "file",
+    "image",
+    "longText",
+    "media",
+    "password",
+    "richText",
+    "text",
+  ].includes(type);
+}
+
+function isEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function isHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function isDateTime(value: string): boolean {
+  return value.includes("T") && !Number.isNaN(Date.parse(value));
+}
+
+function isTime(value: string): boolean {
+  return /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/.test(value);
 }
 
 function isMissing(value: unknown): boolean {

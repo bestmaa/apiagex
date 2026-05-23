@@ -19,6 +19,7 @@ describe("provider migration SQL", () => {
     expect(sql).toContain("sequence BIGSERIAL PRIMARY KEY");
     expect(sql).toContain("is_owner INTEGER NOT NULL DEFAULT 0");
     expect(sql).toContain("REFERENCES schemas(id) ON DELETE CASCADE");
+    expect(sql).toContain("options_json TEXT");
     expect(sql).toContain("CREATE TABLE IF NOT EXISTS workflows");
     expect(sql).toContain("definition_json TEXT NOT NULL");
     expect(sql).toContain("created_by_email TEXT");
@@ -32,6 +33,7 @@ describe("provider migration SQL", () => {
     expect(sql).toContain("sequence BIGINT AUTO_INCREMENT PRIMARY KEY");
     expect(sql).toContain("active TINYINT(1) NOT NULL DEFAULT 1");
     expect(sql).toContain("payload_json LONGTEXT NOT NULL");
+    expect(sql).toContain("options_json LONGTEXT");
     expect(sql).toContain("CREATE TABLE IF NOT EXISTS workflows");
     expect(sql).toContain("definition_json LONGTEXT NOT NULL");
     expect(sql).toContain("created_by_email VARCHAR(191)");

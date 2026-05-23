@@ -25,6 +25,102 @@ describe("schema repository", () => {
     expect(await listSchemas(db)).toHaveLength(1);
   });
 
+  it("validates enum field options and entry values", async () => {
+    const db = openMigratedSqliteAdapter();
+    const schema = await createSchema(db, {
+      name: "Post",
+      slug: "post",
+      fields: [
+        { name: "Status", options: ["draft", "published"], slug: "status", type: "enum", required: true },
+      ],
+    });
+
+    expect(schema.fields[0]?.options).toEqual(["draft", "published"]);
+    await expect(createEntry(db, { schemaId: schema.id, data: { status: "draft" } })).resolves.toMatchObject({
+      data: { status: "draft" },
+    });
+    await expect(createEntry(db, { schemaId: schema.id, data: { status: "archived" } }))
+      .rejects.toThrow("ENTRY_FIELD_TYPE_INVALID:status");
+  });
+
+  it("validates primitive field type values", async () => {
+    const db = openMigratedSqliteAdapter();
+    const schema = await createSchema(db, {
+      name: "Profile",
+      slug: "profile",
+      fields: [
+        { name: "Email", slug: "email", type: "email", required: true },
+        { name: "Website", slug: "website", type: "url" },
+        { name: "Age", slug: "age", type: "integer" },
+        { name: "Price", slug: "price", type: "decimal" },
+        { name: "Amount", slug: "amount", type: "currency" },
+        { name: "Starts", slug: "starts", type: "datetime" },
+        { name: "Opens", slug: "opens", type: "time" },
+        { name: "Secret", slug: "secret", type: "password" },
+        { name: "Body", slug: "body", type: "richText" },
+      ],
+    });
+
+    await expect(createEntry(db, {
+      schemaId: schema.id,
+      data: {
+        amount: 120.5,
+        age: 3,
+        body: "<p>Hello</p>",
+        email: "user@example.com",
+        opens: "09:30",
+        price: 19.99,
+        secret: "hidden",
+        starts: "2026-05-23T10:30",
+        website: "https://example.com",
+      },
+    })).resolves.toMatchObject({ data: { email: "user@example.com", age: 3 } });
+    await expect(createEntry(db, { schemaId: schema.id, data: { email: "bad", age: 1.5 } }))
+      .rejects.toThrow("ENTRY_FIELD_TYPE_INVALID:email");
+    await expect(createEntry(db, { schemaId: schema.id, data: { email: "user@example.com", age: 1.5 } }))
+      .rejects.toThrow("ENTRY_FIELD_TYPE_INVALID:age");
+  });
+
+  it("validates multiSelect options and entry values", async () => {
+    const db = openMigratedSqliteAdapter();
+    const schema = await createSchema(db, {
+      name: "Product",
+      slug: "product",
+      fields: [
+        { name: "Tags", options: ["new", "sale", "featured"], slug: "tags", type: "multiSelect", required: true },
+      ],
+    });
+
+    await expect(createEntry(db, { schemaId: schema.id, data: { tags: ["new", "sale", "new"] } }))
+      .resolves.toMatchObject({ data: { tags: ["new", "sale"] } });
+    await expect(createEntry(db, { schemaId: schema.id, data: { tags: ["missing"] } }))
+      .rejects.toThrow("ENTRY_FIELD_TYPE_INVALID:tags");
+    await expect(createEntry(db, { schemaId: schema.id, data: { tags: [] } }))
+      .rejects.toThrow("ENTRY_FIELD_REQUIRED:tags");
+  });
+
+  it("requires options only on enum fields", async () => {
+    const db = openMigratedSqliteAdapter();
+
+    await expect(createSchema(db, {
+      name: "Post",
+      slug: "post",
+      fields: [{ name: "Status", slug: "status", type: "enum" }],
+    })).rejects.toThrow("FIELD_ENUM_OPTIONS_REQUIRED");
+
+    await expect(createSchema(db, {
+      name: "Product",
+      slug: "product",
+      fields: [{ name: "Tags", slug: "tags", type: "multiSelect" }],
+    })).rejects.toThrow("FIELD_ENUM_OPTIONS_REQUIRED");
+
+    await expect(createSchema(db, {
+      name: "Article",
+      slug: "article",
+      fields: [{ name: "Title", options: ["draft"], slug: "title", type: "text" }],
+    })).rejects.toThrow("FIELD_OPTIONS_FOR_NON_ENUM_FIELD");
+  });
+
   it("allows relation fields to existing schemas", async () => {
     const db = openMigratedSqliteAdapter();
     const author = await createSchema(db, {

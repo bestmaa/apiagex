@@ -17,7 +17,30 @@ import type {
 } from "./schema-repository.type.js";
 
 const slugPattern = /^[a-z][a-z0-9-]*$/;
-const fieldTypes: FieldType[] = ["text", "longText", "number", "boolean", "date", "json", "media", "relation"];
+const fieldTypes: FieldType[] = [
+  "text",
+  "longText",
+  "number",
+  "boolean",
+  "date",
+  "datetime",
+  "time",
+  "email",
+  "url",
+  "integer",
+  "decimal",
+  "currency",
+  "enum",
+  "multiSelect",
+  "password",
+  "richText",
+  "json",
+  "media",
+  "file",
+  "image",
+  "relation",
+];
+const optionFieldTypes = new Set<FieldType>(["enum", "multiSelect"]);
 const relationTypes: RelationType[] = ["oneToOne", "oneToMany", "manyToOne", "manyToMany"];
 
 export async function createSchema(db: ApiagexDatabase, input: CreateSchemaInput): Promise<SchemaRecord> {
@@ -124,13 +147,14 @@ async function insertField(
   position: number,
 ): Promise<void> {
   await db.prepare(
-    "INSERT INTO fields (id, schema_id, name, slug, type, relation_schema_id, relation_type, required, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO fields (id, schema_id, name, slug, type, options_json, relation_schema_id, relation_type, required, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
   ).run(
     randomUUID(),
     schemaId,
     field.name,
     field.slug,
     field.type,
+    JSON.stringify(normalizeFieldOptions(field)),
     field.relationSchemaId ?? null,
     field.relationType ?? null,
     field.required ? 1 : 0,
@@ -141,10 +165,14 @@ async function insertField(
 async function listFields(db: ApiagexDatabase, schemaId: string): Promise<FieldRecord[]> {
   const rows = await db
     .prepare(
-      "SELECT id, schema_id as schemaId, name, slug, type, relation_schema_id as relationSchemaId, relation_type as relationType, required, position FROM fields WHERE schema_id = ? ORDER BY position ASC",
+      "SELECT id, schema_id as schemaId, name, slug, type, options_json as optionsJson, relation_schema_id as relationSchemaId, relation_type as relationType, required, position FROM fields WHERE schema_id = ? ORDER BY position ASC",
     )
-    .all<Omit<FieldRecord, "required"> & { required: number }>(schemaId);
-  return rows.map((row) => ({ ...row, required: Boolean(row.required) }));
+    .all<Omit<FieldRecord, "options" | "required"> & { optionsJson?: string | null; required: number }>(schemaId);
+  return rows.map(({ optionsJson, ...row }) => ({
+    ...row,
+    options: parseFieldOptions(optionsJson),
+    required: Boolean(row.required),
+  }));
 }
 
 async function validateSchemaInput(db: ApiagexDatabase, input: CreateSchemaInput): Promise<void> {
@@ -154,6 +182,7 @@ async function validateSchemaInput(db: ApiagexDatabase, input: CreateSchemaInput
     validateSlug(field.slug, "FIELD_SLUG_INVALID");
     if (!fieldTypes.includes(field.type)) throw new Error("FIELD_TYPE_INVALID");
     await validateRelationMetadata(db, field);
+    validateFieldOptions(field);
   }
 }
 
@@ -165,6 +194,38 @@ async function validateRelationMetadata(db: ApiagexDatabase, field: CreateFieldI
   if (!field.relationSchemaId) throw new Error(relationErrors.targetRequired);
   if (!(await getSchemaById(db, field.relationSchemaId))) throw new Error(relationErrors.targetMissing);
   if (field.relationType && !relationTypes.includes(field.relationType)) throw new Error(relationErrors.typeInvalid);
+}
+
+function validateFieldOptions(field: CreateFieldInput): void {
+  const options = normalizeFieldOptions(field);
+  if (optionFieldTypes.has(field.type)) {
+    if (options.length === 0) throw new Error("FIELD_ENUM_OPTIONS_REQUIRED");
+    return;
+  }
+  if (options.length > 0) throw new Error("FIELD_OPTIONS_FOR_NON_ENUM_FIELD");
+}
+
+function normalizeFieldOptions(field: CreateFieldInput): string[] {
+  if (!Array.isArray(field.options)) return [];
+  const seen = new Set<string>();
+  const options: string[] = [];
+  for (const option of field.options) {
+    const value = typeof option === "string" ? option.trim() : "";
+    if (!value || seen.has(value)) continue;
+    seen.add(value);
+    options.push(value);
+  }
+  return options;
+}
+
+function parseFieldOptions(value: string | null | undefined): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
+  } catch {
+    return [];
+  }
 }
 
 function validateSlug(slug: string, error: string): void {

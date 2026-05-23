@@ -17,6 +17,14 @@ export type EntryFieldValue =
 
 export type EntryData = Record<string, EntryFieldValue | undefined>;
 
+export type EntryMediaUpload = {
+  contentBase64: string;
+  contentType: string;
+  filename: string;
+};
+
+export type EntryMediaUploads = Record<string, EntryMediaUpload>;
+
 export type EntryRecord = {
   id: string;
   schemaId: string;

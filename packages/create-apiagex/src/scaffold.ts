@@ -32,6 +32,7 @@ export function createScaffoldFiles(answers: ScaffoldAnswers): ScaffoldFile[] {
           project: {
             appSecretEnv: "APIAGEX_SECRET",
             language: answers.language,
+            multiTenant: answers.multiTenant,
             packageManager: answers.packageManager,
             setupMode: answers.setupMode,
           },
@@ -81,6 +82,7 @@ export function renderPlan(projectName: string, targetDir: string, files: Scaffo
     `- Server: http://${answers.host}:${answers.port}`,
     `- Language: ${languageLabel(answers.language)}`,
     `- Package manager: ${answers.packageManager}`,
+    `- Multi-tenant starter: ${answers.multiTenant ? "yes" : "no"}`,
     `- Install dependencies: ${answers.installDependencies ? "yes" : "no"}`,
     `- Initialize git: ${answers.initGit ? "yes" : "no"}`,
     `- Owner setup: ${answers.bootstrapOwner ? "create from .env on first start" : "create from Admin UI"}`,
@@ -117,6 +119,7 @@ ${runCommand(answers.packageManager, "dev")}
 Open http://127.0.0.1:4000/adminui to create the first owner. Open /doc for API docs and /readme for the readable project summary.
 If .env contains APIAGEX_OWNER_EMAIL and APIAGEX_OWNER_PASSWORD, the first owner is created automatically on first server start. Remove APIAGEX_OWNER_PASSWORD from .env after the first successful start.
 AI assistants should read .apiagex/codex.md before creating schemas, workflows, permissions, or frontend API clients.
+${multiTenantReadmeSection(answers)}
 
 ## Scripts
 
@@ -300,6 +303,7 @@ function codexContextFile(answers: ScaffoldAnswers): string {
   return `# Apiagex Codex Context
 
 This project uses Apiagex as the backend.
+${answers.multiTenant ? "\nMulti-tenant starter config is enabled. Resolve the tenant by host or path prefix before creating schemas, workflows, roles, or content.\n" : ""}
 
 ## Connection
 
@@ -363,6 +367,30 @@ Read .apiagex/codex.md and use the Apiagex MCP tools to create the schemas, work
 `;
 }
 
+function multiTenantReadmeSection(answers: ScaffoldAnswers): string {
+  if (!answers.multiTenant) return "";
+  const localTenantUrl = `http://restaurant-one.localhost:${answers.port}/adminui`;
+  return `
+
+## Multi-Tenant Starter
+
+English: This starter is configured for one platform database plus one isolated tenant database/uploads folder per customer. Keep tenant database URLs and tenant secret key in env/secrets only.
+
+Hinglish: Is starter me ek platform database hota hai, aur har customer/restaurant ka apna tenant database aur uploads folder hota hai. Tenant DB URL aur tenant secret key sirf env/secrets me rakho.
+
+Local env keys:
+
+- APIAGEX_MULTI_TENANT=true
+- APIAGEX_PLATFORM_DATABASE_PROVIDER=sqlite
+- APIAGEX_PLATFORM_DATABASE_URL=.apiagex/platform.sqlite
+- APIAGEX_TENANT_SECRET_KEY=change-me-32-byte-secret
+- APIAGEX_TENANT_ROOT_DOMAIN=localhost
+- APIAGEX_TENANT_PATH_PREFIX=/t
+
+Use Admin UI/platform tooling to create tenants, then open ${localTenantUrl} or a path-prefix tenant URL. Single-tenant projects should leave APIAGEX_MULTI_TENANT unset.
+`;
+}
+
 function packageJsonFile(answers: ScaffoldAnswers): string {
   const isTypeScript = answers.language === "ts";
   return `${JSON.stringify(
@@ -390,7 +418,7 @@ function packageJsonFile(answers: ScaffoldAnswers): string {
             smoke: "apiagex smoke",
           },
       dependencies: {
-        "@apiagex/server": "^0.8.21",
+        "@apiagex/server": "^0.9.12",
       },
       ...(isTypeScript
         ? {
@@ -441,6 +469,18 @@ function envFile(answers: ScaffoldAnswers, includeSecrets: boolean): string {
     `HOST=${answers.host}`,
     `PORT=${answers.port}`,
   ];
+  if (answers.multiTenant) {
+    lines.push(
+      "",
+      "# Multi-tenant platform mode. Keep disabled for normal single-tenant projects.",
+      "APIAGEX_MULTI_TENANT=true",
+      "APIAGEX_PLATFORM_DATABASE_PROVIDER=sqlite",
+      "APIAGEX_PLATFORM_DATABASE_URL=.apiagex/platform.sqlite",
+      `APIAGEX_TENANT_SECRET_KEY=${includeSecrets ? answers.appSecret : "change-me-32-byte-secret"}`,
+      "APIAGEX_TENANT_ROOT_DOMAIN=localhost",
+      "# APIAGEX_TENANT_PATH_PREFIX=/t",
+    );
+  }
   if (answers.bootstrapOwner) {
     lines.push(
       `APIAGEX_OWNER_EMAIL=${answers.ownerEmail ?? "owner@apiagex.local"}`,

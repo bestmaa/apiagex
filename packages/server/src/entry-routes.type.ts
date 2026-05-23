@@ -1,4 +1,5 @@
 import type { EntryData } from "@apiagex/database";
+import type { MediaUploadBody } from "./media-routes.js";
 
 export type EntryListParams = {
   schemaId: string;
@@ -17,4 +18,5 @@ export type EntryParams = EntryListParams & {
 
 export type EntryBody = {
   data: EntryData;
+  mediaUploads?: Record<string, MediaUploadBody>;
 };

@@ -19,6 +19,7 @@ describe("generated Apiagex project", () => {
     expect(packageJson).toContain('"ai": "apiagex ai"');
     expect(packageJson).toContain('"mcp": "apiagex mcp"');
     expect(packageJson).toContain('"@apiagex/server"');
+    await expect(readFile(join(projectDir, ".env.example"), "utf8")).resolves.not.toContain("APIAGEX_MULTI_TENANT=true");
     const entry = await readFile(join(projectDir, "src/index.js"), "utf8");
     expect(entry).toContain("startApiagex");
     expect(entry).toContain("registerCustomRoutes");

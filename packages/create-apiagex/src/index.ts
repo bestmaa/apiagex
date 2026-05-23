@@ -9,7 +9,7 @@ import { resolveAnswers } from "./prompts.js";
 import { createScaffoldFiles, renderPlan } from "./scaffold.js";
 import type { CliResult, RunCliOptions } from "./create-apiagex.type.js";
 
-const packageVersion = "0.8.21";
+const packageVersion = "0.9.12";
 
 export async function runCli(args: string[], cwd = process.cwd(), io: RunCliOptions = {}): Promise<CliResult> {
   const parsed = parseArgs(args);
@@ -66,6 +66,8 @@ Options:
   --owner-email <email>          Set first owner email when owner bootstrap is enabled.
   --owner-password <password>    Set first owner password and enable owner bootstrap.
   --package-manager npm|pnpm|yarn
+  --multi-tenant, --single-tenant
+                                Include optional multi-tenant platform config.
   --install, --no-install        Record whether dependencies should be installed after scaffold.
   --git, --no-git                Record whether git should be initialized after scaffold.
   --owner, --no-owner            Configure first owner bootstrap on first server start.

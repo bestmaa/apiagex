@@ -4,6 +4,7 @@ export type AdminRoute =
   | "entries"
   | "apis"
   | "users"
+  | "platform"
   | "settings"
   | "settings/admin-roles"
   | "settings/content-roles"

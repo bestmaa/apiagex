@@ -14,6 +14,7 @@ import type {
   EntryData,
   EntryListQuery,
   EntryListResponse,
+  EntryMediaUploads,
   EntryMutationResponse,
 } from "./entry.type";
 import type {
@@ -164,11 +165,12 @@ export async function listEntries(
 export async function createEntry(
   schemaId: string,
   data: EntryData,
+  mediaUploads?: EntryMediaUploads,
 ): Promise<EntryMutationResponse> {
   return adminJson<EntryMutationResponse>(`/api/admin/schemas/${schemaId}/entries`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ data }),
+    body: JSON.stringify(entryPayload(data, mediaUploads)),
   });
 }
 
@@ -176,11 +178,12 @@ export async function updateEntry(
   schemaId: string,
   entryId: string,
   data: EntryData,
+  mediaUploads?: EntryMediaUploads,
 ): Promise<EntryMutationResponse> {
   return adminJson<EntryMutationResponse>(`/api/admin/schemas/${schemaId}/entries/${entryId}`, {
     method: "PUT",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ data }),
+    body: JSON.stringify(entryPayload(data, mediaUploads)),
   });
 }
 
@@ -191,6 +194,36 @@ export async function deleteEntry(
   return adminJson<EntryDeleteResponse>(`/api/admin/schemas/${schemaId}/entries/${entryId}`, {
     method: "DELETE",
   });
+}
+
+export async function uploadMediaFile(file: File): Promise<{
+  error?: string;
+  media?: {
+    contentType: string;
+    filename: string;
+    id: string;
+    size: number;
+    url: string;
+  };
+  ok: boolean;
+}> {
+  return adminJson("/api/admin/media", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      contentBase64: await fileToBase64(file),
+      contentType: file.type,
+      filename: file.name,
+    }),
+  });
+}
+
+export async function fileToMediaUpload(file: File): Promise<EntryMediaUploads[string]> {
+  return {
+    contentBase64: await fileToBase64(file),
+    contentType: file.type,
+    filename: file.name,
+  };
 }
 
 export async function listRoles(): Promise<RoleListResponse> {
@@ -438,4 +471,22 @@ export async function adminJson<TResult>(path: string, init: RequestInit = {}): 
     window.dispatchEvent(new CustomEvent("apiagex-owner-session-invalid"));
   }
   return result;
+}
+
+function entryPayload(data: EntryData, mediaUploads: EntryMediaUploads | undefined): {
+  data: EntryData;
+  mediaUploads?: EntryMediaUploads;
+} {
+  if (!mediaUploads || Object.keys(mediaUploads).length === 0) return { data };
+  return { data, mediaUploads };
+}
+
+async function fileToBase64(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+  for (let index = 0; index < bytes.length; index += 8192) {
+    binary += String.fromCharCode(...bytes.slice(index, index + 8192));
+  }
+  return btoa(binary);
 }

@@ -1,9 +1,18 @@
 import { randomUUID } from "node:crypto";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { openSqliteDatabase } from "@apiagex/database";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { createServer } from "../src/app.js";
 
+const tempDirs: string[] = [];
+
 describe("entry admin APIs", () => {
+  afterEach(async () => {
+    await Promise.all(tempDirs.splice(0).map((dir) => rm(dir, { force: true, recursive: true })));
+  });
+
   it("creates, lists, reads, updates, and deletes entries per schema", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);
@@ -57,6 +66,94 @@ describe("entry admin APIs", () => {
       ok: false,
       error: "ENTRY_FIELD_TYPE_INVALID:title",
     });
+  });
+
+  it("uploads media through the schema entry API and saves the scoped URL", async () => {
+    const uploadsPath = await tempUploadsPath();
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase(), uploadsPath });
+    const schema = await createMediaSchema(server);
+
+    const create = await server.inject({
+      method: "POST",
+      payload: {
+        data: { title: "Launch" },
+        mediaUploads: {
+          hero: {
+            contentBase64: Buffer.from("hero image").toString("base64"),
+            contentType: "image/png",
+            filename: "../Hero Image.png",
+          },
+        },
+      },
+      url: `/api/admin/schemas/${schema.id}/entries`,
+    });
+
+    expect(create.statusCode).toBe(200);
+    const url = create.json().entry.data.hero as string;
+    expect(url).toMatch(new RegExp(`^/uploads/${schema.slug}/hero/.+-Hero-Image\\.png$`));
+
+    const served = await server.inject({ method: "GET", url });
+    expect(served.statusCode).toBe(200);
+    expect(served.body).toBe("hero image");
+  });
+
+  it("supports file and image fields through schema-scoped uploads", async () => {
+    const uploadsPath = await tempUploadsPath();
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase(), uploadsPath });
+    const schemaResponse = await server.inject({
+      method: "POST",
+      payload: {
+        fields: [
+          { name: "Hero", required: true, slug: "hero", type: "image" },
+          { name: "Attachment", slug: "attachment", type: "file" },
+        ],
+        name: "Gallery",
+        slug: "gallery",
+      },
+      url: "/api/admin/schemas",
+    });
+    const schemaId = schemaResponse.json().schema.id as string;
+
+    const create = await server.inject({
+      method: "POST",
+      payload: {
+        data: {},
+        mediaUploads: {
+          attachment: {
+            contentBase64: Buffer.from("pdf").toString("base64"),
+            contentType: "application/pdf",
+            filename: "guide.pdf",
+          },
+          hero: {
+            contentBase64: Buffer.from("png").toString("base64"),
+            contentType: "image/png",
+            filename: "hero.png",
+          },
+        },
+      },
+      url: `/api/admin/schemas/${schemaId}/entries`,
+    });
+
+    expect(create.statusCode).toBe(200);
+    expect(create.json().entry.data.hero).toContain("/uploads/gallery/hero/");
+    expect(create.json().entry.data.attachment).toContain("/uploads/gallery/attachment/");
+
+    const rejected = await server.inject({
+      method: "POST",
+      payload: {
+        data: {},
+        mediaUploads: {
+          hero: {
+            contentBase64: Buffer.from("pdf").toString("base64"),
+            contentType: "application/pdf",
+            filename: "hero.pdf",
+          },
+        },
+      },
+      url: `/api/admin/schemas/${schemaId}/entries`,
+    });
+    expect(rejected.statusCode).toBe(400);
+    expect(rejected.json()).toEqual({ ok: false, error: "MEDIA_CONTENT_TYPE_NOT_ALLOWED" });
   });
 
   it("lists entries with search, field projection, and pagination metadata", async () => {
@@ -158,6 +255,29 @@ async function createArticleSchema(server: ReturnType<typeof createServer>): Pro
     },
   });
   return response.json().schema.id as string;
+}
+
+async function createMediaSchema(server: ReturnType<typeof createServer>): Promise<{ id: string; slug: string }> {
+  const slug = `article-${randomUUID()}`;
+  const response = await server.inject({
+    method: "POST",
+    payload: {
+      fields: [
+        { name: "Title", required: true, slug: "title", type: "text" },
+        { name: "Hero", required: true, slug: "hero", type: "media" },
+      ],
+      name: "Article",
+      slug,
+    },
+    url: "/api/admin/schemas",
+  });
+  return { id: response.json().schema.id as string, slug };
+}
+
+async function tempUploadsPath(): Promise<string> {
+  const dir = await mkdtemp(join(tmpdir(), "apiagex-entry-media-"));
+  tempDirs.push(dir);
+  return dir;
 }
 
 async function createAuthorSchema(server: ReturnType<typeof createServer>): Promise<string> {

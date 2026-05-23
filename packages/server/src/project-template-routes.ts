@@ -26,10 +26,10 @@ const tableSpecs: TableSpec[] = [
     select: "SELECT id, name, slug, description, created_at, updated_at FROM schemas ORDER BY created_at ASC",
   },
   {
-    columns: ["id", "schema_id", "name", "slug", "type", "relation_schema_id", "relation_type", "required", "position"],
+    columns: ["id", "schema_id", "name", "slug", "type", "options_json", "relation_schema_id", "relation_type", "required", "position"],
     key: "fields",
     name: "fields",
-    select: "SELECT id, schema_id, name, slug, type, relation_schema_id, relation_type, required, position FROM fields ORDER BY schema_id ASC, position ASC",
+    select: "SELECT id, schema_id, name, slug, type, options_json, relation_schema_id, relation_type, required, position FROM fields ORDER BY schema_id ASC, position ASC",
   },
   {
     columns: ["id", "value_json", "updated_at"],

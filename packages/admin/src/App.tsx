@@ -10,6 +10,7 @@ import {
 import { ApiList } from "./ApiList";
 import { DashboardPage } from "./DashboardPage";
 import { EntryManager } from "./EntryManager";
+import { PlatformPage } from "./PlatformPage";
 import { SchemaBuilder } from "./SchemaBuilder";
 import { UserManager } from "./UserManager";
 import { readAdminRoute } from "./app-route";
@@ -30,6 +31,7 @@ const navItems: AdminNavItem[] = [
   { label: "Entries", route: "entries" },
   { label: "APIs", route: "apis" },
   { label: "Users", route: "users" },
+  { label: "Platform", route: "platform" },
   { label: "Settings", route: "settings" },
   { label: "Docs", route: "docs" },
 ];
@@ -168,6 +170,7 @@ function renderRoute(
   if (route === "schemas") return <SchemaBuilder />;
   if (route === "entries") return <EntryManager />;
   if (route === "apis") return <ApiList />;
+  if (route === "platform") return <PlatformPage />;
   if (route === "settings" || route.startsWith("settings/")) return <SettingsPage route={route} />;
   return <UserManager />;
 }

@@ -16,6 +16,7 @@ describe("admin route helpers", () => {
     expect(readAdminRoute("#settings/workflows")).toBe("settings/workflows");
     expect(readAdminRoute("#docs/webhooks")).toBe("docs/webhooks");
     expect(readAdminRoute("#docs/realtime")).toBe("docs/realtime");
+    expect(readAdminRoute("#platform")).toBe("platform");
     expect(readAdminRoute("#roles")).toBe("settings/content-roles");
     expect(readAdminRoute("#missing")).toBe("dashboard");
   });
@@ -50,5 +51,10 @@ describe("admin route helpers", () => {
   it("keeps focused docs pages active under the Docs nav item", () => {
     expect(activeNavRoute("docs/webhooks")).toBe("docs");
     expect(activeNavRoute("docs/realtime")).toBe("docs");
+  });
+
+  it("keeps platform route separate from tenant settings", () => {
+    expect(activeNavRoute("platform")).toBe("platform");
+    expect(isSettingsRoute("platform")).toBe(false);
   });
 });

@@ -9,6 +9,7 @@ import {
   updateEntry,
   type ApiagexDatabase,
   type EntryListOptions,
+  type SchemaRecord,
 } from "@apiagex/database";
 import type {
   EntryBody,
@@ -20,10 +21,15 @@ import { emitEntryMutationWebhook } from "./entry-webhooks.js";
 import { emitEntryRealtime } from "./entry-realtime.js";
 import type { RealtimeBroker } from "./realtime-broker.type.js";
 import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
+import { uploadMedia } from "./media-routes.js";
+import { currentUploadsPath } from "./request-runtime.js";
+
+const imageContentTypes = new Set(["image/gif", "image/jpeg", "image/png", "image/webp"]);
 
 export function registerEntryRoutes(
   server: FastifyInstance,
   database: ApiagexDatabase,
+  uploadsPath: string,
   webhookOptions: WebhookDispatcherOptions = {},
   realtimeBroker?: RealtimeBroker,
 ): void {
@@ -48,8 +54,10 @@ export function registerEntryRoutes(
     "/api/admin/schemas/:schemaId/entries",
     async (request, reply) => {
       try {
-        const entry = await createEntry(database, { schemaId: request.params.schemaId, data: request.body.data });
         const schema = await getSchemaById(database, request.params.schemaId);
+        if (!schema) return reply.code(404).send({ ok: false, error: "SCHEMA_NOT_FOUND" });
+        const data = await applySchemaMediaUploads(currentUploadsPath(uploadsPath), schema, request.body);
+        const entry = await createEntry(database, { schemaId: request.params.schemaId, data });
         if (schema) await emitEntryMutationWebhook(database, schema, "entry.created", entry, webhookOptions);
         if (schema) emitEntryRealtime(realtimeBroker, schema, "entry.created", entry);
         return { ok: true, entry };
@@ -77,8 +85,10 @@ export function registerEntryRoutes(
         if (!(await entryBelongsToSchema(database, request.params.entryId, request.params.schemaId))) {
           return reply.code(404).send({ ok: false, error: "ENTRY_NOT_FOUND" });
         }
-        const entry = await updateEntry(database, request.params.entryId, request.body);
         const schema = await getSchemaById(database, request.params.schemaId);
+        if (!schema) return reply.code(404).send({ ok: false, error: "SCHEMA_NOT_FOUND" });
+        const data = await applySchemaMediaUploads(currentUploadsPath(uploadsPath), schema, request.body);
+        const entry = await updateEntry(database, request.params.entryId, { data });
         if (schema) await emitEntryMutationWebhook(database, schema, "entry.updated", entry, webhookOptions);
         if (schema) emitEntryRealtime(realtimeBroker, schema, "entry.updated", entry);
         return { ok: true, entry };
@@ -106,6 +116,29 @@ export function registerEntryRoutes(
       }
     },
   );
+}
+
+async function applySchemaMediaUploads(
+  uploadsPath: string,
+  schema: SchemaRecord,
+  body: EntryBody,
+): Promise<EntryBody["data"]> {
+  const mediaUploads = body.mediaUploads ?? {};
+  const data = { ...body.data };
+  for (const [fieldSlug, upload] of Object.entries(mediaUploads)) {
+    const field = schema.fields.find((item) => item.slug === fieldSlug);
+    if (!field || !isUploadField(field.type)) throw new Error(`ENTRY_MEDIA_FIELD_INVALID:${fieldSlug}`);
+    const uploaded = await uploadMedia(uploadsPath, upload, {
+      ...(field.type === "image" ? { allowedContentTypes: imageContentTypes } : {}),
+      pathSegments: [schema.slug, field.slug],
+    });
+    data[fieldSlug] = uploaded.media.url;
+  }
+  return data;
+}
+
+function isUploadField(type: SchemaRecord["fields"][number]["type"]): boolean {
+  return type === "media" || type === "file" || type === "image";
 }
 
 function sendEntryError(reply: FastifyReply, error: unknown, statusCode: number): FastifyReply {

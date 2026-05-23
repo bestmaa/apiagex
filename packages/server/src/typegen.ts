@@ -75,8 +75,15 @@ function renderField(field: FieldRecord): string {
 }
 
 function fieldType(field: FieldRecord): string {
-  if (field.type === "number") return "number";
+  if (field.type === "number" || field.type === "integer" || field.type === "decimal" || field.type === "currency") return "number";
   if (field.type === "boolean") return "boolean";
+  if (field.type === "enum" && field.options.length > 0) {
+    return field.options.map((option) => JSON.stringify(option)).join(" | ");
+  }
+  if (field.type === "multiSelect" && field.options.length > 0) {
+    return `Array<${field.options.map((option) => JSON.stringify(option)).join(" | ")}>`;
+  }
+  if (field.type === "multiSelect") return "string[]";
   if (field.type === "json") return "unknown";
   if (field.type === "relation") return relationFieldType(field);
   return "string";

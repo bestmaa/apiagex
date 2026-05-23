@@ -29,12 +29,31 @@ export async function migrateProviderFoundation(
   provider: DatabaseProvider,
 ): Promise<void> {
   await db.exec(providerFoundationSql(provider));
+  await applyProviderAdditiveMigrations(db);
   const existing = await db.prepare("SELECT id, applied_at FROM migrations WHERE id = ?")
     .get<{ id: string; applied_at: string }>(MVP_MIGRATION_ID);
   if (!existing) {
     await db.prepare("INSERT INTO migrations (id, applied_at) VALUES (?, ?)")
       .run(MVP_MIGRATION_ID, new Date().toISOString());
   }
+}
+
+async function applyProviderAdditiveMigrations(db: ApiagexDatabase): Promise<void> {
+  for (const sql of ["ALTER TABLE fields ADD COLUMN options_json TEXT"]) {
+    try {
+      await db.exec(sql);
+    } catch (error) {
+      if (!isDuplicateColumnError(error)) throw error;
+    }
+  }
+}
+
+function isDuplicateColumnError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const message = error.message.toLowerCase();
+  return message.includes("duplicate column")
+    || message.includes("already exists")
+    || message.includes("duplicate column name");
 }
 
 export const POSTGRES_FOUNDATION_SQL = `
@@ -77,6 +96,7 @@ CREATE TABLE IF NOT EXISTS fields (
   name TEXT NOT NULL,
   slug TEXT NOT NULL,
   type TEXT NOT NULL,
+  options_json TEXT,
   relation_schema_id TEXT REFERENCES schemas(id),
   relation_type TEXT,
   required INTEGER NOT NULL DEFAULT 0,
@@ -267,7 +287,7 @@ CREATE TABLE IF NOT EXISTS migrations (id VARCHAR(191) PRIMARY KEY, applied_at T
 CREATE TABLE IF NOT EXISTS roles (id VARCHAR(191) PRIMARY KEY, name VARCHAR(191) NOT NULL UNIQUE, description LONGTEXT NOT NULL, is_owner TINYINT(1) NOT NULL DEFAULT 0, role_kind VARCHAR(32) NOT NULL DEFAULT 'api', created_at TEXT NOT NULL, updated_at TEXT NOT NULL) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS users (id VARCHAR(191) PRIMARY KEY, email VARCHAR(191) NOT NULL UNIQUE, password_hash VARCHAR(191) NOT NULL, role_id VARCHAR(191) NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS schemas (id VARCHAR(191) PRIMARY KEY, name VARCHAR(191) NOT NULL, slug VARCHAR(191) NOT NULL UNIQUE, description LONGTEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL) ENGINE=InnoDB;
-CREATE TABLE IF NOT EXISTS fields (id VARCHAR(191) PRIMARY KEY, schema_id VARCHAR(191) NOT NULL, name VARCHAR(191) NOT NULL, slug VARCHAR(191) NOT NULL, type VARCHAR(64) NOT NULL, relation_schema_id VARCHAR(191), relation_type VARCHAR(64), required TINYINT(1) NOT NULL DEFAULT 0, position INTEGER NOT NULL, UNIQUE(schema_id, slug), CONSTRAINT fk_fields_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE, CONSTRAINT fk_fields_relation_schema FOREIGN KEY (relation_schema_id) REFERENCES schemas(id)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS fields (id VARCHAR(191) PRIMARY KEY, schema_id VARCHAR(191) NOT NULL, name VARCHAR(191) NOT NULL, slug VARCHAR(191) NOT NULL, type VARCHAR(64) NOT NULL, options_json LONGTEXT, relation_schema_id VARCHAR(191), relation_type VARCHAR(64), required TINYINT(1) NOT NULL DEFAULT 0, position INTEGER NOT NULL, UNIQUE(schema_id, slug), CONSTRAINT fk_fields_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE, CONSTRAINT fk_fields_relation_schema FOREIGN KEY (relation_schema_id) REFERENCES schemas(id)) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS entries (id VARCHAR(191) PRIMARY KEY, schema_id VARCHAR(191) NOT NULL, data_json LONGTEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, CONSTRAINT fk_entries_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS permissions (id VARCHAR(191) PRIMARY KEY, role_id VARCHAR(191) NOT NULL, schema_id VARCHAR(191) NOT NULL, action VARCHAR(64) NOT NULL, allowed TINYINT(1) NOT NULL DEFAULT 0, UNIQUE(role_id, schema_id, action), CONSTRAINT fk_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE, CONSTRAINT fk_permissions_schema FOREIGN KEY (schema_id) REFERENCES schemas(id) ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS app_settings (id VARCHAR(191) PRIMARY KEY, value_json LONGTEXT NOT NULL, updated_at TEXT NOT NULL) ENGINE=InnoDB;

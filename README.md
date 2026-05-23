@@ -28,6 +28,14 @@ TypeScript is the default starter language. Use JavaScript explicitly when neede
 npx create-apiagex@latest my-cms --language js
 ```
 
+Single-tenant is the default and simplest install. Multi-tenant mode is available for platform builds that sell one product to many customers, with one platform registry plus isolated tenant databases/uploads:
+
+```bash
+npx create-apiagex@latest my-platform --multi-tenant
+```
+
+Read [docs/multi-tenant-architecture.md](./docs/multi-tenant-architecture.md), [docs/multi-tenant-runbook.md](./docs/multi-tenant-runbook.md), and [docs/multi-tenant-release-checklist.md](./docs/multi-tenant-release-checklist.md) before using multi-tenant mode outside local testing.
+
 After creating or changing schemas in Admin UI, generate TypeScript helpers:
 
 ```bash
@@ -154,8 +162,8 @@ GitHub repo secret me `NPM_TOKEN` add karo. Pehle `dry_run=true` se check karo; 
 - Schema repository supports ordered fields and safe relation targets.
 - Schema admin APIs are available at `/api/admin/schemas` for create, list, read, update, and delete.
 - Schema admin APIs `/api/admin/schemas` par create, list, read, update, aur delete ke liye available hain.
-- React Admin UI now includes a schema builder form with all MVP field types.
-- React Admin UI me ab sab MVP field types ke saath schema builder form hai.
+- React Admin UI now includes a schema builder form with primitive validation types, enum/select, multiSelect, media/file/image, JSON, and relation fields.
+- React Admin UI me ab primitive validation types, enum/select, multiSelect, media/file/image, JSON, aur relation fields ke saath schema builder form hai.
 - Relation fields now use an existing-schema picker and backend validation.
 - Relation fields ab existing-schema picker aur backend validation use karte hain.
 - Task3 relation support now covers `oneToOne`, `oneToMany`, `manyToOne`, `manyToMany`, JSON storage, populate, delete guards, and Admin UI entry pickers.
@@ -251,9 +259,9 @@ Admin redesign note Hinglish: `/adminui` API server se served React Admin UI hi 
 
 ## Schema Builder Quick Use
 
-English: Log in at `/adminui`, create the target schema first, then create schemas with text, long text, number, boolean, date, JSON, media, or relation fields. Relation fields must select an existing schema target.
+English: Log in at `/adminui`, create the target schema first, then create schemas with primitive validation fields, option fields, JSON, media/file/image uploads, or relation fields. Relation fields must select an existing schema target.
 
-Hinglish: `/adminui` par login karo, pehle target schema banao, phir text, long text, number, boolean, date, JSON, media, ya relation fields ke saath schema banao. Relation field me existing schema target select karna zaruri hai.
+Hinglish: `/adminui` par login karo, pehle target schema banao, phir primitive validation fields, option fields, JSON, media/file/image uploads, ya relation fields ke saath schema banao. Relation field me existing schema target select karna zaruri hai.
 
 ## Dynamic API Quick Use
 

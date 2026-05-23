@@ -6,6 +6,15 @@ export {
   sendAdminSession,
   verifyOwnerToken,
 } from "./admin-auth.js";
+export {
+  isPlatformApiPath,
+  platformAdminTokenFromRequest,
+  registerPlatformAdminAuthGuard,
+  verifyPlatformAdminToken,
+} from "./platform-admin-auth.js";
+export {
+  registerPlatformTenantRoutes,
+} from "./platform-tenant-routes.js";
 export { readDocsPage, resolveDocsUiAsset } from "./docs-ui.js";
 export { createServer } from "./app.js";
 export { createCustomRouteContext } from "./custom-routes.js";
@@ -23,6 +32,16 @@ export {
   setWorkflowStepOutput,
   setWorkflowVariable,
 } from "./workflow-context.js";
+export {
+  createRequestScopedDatabase,
+  currentRequestRuntime,
+  currentUploadsPath,
+  registerRequestRuntime,
+} from "./request-runtime.js";
+export {
+  registerTenantObservabilityHooks,
+  tenantMetricsLabels,
+} from "./tenant-observability.js";
 export {
   resolveWorkflowPath,
   resolveWorkflowTemplateString,
@@ -74,11 +93,29 @@ export type {
   AdminUiAsset,
 } from "./admin-ui.type.js";
 export type {
+  PlatformAdminAuthResult,
+} from "./platform-admin-auth.js";
+export type {
+  CreatePlatformTenantBody,
+  PlatformTenantListResponse,
+  PlatformTenantResponse,
+  RegisterPlatformTenantRoutesOptions,
+} from "./platform-tenant-routes.js";
+export type {
   ApiagexServer,
   ApiRootResponse,
   CreateServerOptions,
   HealthResponse,
 } from "./app.type.js";
+export type {
+  TenantMetricsHookInput,
+  TenantMetricsLabels,
+  TenantMetricsOptions,
+  TenantObservabilityOptions,
+  TenantRateLimitDecision,
+  TenantRateLimitHookInput,
+  TenantRateLimitOptions,
+} from "./tenant-observability.js";
 export type {
   ApiagexCustomRouteContext,
   ApiagexEntryDataFor,
@@ -108,10 +145,129 @@ export {
   handleApiagexMcpJsonRpcMessage,
   runApiagexMcpStdioServer,
 } from "./mcp-server.js";
+export {
+  buildTenantHealthDiagnostics,
+  checkTenantDatabase,
+  checkTenantUploads,
+} from "./tenant-health.js";
+export {
+  runTenantMigrations,
+} from "./tenant-migration-runner.js";
+export {
+  bootstrapTenantOwner,
+} from "./tenant-owner-bootstrap.js";
+export {
+  markTenantProvisioningFailed,
+  redactTenantSecretText,
+  sanitizedProvisioningError,
+} from "./tenant-provisioning-rollback.js";
+export {
+  isTenantBackupManifest,
+  TENANT_BACKUP_FORMAT_VERSION,
+} from "./tenant-backup.js";
+export {
+  backupSqliteTenant,
+  restoreSqliteTenant,
+} from "./sqlite-tenant-backup.js";
 export type {
   ApiagexMcpRunnerOptions,
   ApiagexMcpToolResult,
 } from "./mcp-server.js";
+export type {
+  TenantDatabaseHealthCheck,
+  TenantHealthCheck,
+  TenantHealthDiagnostics,
+  TenantHealthDiagnosticsInput,
+  TenantHealthStatus,
+  TenantHealthTenantSummary,
+  TenantUploadsHealthCheck,
+} from "./tenant-health.js";
+export type {
+  TenantMigrationRunResult,
+} from "./tenant-migration-runner.js";
+export type {
+  TenantOwnerBootstrapResult,
+} from "./tenant-owner-bootstrap.js";
+export type {
+  TenantProvisioningFailureResult,
+} from "./tenant-provisioning-rollback.js";
+export type {
+  TenantBackupFileManifest,
+  TenantBackupManifest,
+} from "./tenant-backup.js";
+export type {
+  BackupSqliteTenantInput,
+  RestoreSqliteTenantInput,
+  SqliteTenantBackupResult,
+} from "./sqlite-tenant-backup.js";
+export {
+  createTenantProvisioningPlan,
+  tenantProvisioningStepIds,
+} from "./tenant-provisioning.type.js";
+export {
+  provisionSqliteTenant,
+  resolveSqliteTenantProvisioningPaths,
+  sqliteTenantProvisioner,
+} from "./sqlite-tenant-provisioning.js";
+export {
+  buildPostgresTenantDatabaseNames,
+  buildPostgresTenantDatabaseUrl,
+  buildPostgresTenantUserNames,
+  buildPostgresTenantUserUrl,
+  generatePostgresTenantPassword,
+  postgresAlterRolePasswordSql,
+  postgresCreateDatabaseSql,
+  postgresCreateRoleSql,
+  postgresGrantDatabaseSql,
+  postgresGrantTenantSchemaSql,
+  provisionPostgresTenantDatabase,
+  provisionPostgresTenantUser,
+  quotePostgresIdentifier,
+} from "./postgres-tenant-provisioning.js";
+export {
+  buildMySqlTenantDatabaseNames,
+  buildMySqlTenantDatabaseUrl,
+  buildMySqlTenantUserNames,
+  buildMySqlTenantUserUrl,
+  generateMySqlTenantPassword,
+  mySqlAlterUserPasswordSql,
+  mySqlCreateDatabaseSql,
+  mySqlCreateUserSql,
+  mySqlGrantDatabaseSql,
+  provisionMySqlTenantDatabase,
+  provisionMySqlTenantUser,
+  quoteMySqlIdentifier,
+} from "./mysql-tenant-provisioning.js";
+export type {
+  MySqlTenantProvisioningConfig,
+  PostgresTenantProvisioningConfig,
+  SqliteTenantProvisioningConfig,
+  TenantProvisioner,
+  TenantProvisioningActor,
+  TenantProvisioningConfig,
+  TenantProvisioningContext,
+  TenantProvisioningOwnerInput,
+  TenantProvisioningPlan,
+  TenantProvisioningProgressEvent,
+  TenantProvisioningRequest,
+  TenantProvisioningResult,
+  TenantProvisioningStep,
+  TenantProvisioningStepId,
+  TenantProvisioningStepStatus,
+} from "./tenant-provisioning.type.js";
+export type { SqliteTenantProvisioningPaths } from "./sqlite-tenant-provisioning.js";
+export type {
+  PostgresTenantDatabaseNames,
+  PostgresTenantDatabaseProvisioningOptions,
+  PostgresTenantUserNames,
+  PostgresTenantUserProvisioningOptions,
+} from "./postgres-tenant-provisioning.js";
+export type {
+  MySqlTenantDatabaseNames,
+  MySqlTenantDatabaseProvisioningOptions,
+  MySqlTenantUserNames,
+  MySqlTenantUserProvisioningOptions,
+} from "./mysql-tenant-provisioning.js";
 export type {
   ApiagexMcpCreateSchemaInput,
   ApiagexMcpCreateSchemaOutput,
@@ -169,6 +325,9 @@ export type {
   WorkflowRequestHeaders,
   WorkflowResponseDraft,
 } from "./workflow-context.js";
+export type {
+  ApiagexRequestRuntime,
+} from "./request-runtime.js";
 export type {
   WorkflowTemplateResolution,
 } from "./workflow-template.js";

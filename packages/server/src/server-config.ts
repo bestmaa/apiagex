@@ -19,6 +19,18 @@ export function resolveLocalServerConfig(
     ...(databaseUrl === undefined ? {} : { databaseUrl }),
     databasePath,
     databaseProvider,
+    ...(env.APIAGEX_MULTI_TENANT === "true"
+      ? {
+          multiTenant: {
+            enabled: true,
+            ...(env.APIAGEX_TENANT_PATH_PREFIX === undefined ? {} : { pathPrefix: env.APIAGEX_TENANT_PATH_PREFIX }),
+            platformDatabaseProvider: resolveDatabaseProvider(env.APIAGEX_PLATFORM_DATABASE_PROVIDER),
+            platformDatabaseUrl: requiredEnv(env.APIAGEX_PLATFORM_DATABASE_URL, "APIAGEX_PLATFORM_DATABASE_URL"),
+            ...(env.APIAGEX_TENANT_ROOT_DOMAIN === undefined ? {} : { rootDomain: env.APIAGEX_TENANT_ROOT_DOMAIN }),
+            secretKeyBase64: requiredEnv(env.APIAGEX_TENANT_SECRET_KEY, "APIAGEX_TENANT_SECRET_KEY"),
+          },
+        }
+      : {}),
     uploadsPath,
   };
 }
@@ -37,5 +49,10 @@ function resolveDatabaseProvider(value: string | undefined): DatabaseProvider {
 function resolveDatabaseUrl(provider: DatabaseProvider, value: string | undefined): string | undefined {
   if (provider === "sqlite") return undefined;
   if (!value?.trim()) throw new Error(`DATABASE_URL_REQUIRED: ${provider}`);
+  return value.trim();
+}
+
+function requiredEnv(value: string | undefined, name: string): string {
+  if (!value?.trim()) throw new Error(`${name}_REQUIRED`);
   return value.trim();
 }

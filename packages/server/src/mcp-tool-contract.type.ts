@@ -35,7 +35,29 @@ export type ApiagexMcpListSchemasInput = Record<string, never>;
 export type ApiagexMcpSchemaFieldInput = {
   name: string;
   slug: string;
-  type: "text" | "longText" | "number" | "boolean" | "date" | "json" | "media" | "relation";
+  type:
+    | "text"
+    | "longText"
+    | "number"
+    | "boolean"
+    | "date"
+    | "datetime"
+    | "time"
+    | "email"
+    | "url"
+    | "integer"
+    | "decimal"
+    | "currency"
+    | "enum"
+    | "multiSelect"
+    | "password"
+    | "richText"
+    | "json"
+    | "media"
+    | "file"
+    | "image"
+    | "relation";
+  options?: string[] | undefined;
   required?: boolean | undefined;
   relationSchemaId?: string | undefined;
   relationType?: "oneToOne" | "oneToMany" | "manyToOne" | "manyToMany" | undefined;

@@ -4,8 +4,21 @@ export type FieldType =
   | "number"
   | "boolean"
   | "date"
+  | "datetime"
+  | "time"
+  | "email"
+  | "url"
+  | "integer"
+  | "decimal"
+  | "currency"
+  | "enum"
+  | "multiSelect"
+  | "password"
+  | "richText"
   | "json"
   | "media"
+  | "file"
+  | "image"
   | "relation";
 
 export type RelationType =
@@ -32,6 +45,7 @@ export type CreateFieldInput = {
   slug: string;
   type: FieldType;
   required?: boolean;
+  options?: string[];
   relationSchemaId?: string;
   relationType?: RelationType;
 };
@@ -52,6 +66,7 @@ export type FieldRecord = {
   slug: string;
   type: FieldType;
   required: boolean;
+  options: string[];
   relationSchemaId?: string | null;
   relationType?: RelationType | null;
   position: number;

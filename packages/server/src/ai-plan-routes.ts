@@ -83,6 +83,7 @@ export async function applyAiPlan(
       await createSchema(database, {
         fields: operation.schema.fields.map((field) => ({
           name: field.name,
+          ...(field.options === undefined ? {} : { options: field.options }),
           slug: field.slug,
           type: field.type,
           ...(field.required === undefined ? {} : { required: field.required }),

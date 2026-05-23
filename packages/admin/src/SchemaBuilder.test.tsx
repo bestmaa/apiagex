@@ -67,6 +67,56 @@ describe("SchemaBuilder", () => {
     expect(schemaName.value).toBe("News Article");
     expect(fieldName.value).toBe("Display Title");
   });
+
+  it("sends enum options when creating a schema", async () => {
+    const container = await renderSchemaBuilder();
+    await clickButton(container, "Add schema");
+    const [schemaName, , fieldName] = [...container.querySelectorAll<HTMLInputElement>("input")];
+    const typeSelect = container.querySelector<HTMLSelectElement>("select");
+    if (!schemaName || !fieldName || !typeSelect) throw new Error("Schema form controls not found");
+
+    await setControlledInput(schemaName, "Post");
+    await setControlledInput(fieldName, "Status");
+    await setControlledSelect(typeSelect, "enum");
+    const options = container.querySelector<HTMLTextAreaElement>(".enum-options-field textarea");
+    if (!options) throw new Error("Enum options input not found");
+    await setControlledTextarea(options, "draft\npublished\narchived");
+    await submitForm(container);
+
+    expect(createSchema).toHaveBeenCalledWith(expect.objectContaining({
+      fields: [expect.objectContaining({
+        options: ["draft", "published", "archived"],
+        slug: "status",
+        type: "enum",
+      })],
+      slug: "post",
+    }));
+  });
+
+  it("sends multiSelect options when creating a schema", async () => {
+    const container = await renderSchemaBuilder();
+    await clickButton(container, "Add schema");
+    const [schemaName, , fieldName] = [...container.querySelectorAll<HTMLInputElement>("input")];
+    const typeSelect = container.querySelector<HTMLSelectElement>("select");
+    if (!schemaName || !fieldName || !typeSelect) throw new Error("Schema form controls not found");
+
+    await setControlledInput(schemaName, "Product");
+    await setControlledInput(fieldName, "Tags");
+    await setControlledSelect(typeSelect, "multiSelect");
+    const options = container.querySelector<HTMLTextAreaElement>(".enum-options-field textarea");
+    if (!options) throw new Error("MultiSelect options input not found");
+    await setControlledTextarea(options, "new\nsale\nfeatured");
+    await submitForm(container);
+
+    expect(createSchema).toHaveBeenCalledWith(expect.objectContaining({
+      fields: [expect.objectContaining({
+        options: ["new", "sale", "featured"],
+        slug: "tags",
+        type: "multiSelect",
+      })],
+      slug: "product",
+    }));
+  });
 });
 
 async function renderSchemaBuilder(): Promise<HTMLDivElement> {
@@ -96,6 +146,35 @@ async function setControlledInput(input: HTMLInputElement, value: string): Promi
   await act(async () => {
     setter.call(input, value);
     input.dispatchEvent(new Event("input", { bubbles: true }));
+    await flushPromises();
+  });
+}
+
+async function setControlledSelect(select: HTMLSelectElement, value: string): Promise<void> {
+  const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")?.set;
+  if (!setter) throw new Error("Select value setter not found");
+  await act(async () => {
+    setter.call(select, value);
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    await flushPromises();
+  });
+}
+
+async function setControlledTextarea(textarea: HTMLTextAreaElement, value: string): Promise<void> {
+  const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")?.set;
+  if (!setter) throw new Error("Textarea value setter not found");
+  await act(async () => {
+    setter.call(textarea, value);
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    await flushPromises();
+  });
+}
+
+async function submitForm(container: HTMLElement): Promise<void> {
+  const form = container.querySelector("form");
+  if (!form) throw new Error("Schema form not found");
+  await act(async () => {
+    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await flushPromises();
   });
 }

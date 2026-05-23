@@ -12,6 +12,8 @@ export function parseArgs(args: string[]): CliOptions | string {
     else if (arg === "--no-install") options.installDependencies = false;
     else if (arg === "--git") options.initGit = true;
     else if (arg === "--no-git") options.initGit = false;
+    else if (arg === "--multi-tenant") options.multiTenant = true;
+    else if (arg === "--single-tenant") options.multiTenant = false;
     else if (arg === "--owner") options.bootstrapOwner = true;
     else if (arg === "--no-owner") options.bootstrapOwner = false;
     else if (arg === "--language") {
