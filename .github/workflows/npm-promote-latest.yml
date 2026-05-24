@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - npm-promote-v*
+      - npm-promote-latest-v*
   workflow_dispatch:
     inputs:
       version:
@@ -40,6 +41,8 @@ jobs:
           set -euo pipefail
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             version="${{ inputs.version }}"
+          elif [[ "$GITHUB_REF_NAME" == npm-promote-latest-v* ]]; then
+            version="${GITHUB_REF_NAME#npm-promote-latest-v}"
           else
             version="${GITHUB_REF_NAME#npm-promote-v}"
             version="${version%-latest}"
@@ -62,7 +65,12 @@ jobs:
 
           for package_name in "${packages[@]}"; do
             npm view "${package_name}@${VERSION}" version
-            npm dist-tag add "${package_name}@${VERSION}" latest
+            current_latest="$(npm view "$package_name" dist-tags.latest || true)"
+            if [ "$current_latest" = "$VERSION" ]; then
+              echo "${package_name} already latest=${VERSION}"
+            else
+              npm dist-tag add "${package_name}@${VERSION}" latest
+            fi
           done
 
       - name: Verify latest tags
@@ -72,7 +80,15 @@ jobs:
         run: |
           set -euo pipefail
           for package_name in "@apiagex/database" "@apiagex/server" "create-apiagex"; do
-            latest="$(npm view "$package_name" dist-tags.latest)"
+            latest=""
+            for attempt in 1 2 3 4 5 6; do
+              latest="$(npm view "$package_name" dist-tags.latest)"
+              if [ "$latest" = "$VERSION" ]; then
+                break
+              fi
+              echo "${package_name} latest=${latest}; waiting for ${VERSION} (attempt ${attempt})"
+              sleep 10
+            done
             if [ "$latest" != "$VERSION" ]; then
               echo "::error::${package_name} latest is ${latest}, expected ${VERSION}"
               exit 1
