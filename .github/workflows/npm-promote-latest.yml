@@ -1,0 +1,81 @@
+name: Promote npm packages to latest
+
+on:
+  push:
+    tags:
+      - npm-promote-v*
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing npm version to promote
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-promote-latest-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: Move npm latest dist-tags
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            version="${{ inputs.version }}"
+          else
+            version="${GITHUB_REF_NAME#npm-promote-v}"
+            version="${version%-latest}"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Promoting npm packages to latest: $version"
+
+      - name: Promote packages
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          packages=(
+            "@apiagex/database"
+            "@apiagex/server"
+            "create-apiagex"
+          )
+
+          for package_name in "${packages[@]}"; do
+            npm view "${package_name}@${VERSION}" version
+            npm dist-tag add "${package_name}@${VERSION}" latest
+          done
+
+      - name: Verify latest tags
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          for package_name in "@apiagex/database" "@apiagex/server" "create-apiagex"; do
+            latest="$(npm view "$package_name" dist-tags.latest)"
+            if [ "$latest" != "$VERSION" ]; then
+              echo "::error::${package_name} latest is ${latest}, expected ${VERSION}"
+              exit 1
+            fi
+            echo "${package_name} latest=${latest}"
+          done
