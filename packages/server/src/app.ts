@@ -1,7 +1,7 @@
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import { mkdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import {
   migrateMvpDatabase,
   openMigratedSqliteAdapter,
@@ -39,6 +39,8 @@ import { registerAiAutomationRoutes } from "./ai-automation-routes.js";
 import { registerAiPlanRoutes } from "./ai-plan-routes.js";
 import { registerProjectTemplateRoutes } from "./project-template-routes.js";
 import { registerMediaRoutes } from "./media-routes.js";
+import { registerApiLogRoutes } from "./api-log-routes.js";
+import { registerApiRequestLogging } from "./api-request-log.js";
 import { buildTenantHealthDiagnostics } from "./tenant-health.js";
 import type { ApiagexTenantContext } from "./tenant-context.js";
 import { registerPlatformAdminAuthGuard } from "./platform-admin-auth.js";
@@ -51,9 +53,15 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   const rootDatabase = resolveDatabase(options);
   const database = createRequestScopedDatabase(rootDatabase);
   const uploadsPath = resolve(options.uploadsPath ?? ".apiagex/uploads");
+  const apiLogsPath = resolve(options.apiLogsPath ?? resolve(dirname(uploadsPath), "logs/api"));
   mkdirSync(uploadsPath, { recursive: true });
+  mkdirSync(apiLogsPath, { recursive: true });
   const realtimeBroker = createRealtimeBroker(database);
   realtimeBroker.attach(server);
+  registerApiRequestLogging(server, {
+    logsPath: apiLogsPath,
+    ...(options.apiLogMaxBytes === undefined ? {} : { maxFileBytes: options.apiLogMaxBytes }),
+  });
   server.register(fastifyStatic, {
     prefix: "/adminui/",
     root: resolveAdminUiAsset().root,
@@ -79,6 +87,10 @@ export function createServer(options: CreateServerOptions = {}): ApiagexServer {
   registerUserRoutes(server, database);
   registerSettingsRoutes(server, database);
   registerMediaRoutes(server, uploadsPath);
+  registerApiLogRoutes(server, {
+    logsPath: apiLogsPath,
+    ...(options.apiLogMaxBytes === undefined ? {} : { maxFileBytes: options.apiLogMaxBytes }),
+  });
   registerProjectTemplateRoutes(server, database);
   registerAutomationTokenRoutes(server, database, {
     ...(options.projectEnvPath === undefined ? {} : { projectEnvPath: options.projectEnvPath }),

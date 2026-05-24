@@ -3,6 +3,8 @@ export type AdminRoute =
   | "schemas"
   | "entries"
   | "apis"
+  | "apis/endpoints"
+  | "apis/logs"
   | "users"
   | "platform"
   | "settings"

@@ -1,6 +1,6 @@
 {
   "name": "@apiagex/docs",
-  "version": "0.9.12",
+  "version": "0.9.13",
   "description": "Static documentation package for Apiagex.",
   "type": "module",
   "license": "MIT",

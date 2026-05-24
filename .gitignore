@@ -3,6 +3,9 @@ data/
 dist/
 .apiagex/
 node_modules/
+project-test/
+task/
+packages/docs-site/docs/.vitepress/cache/
 *.db
 *.sqlite
 *.tsbuildinfo

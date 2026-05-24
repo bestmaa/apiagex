@@ -16,6 +16,8 @@ describe("admin route helpers", () => {
     expect(readAdminRoute("#settings/workflows")).toBe("settings/workflows");
     expect(readAdminRoute("#docs/webhooks")).toBe("docs/webhooks");
     expect(readAdminRoute("#docs/realtime")).toBe("docs/realtime");
+    expect(readAdminRoute("#apis/endpoints")).toBe("apis/endpoints");
+    expect(readAdminRoute("#apis/logs")).toBe("apis/logs");
     expect(readAdminRoute("#platform")).toBe("platform");
     expect(readAdminRoute("#roles")).toBe("settings/content-roles");
     expect(readAdminRoute("#missing")).toBe("dashboard");

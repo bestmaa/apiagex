@@ -1,4 +1,5 @@
 import type { AuthResponse, OwnerStatusResponse } from "./session.type";
+import type { ApiRequestLogResponse } from "./api-log.type";
 import type {
   AutomationTokenCreateResponse,
   AutomationTokenListResponse,
@@ -122,6 +123,10 @@ async function requestAuth(
 
 export async function listSchemas(): Promise<SchemaListResponse> {
   return adminJson<SchemaListResponse>("/api/admin/schemas");
+}
+
+export async function listApiRequestLogs(limit = 100): Promise<ApiRequestLogResponse> {
+  return adminJson<ApiRequestLogResponse>(`/api/admin/api-logs?limit=${encodeURIComponent(String(limit))}`);
 }
 
 export async function createSchema(input: SchemaDraft): Promise<SchemaMutationResponse> {

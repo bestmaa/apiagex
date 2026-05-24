@@ -22,7 +22,12 @@ import type {
 } from "./content-routes.type.js";
 import { emitEntryMutationWebhook } from "./entry-webhooks.js";
 import { emitEntryRealtime } from "./entry-realtime.js";
-import { populateEntryRelations, shouldPopulateRelations, type PopulatedEntryRecord } from "./relation-populate.js";
+import {
+  populateEntriesRelations,
+  populateEntryRelations,
+  shouldPopulateRelations,
+  type PopulatedEntryRecord,
+} from "./relation-populate.js";
 import type { RealtimeBroker } from "./realtime-broker.type.js";
 import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
 
@@ -52,7 +57,7 @@ export function registerContentRoutes(
         ok: true,
         schema: schema.slug,
         ...result,
-        entries: await Promise.all(result.entries.map((entry) => populateContentEntry(database, request, schema, entry))),
+        entries: await populateContentEntries(database, request, schema, result.entries),
       };
     },
   );
@@ -192,6 +197,17 @@ async function populateContentEntry(
   entry: EntryRecord,
 ): Promise<PopulatedEntryRecord> {
   return populateEntryRelations(database, schema, entry, async (targetSchema) =>
+    (await canAccess(database, request, targetSchema, "get")).allowed,
+  );
+}
+
+async function populateContentEntries(
+  database: ApiagexDatabase,
+  request: FastifyRequest,
+  schema: SchemaRecord,
+  entries: EntryRecord[],
+): Promise<PopulatedEntryRecord[]> {
+  return populateEntriesRelations(database, schema, entries, async (targetSchema) =>
     (await canAccess(database, request, targetSchema, "get")).allowed,
   );
 }

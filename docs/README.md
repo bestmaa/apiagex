@@ -8,6 +8,10 @@ Primary docs route will be `/doc`; project summary route will be `/readme`.
 
 Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 
+Long-form VitePress docs live in `packages/docs-site`. They are a separate docs package for product walkthroughs, Admin UI screenshots, schema/API workflows, tokens, realtime, webhooks, custom APIs, AI/Codex, MCP, database providers, and operations. They do not replace `/doc` or `/readme` until a future server integration task explicitly changes that.
+
+Long-form VitePress docs `packages/docs-site` me hain. Ye product walkthroughs aur screenshots ke liye separate package hai; `/doc` ya `/readme` ko abhi replace nahi karta.
+
 ## Required Docs
 
 - Owner setup and login
@@ -116,6 +120,8 @@ Primary docs route `/doc` hoga; project summary route `/readme` hoga.
 - AI API plan format `docs/ai-api-plan-format.md` me documented hai.
 - Codex Project AI Integration release notes are documented in `docs/codex-project-ai-release.md`.
 - Codex Project AI Integration release notes `docs/codex-project-ai-release.md` me documented hain.
+- VitePress docs-site release notes are documented in `docs/release-0.9.13.md`.
+- VitePress docs-site release notes `docs/release-0.9.13.md` me documented hain.
 
 ## Owner Bootstrap And Login
 

@@ -61,6 +61,32 @@ describe("ApiPermissionManager", () => {
     expect(container.textContent).toContain("Allowed public actions are reachable without Authorization headers");
     expect(listRolePermissions).toHaveBeenCalledWith("role_public");
   });
+
+  it("shows access counts for every role and selects a role from the role card", async () => {
+    vi.mocked(listRolePermissions).mockImplementation(async (roleId) => ({
+      ok: true,
+      permissions: roleId === "role_public"
+        ? [{ action: "getAll", allowed: true, id: "public_getAll", roleId, schemaId: "schema_article" }]
+        : [{ action: "get", allowed: true, id: "reader_get", roleId, schemaId: "schema_article" }],
+    }));
+    const container = await renderApiPermissionManager();
+
+    expect(container.textContent).toContain("public");
+    expect(container.textContent).toContain("reader");
+    expect(container.textContent?.match(/1\/7 allowed/g)?.length).toBeGreaterThanOrEqual(2);
+
+    const readerRow = Array.from(container.querySelectorAll<HTMLElement>(".role-row"))
+      .find((row) => row.textContent?.includes("reader"));
+    expect(readerRow).toBeTruthy();
+    await act(async () => {
+      readerRow?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await flushPromises();
+    });
+
+    const select = container.querySelector<HTMLSelectElement>("select");
+    expect(select?.value).toBe("role_reader");
+    expect(listRolePermissions).toHaveBeenCalledWith("role_reader");
+  });
 });
 
 async function renderApiPermissionManager(): Promise<HTMLDivElement> {

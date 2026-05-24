@@ -257,6 +257,10 @@ Admin redesign note: `/adminui` remains the React Admin UI served by the API ser
 
 Admin redesign note Hinglish: `/adminui` API server se served React Admin UI hi rahta hai, aur `/doc` plus `/readme` docs package ke public static docs routes hi rahte hain. Redesign visible Admin UI change karta hai, server paths nahi.
 
+VitePress docs site: `packages/docs-site` contains the long-form product docs with Admin UI screenshots, setup guides, schema/API workflows, token guidance, realtime/webhook docs, custom API notes, AI/Codex workflow, and operations pages. Run `npm run dev -w @apiagex/docs-site` for local authoring or `npm run build -w @apiagex/docs-site` to verify it.
+
+VitePress docs site Hinglish: `packages/docs-site` me screenshots ke saath proper long-form docs hain. Local docs dekhne ke liye `npm run dev -w @apiagex/docs-site` aur verify ke liye `npm run build -w @apiagex/docs-site` chalao.
+
 ## Schema Builder Quick Use
 
 English: Log in at `/adminui`, create the target schema first, then create schemas with primitive validation fields, option fields, JSON, media/file/image uploads, or relation fields. Relation fields must select an existing schema target.

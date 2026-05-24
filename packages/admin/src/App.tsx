@@ -169,7 +169,7 @@ function renderRoute(
   if (!session) return <LoginRequiredPage mode={mode} onReset={logout} status={status} onSubmit={submitLogin} />;
   if (route === "schemas") return <SchemaBuilder />;
   if (route === "entries") return <EntryManager />;
-  if (route === "apis") return <ApiList />;
+  if (route === "apis" || route.startsWith("apis/")) return <ApiList route={route} />;
   if (route === "platform") return <PlatformPage />;
   if (route === "settings" || route.startsWith("settings/")) return <SettingsPage route={route} />;
   return <UserManager />;

@@ -29,34 +29,52 @@ const actionHelp = {
 
 export function RoleList(props: {
   activeRoleId: string;
+  onSelectRole: (roleId: string) => void;
   permissions: PermissionRecord[];
+  permissionsByRoleId: Record<string, PermissionRecord[]>;
   roles: RoleRecord[];
   schemas: SchemaRecord[];
 }) {
-  const { activeRoleId, permissions, roles, schemas } = props;
+  const { activeRoleId, onSelectRole, permissions, permissionsByRoleId, roles, schemas } = props;
   if (roles.length === 0) {
     return <StateMessage title="No API roles yet" variant="empty">Create an API role to start access setup.</StateMessage>;
   }
-  const allowedCount = permissions.filter((permission) => permission.allowed).length;
   const possibleCount = schemas.length * permissionActions.length;
   return (
     <section className="role-list" aria-labelledby="role-list-title">
       <h3>Role list</h3>
-      {roles.map((role) => (
-        <article className={role.id === activeRoleId ? "role-row is-active" : "role-row"} key={role.id}>
-          <div>
-            <strong>{role.name}</strong>
-            <span>{role.description || "No description"}</span>
-          </div>
-          <div className="role-row-badges">
-            <span>API role</span>
-            {role.id === activeRoleId ? <span>Active</span> : null}
-            <span>{role.id === activeRoleId ? `${allowedCount}/${possibleCount} allowed` : "Select to inspect"}</span>
-          </div>
-          {role.id === activeRoleId ? <PermissionSummaryBadges permissions={permissions} /> : null}
-          <p>Use this role id in content API requests after permissions are saved.</p>
-        </article>
-      ))}
+      {roles.map((role) => {
+        const rolePermissions = role.id === activeRoleId ? permissions : permissionsByRoleId[role.id] ?? [];
+        const allowedCount = rolePermissions.filter((permission) => permission.allowed).length;
+        return (
+          <article
+            aria-current={role.id === activeRoleId ? "true" : undefined}
+            className={role.id === activeRoleId ? "role-row is-active" : "role-row"}
+            key={role.id}
+            onClick={() => onSelectRole(role.id)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onSelectRole(role.id);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+          >
+            <div>
+              <strong>{role.name}</strong>
+              <span>{role.description || "No description"}</span>
+            </div>
+            <div className="role-row-badges">
+              <span>API role</span>
+              {role.id === activeRoleId ? <span>Active</span> : <span>Click to inspect</span>}
+              <span>{allowedCount}/{possibleCount} allowed</span>
+            </div>
+            <PermissionSummaryBadges permissions={rolePermissions} />
+            <p>Use this role id in content API requests after permissions are saved.</p>
+          </article>
+        );
+      })}
     </section>
   );
 }
@@ -72,21 +90,31 @@ export function PermissionGrid(props: {
         <StateMessage title="No schemas for permissions" variant="empty">
           Create a schema before assigning permissions.
         </StateMessage>
-      ) : props.schemas.map((schema) => (
-        <fieldset className="permission-card" key={schema.id}>
-          <legend>{schema.name}</legend>
-          <code>/api/content/{schema.slug}</code>
-          <p className="permission-help">getAll = list API, get = one entry API, realtime = WebSocket subscribe, manage = all actions for this API.</p>
-          {permissionActions.map((action) => (
-            <PermissionToggle
-              action={action}
-              allowed={isAllowed(props.permissions, schema.id, action)}
-              key={action}
-              onChange={(allowed) => props.toggle(schema.id, action, allowed)}
-            />
-          ))}
-        </fieldset>
-      ))}
+      ) : props.schemas.map((schema, index) => {
+        const allowedCount = permissionActions.filter((action) => isAllowed(props.permissions, schema.id, action)).length;
+        return (
+          <details className="permission-card" key={schema.id} open={index === 0}>
+            <summary>
+              <span>
+                <strong>{schema.name}</strong>
+                <code>/api/content/{schema.slug}</code>
+              </span>
+              <span>{allowedCount}/{permissionActions.length} allowed</span>
+            </summary>
+            <div className="permission-card-body">
+              <p className="permission-help">getAll = list API, get = one entry API, realtime = WebSocket subscribe, manage = all actions for this API.</p>
+              {permissionActions.map((action) => (
+                <PermissionToggle
+                  action={action}
+                  allowed={isAllowed(props.permissions, schema.id, action)}
+                  key={action}
+                  onChange={(allowed) => props.toggle(schema.id, action, allowed)}
+                />
+              ))}
+            </div>
+          </details>
+        );
+      })}
     </div>
   );
 }

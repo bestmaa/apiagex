@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { adminThemeStorageKey, type AdminTheme } from "../theme.type";
 
 function readTheme(): AdminTheme {
-  return localStorage.getItem(adminThemeStorageKey) === "dark" ? "dark" : "light";
+  return localStorage.getItem(adminThemeStorageKey) === "light" ? "light" : "dark";
 }
 
 function applyTheme(theme: AdminTheme) {

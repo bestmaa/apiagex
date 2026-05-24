@@ -1,0 +1,16 @@
+{
+  "name": "@apiagex/docs-site",
+  "version": "0.9.13",
+  "description": "VitePress product documentation site for Apiagex.",
+  "type": "module",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "dev": "vitepress dev docs --host 127.0.0.1",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs --host 127.0.0.1"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}

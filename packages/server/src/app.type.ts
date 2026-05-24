@@ -21,6 +21,8 @@ export type ApiRootResponse = {
 
 export type CreateServerOptions = {
   adminAuth?: "disabled" | "required";
+  apiLogMaxBytes?: number;
+  apiLogsPath?: string;
   database?: ApiagexDatabase | SqliteDatabase;
   databasePath?: string;
   customRoutes?: RegisterApiagexCustomRoutes;

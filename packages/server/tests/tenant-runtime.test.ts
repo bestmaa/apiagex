@@ -11,6 +11,7 @@ import { createServer } from "../src/app.js";
 import { tenantLookupFromRecords } from "../src/tenant-context.js";
 
 const tempDirs: string[] = [];
+const tenantRuntimeTimeoutMs = 15_000;
 
 describe("tenant-aware runtime", () => {
   afterEach(async () => {
@@ -60,7 +61,7 @@ describe("tenant-aware runtime", () => {
 
     await server.close();
     await Promise.all(Object.values(dbBySlug).map((db) => db.close()));
-  });
+  }, tenantRuntimeTimeoutMs);
 
   it("routes content APIs to the resolved tenant database", async () => {
     const { dbBySlug, tenants } = await tenantFixture();
@@ -109,7 +110,7 @@ describe("tenant-aware runtime", () => {
 
     await server.close();
     await Promise.all(Object.values(dbBySlug).map((db) => db.close()));
-  });
+  }, tenantRuntimeTimeoutMs);
 
   it("routes tenant media uploads to the resolved tenant upload folder", async () => {
     const { dbBySlug, tenants, uploadsRoot } = await tenantFixture();
@@ -148,7 +149,7 @@ describe("tenant-aware runtime", () => {
 
     await server.close();
     await Promise.all(Object.values(dbBySlug).map((db) => db.close()));
-  }, 15_000);
+  }, tenantRuntimeTimeoutMs);
 
   it("keeps automation tokens tenant-local", async () => {
     const { dbBySlug, tenants } = await tenantFixture();
@@ -199,7 +200,7 @@ describe("tenant-aware runtime", () => {
 
     await server.close();
     await Promise.all(Object.values(dbBySlug).map((db) => db.close()));
-  });
+  }, tenantRuntimeTimeoutMs);
 
   it("applies AI plans only to the resolved tenant database", async () => {
     const { dbBySlug, tenants } = await tenantFixture();
@@ -268,7 +269,7 @@ describe("tenant-aware runtime", () => {
 
     await server.close();
     await Promise.all(Object.values(dbBySlug).map((db) => db.close()));
-  });
+  }, tenantRuntimeTimeoutMs);
 
   it("exports and imports tenant templates without crossing tenant data", async () => {
     const { dbBySlug, tenants } = await tenantFixture();
@@ -314,7 +315,7 @@ describe("tenant-aware runtime", () => {
 
     await server.close();
     await Promise.all(Object.values(dbBySlug).map((db) => db.close()));
-  });
+  }, tenantRuntimeTimeoutMs);
 
   it("keeps realtime and webhook configuration tenant-local", async () => {
     const { dbBySlug, tenants } = await tenantFixture();
@@ -378,7 +379,7 @@ describe("tenant-aware runtime", () => {
 
     await server.close();
     await Promise.all(Object.values(dbBySlug).map((db) => db.close()));
-  });
+  }, tenantRuntimeTimeoutMs);
 
   it("exposes tenant labels to rate limit and metrics hooks", async () => {
     const { dbBySlug, tenants } = await tenantFixture();
@@ -428,7 +429,7 @@ describe("tenant-aware runtime", () => {
 
     await server.close();
     await Promise.all(Object.values(dbBySlug).map((db) => db.close()));
-  });
+  }, tenantRuntimeTimeoutMs);
 });
 
 async function tenantFixture(): Promise<{
