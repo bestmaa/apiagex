@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AddressInfo } from "node:net";
+import { readFileSync } from "node:fs";
 import { mkdir, mkdtemp, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -24,7 +25,7 @@ describe("apiagex runtime CLI", () => {
     const result = await runRuntimeCli(["--version"]);
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("apiagex 0.8.21");
+    expect(result.stdout).toContain(`apiagex ${serverPackageVersion()}`);
   });
 
   it("runs a health smoke check without a long-running server", async () => {
@@ -232,3 +233,10 @@ describe("apiagex runtime CLI", () => {
     }
   }, 15_000);
 });
+
+function serverPackageVersion(): string {
+  const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as {
+    version: string;
+  };
+  return packageJson.version;
+}

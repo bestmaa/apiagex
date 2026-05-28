@@ -2,6 +2,7 @@ import {
   APIAGEX_MCP_TOOL_NAMES,
   type ApiagexMcpToolName,
 } from "./mcp-tool-contract.type.js";
+import { readApiagexPackageVersion } from "./package-version.js";
 
 export type ApiagexMcpRunnerOptions = {
   baseUrl: string;
@@ -55,7 +56,7 @@ export async function handleApiagexMcpJsonRpcMessage(
       result: {
         capabilities: { tools: {} },
         protocolVersion: "2024-11-05",
-        serverInfo: { name: "apiagex-mcp", version: "0.8.21" },
+        serverInfo: { name: "apiagex-mcp", version: readApiagexPackageVersion() },
       },
     };
   }

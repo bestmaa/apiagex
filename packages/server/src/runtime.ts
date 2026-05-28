@@ -20,8 +20,9 @@ import {
 } from "@apiagex/database";
 import type { RuntimeCliOptions, RuntimeCliResult, StartedApiagexServer, StartServerOptions } from "./runtime.type.js";
 import { TenantConnectionCache } from "./tenant-connection-cache.js";
+import { readApiagexPackageVersion } from "./package-version.js";
 
-const runtimeVersion = "0.8.21";
+const runtimeVersion = readApiagexPackageVersion();
 
 export async function startApiagex(options: StartServerOptions = {}): Promise<StartedApiagexServer | undefined> {
   return startApiagexServer(options);

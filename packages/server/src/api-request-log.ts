@@ -81,7 +81,12 @@ async function activeLogFile(options: ApiRequestLogOptions): Promise<string> {
   const files = await listLogFiles(options.logsPath);
   const latest = files.at(-1);
   if (latest && latest.bytes < maxFileBytes(options)) return join(options.logsPath, latest.name);
-  return join(options.logsPath, `api-${new Date().toISOString().replaceAll(/[:.]/g, "-")}.jsonl`);
+  return join(options.logsPath, nextLogFileName());
+}
+
+function nextLogFileName(): string {
+  const timestamp = new Date().toISOString().replaceAll(/[:.]/g, "-");
+  return `api-${timestamp}-${process.hrtime.bigint()}.jsonl`;
 }
 
 async function listLogFiles(logsPath: string): Promise<ApiRequestLogFile[]> {

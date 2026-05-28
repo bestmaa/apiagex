@@ -1,6 +1,6 @@
 {
   "name": "@apiagex/docs-site",
-  "version": "0.9.13",
+  "version": "0.9.14",
   "description": "VitePress product documentation site for Apiagex.",
   "type": "module",
   "license": "MIT",

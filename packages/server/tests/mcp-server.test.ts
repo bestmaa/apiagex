@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import {
   createAutomationToken,
@@ -12,6 +13,19 @@ import {
 } from "../src/mcp-server.js";
 
 describe("Apiagex MCP server", () => {
+  it("reports the package version during initialize", async () => {
+    const initialized = await handleApiagexMcpJsonRpcMessage(
+      { id: 1, jsonrpc: "2.0", method: "initialize" },
+      { baseUrl: "http://127.0.0.1:4000" },
+    );
+
+    expect(initialized).toMatchObject({
+      result: {
+        serverInfo: { name: "apiagex-mcp", version: serverPackageVersion() },
+      },
+    });
+  });
+
   it("lists MCP tools and calls Apiagex through secure HTTP APIs", async () => {
     const database = openMigratedSqliteAdapter();
     const token = await createAutomationToken(database, {
@@ -120,4 +134,11 @@ function echoWorkflowDefinition(path: string) {
     startNodeId: "start",
     version: 1,
   };
+}
+
+function serverPackageVersion(): string {
+  const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as {
+    version: string;
+  };
+  return packageJson.version;
 }
