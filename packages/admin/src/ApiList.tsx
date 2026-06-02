@@ -454,7 +454,7 @@ function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
         </div>
         <span>{schema.fields.length} fields</span>
       </div>
-      <p className="api-rbac-note">Role permissions must allow the action. Send <code>x-apiagex-role-id: ROLE_ID</code> or <code>Authorization: Bearer TOKEN</code>; blocked requests return <code>API_PERMISSION_DENIED</code>.</p>
+      <p className="api-rbac-note">Role permissions must allow the action. Content users call <code>POST /api/auth/login-user</code> and send <code>Authorization: Bearer TOKEN</code>; public access works only when the public role allows it.</p>
       <ul className="api-endpoint-list">
         {contentActions.map((action) => (
           <EndpointListItem
@@ -469,7 +469,7 @@ function ApiExplorerRow({ schema }: { schema: SchemaRecord }) {
         <ApiExample title="Create or update payload" value={{ data: sampleData(schema.fields) }} />
         <ApiExample title="Populate routes" value={populateExamples(schema.slug, schema.fields)} />
         <ApiExample title="Response examples" value={responseExamples(schema)} />
-        <ApiExample title="RBAC request hint" value={{ headers: { authorization: "Bearer API_TOKEN", "x-apiagex-role-id": "ROLE_ID" }, blocked: { ok: false, error: "API_PERMISSION_DENIED" } }} />
+        <ApiExample title="RBAC request hint" value={{ login: "POST /api/auth/login-user", headers: { authorization: "Bearer CONTENT_USER_OR_API_TOKEN" }, blocked: { ok: false, error: "API_PERMISSION_DENIED" } }} />
       </div>
     </article>
   );

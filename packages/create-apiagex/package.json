@@ -1,6 +1,6 @@
 {
   "name": "create-apiagex",
-  "version": "0.9.14",
+  "version": "0.9.15",
   "description": "Installer CLI for creating Apiagex CMS projects.",
   "type": "module",
   "license": "MIT",

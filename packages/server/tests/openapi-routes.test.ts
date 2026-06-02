@@ -36,14 +36,19 @@ describe("OpenAPI and Swagger routes", () => {
       "#/components/schemas/ArticleMutationRequest",
     );
     expect(spec.paths["/api/content/article/{entryId}"].delete.summary).toBe("Delete one Article entry");
+    expect(spec.paths["/api/auth/login-user"].post).toMatchObject({
+      summary: "Log in a content API user",
+      tags: ["Content Auth"],
+    });
     expect(spec.paths["/api/admin/schemas"].post.summary).toBe("Create an admin schema");
     expect(spec.paths["/api/admin/settings/api-docs"].put.summary).toBe("Enable or disable Swagger/OpenAPI visibility");
     expect(spec.components.securitySchemes).toMatchObject({
-      bearerAuth: { type: "http", scheme: "bearer" },
+      bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "API_TOKEN_OR_CONTENT_USER_TOKEN" },
       apiTokenHeader: { type: "apiKey", name: "x-apiagex-api-token" },
       adminBearerAuth: { type: "http", scheme: "bearer" },
       roleIdHeader: { type: "apiKey", name: "x-apiagex-role-id" },
     });
+    expect(spec.components.schemas.ContentUserAuthResponse.required).toEqual(["ok", "token", "tokenType", "expiresAt", "user"]);
     expect(spec.components.schemas.ArticleData).toMatchObject({
       additionalProperties: false,
       required: ["title"],
@@ -82,6 +87,7 @@ describe("OpenAPI and Swagger routes", () => {
 
     expect(response.statusCode).toBe(200);
     expect(spec.paths["/api/content/article"]).toBeDefined();
+    expect(spec.paths["/api/auth/login-user"]).toBeDefined();
     expect(spec.paths["/api/admin/schemas"]).toBeUndefined();
   });
 

@@ -12,9 +12,9 @@ import {
   listRoles,
   pruneRealtimeEvents,
   recordRealtimeEvent,
-  resolveApiToken,
   type ApiagexDatabase,
 } from "@apiagex/database";
+import { resolveApiRoleCredential } from "./api-role-auth.js";
 import type {
   RealtimeBroker,
   RealtimeConnectionSnapshot,
@@ -142,9 +142,9 @@ export function createRealtimeBroker(database: ApiagexDatabase): RealtimeBroker 
     }
     const token = url.searchParams.get("token")?.trim();
     if (token) {
-      const apiToken = await resolveApiToken(database, token);
-      if (!apiToken) return { allowed: false, error: "API_TOKEN_INVALID" };
-      return { allowed: await canRealtimeSubscribe(apiToken.roleId, schemaId) };
+      const credential = await resolveApiRoleCredential(database, token);
+      if (!credential) return { allowed: false, error: "API_TOKEN_INVALID" };
+      return { allowed: await canRealtimeSubscribe(credential.roleId, schemaId) };
     }
     const roleId = url.searchParams.get("roleId")?.trim();
     if (roleId) return { allowed: await canRealtimeSubscribe(roleId, schemaId) };

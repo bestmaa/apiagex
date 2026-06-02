@@ -33,9 +33,11 @@ describe("MVP release smoke", () => {
 
     const allowedLogin = await loginUser(server, "reader@apiagex.local");
     const blockedLogin = await loginUser(server, "blocked@apiagex.local");
-    const allowed = await readContent(server, allowedLogin.roleId);
-    const blocked = await readContent(server, blockedLogin.roleId);
+    const allowed = await readContent(server, allowedLogin.token);
+    const blocked = await readContent(server, blockedLogin.token);
 
+    expect(allowedLogin.roleId).toBe(allowedRole.id);
+    expect(allowedLogin.token).toMatch(/^agxu_/);
     expect(allowed.statusCode).toBe(200);
     expect(blocked.statusCode).toBe(403);
   });
@@ -89,7 +91,7 @@ describe("MVP release smoke", () => {
     const allowed = await server.inject({
       method: "GET",
       url: `/api/content/smoke-book/${bookId}?populate=relations`,
-      headers: { "x-apiagex-role-id": allowedLogin.roleId },
+      headers: { authorization: `Bearer ${allowedLogin.token}` },
     });
     expect(allowed.statusCode).toBe(200);
     expect(allowed.json().entry.data.author.data.name).toBe("Octavia Butler");
@@ -97,7 +99,7 @@ describe("MVP release smoke", () => {
     const blocked = await server.inject({
       method: "GET",
       url: `/api/content/smoke-book/${bookId}?populate=relations`,
-      headers: { "x-apiagex-role-id": blockedLogin.roleId },
+      headers: { authorization: `Bearer ${blockedLogin.token}` },
     });
     expect(blocked.statusCode).toBe(403);
     expect(blocked.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
@@ -232,13 +234,14 @@ async function loginUser(server: ReturnType<typeof createServer>, email: string)
     url: "/api/auth/login-user",
     payload: { email, password: "UserPass123!" },
   });
-  return response.json().user as { roleId: string };
+  const body = response.json() as { token: string; user: { roleId: string } };
+  return { roleId: body.user.roleId, token: body.token };
 }
 
-async function readContent(server: ReturnType<typeof createServer>, roleId: string) {
+async function readContent(server: ReturnType<typeof createServer>, token: string) {
   return server.inject({
     method: "GET",
     url: "/api/content/article",
-    headers: { "x-apiagex-role-id": roleId },
+    headers: { authorization: `Bearer ${token}` },
   });
 }

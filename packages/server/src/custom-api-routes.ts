@@ -4,11 +4,11 @@ import {
   canRoleAccessCustomApi,
   getCustomApiRouteByMethodPath,
   listRoles,
-  resolveApiToken,
   syncCustomApiRoutes,
   type ApiagexDatabase,
   type SyncCustomApiRouteInput,
 } from "@apiagex/database";
+import { apiRoleTokenFromRequest, resolveApiRoleCredential } from "./api-role-auth.js";
 import { createCustomRouteContext } from "./custom-routes.js";
 import type { RegisterApiagexCustomRoutes } from "./custom-routes.type.js";
 
@@ -85,11 +85,11 @@ async function customApiAccess(
   request: FastifyRequest,
   routeId: string,
 ): Promise<{ allowed: boolean; error?: string }> {
-  const token = requestApiToken(request);
+  const token = apiRoleTokenFromRequest(request);
   if (token) {
-    const apiToken = await resolveApiToken(database, token);
-    if (!apiToken) return { allowed: false, error: "API_TOKEN_INVALID" };
-    return { allowed: await canRoleAccessCustomApi(database, apiToken.roleId, routeId) };
+    const credential = await resolveApiRoleCredential(database, token);
+    if (!credential) return { allowed: false, error: "API_TOKEN_INVALID" };
+    return { allowed: await canRoleAccessCustomApi(database, credential.roleId, routeId) };
   }
   const roleId = request.headers["x-apiagex-role-id"];
   if (!roleId) return { allowed: await canPublicCustomApiAccess(database, routeId) };
@@ -166,16 +166,4 @@ function humanLabel(value: string): string {
 
 function slugSegment(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "route";
-}
-
-function requestApiToken(request: FastifyRequest): string | undefined {
-  const directToken = headerString(request.headers["x-apiagex-api-token"]);
-  if (directToken) return directToken;
-  const authorization = headerString(request.headers.authorization);
-  if (!authorization?.toLowerCase().startsWith("bearer ")) return undefined;
-  return authorization.slice(7).trim() || "__empty_api_token__";
-}
-
-function headerString(value: string | string[] | undefined): string | undefined {
-  return typeof value === "string" ? value.trim() : undefined;
 }

@@ -1,6 +1,6 @@
 {
   "name": "@apiagex/database",
-  "version": "0.9.14",
+  "version": "0.9.15",
   "description": "Kysely database adapter package for Apiagex CMS.",
   "type": "module",
   "license": "MIT",

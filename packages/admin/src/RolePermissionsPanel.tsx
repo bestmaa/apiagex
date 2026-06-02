@@ -46,6 +46,7 @@ export function RoleList(props: {
       {roles.map((role) => {
         const rolePermissions = role.id === activeRoleId ? permissions : permissionsByRoleId[role.id] ?? [];
         const allowedCount = rolePermissions.filter((permission) => permission.allowed).length;
+        const isPublicRole = role.name === "public";
         return (
           <article
             aria-current={role.id === activeRoleId ? "true" : undefined}
@@ -66,12 +67,16 @@ export function RoleList(props: {
               <span>{role.description || "No description"}</span>
             </div>
             <div className="role-row-badges">
-              <span>API role</span>
+              <span>{isPublicRole ? "Public no-login" : "API role"}</span>
               {role.id === activeRoleId ? <span>Active</span> : <span>Click to inspect</span>}
               <span>{allowedCount}/{possibleCount} allowed</span>
             </div>
             <PermissionSummaryBadges permissions={rolePermissions} />
-            <p>Use this role id in content API requests after permissions are saved.</p>
+            <p>
+              {isPublicRole
+                ? "Allowed actions are reachable without login or Authorization headers."
+                : "Users assigned to this role log in with /api/auth/login-user and send the returned token as Authorization: Bearer TOKEN."}
+            </p>
           </article>
         );
       })}

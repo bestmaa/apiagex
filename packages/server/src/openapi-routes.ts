@@ -94,7 +94,10 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
     servers: [{ url: "/" }],
     tags: [
       ...(settings.contentEnabled
-        ? [{ name: "Content", description: "Generated content APIs. Requests need API permissions unless the public role allows the action." }]
+        ? [
+            { name: "Content Auth", description: "Public content-user login endpoint for protected generated content APIs." },
+            { name: "Content", description: "Generated content APIs. Requests need API permissions unless the public role explicitly allows the action." },
+          ]
         : []),
       ...(settings.contentEnabled
         ? [{ name: "Custom APIs", description: "Project custom APIs discovered from code and mounted under /api/custom." }]
@@ -135,6 +138,7 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
         },
       },
       ...(settings.adminEnabled ? [adminPaths()] : []),
+      ...(settings.contentEnabled ? [contentAuthPaths()] : []),
       ...(settings.contentEnabled ? [Object.fromEntries(schemas.flatMap((schema) => contentPaths(schema)))] : []),
       ...(settings.contentEnabled ? [customApiPaths(customApiRoutes)] : []),
       ...(settings.contentEnabled ? [workflowApiPaths(workflows)] : []),
@@ -142,7 +146,8 @@ export async function buildOpenApiDocument(database: ApiagexDatabase): Promise<O
     components: {
       securitySchemes: {
         bearerAuth: {
-          bearerFormat: "API_TOKEN",
+          bearerFormat: "API_TOKEN_OR_CONTENT_USER_TOKEN",
+          description: "Use an API role token from Admin API Keys, or the content-user token returned by /api/auth/login-user.",
           scheme: "bearer",
           type: "http",
         },
@@ -268,7 +273,7 @@ function contentPaths(schema: SchemaRecord): Array<[string, OpenApiSchema]> {
         get: {
           tags: ["Content", schema.name],
           summary: `List ${schema.name} entries`,
-          description: "Requires getAll permission, or public getAll permission for no-token access.",
+          description: "Requires getAll permission through a content-user token or API token. Public getAll permission enables no-token access.",
           security: apiSecurity(),
           parameters: [queryParameters.fields, queryParameters.search, queryParameters.limit, queryParameters.offset, queryParameters.populate],
           responses: okResponse({ $ref: `#/components/schemas/${names.listResponse}` }),
@@ -276,7 +281,7 @@ function contentPaths(schema: SchemaRecord): Array<[string, OpenApiSchema]> {
         post: {
           tags: ["Content", schema.name],
           summary: `Create ${schema.name} entry`,
-          description: "Requires create permission, or public create permission for no-token access.",
+          description: "Requires create permission through a content-user token or API token. Public create permission enables no-token access.",
           security: apiSecurity(),
           requestBody: requestBody(names.mutationRequest),
           responses: okResponse({ $ref: `#/components/schemas/${names.entryResponse}` }),
@@ -298,7 +303,7 @@ function contentPaths(schema: SchemaRecord): Array<[string, OpenApiSchema]> {
         get: {
           tags: ["Content", schema.name],
           summary: `Read one ${schema.name} entry`,
-          description: "Requires get permission, or public get permission for no-token access.",
+          description: "Requires get permission through a content-user token or API token. Public get permission enables no-token access.",
           security: apiSecurity(),
           parameters: [queryParameters.fields, queryParameters.populate],
           responses: okResponse({ $ref: `#/components/schemas/${names.entryResponse}` }),
@@ -306,7 +311,7 @@ function contentPaths(schema: SchemaRecord): Array<[string, OpenApiSchema]> {
         put: {
           tags: ["Content", schema.name],
           summary: `Update one ${schema.name} entry`,
-          description: "Requires update permission, or public update permission for no-token access.",
+          description: "Requires update permission through a content-user token or API token. Public update permission enables no-token access.",
           security: apiSecurity(),
           requestBody: requestBody(names.mutationRequest),
           responses: okResponse({ $ref: `#/components/schemas/${names.entryResponse}` }),
@@ -314,7 +319,7 @@ function contentPaths(schema: SchemaRecord): Array<[string, OpenApiSchema]> {
         delete: {
           tags: ["Content", schema.name],
           summary: `Delete one ${schema.name} entry`,
-          description: "Requires delete permission, or public delete permission for no-token access.",
+          description: "Requires delete permission through a content-user token or API token. Public delete permission enables no-token access.",
           security: apiSecurity(),
           responses: okResponse({ $ref: "#/components/schemas/DeleteResponse" }),
         },
@@ -679,10 +684,24 @@ function adminPaths(): Record<string, OpenApiSchema> {
       post: {
         tags: ["Admin Realtime"],
         summary: "Create a one-time browser WebSocket session token",
-        description: "Requires a content API token with realtime permission for the schema. getAll is accepted for backward compatibility.",
+        description: "Requires a content-user token or API token with realtime permission for the schema. getAll is accepted for backward compatibility.",
         security: apiTokenSecurity(),
         requestBody: requestBody("RealtimeSessionRequest"),
         responses: okResponse({ type: "object" }),
+      },
+    },
+  };
+}
+
+function contentAuthPaths(): Record<string, OpenApiSchema> {
+  return {
+    "/api/auth/login-user": {
+      post: {
+        tags: ["Content Auth"],
+        summary: "Log in a content API user",
+        description: "Public login endpoint for content API users. Send the returned token as Authorization: Bearer TOKEN when calling protected generated content APIs.",
+        requestBody: requestBody("AuthRequest"),
+        responses: okResponse({ $ref: "#/components/schemas/ContentUserAuthResponse" }),
       },
     },
   };
@@ -773,6 +792,29 @@ function adminSchemaComponents(): Record<string, OpenApiSchema> {
         user: { type: "object" },
       },
       required: ["ok"],
+    },
+    ContentUserAuthResponse: {
+      type: "object",
+      properties: {
+        ok: { type: "boolean", example: true },
+        token: {
+          type: "string",
+          description: "Signed content-user session token for generated content APIs.",
+        },
+        tokenType: { type: "string", enum: ["content-user"] },
+        expiresAt: { type: "string", format: "date-time" },
+        user: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            email: { type: "string", format: "email" },
+            roleId: { type: "string" },
+            roleName: { type: "string" },
+          },
+          required: ["id", "email", "roleId", "roleName"],
+        },
+      },
+      required: ["ok", "token", "tokenType", "expiresAt", "user"],
     },
     OwnerStatusResponse: {
       type: "object",
@@ -1106,7 +1148,6 @@ function apiSecurity(): OpenApiSchema[] {
   return [
     { bearerAuth: [] },
     { apiTokenHeader: [] },
-    { roleIdHeader: [] },
     {},
   ];
 }

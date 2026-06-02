@@ -95,6 +95,30 @@ describe("custom business route extension", () => {
     expect(paidAgain.json()).toEqual({ ok: false, error: "ORDER_NOT_PAYABLE" });
   });
 
+  it("allows custom APIs with a content user login token", async () => {
+    const server = createServer({
+      adminAuth: "disabled",
+      database: openSqliteDatabase(),
+      async customRoutes(app) {
+        app.get("/reports/sales", async () => ({ ok: true, report: "sales" }));
+      },
+    });
+    const roleId = await ensureApiRole(server, "report-reader");
+    await allowCustomApiForRole(server, roleId, "GET", "/api/custom/reports/sales");
+    await createContentUser(server, "report-reader@apiagex.local", roleId);
+    const login = await loginContentUser(server, "report-reader@apiagex.local");
+
+    const response = await server.inject({
+      method: "GET",
+      url: "/api/custom/reports/sales",
+      headers: { authorization: `Bearer ${login.token}` },
+    });
+
+    expect(login.token).toMatch(/^agxu_/);
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ ok: true, report: "sales" });
+  });
+
   it("supports slug-based entry helpers for custom routes", async () => {
     const server = createServer({
       adminAuth: "disabled",
@@ -292,4 +316,30 @@ async function allowCustomApiForRole(
     url: `/api/admin/roles/${roleId}/custom-api-permissions`,
   });
   expect(save.statusCode).toBe(200);
+}
+
+async function createContentUser(
+  server: ReturnType<typeof createServer>,
+  email: string,
+  roleId: string,
+): Promise<void> {
+  const response = await server.inject({
+    method: "POST",
+    payload: { email, password: "UserPass123!", roleId },
+    url: "/api/admin/users",
+  });
+  expect(response.statusCode).toBe(200);
+}
+
+async function loginContentUser(
+  server: ReturnType<typeof createServer>,
+  email: string,
+): Promise<{ token: string }> {
+  const response = await server.inject({
+    method: "POST",
+    payload: { email, password: "UserPass123!" },
+    url: "/api/auth/login-user",
+  });
+  expect(response.statusCode).toBe(200);
+  return response.json() as { token: string };
 }

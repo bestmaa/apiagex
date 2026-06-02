@@ -18,15 +18,16 @@ describe("MVP RBAC flow", () => {
     const allowed = await server.inject({
       method: "GET",
       url: "/api/content/article",
-      headers: { "x-apiagex-role-id": readerLogin.roleId },
+      headers: { authorization: `Bearer ${readerLogin.token}` },
     });
     const blocked = await server.inject({
       method: "GET",
       url: "/api/content/article",
-      headers: { "x-apiagex-role-id": blockedLogin.roleId },
+      headers: { authorization: `Bearer ${blockedLogin.token}` },
     });
 
     expect(readerLogin.roleId).toBe(readerRoleId);
+    expect(readerLogin.token).toMatch(/^agxu_/);
     expect(allowed.statusCode).toBe(200);
     expect(allowed.json().entries[0].data.title).toBe("RBAC visible");
     expect(blocked.statusCode).toBe(403);
@@ -181,13 +182,14 @@ async function createUser(
 async function loginUser(
   server: ReturnType<typeof createServer>,
   email: string,
-): Promise<{ roleId: string }> {
+): Promise<{ roleId: string; token: string }> {
   const response = await server.inject({
     method: "POST",
     url: "/api/auth/login-user",
     payload: { email, password: "UserPass123!" },
   });
-  return response.json().user as { roleId: string };
+  const body = response.json() as { token: string; user: { roleId: string } };
+  return { roleId: body.user.roleId, token: body.token };
 }
 
 async function createAdminEntry(

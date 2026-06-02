@@ -58,6 +58,19 @@ export function UserManager() {
     <section aria-labelledby="user-manager-title">
       <h2 id="user-manager-title">Users</h2>
       <p>Create content API users or control admin users and assign exactly one role.</p>
+      {mode === "content" ? (
+        <div className="content-auth-guide" aria-label="Content user login flow">
+          <div>
+            <strong>Content login endpoint</strong>
+            <code>POST /api/auth/login-user</code>
+          </div>
+          <div>
+            <strong>Protected API header</strong>
+            <code>Authorization: Bearer CONTENT_USER_TOKEN</code>
+          </div>
+          <p>Public access works only when the public role is explicitly allowed in API Permissions.</p>
+        </div>
+      ) : null}
       <div className="segmented-control" aria-label="User type">
         <button className={mode === "content" ? "is-active" : ""} type="button" onClick={() => setMode("content")}>
           Content users
@@ -133,8 +146,8 @@ function UserList({ mode, users }: { mode: UserMode; users: UserRecord[] }) {
             <strong>{user.email}</strong>
             <span>{mode === "content" ? "API" : "Admin"} role: {user.roleName}</span>
           </div>
-          {mode === "content" ? <code>x-apiagex-role-id: {user.roleId}</code> : <code>control role: {user.roleName}</code>}
-          <p>{mode === "content" ? "Use this user for generated content API login flows." : "Use this user for future Admin UI control-plane login flows."}</p>
+          {mode === "content" ? <code>{"login-user -> bearer token"}</code> : <code>control role: {user.roleName}</code>}
+          <p>{mode === "content" ? "After login, Apiagex verifies the token and applies this user's API role permissions." : "Use this user for future Admin UI control-plane login flows."}</p>
         </article>
       ))}
     </section>

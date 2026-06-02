@@ -7,7 +7,6 @@ import {
   getSchemaBySlug,
   listRoles,
   queryEntries,
-  resolveApiToken,
   updateEntry,
   type ApiagexDatabase,
   type EntryListOptions,
@@ -30,6 +29,7 @@ import {
 } from "./relation-populate.js";
 import type { RealtimeBroker } from "./realtime-broker.type.js";
 import type { WebhookDispatcherOptions } from "./webhook-dispatcher.type.js";
+import { apiRoleTokenFromRequest, resolveApiRoleCredential } from "./api-role-auth.js";
 
 export function registerContentRoutes(
   server: FastifyInstance,
@@ -169,11 +169,11 @@ async function canAccess(
   schema: SchemaRecord,
   action: "getAll" | "get" | "create" | "update" | "delete",
 ): Promise<{ allowed: boolean; error?: string }> {
-  const token = requestApiToken(request);
+  const token = apiRoleTokenFromRequest(request);
   if (token) {
-    const apiToken = await resolveApiToken(database, token);
-    if (!apiToken) return { allowed: false, error: "API_TOKEN_INVALID" };
-    return { allowed: await canRoleAccess(database, apiToken.roleId, schema.id, action) };
+    const credential = await resolveApiRoleCredential(database, token);
+    if (!credential) return { allowed: false, error: "API_TOKEN_INVALID" };
+    return { allowed: await canRoleAccess(database, credential.roleId, schema.id, action) };
   }
   const roleId = request.headers["x-apiagex-role-id"];
   if (!roleId) return { allowed: await canPublicAccess(database, schema.id, action) };
@@ -210,18 +210,6 @@ async function populateContentEntries(
   return populateEntriesRelations(database, schema, entries, async (targetSchema) =>
     (await canAccess(database, request, targetSchema, "get")).allowed,
   );
-}
-
-function requestApiToken(request: FastifyRequest): string | undefined {
-  const directToken = headerString(request.headers["x-apiagex-api-token"]);
-  if (directToken) return directToken;
-  const authorization = headerString(request.headers.authorization);
-  if (!authorization?.toLowerCase().startsWith("bearer ")) return undefined;
-  return authorization.slice(7).trim() || "__empty_api_token__";
-}
-
-function headerString(value: string | string[] | undefined): string | undefined {
-  return typeof value === "string" ? value.trim() : undefined;
 }
 
 function forbidden(reply: FastifyReply, error = "API_PERMISSION_DENIED"): FastifyReply {

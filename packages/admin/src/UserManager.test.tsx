@@ -71,6 +71,10 @@ describe("UserManager", () => {
     expect(container.textContent).toContain("Content user list");
     expect(container.textContent).toContain(existingUser.email);
     expect(container.textContent).toContain("Create content API users or control admin users and assign exactly one role.");
+    expect(container.textContent).toContain("POST /api/auth/login-user");
+    expect(container.textContent).toContain("Authorization: Bearer CONTENT_USER_TOKEN");
+    expect(container.textContent).toContain("login-user -> bearer token");
+    expect(container.textContent).not.toContain("x-apiagex-role-id");
     expect(container.textContent).not.toContain("English:");
     expect(container.textContent).not.toContain("Hinglish:");
 

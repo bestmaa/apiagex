@@ -106,6 +106,13 @@ describe("project feature audit", () => {
       payload: { email: "audit-reader@apiagex.local", password: "UserPass123!" },
     }));
     expect(userLogin.json().user.roleId).toBe(readerRole.id);
+    expect(userLogin.json().token).toMatch(/^agxu_/);
+
+    await expectStatus(server.inject({
+      headers: { authorization: `Bearer ${userLogin.json().token}` },
+      method: "GET",
+      url: "/api/content/audit-article",
+    }), 200);
 
     const token = await createToken(server, readerRole.id, "Audit reader token");
     const blockedToken = await createToken(server, blockedRole.id, "Blocked token");

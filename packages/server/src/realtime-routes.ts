@@ -6,10 +6,10 @@ import {
   listRealtimeSettings,
   listRecentRealtimeEvents,
   listSchemas,
-  resolveApiToken,
   setRealtimeConfig,
   type ApiagexDatabase,
 } from "@apiagex/database";
+import { resolveApiRoleCredential } from "./api-role-auth.js";
 import type { RealtimeBroker } from "./realtime-broker.type.js";
 import type { RealtimeConfigBody, RealtimeConfigParams, RealtimeSessionBody } from "./realtime-routes.type.js";
 
@@ -54,13 +54,13 @@ export function registerRealtimeRoutes(
     }
     const schema = await getSchemaBySlug(database, schemaSlug);
     if (!schema) return reply.code(404).send({ ok: false, error: "SCHEMA_NOT_FOUND" });
-    const apiToken = await resolveApiToken(database, bearerToken(request.headers.authorization));
-    if (!apiToken) return reply.code(401).send({ ok: false, error: "API_TOKEN_INVALID" });
-    if (!(await canRealtimeSubscribe(database, apiToken.roleId, schema.id))) {
+    const credential = await resolveApiRoleCredential(database, bearerToken(request.headers.authorization));
+    if (!credential) return reply.code(401).send({ ok: false, error: "API_TOKEN_INVALID" });
+    if (!(await canRealtimeSubscribe(database, credential.roleId, schema.id))) {
       return reply.code(403).send({ ok: false, error: "API_PERMISSION_DENIED" });
     }
     const input = {
-      roleId: apiToken.roleId,
+      roleId: credential.roleId,
       schemaId: schema.id,
       schemaSlug: schema.slug,
       ...(body.ttlSeconds === undefined ? {} : { ttlSeconds: body.ttlSeconds }),

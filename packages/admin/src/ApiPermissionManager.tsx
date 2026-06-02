@@ -94,7 +94,7 @@ export function ApiPermissionManager() {
     <section aria-labelledby="api-permission-manager-title">
       <h2 id="api-permission-manager-title">API Permissions</h2>
       <p>All generated content APIs are blocked by default. Allow actions per role and schema here.</p>
-      <p>Select <strong>public</strong> to open an API without a token. Leave public blocked when the API must require an API token.</p>
+      <p>Select <strong>public</strong> only when an API should open without login. Leave public blocked when the API must require a content-user login token or an API key.</p>
       <RoleList
         activeRoleId={roleId}
         onSelectRole={(nextRoleId) => void changeRole(nextRoleId)}
@@ -115,6 +115,8 @@ export function ApiPermissionManager() {
       </label>
       {activeRole?.name === "public" ? (
         <p className="warning-text">Allowed public actions are reachable without Authorization headers or API tokens.</p>
+      ) : activeRole ? (
+        <p className="helper-text">Users assigned to <strong>{activeRole.name}</strong> can call protected content APIs after <code>POST /api/auth/login-user</code> and <code>Authorization: Bearer TOKEN</code>.</p>
       ) : null}
       <PermissionGrid permissions={permissions} schemas={schemas} toggle={toggle} />
       <button disabled={!roleId || schemas.length === 0} type="button" onClick={() => void savePermissions()}>

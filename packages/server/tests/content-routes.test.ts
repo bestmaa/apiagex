@@ -222,6 +222,47 @@ describe("dynamic content APIs", () => {
     expect(revoked.json()).toEqual({ ok: false, error: "API_TOKEN_INVALID" });
   });
 
+  it("uses content user login tokens to enforce role permissions", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+    const readerRole = await createRole(server, "session-reader");
+    const blockedRole = await createRole(server, "session-blocked");
+    await savePermission(server, readerRole, schemaId, "getAll");
+    await createUser(server, "session-reader@apiagex.local", readerRole);
+    await createUser(server, "session-blocked@apiagex.local", blockedRole);
+    await createAdminEntry(server, schemaId, { title: "Session article" });
+
+    const readerLogin = await loginUser(server, "session-reader@apiagex.local");
+    const blockedLogin = await loginUser(server, "session-blocked@apiagex.local");
+
+    const allowed = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { authorization: `Bearer ${readerLogin.token}` },
+    });
+    const blocked = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { authorization: `Bearer ${blockedLogin.token}` },
+    });
+    const unsigned = await server.inject({
+      method: "GET",
+      url: "/api/content/article",
+      headers: { authorization: `Bearer user:${readerLogin.user.id}:${readerLogin.user.roleId}` },
+    });
+
+    expect(readerLogin.token).toMatch(/^agxu_/);
+    expect(readerLogin.tokenType).toBe("content-user");
+    expect(readerLogin.expiresAt).toEqual(expect.any(String));
+    expect(readerLogin.user).toMatchObject({ roleId: readerRole, roleName: "session-reader" });
+    expect(allowed.statusCode).toBe(200);
+    expect(allowed.json().entries[0].data.title).toBe("Session article");
+    expect(blocked.statusCode).toBe(403);
+    expect(blocked.json()).toEqual({ ok: false, error: "API_PERMISSION_DENIED" });
+    expect(unsigned.statusCode).toBe(403);
+    expect(unsigned.json()).toEqual({ ok: false, error: "API_TOKEN_INVALID" });
+  });
+
   it("validates relation payloads after dynamic write permissions pass", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const authorSchemaId = await createAuthorSchema(server);
@@ -423,6 +464,40 @@ async function createAdminEntry(
     payload: { data },
   });
   return response.json().entry.id as string;
+}
+
+async function createUser(
+  server: ReturnType<typeof createServer>,
+  email: string,
+  roleId: string,
+): Promise<void> {
+  await server.inject({
+    method: "POST",
+    url: "/api/admin/users",
+    payload: { email, password: "UserPass123!", roleId },
+  });
+}
+
+async function loginUser(
+  server: ReturnType<typeof createServer>,
+  email: string,
+): Promise<{
+  expiresAt: string;
+  token: string;
+  tokenType: string;
+  user: { id: string; roleId: string; roleName: string };
+}> {
+  const response = await server.inject({
+    method: "POST",
+    url: "/api/auth/login-user",
+    payload: { email, password: "UserPass123!" },
+  });
+  return response.json() as {
+    expiresAt: string;
+    token: string;
+    tokenType: string;
+    user: { id: string; roleId: string; roleName: string };
+  };
 }
 
 async function createAuthorSchema(server: ReturnType<typeof createServer>): Promise<string> {

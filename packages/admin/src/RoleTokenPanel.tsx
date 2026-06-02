@@ -72,7 +72,7 @@ export function RoleTokenPanel({
   return (
     <section className="settings-panel role-token-panel" aria-labelledby="role-token-title">
       <h3 id="role-token-title"><KeyRound aria-hidden="true" size={18} /> API Tokens</h3>
-      <p>Use tokens for content API calls with <code>Authorization: Bearer TOKEN</code> or <code>x-apiagex-api-token</code>.</p>
+      <p>Use API tokens for server or partner app calls with <code>Authorization: Bearer TOKEN</code> or <code>x-apiagex-api-token</code>. Content users can also log in with <code>/api/auth/login-user</code>.</p>
       {!roleId ? (
         <StateMessage title="No active API role" variant="empty">Select an API role before creating tokens.</StateMessage>
       ) : (

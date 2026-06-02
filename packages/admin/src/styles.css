@@ -1745,6 +1745,31 @@ tr:last-child td {
   padding: var(--admin-space-2) var(--admin-space-4);
 }
 
+.content-auth-guide {
+  background: var(--admin-color-surface);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-md);
+  display: grid;
+  gap: var(--admin-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  padding: var(--admin-space-4);
+}
+
+.content-auth-guide div {
+  display: grid;
+  gap: var(--admin-space-2);
+}
+
+.content-auth-guide strong {
+  color: var(--admin-color-text);
+}
+
+.content-auth-guide p {
+  color: var(--admin-color-text-soft);
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 .user-form {
   background: var(--admin-color-surface);
   border: 1px solid var(--admin-color-border-soft);

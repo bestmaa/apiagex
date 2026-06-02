@@ -218,6 +218,38 @@ describe("realtime WebSocket APIs", () => {
     expect(list.statusCode).toBe(403);
   });
 
+  it("creates realtime sessions with a content user login token", async () => {
+    const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
+    const schemaId = await createArticleSchema(server);
+    const role = await server.inject({ method: "POST", url: "/api/admin/roles", payload: { name: "live-user" } });
+    await server.inject({
+      method: "PUT",
+      url: `/api/admin/roles/${role.json().role.id}/permissions`,
+      payload: { permissions: [{ action: "realtime", allowed: true, schemaId }] },
+    });
+    await server.inject({
+      method: "POST",
+      url: "/api/admin/users",
+      payload: { email: "live-user@apiagex.local", password: "UserPass123!", roleId: role.json().role.id },
+    });
+    const login = await server.inject({
+      method: "POST",
+      url: "/api/auth/login-user",
+      payload: { email: "live-user@apiagex.local", password: "UserPass123!" },
+    });
+
+    const session = await server.inject({
+      method: "POST",
+      url: "/api/realtime/session",
+      headers: { authorization: `Bearer ${login.json().token}` },
+      payload: { schema: "article" },
+    });
+
+    expect(login.json().token).toMatch(/^agxu_/);
+    expect(session.statusCode).toBe(200);
+    expect(session.json().token).toMatch(/^rt_/);
+  });
+
   it("keeps getAll as a backward-compatible realtime fallback", async () => {
     const server = createServer({ adminAuth: "disabled", database: openSqliteDatabase() });
     const schemaId = await createArticleSchema(server);

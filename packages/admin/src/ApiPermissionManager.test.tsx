@@ -59,6 +59,7 @@ describe("ApiPermissionManager", () => {
     expect(container.textContent).toContain("public - open/no token");
     expect(container.textContent).toContain("realtime = WebSocket subscribe");
     expect(container.textContent).toContain("Allowed public actions are reachable without Authorization headers");
+    expect(container.textContent).toContain("content-user login token or an API key");
     expect(listRolePermissions).toHaveBeenCalledWith("role_public");
   });
 
@@ -86,6 +87,8 @@ describe("ApiPermissionManager", () => {
     const select = container.querySelector<HTMLSelectElement>("select");
     expect(select?.value).toBe("role_reader");
     expect(listRolePermissions).toHaveBeenCalledWith("role_reader");
+    expect(container.textContent).toContain("POST /api/auth/login-user");
+    expect(container.textContent).toContain("Authorization: Bearer TOKEN");
   });
 });
 
